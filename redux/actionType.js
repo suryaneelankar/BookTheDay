@@ -1,0 +1,1 @@
+export const GET_LOGINUSERID = 'GET_LOGINUSERID';
