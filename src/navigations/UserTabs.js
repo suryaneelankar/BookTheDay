@@ -4,6 +4,10 @@ import React from 'react';
 import {Image, Platform,View, TouchableOpacity, Text, Button} from 'react-native';
 import { useDispatch } from 'react-redux';
 import { getLoginUserId } from '../../redux/actions';
+import HomeDashboard from '../screens/Home';
+import Events from '../screens/Events';
+import Categories from '../screens/Categories';
+import MyBox from '../screens/MyBox';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -12,30 +16,6 @@ const UserTabs = () => {
     const dispatch = useDispatch();
 
   
-  const Tab1Screen = ({ navigation }) => {
-    return (
-        <View>
-            <Text>Tab 1 User Home screen</Text>
-            <Button title="Go to Details" onPress={() => navigation.navigate('Details')} />
-        </View>
-    );
-};
-const Tab2Screen = ({ navigation }) => {
-    return (
-        <View>
-            <Text>Tab 2  user Events screen</Text>
-            <Button title="Go to Details" onPress={() => navigation.navigate('Details')} />
-        </View>
-    );
-};
-const Tab3Screen = ({ navigation }) => {
-  return (
-      <View>
-          <Text>Tab 3  user Categories screen</Text>
-          <Button title="Go to Details" onPress={() => navigation.navigate('Details')} />
-      </View>
-  );
-};
 const Tab4Screen = ({ navigation }) => {
   return (
       <View>
@@ -44,9 +24,6 @@ const Tab4Screen = ({ navigation }) => {
       </View>
   );
 };
-
-
-
 
   const StackProfileNavigation = () => {
     return (
@@ -83,31 +60,27 @@ const Tab4Screen = ({ navigation }) => {
   return (
    
     <Tab.Navigator
-    initialRouteName='UserHome'
+    initialRouteName='Homie'
       screenOptions={props => {
         return {
           tabBarShowLabel: false,
-          tabBarActiveTintColor: 'blue', // Change the active tab color
-          tabBarInactiveTintColor: 'white', // Change the inactive tab color
+          // tabBarActiveTintColor: 'blue', // Change the active tab color
+          // tabBarInactiveTintColor: 'white', // Change the inactive tab color
           tabBarStyle: {
             backgroundColor: 'white',
-            height: 40,
+            height: 45,
             position: 'absolute',
-            // bottom: 20,
-            // borderRadius: 90,
-            // marginHorizontal: 25,
-            // ...props.route.name === 'WebViewScreen' ? { display: 'none' } : {},
           },
         };
       }}>
 
      <Tab.Screen
-     name="UserHome"
-     component={Tab1Screen}
+     name="Homie"
+     component={HomeDashboard}
      options={({ focused }) => ({
      tabBarIcon: ({focused}) => (
         <Image
-        source={require('../assets/eventsicon.png')}
+        source={require('../assets/homie.png')}
         style={{
           width: 20,
           height: 20,
@@ -119,9 +92,30 @@ const Tab4Screen = ({ navigation }) => {
     headerShown: false,
   })}
 />
+
+ <Tab.Screen
+  name="Category"
+  component={Categories}
+  options={({ focused }) => ({
+    tabBarIcon: ({focused}) => (
+      
+        <Image
+        source={require('../assets/categories.png')}
+        style={{
+          width: 20,
+          height: 20,
+          marginTop: os === 'ios' ? 30 : 0,
+          tintColor: focused ? 'black' : 'gray',
+        }}
+      />
+    ),
+    headerShown: false,
+  })}
+/>
+
 <Tab.Screen
   name="Events"
-  component={Tab2Screen}
+  component={Events}
   options={({ focused }) => ({
     tabBarIcon: ({focused}) => (
       
@@ -138,25 +132,27 @@ const Tab4Screen = ({ navigation }) => {
     headerShown: false,
   })}
 />
-      <Tab.Screen
-  name="Category"
-  component={Tab3Screen}
+
+<Tab.Screen
+  name="My Box"
+  component={MyBox}
   options={({ focused }) => ({
     tabBarIcon: ({focused}) => (
-      
+     
         <Image
-        source={require('../assets/eventsicon.png')}
-        style={{
-          width: 20,
-          height: 20,
-          marginTop: os === 'ios' ? 30 : 0,
-          tintColor: focused ? 'black' : 'gray',
-        }}
-      />
+          source={require('../assets/Home.png')}
+          style={{
+            width: 20,
+            height: 20,
+            marginTop: os === 'ios' ? 30 : 0,
+            tintColor: focused ? 'black' : 'gray',
+          }}
+        />
     ),
     headerShown: false,
   })}
 />
+
 <Tab.Screen
   name="My Profile"
   component={StackProfileNavigation}
