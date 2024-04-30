@@ -7,6 +7,7 @@ import VendorTabs from "./VendorTabs";
 import ViewTrendingDetails from "../screens/Home/ViewTrendingDetails";
 import CategoriesList from "../screens/Categories/categoriesList";
 import ViewEvents from "../screens/Events/ViewEvents";
+import BookingOverView from "../screens/Bookings/BookingOverView";
 
 const MainNavigation = () => {
 
@@ -33,6 +34,7 @@ const MainNavigation = () => {
                 <Stack.Screen name="ViewTrendingDetails" component={ViewTrendingDetails} options={{ headerShown: true }} />
                 <Stack.Screen name="CategoriesList" component={CategoriesList} options={{ headerShown: false }} />
                 <Stack.Screen name="ViewEvents" component={ViewEvents} options={{ headerShown: true }} />
+                <Stack.Screen name="BookingOverView" component={BookingOverView} options={{ headerShown: false }} />
 
             </Stack.Navigator>
         </NavigationContainer>

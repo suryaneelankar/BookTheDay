@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions, FlatList } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions, FlatList, Pressable } from 'react-native';
 import BASE_URL from "../../apiconfig";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import SwiperFlatList from 'react-native-swiper-flatlist';
@@ -64,10 +64,13 @@ const Events = () => {
             }
         }
 
+        const onPressEventImage = () => {
+            navigation.navigate('ViewEvents', { categoryId: item?._id });
+        }
+
         return (
             <View style={{ marginBottom: 15 }}>
-                <View
-                    style={styles.container}>
+                <View style={styles.container}>
                     <SwiperFlatList
                         index={currentIndex}
                         showPagination
@@ -81,11 +84,13 @@ const Events = () => {
                         style={{ borderRadius: 15 }}
                         onChangeIndex={({ index, prevIndex }) => scrollToFirstonEnd(index)}
                         renderItem={({ item }) => (
-                            <View style={[{ backgroundColor: item, alignSelf: 'center', borderRadius: 15, width: Dimensions.get('window').width - 50, justifyContent: 'center', height: 220 }]}>
+                            <TouchableOpacity style={[{ backgroundColor: item, alignSelf: 'center', borderRadius: 15, width: Dimensions.get('window').width - 50, justifyContent: 'center', height: 220 }]}
+                            onPress={() => onPressEventImage()}
+                            >
                                 <Image source={{ uri: item }} style={styles.image}
                                     resizeMethod="resize"
                                     resizeMode="cover" />
-                            </View>
+                            </TouchableOpacity>
                         )}
                     />
                 </View>
@@ -94,8 +99,8 @@ const Events = () => {
                     style={{ width: Dimensions.get('window').width - 50, alignSelf: 'center' }}>
                     <View style={{ marginTop: 15, flexDirection: 'row', justifyContent: 'space-between', }}>
                         <View>
-                            <Text style={{ fontWeight: '600', color: 'black', fontSize: 16 }}>{item?.name}</Text>
-                            <Text style={{ fontWeight: '600', color: '#696969', fontSize: 12,marginTop:5 }}>Madhapur,Hyderabad</Text>
+                            <Text style={{ fontWeight: '600', color: 'black', fontSize: 17 }}>{item?.name}</Text>
+                            <Text style={{ fontWeight: '500', color: '#696969', fontSize: 13,marginTop:5 }}>Madhapur,Hyderabad</Text>
                         </View>
                         <View>
                             <Text style={{ fontWeight: '600', color: 'black', fontSize: 18 }}>{formatAmount(item?.price)}<Text style={{ color: "gray", fontSize: 16 }}>/day</Text></Text>
@@ -111,23 +116,23 @@ const Events = () => {
                     </View>
                     <View style={{  flexDirection: 'row', justifyContent: 'space-between', width: "50%" }}>
                        
-                        <View style={{ backgroundColor:"#dcfcf0",flexDirection: 'row', alignSelf: "center", alignItems: "center" , borderRadius:10, paddingHorizontal:10, paddingVertical:2}}>
+                        <View style={{ backgroundColor: item?.available ? "#dcfcf0" : "#ff6347",flexDirection: 'row', alignSelf: "center", alignItems: "center" , borderRadius:8, paddingHorizontal:10, paddingVertical:5}}>
                             <Image source={require('../../assets/available.png')} style={{ width: 15, height: 15 }} />
-                            <Text style={{ fontWeight: '600', color: '#696969', fontSize: 12,}}  >{item?.available ? 'Available' : 'Not Available'}</Text>
+                            {item?.available ? 
+                            <Text style={{ fontWeight: '600', color: 'black', fontSize: 12,marginHorizontal:5}}>Available</Text>
+                            :
+                            <Text style={{ fontWeight: '600', color: 'black', fontSize: 12,marginHorizontal:5}}>Booked</Text>
+                            }
                         </View>
-                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center" }}>
+                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center",marginHorizontal:5 }}>
                             <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} />
-                            <Text > 300-500</Text>
+                            <Text style={{marginHorizontal:2}}> 300-500</Text>
                         </View>
 
 
 
                         {/* <Text style={{ fontWeight: '600', color: '#696969', fontSize: 12, width: '50%' }}>{item?.location}</Text> */}
-                        {/* <Text numberOfLines={2} style={{ fontWeight: '600', color: '#696969', fontSize: 14, width: '25%', textAlign: 'right' }}>Incl. tax for 1 night</Text> */}
                     </View>
-                    {/* <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={{ fontWeight: '600', color: '#696969', fontSize: 12, width: '50%' }}>{item?.available ? 'Available' : 'Rented'}</Text>
-                    </View> */}
                 </TouchableOpacity>
             </View>
         )
