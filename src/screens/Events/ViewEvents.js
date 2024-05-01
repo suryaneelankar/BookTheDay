@@ -6,6 +6,7 @@ import BASE_URL from "../../apiconfig";
 import { verticalScale, moderateScale, horizontalScale } from "../../utils/scalingMetrics";
 import { Calendar } from 'react-native-calendars';
 import moment from 'moment';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const ViewEvents = ({ route,navigation }) => {
   const { width } = Dimensions.get('window');
@@ -16,9 +17,17 @@ const ViewEvents = ({ route,navigation }) => {
   const [noOfDays, setNoOfDays] = useState();
   const [bookingData,setBookingData] = useState([]);
 
-
   const { categoryId } = route.params;
   console.log("CATEID I::::::", categoryId)
+  const editsData = [
+    { image: require('../../assets/chair.png'), name: '300 Seating', status: 'Available' },
+    { image: require('../../assets/foodAvailable.png'), name: 'Food', status: 'Available' },
+    { image: require('../../assets/rooms.png'), name: 'Rooms', status: 'Available' },
+    { image: require('../../assets/foodAvailable.png'), name: 'Area Available', status: 'Available' },
+    { image: require('../../assets/acAvailable.jpeg'), name: 'No A/C', status: 'Available' },
+    { image: require('../../assets/foodAvailable.png'), name: 'Food', status: 'Available' },
+
+]
 
   useEffect(() => {
     getEventsDetails();
@@ -129,7 +138,7 @@ const ViewEvents = ({ route,navigation }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
-      <ScrollView style={{ backgroundColor: "white" }}>
+      <ScrollView style={{ backgroundColor: "white",marginBottom: 30 }}>
         <View style={styles.container}>
           <SwiperFlatList
             index={0}
@@ -164,52 +173,106 @@ const ViewEvents = ({ route,navigation }) => {
             <Text style={{
               fontSize: 12,
               color: "black",
-              fontWeight: "200"
+              fontWeight: "400"
             }}>MRP</Text>
-            <Text style={{ color: "black", fontSize: 12, fontWeight: "700" }}> ₹1000/day</Text>
+            <Text style={{ color: "black", fontSize: 12, fontWeight: "700" }}> {formatAmount(eventsDetails?.price)}</Text>
             <Text style={styles.strickedoffer}>₹1800</Text>
             <Text style={styles.off}> (20% off) </Text>
           </View>
+
+          <View style={{ marginTop: 20 }}>
+            <Text style={styles.title}>Description :</Text>
+            <Text style={{fontFamily:"roboto", fontSize: 14, color: "#5a5c5a", fontWeight: "400", marginTop: 10, marginBottom: 10 }}>{eventsDetails?.description}</Text>
+          </View>
+
+          <View style={{ marginTop: 10, flexDirection:"row" }}>
+            <Icon name="map-marker" size={20} color="black" />
+            <Text style={{fontFamily:"roboto", fontSize: 14, color: "#5a5c5a", fontWeight: "400",marginLeft:5 }}>Madhapur, Hyderabad</Text>
+          </View>
+
 
           <View style={{ marginTop: 20, flexDirection: "row", alignItems: "center", backgroundColor: "#e6fcfc", borderRadius: 10, justifyContent: "space-between" }}>
             <Image source={require('../../assets/offerIcon.png')}
               style={{ height: 50, width: 50, }}
             />
-            <Text style={{ marginRight: 10 }}>5% Discount on First Order</Text>
+            <Text style={{ marginRight: 10 }}>5% Discount on First Booking</Text>
           </View>
 
-          <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20 }}>
-            <Text style={styles.title}>Size available :</Text>
-            <Text style={styles.subTitle}>{eventsDetails?.catType == 'cloth' ? ' XS  S  M  L' : 'Free Size'}</Text>
+          <View style={{ marginTop: 20 }}>
+            <Text style={[styles.title,{fontWeight:"700"}]}>Venue Facilities :</Text>
+            <ScrollView horizontal>
+          {editsData.map((item, index) => (
+                            <View key={index} style={{width:100, margin:5,alignItems:"center",paddingVertical:10}} >
+                                <Image source={item.image} style={{width:40, height:40, borderRadius:20, marginTop:10}} />
+                                
+                                 <Text >{item?.name}</Text>
+                            </View>
+                        ))}
+                        </ScrollView>
+            {/* <View style={{flexDirection:"row", alignItems:"center",marginTop:10,}}>
+              <Image source={require('../../assets/chair.png')} style={{width:25, height:25,}}/>
+            <Text style={{fontFamily:"roboto", fontSize: 14, color: "#5a5c5a", fontWeight: "400",marginLeft:10 }}>300 Seating</Text>
+            </View>
+            <View style={{flexDirection:"row", alignItems:"center",marginTop:10}}>
+              <Image source={require('../../assets/foodAvailable.png')} style={{width:25, height:25}}/>
+              <Text style={{fontFamily:"roboto", fontSize: 14, color: "#5a5c5a", fontWeight: "400",marginLeft:10 }}>Food</Text>
+            </View>
+            <View style={{flexDirection:"row", alignItems:"center",marginTop:10}}>
+              <Image source={require('../../assets/rooms.png')} style={{width:20, height:20}}/>
+              <Text style={{fontFamily:"roboto", fontSize: 14, color: "#5a5c5a", fontWeight: "400",marginLeft:10 }}>4 Rooms</Text>
+            </View>
+            <View style={{flexDirection:"row", alignItems:"center",marginTop:10}}>
+              <Image source={require('../../assets/chair.png')} style={{width:20, height:20}}/>
+              <Text style={{fontFamily:"roboto", fontSize: 14, color: "#5a5c5a", fontWeight: "400",marginLeft:10 }}>Area : 1000 sq.yrds</Text>
+            </View>
+            <View style={{flexDirection:"row", alignItems:"center",marginTop:10}}>
+              <Image source={require('../../assets/chair.png')} style={{width:20, height:20}}/>
+              <Text style={{fontFamily:"roboto", fontSize: 14, color: "#5a5c5a", fontWeight: "400", marginLeft:10 }}>No A/C</Text>
+            </View> */}
+
           </View>
 
           {renderCalendar()}
-          <View style={{ marginTop: 20 }}>
-            <TouchableOpacity onPress={() => setCalendarVisible(true)}>
-              <Text style={styles.title}>From Date: {selectedStartDate}</Text>
+          <View style={{flexDirection:"row", alignItems:"center",marginTop:30}}>
+            <Text style={{fontSize:14, fontWeight:"600", color:"black", }}>Book The Day</Text>
+          </View>
+
+          <View style={{ marginTop: 15, flexDirection:"row", justifyContent:"space-between"}}>
+            <TouchableOpacity style={{}} onPress={() => setCalendarVisible(true)}>
+            <View style={{flexDirection:"row",alignItems:"center"}}>
+            <Icon name="calendar" size={15} color="green" />
+              <Text style={[styles.title,{marginLeft:5}]}>From Date:</Text>
+              </View>
+              <Text style={[styles.title,{marginTop:2}]}>{selectedStartDate}</Text>
+
             </TouchableOpacity>
-            <TouchableOpacity style={{ marginTop: 10 }} onPress={() => setCalendarVisible(true)}>
-              <Text style={styles.title}>To  Date: {selectedEndDate}</Text>
+            <TouchableOpacity  onPress={() => setCalendarVisible(true)}>
+            <View style={{flexDirection:"row",alignItems:"center"}}>
+            <Icon name="calendar" size={15} color="green" />
+              <Text style={[styles.title,{marginLeft:5}]}>To  Date:</Text>   
+             </View>
+               <Text sstyle={[styles.title,{marginTop:2,color:"black"}]}>{selectedEndDate}</Text>
             </TouchableOpacity>
           </View>
 
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <View>
-              <Text style={[styles.title, { marginTop: 10 }]}>Total Price : {noOfDays ? formatAmount(eventsDetails?.price * noOfDays) : formatAmount(eventsDetails?.price)}</Text>
-              <Text style={styles.title}>Extra Hrs Price :  20/Hr</Text>
-            </View>
-            <View>
-              <Text style={[styles.title, { marginTop: 10 }]}>Total Days : {noOfDays}</Text>
-            </View>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop:10 }}>
+          
+              <Text style={[styles.title, { marginTop: 10 }]}>Total Days :</Text>
+              <Text style={[styles.title, { marginTop: 10, fontWeight:"bold" }]}>{noOfDays > 1 ? `${noOfDays} days` : '1 day'}</Text> 
           </View>
-
-
-          <View style={{ marginTop: 20 }}>
-            <Text style={styles.title}>Description</Text>
-            <Text style={{ fontSize: 14, color: "#5a5c5a", fontWeight: "400", marginTop: 10, marginBottom: 10 }}>{eventsDetails?.description}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop:10 }}>
+          
+          <Text style={[styles.title, { marginTop: 10 }]}>Total Price :</Text>
+          <Text style={[styles.title, { marginTop: 10,fontWeight:"bold"  }]}>{noOfDays ? formatAmount(eventsDetails?.price * noOfDays) : formatAmount(eventsDetails?.price)}</Text>
           </View>
+        
+
+        
+          
+
 
         </View>
+
 
       </ScrollView>
       <Text style={{ padding:10,color:'black',fontWeight:'600' }}>Total for {noOfDays} days</Text>
@@ -258,7 +321,7 @@ const styles = StyleSheet.create({
   },
   container: { flex: 1, backgroundColor: 'white' },
   text: { fontSize: 12, textAlign: 'center' },
-  title: { fontSize: 14, color: "black", fontWeight: "400" },
+  title: { fontSize: 14, color: "black", fontWeight: "400",},
   subTitle: { fontSize: 14, color: "#5a5c5a", fontWeight: "400", },
   status: {
     fontSize: 10,
@@ -284,7 +347,7 @@ const styles = StyleSheet.create({
   strickedoffer: {
     fontSize: 12,
     color: "black",
-    fontWeight: "200",
+    fontWeight: "400",
     marginLeft: 7,
     textDecorationLine: 'line-through'
   },
