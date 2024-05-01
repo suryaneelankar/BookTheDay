@@ -14,6 +14,7 @@ const ViewEvents = ({ route,navigation }) => {
   const [selectedEndDate, setSelectedEndDate] = useState('');
   const [isCalendarVisible, setCalendarVisible] = useState(false);
   const [noOfDays, setNoOfDays] = useState();
+  const [bookingData,setBookingData] = useState([]);
 
 
   const { categoryId } = route.params;
@@ -28,32 +29,42 @@ const ViewEvents = ({ route,navigation }) => {
     try {
       const response = await axios.get(`${BASE_URL}/getEvent/${categoryId}`);
       console.log("events view details ::::::::::", response?.data?.data);
-      const data = {
-        "data": {
-          "_id": "661d6a6ba8da8199cf381c2a",
-          "name": "Falaknuma Palace",
-          "description": "Falaknuma Palace great place for wedding events and accepted all types of orders for any event, with spacious and colorful.",
-          "title": "Royal Palace",
-          "mainImageUrl": "https://i.pinimg.com/736x/aa/b1/ea/aab1ea91e893afba4093bfea2baef981.jpg",
-          "catType": "event",
-          "subImages": [
-            "https://i.pinimg.com/236x/44/4c/0a/444c0a19af3d8175b12fa3dda4dbbff6.jpg",
-            "https://i.pinimg.com/474x/c9/91/2f/c9912fade266eed13bad35226713d181.jpg",
-            "https://i.pinimg.com/474x/7a/87/49/7a874996291a1495f1a857d328b03283.jpg"
-          ],
-          "available": true,
-          "price": 17900,
-          "__v": 0
-        },
-        "message": "data retrived successfully"
-      }
-      // setEventsDetails(data)
       setEventsDetails(response?.data?.data)
     } catch (error) {
       console.log("categories::::::::::", error);
 
     }
   }
+
+  const createFunctionHallBooking = async (eventId) => {
+
+    const bookingData = {
+      eventId: eventId,
+      startDate: selectedStartDate,
+      endDate: selectedEndDate,
+      totalAmount: noOfDays ? formatAmount(eventsDetails?.price * noOfDays) : formatAmount(eventsDetails?.price),
+      numOfDays:noOfDays
+    };
+ 
+    console.log('params data is::>>',bookingData);
+     
+    try {
+        const response = await axios.post(`${BASE_URL}/create-event-booking`,bookingData,{
+          headers:{
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          }
+        });
+        console.log("event booking resp ::::::::::", response?.data?.data);
+
+        setBookingData(response?.data?.data);
+        if(response?.data?.status == 200){
+          navigation.navigate('BookingOverView',{categoryId:categoryId})
+        }
+    } catch (error) {
+        console.log("event bookings api error::::::::::", error);
+    }
+}
 
   function formatAmount(amount) {
     const amountStr = `${amount}`;
@@ -130,7 +141,6 @@ const ViewEvents = ({ route,navigation }) => {
             paginationStyleItemInactive={{ width: 7, height: 7 }}
             paginationStyleItemActive={{ width: 10, height: 10 }}
             data={eventsDetails?.subImages}
-            // style={{ borderRadius: 15 }}
             style={{ flex: 1, alignSelf: "center", marginTop: 10 }}
             renderItem={({ item }) => (
               <View style={[{ width: Dimensions.get('window').width, justifyContent: 'center', height: 300 }]}>
@@ -220,7 +230,7 @@ const ViewEvents = ({ route,navigation }) => {
 
         </TouchableOpacity>
         <TouchableOpacity style={{ backgroundColor: 'green', borderRadius: 8, padding: 10, borderColor: 'white', borderWidth: 2, width: '45%' }}
-        onPress={() => navigation.navigate('BookingOverView',{categoryId:categoryId})}
+        onPress={() => createFunctionHallBooking(categoryId)}
         >
           <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
             <View>
