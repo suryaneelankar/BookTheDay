@@ -8,6 +8,11 @@ import ViewTrendingDetails from "../screens/Home/ViewTrendingDetails";
 import CategoriesList from "../screens/Categories/categoriesList";
 import ViewEvents from "../screens/Events/ViewEvents";
 import BookingOverView from "../screens/Bookings/BookingOverView";
+import StackProfileNavigation from "./profileScreens";
+import Login from "../screens/Authentication/Login";
+import Register from "../screens/Authentication/Register";
+import ForgotPassword from "../screens/Authentication/ForgotPassword"
+import ResetPassword from "../screens/Authentication/ResetPassword"
 
 const MainNavigation = () => {
 
@@ -35,6 +40,11 @@ const MainNavigation = () => {
                 <Stack.Screen name="CategoriesList" component={CategoriesList} options={{ headerShown: false }} />
                 <Stack.Screen name="ViewEvents" component={ViewEvents} options={{ headerShown: true }} />
                 <Stack.Screen name="BookingOverView" component={BookingOverView} options={{ headerShown: false }} />
+                <Stack.Screen name="Profile" component={StackProfileNavigation} options={{ headerShown: true }} />
+                <Stack.Screen name="Login" component={Login} options={{ headerShown: true }} />
+                <Stack.Screen name="Register" component={Register} options={{ headerShown: true }} />
+                <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ headerShown: true }} />
+                <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: true }} />
 
             </Stack.Navigator>
         </NavigationContainer>

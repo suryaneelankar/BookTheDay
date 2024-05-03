@@ -1,9 +1,9 @@
-import {View, Text,StyleSheet, Image,SafeAreaView,} from 'react-native';
+import {View, Text,StyleSheet, Button} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import ProfileListContainer from "./ListContainer";
 import { verticalScale } from '../../utils/scalingMetrics';
 
-const ProfileMainScreen = () =>{
+const ProfileMainScreen = ({navigation}) =>{
     return(
         
         <View style={styles.root}>
@@ -15,6 +15,14 @@ const ProfileMainScreen = () =>{
                 <View style={styles.textContainer}>
                     <Text style={styles.userName}>Guest</Text>
                     <Text style={styles.phoneNumber}>+91-7661991537</Text>
+                </View>
+            </View>
+            <View style={styles.buttonsContainer}>
+                <View style={styles.loginContainer}>
+                    <Button title="Login" style={styles.loginButton} onPress={()=>navigation.navigate('Login')}/>
+                </View>
+                <View style={styles.registerContainer}>
+                    <Button title="Register" style={styles.registorButton}  onPress={()=>navigation.navigate('Register')}/>
                 </View>
             </View>
             <View style={styles.listContainer}>
@@ -30,7 +38,7 @@ export default ProfileMainScreen;
 const styles=StyleSheet.create({
     root:{
         flex:1,
-        marginBottom: verticalScale(70)
+        // marginBottom: verticalScale(70)
     },
     topContainer:{
         flexDirection:'row'
@@ -63,6 +71,25 @@ const styles=StyleSheet.create({
         marginLeft:10,
         marginTop:4,
         
+    },
+    buttonsContainer:{
+        width:"30%",
+        marginLeft:20,
+        marginTop:20,
+    },
+    loginContainer:{
+        marginBottom:20,
+        // textTransform:'uppercase'
+    },
+    loginButton:{
+        // verticalAlign:10
+        
+    },
+    registerContainer:{
+
+    },
+    registorButton:{
+        margin:20,
     },
     listContainer:{
         flex:1,
