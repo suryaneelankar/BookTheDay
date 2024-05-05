@@ -1,7 +1,10 @@
 import React, {useEffect, useState} from "react";
-import { View, Text, Dimensions, ImageBackground, StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Dimensions, ImageBackground, Pressable,StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import Wedding from '../../assets/wedding.png';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL from "../../apiconfig";
 import axios from "axios";
@@ -161,7 +164,43 @@ const styles = StyleSheet.create({
         alignItems: 'center', backgroundColor: "yellow",
         height: 200, // Adjust the height as needed
     },
-    container: { flex: 1, backgroundColor: 'white' },
+    swiperContainer: { 
+        flex: 1, 
+        alignSelf:'center',
+        backgroundColor: 'white',
+        width:"90%", 
+    },
+    topContainer:{
+        alignSelf:'center',
+        flexDirection:'row',
+        justifyContent:'space-between',
+        paddingTop:20,
+        paddingVertical:10,
+        width:"90%",
+    },
+    locationContainer: {
+        flexDirection:'column',
+        // marginLeft: 10,
+    },
+    locationSubContainer: {
+        flexDirection: 'row',
+    },
+    locationIcon: {
+        marginRight: 8,
+    },
+    locationName: {
+        fontWeight: '900',
+        fontSize: 19,
+        color: "#000000",
+    },
+    fullLocation:{
+        width:200,
+        fontSize:15,
+        fontWeight:"400",
+    },
+    profileContainer:{
+
+    },
     text: { fontSize: 12, textAlign: 'center' },
     title: {
         fontSize: 12,

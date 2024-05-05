@@ -53,7 +53,6 @@ const MainNavigation = () => {
                 <Stack.Screen name="ViewTrendingDetails" component={ViewTrendingDetails} options={{ headerShown: true }} />
                 <Stack.Screen name="CategoriesList" component={CategoriesList} options={{ headerShown: false }} />
                 <Stack.Screen name="ViewEvents" component={ViewEvents} options={{ headerShown: true }} />
-                <Stack.Screen name="BookingOverView" component={BookingOverView} options={{ headerShown: false }} />
                  {/* ############### profile Screens ################# */}
                 <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{headerShown: true}} />
                 <Stack.Screen name="AboutUs" component={AboutUs} options={{headerShown: true}}/>
