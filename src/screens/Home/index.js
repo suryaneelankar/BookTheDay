@@ -8,7 +8,6 @@ import Wedding from '../../assets/wedding.png';
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL from "../../apiconfig";
 import axios from "axios";
-import StackProfileNavigation from "../../navigations/profileScreens";
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
@@ -57,7 +56,7 @@ const HomeDashboard = () => {
                         </View>
                         <Text style={styles.fullLocation} ellipsizeMode='tail' numberOfLines={1}>Opposite to Delexe boys Hostel, Ambika Mens Hostel, Gachibowli,Hyderabad</Text>
                     </View>
-                    <Pressable onPress={()=>navigation.navigate('Profile')}>
+                    <Pressable onPress={()=>navigation.navigate('ProfileScreen')}>
                     <FontAwesome name={"user-circle"} color={"#000000"} size={35} />
                     </Pressable>
                     
