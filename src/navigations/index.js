@@ -26,6 +26,7 @@ import ProfilePolicy from "../screens/Profile/ProfileSubScreens/PrivacyPolicy";
 import ReferAndEarn from "../screens/Profile/ProfileSubScreens/ReferAndEarn";
 import RefundPolicy from "../screens/Profile/ProfileSubScreens/RefundPolicy";
 import TermsAndCondition from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
+import BookingConfirm from "../screens/Bookings/BookingConfirmScreen";
 
 const MainNavigation = () => {
 
@@ -73,6 +74,8 @@ const MainNavigation = () => {
                 <Stack.Screen name="Register" component={Register} options={{ headerShown: true }} />
                 <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ headerShown: true }} />
                 <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: true }} />
+                <Stack.Screen name="BookingOverView" component={BookingOverView} options={{ headerShown: true }} />
+                <Stack.Screen name="BookingConfirm" component={BookingConfirm} options={{ headerShown:false }}/>
 
             </Stack.Navigator>
         </NavigationContainer>

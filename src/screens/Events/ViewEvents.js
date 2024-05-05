@@ -15,6 +15,7 @@ const ViewEvents = ({ route,navigation }) => {
   const [selectedEndDate, setSelectedEndDate] = useState('');
   const [isCalendarVisible, setCalendarVisible] = useState(false);
   const [noOfDays, setNoOfDays] = useState();
+  const [bookingData,setBookingData] = useState([]);
 
   const { categoryId } = route.params;
   console.log("CATEID I::::::", categoryId)
@@ -43,6 +44,36 @@ const ViewEvents = ({ route,navigation }) => {
 
     }
   }
+
+  const createFunctionHallBooking = async (eventId) => {
+
+    const bookingData = {
+      eventId: eventId,
+      startDate: selectedStartDate,
+      endDate: selectedEndDate,
+      totalAmount: noOfDays ? formatAmount(eventsDetails?.price * noOfDays) : formatAmount(eventsDetails?.price),
+      numOfDays:noOfDays
+    };
+ 
+    console.log('params data is::>>',bookingData);
+     
+    try {
+        const response = await axios.post(`${BASE_URL}/create-event-booking`,bookingData,{
+          headers:{
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          }
+        });
+        console.log("event booking resp ::::::::::", response?.data?.data);
+
+        setBookingData(response?.data?.data);
+        if(response?.data?.status == 200){
+          navigation.navigate('BookingOverView',{categoryId:categoryId})
+        }
+    } catch (error) {
+        console.log("event bookings api error::::::::::", error);
+    }
+}
 
   function formatAmount(amount) {
     const amountStr = `${amount}`;
@@ -119,7 +150,6 @@ const ViewEvents = ({ route,navigation }) => {
             paginationStyleItemInactive={{ width: 7, height: 7 }}
             paginationStyleItemActive={{ width: 10, height: 10 }}
             data={eventsDetails?.subImages}
-            // style={{ borderRadius: 15 }}
             style={{ flex: 1, alignSelf: "center", marginTop: 10 }}
             renderItem={({ item }) => (
               <View style={[{ width: Dimensions.get('window').width, justifyContent: 'center', height: 300 }]}>
@@ -263,7 +293,7 @@ const ViewEvents = ({ route,navigation }) => {
 
         </TouchableOpacity>
         <TouchableOpacity style={{ backgroundColor: 'green', borderRadius: 8, padding: 10, borderColor: 'white', borderWidth: 2, width: '45%' }}
-        onPress={() => navigation.navigate('BookingOverView',{categoryId:categoryId})}
+        onPress={() => createFunctionHallBooking(categoryId)}
         >
           <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
             <View>
