@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import { View, Text, Dimensions, ImageBackground, Pressable,StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Dimensions, ImageBackground,PermissionsAndroid, Pressable,StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity ,Platform, Alert} from 'react-native';
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import Wedding from '../../assets/wedding.png';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
@@ -8,14 +8,72 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL from "../../apiconfig";
 import axios from "axios";
+import Geolocation from '@react-native-community/geolocation';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import GetLocation from 'react-native-get-location'
+
 
 const HomeDashboard = () => {
     const [categories,setCategories] = useState([])
-
+    const [address, setAddress] = useState('');
 
     useEffect(()=>{
+        getPermissions();
         getCategories();
     },[]);
+
+
+    const getLocation = async() =>{
+        GetLocation.getCurrentPosition({
+            enableHighAccuracy: true,
+            timeout: 60000,
+        })
+        .then(location => {
+            console.log("getting location",location);
+            if (location) {
+                fetch(
+                  `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}`
+                )
+                  .then(response => response.json())
+                  .then(data => {
+                    console.log("address is::::::", data)
+                    setAddress(data?.address);
+                  })
+                  .catch(error => {
+                    console.error(error);
+                  });
+              }
+        })
+        .catch(error => {
+            const { code, message } = error;
+            console.warn(code, message);
+        })
+
+    }
+    
+    const getPermissions = async() =>{
+      try{
+        const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+            {
+                title:'APP location permission',
+                message:'App needs location Permissions',
+                buttonNeutral:'Ask Me Later',
+                buttonNegative:'Cancel',
+                buttonPositive:'OK'
+            },
+        );
+        if(granted === PermissionsAndroid.RESULTS.GRANTED){
+            getLocation()
+        }else{
+            Alert.alert("Location persmiion denied")
+        }
+      }catch (err){
+        console.warn(err)
+      }
+    }
+
+  
 
     const getCategories = async() =>{
         console.log("IAM CALLING API in home")
@@ -48,21 +106,28 @@ const HomeDashboard = () => {
             <ScrollView style={{ marginBottom: 70 }} >
                 <View style={styles.topContainer}>
                     <View style={styles.locationContainer}>
+                        <Text>Location</Text>
                         <View style={styles.locationSubContainer}>
-                            <FontAwesome5 style={styles.locationIcon} name={"briefcase"} color={"#f74d1d"} size={20} />
-                            <Text style={styles.locationName}>Work</Text>
-                            <MaterialIcon name={"keyboard-arrow-down"} color={"#7e7c7c"} size={25} />
+                        
+                            {/* <FontAwesome5 style={styles.locationIcon} name={"briefcase"} color={"#f74d1d"} size={20} /> */}
+                            {address &&  (
+                            <>
+                            <Text style={styles.locationName}>{address?.neighbourhood}, </Text>
+                            <Text style={styles.locationName}>{address?.city?.substring(0, 3)}</Text>
+                           
+                            <MaterialIcon name={"keyboard-arrow-down"} color={"#7e7c7c"} size={20} style={{marginTop:5}}/>
+                            </>)}
                         </View>
-                        <Text style={styles.fullLocation} ellipsizeMode='tail' numberOfLines={1}>Opposite to Delexe boys Hostel, Ambika Mens Hostel, Gachibowli,Hyderabad</Text>
+                        {/* <Text style={styles.fullLocation} ellipsizeMode='tail' numberOfLines={1}>Opposite to Delexe boys Hostel, Ambika Mens Hostel, Gachibowli,Hyderabad</Text> */}
                     </View>
                     <Pressable onPress={()=>navigation.navigate('ProfileScreen')}>
                     <FontAwesome name={"user-circle"} color={"#000000"} size={35} />
                     </Pressable>
                     
                 </View>
-                <View style={{ height: 65, width: "100%", paddingVertical: 10, borderBottomColor: "#e0dede",marginBottom:25}}>
+                <View style={{ height: 60, width: "100%",alignSelf:"center", paddingVertical: 10, borderBottomColor: "#e0dede",marginBottom:25}}>
                    
-                    <View style={{ flexDirection: "row", width: "90%", alignSelf: "center", alignItems: "center",borderRadius: 10, borderColor: "#bfb8b8", backgroundColor: "white", borderWidth: 0.8 }}>
+                    <View style={{ flexDirection: "row", width: "90%", alignSelf: "center", alignItems: "center",borderRadius: 20, borderColor: "#bfb8b8", backgroundColor: "white", borderWidth: 0.8 }}>
                         <Image source={require('../../assets/searchIcon.png')}
                             style={{ height: 15, width: 15, marginLeft: 10, alignSelf: "center" }}
                         />
@@ -71,17 +136,28 @@ const HomeDashboard = () => {
                             style={{ marginLeft: 15, alignSelf: "center", }} />
                     </View>
                 </View>
-                <View style={styles.container}>
+                <View style={{marginHorizontal:20,alignSelf:"center",flex:1}}>
                     <SwiperFlatList
                         autoplay
                         autoplayDelay={2}
                         autoplayLoop
                         index={2}
                         showPagination
+                        paginationDefaultColor='lightgray'
+                        paginationActiveColor='gray'
+                        paginationStyle={{ position: 'absolute', bottom: -30, left: 0, right:0 }}
+                        paginationStyleItem={{ alignSelf: 'center' }}
+                        paginationStyleItemInactive={{ width: 7, height: 7 }}
+                        paginationStyleItemActive={{ width: 8, height: 8 }}
                         data={images}
-                        style={{ flex: 1 }}
+                        style={{}}
                         renderItem={({ item }) => (
-                            <View style={[{ backgroundColor: item, width, justifyContent: 'center', height: 300 }]}>
+                            <View style={[{ backgroundColor:"yellow",flexDirection:"row", width, height: 150 }]}>
+                             <View style={{width:"50%",marginTop:20,marginHorizontal:10}}>
+                              <Text style={{fontSize:14, fontWeight:"800", color:"black"}}>New Collection</Text>
+                              <Text style={{fontSize:12, fontWeight:"400", color:"black",marginTop:10}}>New Collection now available at store at ;pwest price</Text>
+                              <Text style={{backgroundColor:"lightgray", width:"50%", padding:5,borderRadius:5,alignItems:"center",marginTop:10}}>Book Now</Text>
+                           </View>
                                 <Image source={item} style={styles.image}
                                     resizeMethod="resize"
                                     resizeMode="stretch" />
@@ -174,8 +250,8 @@ const styles = StyleSheet.create({
         alignSelf:'center',
         flexDirection:'row',
         justifyContent:'space-between',
-        paddingTop:20,
-        paddingVertical:10,
+        marginTop:10,
+        // paddingVertical:10,
         width:"90%",
     },
     locationContainer: {
@@ -184,13 +260,15 @@ const styles = StyleSheet.create({
     },
     locationSubContainer: {
         flexDirection: 'row',
+        alignItems:"center",
+        marginHorizontal:20, 
     },
     locationIcon: {
         marginRight: 8,
     },
     locationName: {
         fontWeight: '900',
-        fontSize: 19,
+        fontSize: 12,
         color: "#000000",
     },
     fullLocation:{
@@ -231,8 +309,8 @@ const styles = StyleSheet.create({
         alignItems:"center" 
     },
     image: {
-        width: '100%',
-        height: "95%",
+        width: '50%',
+        height: "100%",
         resizeMode: 'cover',
     },
 });
