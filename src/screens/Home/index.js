@@ -11,6 +11,8 @@ import axios from "axios";
 import Geolocation from '@react-native-community/geolocation';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import GetLocation from 'react-native-get-location'
+import { moderateScale } from "../../utils/scalingMetrics";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 
 const HomeDashboard = () => {
@@ -93,6 +95,7 @@ const HomeDashboard = () => {
         require('../../assets/wedding.png'),
         require('../../assets/furniture.jpg'),
         require('../../assets/decoration.jpg'),
+        require('../../assets/decoration.jpg'),
     ];
     const editsData = [
         { image: require('../../assets/cameraIcon.jpeg'), name: 'Sardha cameras', status: 'Available' },
@@ -169,20 +172,21 @@ const HomeDashboard = () => {
                 <View style={{marginTop:20}}>
                     <View style={{ flexDirection: "row" , alignSelf:"center",justifyContent:"space-between",width:"90%"}}>
                         <Text style={{color:"black", fontSize:14, fontWeight:"400"}}>Trending Now</Text>
-                        <Text style={{color:"black", fontSize:12, fontWeight:"400"}}>View All {'>'}</Text>
+                        {/* <Text style={{color:"black", fontSize:12, fontWeight:"400"}}>View All {'>'}</Text> */}
                     </View>
-                    <ScrollView horizontal style={{marginHorizontal:10,}} showsHorizontalScrollIndicator={false}>
+                    <ScrollView horizontal style={{marginHorizontal:10,marginTop:15}} showsHorizontalScrollIndicator={false}>
                         {categories.filter(item => item.type === 'Trending Now').map((item, index) => (
                             <TouchableOpacity
                             onPress={() => navigation.navigate('ViewTrendingDetails',{categoryId: item?._id})}
-                             key={index} style={styles.card}>
+                             key={index} style={{width:moderateScale(140),marginLeft:10}}>
                                 <Image source={{ uri: item.catImageUrl }} style={{
-                                    width: 100,
-                                    height: 150,
-                                    resizeMode:"contain",
+                                    width: "100%",
+                                    height: 90,
+                                    backgroundColor:"yellow",
+                                    resizeMode:"cover",
                                 }} />
                                 <Text style={styles.title}>{item?.name}</Text>
-                                <Text style={[styles.status,{color:item?.rented ?  "#a85705" : "white", backgroundColor:item?.rented ? "#fabdb6" :"green"}]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text>
+                                {/* <Text style={[styles.status,{color:item?.rented ?  "#a85705" : "white", backgroundColor:item?.rented ? "#fabdb6" :"green"}]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text> */}
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
@@ -192,39 +196,54 @@ const HomeDashboard = () => {
                 <View style={{marginTop:20}}>
                     <View style={{ flexDirection: "row" , alignSelf:"center",justifyContent:"space-between",width:"90%"}}>
                         <Text style={{color:"black", fontSize:14, fontWeight:"400"}}>Brand New</Text>
-                        <Text style={{color:"black", fontSize:12, fontWeight:"400"}}>View All {'>'}</Text>
+                        {/* <Text style={{color:"black", fontSize:12, fontWeight:"400"}}>View All {'>'}</Text> */}
                     </View>
-                    <ScrollView horizontal style={{marginHorizontal:10,}} showsHorizontalScrollIndicator={false}>
+                    <ScrollView horizontal style={{marginHorizontal:10,marginTop:15}} showsHorizontalScrollIndicator={false}>
                         {categories.filter(item => item.type === 'Brand New').map((item, index) => (
                             <TouchableOpacity
                             onPress={() => navigation.navigate('ViewTrendingDetails',{categoryId: item?._id})}
-                             key={index} style={styles.card}>
+                             key={index}style={{width:moderateScale(110),marginLeft:10}} >
                                 <Image source={{ uri: item.catImageUrl }} style={{
-                                    width: 100,
-                                    height: 150,
-                                    resizeMode:"contain"
+                                    width: "100%",
+                                    height: 200,
+                                    resizeMode:"cover"
                                 }} />
                                 <Text style={styles.title}>{item?.name}</Text>
-                                <Text style={[styles.status,{color:item?.rented ?  "#a85705" : "white" , backgroundColor:item?.rented ? "#fabdb6" :"green" }]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text>
+                                {/* <Text style={[styles.status,{color:item?.rented ?  "#a85705" : "white" , backgroundColor:item?.rented ? "#fabdb6" :"green" }]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text> */}
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
 
                 </View>
-                        <View style={{marginTop:30}}>
-                        {editsData.map((item, index) => (
-                            <View key={index} style={styles.listcard}>
-                                <Image source={item.image} style={{
-                                    width: "100%",
-                                    height: 120,
-                                    borderRadius: 10,
-                                    // marginBottom: 10,
-                                }}/>
+
+                <View style={{marginTop:20,marginBottom:"10%"}}>
+                    <View style={{ flexDirection: "row" , alignSelf:"center",justifyContent:"space-between",width:"90%"}}>
+                        <Text style={{color:"black", fontSize:14, fontWeight:"400"}}>Subcription</Text>
+                        {/* <Text style={{color:"black", fontSize:12, fontWeight:"400"}}>View All {'>'}</Text> */}
+                    </View>
+                        {categories.filter(item => item.type === 'Trending Now').map((item, index) => (
+                            <TouchableOpacity
+                            onPress={() => navigation.navigate('ViewTrendingDetails',{categoryId: item?._id})}
+                             key={index}style={{marginHorizontal:15,backgroundColor:"lightgray",paddingHorizontal:5,paddingVertical:10,flexDirection:"row",marginTop:10}} >
+                                <Image source={{ uri: item.catImageUrl }} style={{
+                                    width: "20%",
+                                    height: 60,
+                                    resizeMode:"cover"
+                                }} />
+                                <View style={{marginLeft:10, width:"59%"}}>
+                                <Text style={{color:"black", fontSize:14, fontWeight:"800"}}>Cooking subscription</Text>
+                                <Text style={{color:"black", fontSize:12, fontWeight:"300",marginTop:5}}>Cooking subscription lorem ispusm is simply dummy text to the prinitng</Text>
+                                </View>
+
+                                <TouchableOpacity style={{elevation:10,width:40, height:40, borderRadius:20, backgroundColor:"white",alignSelf:"center",alignItems:"center",justifyContent:"center"}}>
+                                <Icon name="chevron-right" size={10} color="black" />
+                                </TouchableOpacity>
                                 
-                                 <Text style={{position:"absolute", left:20, top:30, color:"black"}}>{item?.name}</Text>
-                            </View>
+                                {/* <Text style={[styles.status,{color:item?.rented ?  "#a85705" : "white" , backgroundColor:item?.rented ? "#fabdb6" :"green" }]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text> */}
+                            </TouchableOpacity>
                         ))}
-                        </View>
+
+                </View>
 
 
 
@@ -285,7 +304,9 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         alignSelf:"center",
         textAlign:"center",
-        marginTop:5
+        // marginTop:5,
+        paddingHorizontal:10,
+        paddingVertical:10
     },
     status: {
         fontSize: 10,
