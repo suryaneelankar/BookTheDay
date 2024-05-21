@@ -14,6 +14,9 @@ import GetLocation from 'react-native-get-location'
 import { moderateScale } from "../../utils/scalingMetrics";
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import { LinearGradient } from 'react-native-linear-gradient';
+import FilterIcon from '../../assets/svgs/filter.svg';
+import Svg, { Circle } from 'react-native-svg';
 
 const HomeDashboard = () => {
     const [categories,setCategories] = useState([])
@@ -102,7 +105,6 @@ const HomeDashboard = () => {
         { image: require('../../assets/men.jpeg'), name: 'fashionstore', status: 'Available' },
         { image: require('../../assets/jwellery.jpg'), name: 'trendnow', status: 'Available' },
     ]
-
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
