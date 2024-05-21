@@ -11,6 +11,8 @@ import Geolocation from '@react-native-community/geolocation';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import GetLocation from 'react-native-get-location'
 import { LinearGradient } from 'react-native-linear-gradient';
+import FilterIcon from '../../assets/svgs/filter.svg';
+import Svg, { Circle } from 'react-native-svg';
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
@@ -100,35 +102,38 @@ const HomeDashboard = () => {
         { image: require('../../assets/jwellery.jpg'), name: 'trendnow', status: 'Available' },
     ]
 
-
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
             <ScrollView style={{ marginBottom: 70 }} >
 
-                    <View style={styles.topContainer}>
-                        <View style={styles.locationContainer}>
-                            <Text style={{fontFamily:'ManropeRegular',color:'#7D7F88',fontSize:12,fontWeight:'400'}}>Location</Text>
-                            <View style={{flexDirection:'row',alignItems:'center',marginTop:5}}>
-                            <FontAwesome name={"map-marker"} color={"#B46609"} size={20}  style={{marginHorizontal:0}}/>
-                            <Text style={{fontFamily:'ManropeRegular',color:'#1A1E25',fontSize:16,fontWeight:'400',marginHorizontal:5}}>Gachibowli, Hyderabad</Text>
-                            <FontAwesome name={"chevron-down"} color={"#000000"} size={15}  style={{marginHorizontal:5}}/>
-                            </View>
-
-                            <View style={styles.locationSubContainer}>
-                                {address && (
-                                    <>
-                                        <Text style={styles.locationName}>{address?.neighbourhood}, </Text>
-                                        <Text style={styles.locationName}>{address?.city?.substring(0, 3)}</Text>
-
-                                        <MaterialIcon name={"keyboard-arrow-down"} color={"#7e7c7c"} size={20} style={{ marginTop: 5 }} />
-                                    </>)}
-                            </View>
+                <View style={styles.topContainer}>
+                    <View style={styles.locationContainer}>
+                        <Text style={{ fontFamily: 'ManropeRegular', color: '#7D7F88', fontSize: 12, fontWeight: '400' }}>Location</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+                            <FontAwesome name={"map-marker"} color={"#B46609"} size={20} style={{ marginHorizontal: 0 }} />
+                            <Text style={{ fontFamily: 'ManropeRegular', color: '#1A1E25', fontSize: 16, fontWeight: '400', marginHorizontal: 5 }}>Gachibowli, Hyderabad</Text>
+                            <FontAwesome name={"chevron-down"} color={"#000000"} size={15} style={{ marginHorizontal: 5 }} />
+                            <FilterIcon width={20} height={20} />
+                            <Svg height="50%" width="50%" viewBox="0 0 100 100" >
+                                <Circle cx="50" cy="50" r="50" stroke="purple" strokeWidth=".5" fill="violet" />
+                            </Svg>
                         </View>
-                        <Pressable onPress={() => navigation.navigate('ProfileScreen')}>
-                            <FontAwesome name={"user-circle"} color={"#000000"} size={35} />
-                        </Pressable>
 
+                        <View style={styles.locationSubContainer}>
+                            {address && (
+                                <>
+                                    <Text style={styles.locationName}>{address?.neighbourhood}, </Text>
+                                    <Text style={styles.locationName}>{address?.city?.substring(0, 3)}</Text>
+
+                                    <MaterialIcon name={"keyboard-arrow-down"} color={"#7e7c7c"} size={20} style={{ marginTop: 5 }} />
+                                </>)}
+                        </View>
                     </View>
+                    <Pressable onPress={() => navigation.navigate('ProfileScreen')}>
+                        <FontAwesome name={"user-circle"} color={"#000000"} size={35} />
+                    </Pressable>
+
+                </View>
                 <View style={{ height: 60, width: "100%", alignSelf: "center", paddingVertical: 10, borderBottomColor: "#e0dede", marginBottom: 25 }}>
 
                     <View style={{ flexDirection: "row", width: "90%", alignSelf: "center", alignItems: "center", borderRadius: 20, borderColor: "#bfb8b8", backgroundColor: "white", borderWidth: 0.8 }}>
@@ -156,11 +161,11 @@ const HomeDashboard = () => {
                         data={images}
                         style={{}}
                         renderItem={({ item }) => (
-                            <View style={[{ backgroundColor: "yellow", flexDirection: "row", width, height: 200,borderRadius:15 }]}>
+                            <View style={[{ backgroundColor: "yellow", flexDirection: "row", width, height: 200, borderRadius: 15 }]}>
                                 <View style={{ width: "50%", marginTop: 20, marginHorizontal: 10 }}>
                                     <Text style={{ fontSize: 14, fontWeight: "800", color: "black" }}>New Collection</Text>
-                                    <Text style={{ fontSize: 12, fontWeight: "400", color: "black", marginTop: 10,fontFamily:'ManropeRegular' }}>New Collection now available at store at lowest price</Text>
-                                    <Text style={{ backgroundColor: "green", width: "50%", padding: 5, borderRadius: 5, alignItems: "center", marginTop: 10, textAlign: 'center', fontWeight: '900', color: 'white',fontFamily:'PoppinsRegular' }}>Book Now</Text>
+                                    <Text style={{ fontSize: 12, fontWeight: "400", color: "black", marginTop: 10, fontFamily: 'ManropeRegular' }}>New Collection now available at store at lowest price</Text>
+                                    <Text style={{ backgroundColor: "green", width: "50%", padding: 5, borderRadius: 5, alignItems: "center", marginTop: 10, textAlign: 'center', fontWeight: '900', color: 'white', fontFamily: 'PoppinsRegular' }}>Book Now</Text>
                                 </View>
                                 <Image source={item} style={styles.image}
                                     resizeMethod="resize"
