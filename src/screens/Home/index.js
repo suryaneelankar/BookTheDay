@@ -1,8 +1,7 @@
-import React, {useEffect, useState} from "react";
-import { View, Text, Dimensions, ImageBackground,PermissionsAndroid, Pressable,StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity ,Platform, Alert} from 'react-native';
+import React, { useEffect, useState } from "react";
+import { View, Text, Dimensions, ImageBackground, PermissionsAndroid, Pressable, StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import Wedding from '../../assets/wedding.png';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import { useNavigation } from '@react-navigation/native';
@@ -14,80 +13,82 @@ import GetLocation from 'react-native-get-location'
 import { moderateScale } from "../../utils/scalingMetrics";
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import { LinearGradient } from 'react-native-linear-gradient';
 
 const HomeDashboard = () => {
-    const [categories,setCategories] = useState([])
+    const [categories, setCategories] = useState([])
     const [address, setAddress] = useState('');
 
-    useEffect(()=>{
+    useEffect(() => {
         getPermissions();
         getCategories();
-    },[]);
+    }, []);
 
 
-    const getLocation = async() =>{
+    const getLocation = async () => {
+        console.log("getting location", location);
         GetLocation.getCurrentPosition({
             enableHighAccuracy: true,
             timeout: 60000,
         })
-        .then(location => {
-            console.log("getting location",location);
-            if (location) {
-                fetch(
-                  `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}`
-                )
-                  .then(response => response.json())
-                  .then(data => {
-                    console.log("address is::::::", data)
-                    setAddress(data?.address);
-                  })
-                  .catch(error => {
-                    console.error(error);
-                  });
-              }
-        })
-        .catch(error => {
-            const { code, message } = error;
-            console.warn(code, message);
-        })
+            .then(location => {
+                console.log("getting location", location);
+                if (location) {
+                    fetch(
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}`
+                    )
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("address is::::::", data)
+                            setAddress(data?.address);
+                        })
+                        .catch(error => {
+                            console.error(error);
+                        });
+                }
+            })
+            .catch(error => {
+                const { code, message } = error;
+                console.warn(code, message);
+            })
 
     }
-    
-    const getPermissions = async() =>{
-      try{
-        const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-            {
-                title:'APP location permission',
-                message:'App needs location Permissions',
-                buttonNeutral:'Ask Me Later',
-                buttonNegative:'Cancel',
-                buttonPositive:'OK'
-            },
-        );
-        if(granted === PermissionsAndroid.RESULTS.GRANTED){
-            getLocation()
-        }else{
-            Alert.alert("Location persmiion denied")
+
+    const getPermissions = async () => {
+        try {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                {
+                    title: 'APP location permission',
+                    message: 'App needs location Permissions',
+                    buttonNeutral: 'Ask Me Later',
+                    buttonNegative: 'Cancel',
+                    buttonPositive: 'OK'
+                },
+            );
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                getLocation()
+            } else {
+                Alert.alert("Location persmiion denied")
+            }
+        } catch (err) {
+            console.warn(err)
         }
-      }catch (err){
-        console.warn(err)
-      }
     }
 
-  
 
-    const getCategories = async() =>{
+
+    const getCategories = async () => {
         console.log("IAM CALLING API in home")
         try {
-            const response = await axios.get(`${BASE_URL}/all-category`);  
+            const response = await axios.get(`${BASE_URL}/all-category`);
             console.log("categories::::::::::", response?.data?.data);
             setCategories(response?.data?.data)
-          } catch (error) {
+        } catch (error) {
             console.log("categories::::::::::", error);
 
+        }
     }
-}
 
     const { width } = Dimensions.get('window');
     const navigation = useNavigation();
@@ -107,30 +108,35 @@ const HomeDashboard = () => {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
             <ScrollView style={{ marginBottom: 70 }} >
-                <View style={styles.topContainer}>
-                    <View style={styles.locationContainer}>
-                        <Text>Location</Text>
-                        <View style={styles.locationSubContainer}>
-                        
-                            {/* <FontAwesome5 style={styles.locationIcon} name={"briefcase"} color={"#f74d1d"} size={20} /> */}
-                            {address &&  (
-                            <>
-                            <Text style={styles.locationName}>{address?.neighbourhood}, </Text>
-                            <Text style={styles.locationName}>{address?.city?.substring(0, 3)}</Text>
-                           
-                            <MaterialIcon name={"keyboard-arrow-down"} color={"#7e7c7c"} size={20} style={{marginTop:5}}/>
-                            </>)}
+
+                    <View style={styles.topContainer}>
+                        <View style={styles.locationContainer}>
+                            <Text style={{fontFamily:'ManropeRegular',color:'#7D7F88',fontSize:12,fontWeight:'400'}}>Location</Text>
+                            <View style={{flexDirection:'row',alignItems:'center',marginTop:5}}>
+                            <FontAwesome name={"map-marker"} color={"#B46609"} size={20}  style={{marginHorizontal:0}}/>
+                            <Text style={{fontFamily:'ManropeRegular',color:'#1A1E25',fontSize:16,fontWeight:'400',marginHorizontal:5}}>Gachibowli, Hyderabad</Text>
+                            <FontAwesome name={"chevron-down"} color={"#000000"} size={15}  style={{marginHorizontal:5}}/>
+                            </View>
+
+                            <View style={styles.locationSubContainer}>
+                                {address && (
+                                    <>
+                                        <Text style={styles.locationName}>{address?.neighbourhood}, </Text>
+                                        <Text style={styles.locationName}>{address?.city?.substring(0, 3)}</Text>
+
+                                        <MaterialIcon name={"keyboard-arrow-down"} color={"#7e7c7c"} size={20} style={{ marginTop: 5 }} />
+                                    </>)
+                                }
+                            </View>
                         </View>
-                        {/* <Text style={styles.fullLocation} ellipsizeMode='tail' numberOfLines={1}>Opposite to Delexe boys Hostel, Ambika Mens Hostel, Gachibowli,Hyderabad</Text> */}
+                        <Pressable onPress={() => navigation.navigate('ProfileScreen')}>
+                            <FontAwesome name={"user-circle"} color={"#000000"} size={35} />
+                        </Pressable>
+
                     </View>
-                    <Pressable onPress={()=>navigation.navigate('ProfileScreen')}>
-                    <FontAwesome name={"user-circle"} color={"#000000"} size={35} />
-                    </Pressable>
-                    
-                </View>
-                <View style={{ height: 60, width: "100%",alignSelf:"center", paddingVertical: 10, borderBottomColor: "#e0dede",marginBottom:25}}>
-                   
-                    <View style={{ flexDirection: "row", width: "90%", alignSelf: "center", alignItems: "center",borderRadius: 20, borderColor: "#bfb8b8", backgroundColor: "white", borderWidth: 0.8 }}>
+                <View style={{ height: 60, width: "100%", alignSelf: "center", paddingVertical: 10, borderBottomColor: "#e0dede", marginBottom: 25 }}>
+
+                    <View style={{ flexDirection: "row", width: "90%", alignSelf: "center", alignItems: "center", borderRadius: 20, borderColor: "#bfb8b8", backgroundColor: "white", borderWidth: 0.8 }}>
                         <Image source={require('../../assets/searchIcon.png')}
                             style={{ height: 15, width: 15, marginLeft: 10, alignSelf: "center" }}
                         />
@@ -139,7 +145,7 @@ const HomeDashboard = () => {
                             style={{ marginLeft: 15, alignSelf: "center", }} />
                     </View>
                 </View>
-                <View style={{marginHorizontal:20,alignSelf:"center",flex:1}}>
+                <View style={{ marginHorizontal: 20, alignSelf: "center", flex: 1 }}>
                     <SwiperFlatList
                         autoplay
                         autoplayDelay={2}
@@ -148,19 +154,19 @@ const HomeDashboard = () => {
                         showPagination
                         paginationDefaultColor='lightgray'
                         paginationActiveColor='gray'
-                        paginationStyle={{ position: 'absolute', bottom: -30, left: 0, right:0 }}
+                        paginationStyle={{ position: 'absolute', bottom: -30, left: 0, right: 0 }}
                         paginationStyleItem={{ alignSelf: 'center' }}
                         paginationStyleItemInactive={{ width: 7, height: 7 }}
                         paginationStyleItemActive={{ width: 8, height: 8 }}
                         data={images}
                         style={{}}
                         renderItem={({ item }) => (
-                            <View style={[{ backgroundColor:"yellow",flexDirection:"row", width, height: 150 }]}>
-                             <View style={{width:"50%",marginTop:20,marginHorizontal:10}}>
-                              <Text style={{fontSize:14, fontWeight:"800", color:"black"}}>New Collection</Text>
-                              <Text style={{fontSize:12, fontWeight:"400", color:"black",marginTop:10}}>New Collection now available at store at ;pwest price</Text>
-                              <Text style={{backgroundColor:"lightgray", width:"50%", padding:5,borderRadius:5,alignItems:"center",marginTop:10}}>Book Now</Text>
-                           </View>
+                            <View style={[{ backgroundColor: "yellow", flexDirection: "row", width, height: 200,borderRadius:15 }]}>
+                                <View style={{ width: "50%", marginTop: 20, marginHorizontal: 10 }}>
+                                    <Text style={{ fontSize: 14, fontWeight: "800", color: "black" }}>New Collection</Text>
+                                    <Text style={{ fontSize: 12, fontWeight: "400", color: "black", marginTop: 10,fontFamily:'ManropeRegular' }}>New Collection now available at store at lowest price</Text>
+                                    <Text style={{ backgroundColor: "green", width: "50%", padding: 5, borderRadius: 5, alignItems: "center", marginTop: 10, textAlign: 'center', fontWeight: '900', color: 'white',fontFamily:'PoppinsRegular' }}>Book Now</Text>
+                                </View>
                                 <Image source={item} style={styles.image}
                                     resizeMethod="resize"
                                     resizeMode="stretch" />
@@ -169,80 +175,64 @@ const HomeDashboard = () => {
                     />
                 </View>
 
-                <View style={{marginTop:20}}>
-                    <View style={{ flexDirection: "row" , alignSelf:"center",justifyContent:"space-between",width:"90%"}}>
-                        <Text style={{color:"black", fontSize:14, fontWeight:"400"}}>Trending Now</Text>
-                        {/* <Text style={{color:"black", fontSize:12, fontWeight:"400"}}>View All {'>'}</Text> */}
+                <View style={{ marginTop: 20 }}>
+                    <View style={{ flexDirection: "row", alignSelf: "center", justifyContent: "space-between", width: "90%" }}>
+                        <Text style={{ color: "black", fontSize: 14, fontWeight: "400" }}>Trending Now</Text>
+                        <Text style={{ color: "black", fontSize: 12, fontWeight: "400" }}>View All {'>'}</Text>
                     </View>
-                    <ScrollView horizontal style={{marginHorizontal:10,marginTop:15}} showsHorizontalScrollIndicator={false}>
+                    <ScrollView horizontal style={{ marginHorizontal: 10, }} showsHorizontalScrollIndicator={false}>
                         {categories.filter(item => item.type === 'Trending Now').map((item, index) => (
                             <TouchableOpacity
-                            onPress={() => navigation.navigate('ViewTrendingDetails',{categoryId: item?._id})}
-                             key={index} style={{width:moderateScale(140),marginLeft:10}}>
+                                onPress={() => navigation.navigate('ViewTrendingDetails', { categoryId: item?._id })}
+                                key={index} style={styles.card}>
                                 <Image source={{ uri: item.catImageUrl }} style={{
-                                    width: "100%",
-                                    height: 90,
-                                    backgroundColor:"yellow",
-                                    resizeMode:"cover",
+                                    width: 100,
+                                    height: 150,
+                                    resizeMode: "contain",
                                 }} />
                                 <Text style={styles.title}>{item?.name}</Text>
-                                {/* <Text style={[styles.status,{color:item?.rented ?  "#a85705" : "white", backgroundColor:item?.rented ? "#fabdb6" :"green"}]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text> */}
+                                <Text style={[styles.status, { color: item?.rented ? "#a85705" : "white", backgroundColor: item?.rented ? "#fabdb6" : "green" }]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text>
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
 
                 </View>
 
-                <View style={{marginTop:20}}>
-                    <View style={{ flexDirection: "row" , alignSelf:"center",justifyContent:"space-between",width:"90%"}}>
-                        <Text style={{color:"black", fontSize:14, fontWeight:"400"}}>Brand New</Text>
-                        {/* <Text style={{color:"black", fontSize:12, fontWeight:"400"}}>View All {'>'}</Text> */}
+                <View style={{ marginTop: 20 }}>
+                    <View style={{ flexDirection: "row", alignSelf: "center", justifyContent: "space-between", width: "90%" }}>
+                        <Text style={{ color: "black", fontSize: 14, fontWeight: "400" }}>Brand New</Text>
+                        <Text style={{ color: "black", fontSize: 12, fontWeight: "400" }}>View All {'>'}</Text>
                     </View>
-                    <ScrollView horizontal style={{marginHorizontal:10,marginTop:15}} showsHorizontalScrollIndicator={false}>
+                    <ScrollView horizontal style={{ marginHorizontal: 10, }} showsHorizontalScrollIndicator={false}>
                         {categories.filter(item => item.type === 'Brand New').map((item, index) => (
                             <TouchableOpacity
-                            onPress={() => navigation.navigate('ViewTrendingDetails',{categoryId: item?._id})}
-                             key={index}style={{width:moderateScale(110),marginLeft:10}} >
+                                onPress={() => navigation.navigate('ViewTrendingDetails', { categoryId: item?._id })}
+                                key={index} style={styles.card}>
                                 <Image source={{ uri: item.catImageUrl }} style={{
-                                    width: "100%",
-                                    height: 200,
-                                    resizeMode:"cover"
+                                    width: 100,
+                                    height: 150,
+                                    resizeMode: "contain"
                                 }} />
                                 <Text style={styles.title}>{item?.name}</Text>
-                                {/* <Text style={[styles.status,{color:item?.rented ?  "#a85705" : "white" , backgroundColor:item?.rented ? "#fabdb6" :"green" }]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text> */}
+                                <Text style={[styles.status, { color: item?.rented ? "#a85705" : "white", backgroundColor: item?.rented ? "#fabdb6" : "green" }]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text>
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
 
                 </View>
+                <View style={{ marginTop: 30 }}>
+                    {editsData.map((item, index) => (
+                        <View key={index} style={styles.listcard}>
+                            <Image source={item.image} style={{
+                                width: "100%",
+                                height: 120,
+                                borderRadius: 10,
+                                // marginBottom: 10,
+                            }} />
 
-                <View style={{marginTop:20,marginBottom:"10%"}}>
-                    <View style={{ flexDirection: "row" , alignSelf:"center",justifyContent:"space-between",width:"90%"}}>
-                        <Text style={{color:"black", fontSize:14, fontWeight:"400"}}>Subcription</Text>
-                        {/* <Text style={{color:"black", fontSize:12, fontWeight:"400"}}>View All {'>'}</Text> */}
-                    </View>
-                        {categories.filter(item => item.type === 'Trending Now').map((item, index) => (
-                            <TouchableOpacity
-                            onPress={() => navigation.navigate('ViewTrendingDetails',{categoryId: item?._id})}
-                             key={index}style={{marginHorizontal:15,backgroundColor:"lightgray",paddingHorizontal:5,paddingVertical:10,flexDirection:"row",marginTop:10}} >
-                                <Image source={{ uri: item.catImageUrl }} style={{
-                                    width: "20%",
-                                    height: 60,
-                                    resizeMode:"cover"
-                                }} />
-                                <View style={{marginLeft:10, width:"59%"}}>
-                                <Text style={{color:"black", fontSize:14, fontWeight:"800"}}>Cooking subscription</Text>
-                                <Text style={{color:"black", fontSize:12, fontWeight:"300",marginTop:5}}>Cooking subscription lorem ispusm is simply dummy text to the prinitng</Text>
-                                </View>
-
-                                <TouchableOpacity style={{elevation:10,width:40, height:40, borderRadius:20, backgroundColor:"white",alignSelf:"center",alignItems:"center",justifyContent:"center"}}>
-                                <Icon name="chevron-right" size={10} color="black" />
-                                </TouchableOpacity>
-                                
-                                {/* <Text style={[styles.status,{color:item?.rented ?  "#a85705" : "white" , backgroundColor:item?.rented ? "#fabdb6" :"green" }]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text> */}
-                            </TouchableOpacity>
-                        ))}
-
+                            <Text style={{ position: "absolute", left: 20, top: 30, color: "black" }}>{item?.name}</Text>
+                        </View>
+                    ))}
                 </View>
 
 
@@ -259,28 +249,37 @@ const styles = StyleSheet.create({
         alignItems: 'center', backgroundColor: "yellow",
         height: 200, // Adjust the height as needed
     },
-    swiperContainer: { 
-        flex: 1, 
-        alignSelf:'center',
+    swiperContainer: {
+        flex: 1,
+        alignSelf: 'center',
         backgroundColor: 'white',
-        width:"90%", 
+        width: "90%",
     },
-    topContainer:{
-        alignSelf:'center',
-        flexDirection:'row',
-        justifyContent:'space-between',
-        marginTop:10,
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    text: {
+        fontSize: 24,
+        color: '#fff',
+    },
+    topContainer: {
+        alignSelf: 'center',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
         // paddingVertical:10,
-        width:"90%",
+        width: "90%",
     },
     locationContainer: {
-        flexDirection:'column',
+        flexDirection: 'column',
         // marginLeft: 10,
     },
     locationSubContainer: {
         flexDirection: 'row',
-        alignItems:"center",
-        marginHorizontal:20, 
+        alignItems: "center",
+        marginHorizontal: 20,
     },
     locationIcon: {
         marginRight: 8,
@@ -290,44 +289,42 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: "#000000",
     },
-    fullLocation:{
-        width:200,
-        fontSize:15,
-        fontWeight:"400",
+    fullLocation: {
+        width: 200,
+        fontSize: 15,
+        fontWeight: "400",
     },
-    profileContainer:{
+    profileContainer: {
 
     },
     text: { fontSize: 12, textAlign: 'center' },
     title: {
         fontSize: 12,
         fontWeight: "400",
-        alignSelf:"center",
-        textAlign:"center",
-        // marginTop:5,
-        paddingHorizontal:10,
-        paddingVertical:10
+        alignSelf: "center",
+        textAlign: "center",
+        marginTop: 5
     },
     status: {
         fontSize: 10,
-        padding:4,
-        borderRadius:5,
-        marginTop:5
+        padding: 4,
+        borderRadius: 5,
+        marginTop: 5
     },
     card: {
-        borderWidth:1, borderColor:"lightgray", borderRadius:10,paddingBottom:10,
-        paddingHorizontal:5,
-        marginTop:10,
+        borderWidth: 1, borderColor: "lightgray", borderRadius: 10, paddingBottom: 10,
+        paddingHorizontal: 5,
+        marginTop: 10,
         alignItems: 'center',
-        margin:5,
+        margin: 5,
         // backgroundColor:"#f7f5f5"
     },
     listcard: {
-        marginTop:10,
-        width:"90%",
-        borderRadius:20, 
-        alignSelf:"center",
-        alignItems:"center" 
+        marginTop: 10,
+        width: "90%",
+        borderRadius: 20,
+        alignSelf: "center",
+        alignItems: "center"
     },
     image: {
         width: '50%',
