@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import { View, Text, Dimensions, ImageBackground,PermissionsAndroid, Pressable,StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity ,Platform, Alert} from 'react-native';
+import { View, Text, Dimensions,FlatList, ImageBackground,PermissionsAndroid, Pressable,StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity ,Platform, Alert} from 'react-native';
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import Wedding from '../../assets/wedding.png';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
@@ -11,22 +11,48 @@ import axios from "axios";
 import Geolocation from '@react-native-community/geolocation';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import GetLocation from 'react-native-get-location'
-import { moderateScale } from "../../utils/scalingMetrics";
+import { height, moderateScale } from "../../utils/scalingMetrics";
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import LocationMarkIcon from '../../assets/svgs/location.svg';
+import SearchIcon from '../../assets/svgs/searchIcon.svg';
+import HomeSwipper from '../../assets/svgs/homeswippers.svg';
+import ArrowDown from '../../assets/svgs/arrowDown.svg';
+import TentHouseIcon from '../../assets/svgs/categories/tentHouse.svg';
+import FuntionalHall from '../../assets/svgs/categories/funtionHalls.svg';
+import DecorationsIcon from '../../assets/svgs/categories/decorations.svg';
+import CateringIcon from '../../assets/svgs/categories/catering.svg';
+import DriversIcon from '../../assets/svgs/categories/drivers.svg';
+import ChefIcon from '../../assets/svgs/categories/chefs.svg';
+import JewelleryIcon from '../../assets/svgs/categories/jewellery.svg';
+import ClothesIcon from '../../assets/svgs/categories/clothes.svg';
+import SwipperOne from '../../assets/svgs/homeSwippers/swipperOne.svg';
+import MoneyWavy from '../../assets/svgs/MoneyWavy.svg';
+import Cloth from '../../assets/svgs/cloth.svg';
+import Cheers from '../../assets/svgs/Cheers.svg';
 import { LinearGradient } from 'react-native-linear-gradient';
 import FilterIcon from '../../assets/svgs/filter.svg';
 import Svg, { Circle } from 'react-native-svg';
+import InfoBox from "../../components/InfoBox";
 
 const HomeDashboard = () => {
     const [categories,setCategories] = useState([])
     const [address, setAddress] = useState('');
+    const images = [SwipperOne,SwipperOne,SwipperOne]; //svg images for swipper  
 
-    useEffect(()=>{
-        getPermissions();
-        getCategories();
-    },[]);
+ const newData =[{name:'Clothes',image:require('../../assets/clothesIcon.png')},
+ {name:'Jewellery',image:require('../../assets/clothesIcon.png')},
+ {name:'Chefs',image:require('../../assets/clothesIcon.png')},
+ {name:'Driver',image:require('../../assets/clothesIcon.png')},
+ {name:'Tent House',image:require('../../assets/clothesIcon.png')},
+ {name:'Halls',image:require('../../assets/clothesIcon.png')},
+ {name:'Decoration',image:require('../../assets/clothesIcon.png')},
+ {name:'Catering',image:require('../../assets/clothesIcon.png')},
+ ]
 
+ useEffect(()=>{
+    getPermissions();
+    getCategories();
+},[]);
 
     const getLocation = async() =>{
         GetLocation.getCurrentPosition({
@@ -93,29 +119,19 @@ const HomeDashboard = () => {
 }
 
     const { width } = Dimensions.get('window');
-    const navigation = useNavigation();
-    const images = [
-        require('../../assets/wedding.png'),
-        require('../../assets/furniture.jpg'),
-        require('../../assets/decoration.jpg'),
-        require('../../assets/decoration.jpg'),
-    ];
-    const editsData = [
-        { image: require('../../assets/cameraIcon.jpeg'), name: 'Sardha cameras', status: 'Available' },
-        { image: require('../../assets/men.jpeg'), name: 'fashionstore', status: 'Available' },
-        { image: require('../../assets/jwellery.jpg'), name: 'trendnow', status: 'Available' },
-    ]
+    const navigation = useNavigation();  
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
             <ScrollView style={{ marginBottom: 70 }} >
-                <View style={styles.topContainer}>
+            <LinearGradient start={{x: 0, y: 0}} end={{x: 0, y: 1}} colors={['#FFF7E7', '#FDFAF5', '#FFFFFF']} style={{flex:1}}>
+            <View style={styles.topContainer}>
                     <View style={styles.locationContainer}>
-                        <Text style={{fontFamily:'ManropeRegular',color:'#7D7F88;',fontSize:12,fontWeight:'400'}}>Find your place in</Text>
-                            <TouchableOpacity onPress={() => getPermissions()} style={{flexDirection:'row',alignItems:'center',marginTop:5}}>
-                            <FontAwesome name={"map-marker"} color={"#FEB622"} size={20}  style={{marginHorizontal:0}}/>
-                            <Text style={{fontFamily:'ManropeRegular',color:'#1A1E25',fontSize:16,fontWeight:'400',marginHorizontal:5}}>{address?.neighbourhood}, {address?.city}</Text>
-                            <MaterialIcon name={"keyboard-arrow-down"} color={"#1A1E25"} size={20}  style={{}}/>
+                        <Text style={styles.currentLoc}>Your current location</Text>
+                            <TouchableOpacity onPress={getLocation} style={styles.getLoc}>
+                            <LocationMarkIcon/>
+                            <Text style={styles.retrievedLoc}>{address?.neighbourhood}, {address?.city}</Text>
+                            <ArrowDown/>
                             </TouchableOpacity>
                     </View>
                     <Pressable onPress={()=>navigation.navigate('ProfileScreen')}>
@@ -123,46 +139,83 @@ const HomeDashboard = () => {
                     </Pressable>
                     
                 </View>
-                <View style={{ height: 60, width: "100%",alignSelf:"center", paddingVertical: 10, borderBottomColor: "#e0dede",marginBottom:25}}>
-                   
-                    <View style={{ flexDirection: "row", width: "90%", alignSelf: "center", alignItems: "center",borderRadius: 20, borderColor: "#bfb8b8", backgroundColor: "white", borderWidth: 0.8 }}>
-                        <Image source={require('../../assets/searchIcon.png')}
-                            style={{ height: 15, width: 15, marginLeft: 10, alignSelf: "center" }}
-                        />
+                <View style={styles.searchContainer}>
+                    <View style={styles.searchProduct}>
+                        <View style={styles.searchProHeader}>
+                        <SearchIcon style={{marginLeft:10}}/>
                         <TextInput
-                            placeholder="Browse requirements"
-                            style={{ marginLeft: 15, alignSelf: "center", }} />
+                            placeholder="Search by products,"
+                            style={styles.textInput} />
+                        </View>   
+                    </View>
+                    <View style={styles.filterView}>
+                        <FilterIcon />
                     </View>
                 </View>
-                <View style={{marginHorizontal:20,alignSelf:"center",flex:1}}>
+                <View style={{width:"100%"}}>
                     <SwiperFlatList
                         autoplay
                         autoplayDelay={2}
                         autoplayLoop
                         index={2}
                         showPagination
-                        paginationDefaultColor='lightgray'
-                        paginationActiveColor='gray'
-                        paginationStyle={{ position: 'absolute', bottom: -30, left: 0, right:0 }}
-                        paginationStyleItem={{ alignSelf: 'center' }}
-                        paginationStyleItemInactive={{ width: 7, height: 7 }}
-                        paginationStyleItemActive={{ width: 8, height: 8 }}
+                        paginationDefaultColor='#DDD4F3'
+                        paginationActiveColor='#ECA73C'
+                        paginationStyle={{ bottom: -20,}}
+                        paginationStyleItem={{ backgroundColor:"red" }}
+                        paginationStyleItemInactive={{ width: 8, height: 8}}
+                        paginationStyleItemActive={{ height: 8,width:20 }}
                         data={images}
                         style={{}}
-                        renderItem={({ item }) => (
-                            <View style={[{ backgroundColor:"yellow",flexDirection:"row", width, height: 150 }]}>
-                             <View style={{width:"50%",marginTop:20,marginHorizontal:10}}>
-                              <Text style={{fontSize:14, fontWeight:"800", color:"black"}}>New Collection</Text>
-                              <Text style={{fontSize:12, fontWeight:"400", color:"black",marginTop:10}}>New Collection now available at store at ;pwest price</Text>
-                              <Text style={{backgroundColor:"lightgray", width:"50%", padding:5,borderRadius:5,alignItems:"center",marginTop:10}}>Book Now</Text>
-                           </View>
-                                <Image source={item} style={styles.image}
-                                    resizeMethod="resize"
-                                    resizeMode="stretch" />
-                            </View>
+                        renderItem={({ item: Item }) => (
+                            <View style={{width,flex:1,alignItems:"center"}}>
+                            <Item  />  
+                         </View>
+                          
                         )}
                     />
                 </View>
+
+                <View style={styles.infoBoxContainer}>
+                    
+                    <InfoBox
+                     IconComponent={MoneyWavy} 
+                     mainText="100%" 
+                     subText="Cost Efficient" 
+                   />
+                   <View style={styles.verticalLine}/>
+                   <InfoBox
+                     IconComponent={Cloth} 
+                     mainText="1500+" 
+                     subText="Products" 
+                   />
+                   <View style={styles.verticalLine}/>
+                   <InfoBox
+                     IconComponent={Cheers} 
+                     mainText="1500+" 
+                     subText="Events" 
+                   />
+
+                </View>
+
+                <View style={{marginTop:10, marginHorizontal:20}}>
+                    <Text style={{fontFamily:"ManropeRegular", fontWeight:"700", fontSize:16, color:'#202020'}}>Categories</Text>
+                    <FlatList
+                       data={newData}
+                       renderItem={({item})=>{
+                        return(
+                          <View style={{padding:5,alignItems:"center",marginRight:20}} >
+                                     <Image source={item.image}style={{height:60, width:60,borderRadius:30,elevation:2}} />
+                               <Text style={{marginTop:5,fontSize:13, fontWeight:"500", color:'#202020',fontFamily:"ManropeRegular", }}>{item?.name}</Text>
+                          </View>
+                         )
+                        }}
+                      showsHorizontalScrollIndicator={false}
+                      numColumns={4}
+                    />
+                </View>
+             </LinearGradient>
+        
 
                 <View style={{marginTop:20}}>
                     <View style={{ flexDirection: "row" , alignSelf:"center",justifyContent:"space-between",width:"90%"}}>
@@ -238,9 +291,7 @@ const HomeDashboard = () => {
                             </TouchableOpacity>
                         ))}
 
-                </View>
-
-
+                </View>        
 
             </ScrollView>
         </SafeAreaView>
@@ -264,7 +315,7 @@ const styles = StyleSheet.create({
         // alignSelf:'center',
         flexDirection:'row',
         justifyContent:'space-between',
-        marginTop:10,
+        marginTop:15,
         marginHorizontal:20
         // paddingVertical:10,
         // width:"90%",
@@ -330,6 +381,78 @@ const styles = StyleSheet.create({
         height: "100%",
         resizeMode: 'cover',
     },
+    currentLoc:{
+        fontFamily:'ManropeRegular',
+        color:'#7D7F88;',
+        fontSize:12,
+        fontWeight:'400'
+    },
+    getLoc:{
+        flexDirection:'row',
+        alignItems:'center',
+        marginTop:5
+    },
+    retrievedLoc:{
+        fontFamily:'ManropeRegular',
+        color:'#1A1E25',
+        fontSize:16,
+        fontWeight:'400',
+        marginHorizontal:5
+    },
+    searchContainer:{
+        marginHorizontal:20,
+        flexDirection:"row",
+        marginVertical:10,
+        justifyContent:"space-between"
+    },
+    searchProduct:{
+        height:45,
+        backgroundColor:"#FFFFFF",
+        width:"85%",
+        flexDirection: "row",
+        alignItems: "center",
+        borderRadius: 10,
+        borderColor: "#FFFFFF",
+        borderWidth: 0.8
+    },
+    searchProHeader:{
+        flexDirection:"row",
+        alignSelf:"center",
+        alignItems:"center"
+    },
+    textInput:{ 
+        marginLeft: 10,
+        alignSelf: "center"
+    },
+    filterView:{
+        height:45,
+        backgroundColor:"#FFFFFF",
+        padding:10,
+        justifyContent:"center",
+        alignItems: "center",
+        borderRadius: 10, 
+        borderColor: "#FFFFFF", 
+        borderWidth: 0.8 
+    },
+    infoBoxContainer:{
+        marginHorizontal:20,
+        flexDirection:"row",
+        justifyContent:"space-evenly",
+        backgroundColor:"#FFFFFF",
+        padding:8,
+        marginVertical:25,
+        borderRadius:10
+    },
+    verticalLine:{
+        backgroundColor:"#EFAE1A",
+        height:"80%",
+        width:1,
+        alignSelf:"center"
+    },
+
+
+
+
 });
 
 export default HomeDashboard;
