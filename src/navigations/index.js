@@ -27,6 +27,7 @@ import ReferAndEarn from "../screens/Profile/ProfileSubScreens/ReferAndEarn";
 import RefundPolicy from "../screens/Profile/ProfileSubScreens/RefundPolicy";
 import TermsAndCondition from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
 import BookingConfirm from "../screens/Bookings/BookingConfirmScreen";
+import ProductScreen from "../screens/Products/ProductScreen";
 
 const MainNavigation = () => {
 
@@ -69,6 +70,9 @@ const MainNavigation = () => {
                 <Stack.Screen name="RefundPolicy" component={RefundPolicy} options={{headerShown: true,}} />
                 <Stack.Screen name="TermsAndConditions" component={TermsAndCondition} options={{headerShown: true,}} />
                 {/* ############################################################ */}
+
+                <Stack.Screen name="ProductScreen" component={ProductScreen} options={{headerShown: true,}} />
+
                 <Stack.Screen name="Login" component={Login} options={{ headerShown: true }} />
                 <Stack.Screen name="Register" component={Register} options={{ headerShown: true }} />
                 <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ headerShown: true }} />

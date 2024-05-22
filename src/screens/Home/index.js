@@ -114,9 +114,6 @@ const HomeDashboard = () => {
                             <Text style={{ fontFamily: 'ManropeRegular', color: '#1A1E25', fontSize: 16, fontWeight: '400', marginHorizontal: 5 }}>Gachibowli, Hyderabad</Text>
                             <FontAwesome name={"chevron-down"} color={"#000000"} size={15} style={{ marginHorizontal: 5 }} />
                             <FilterIcon width={20} height={20} />
-                            <Svg height="50%" width="50%" viewBox="0 0 100 100" >
-                                <Circle cx="50" cy="50" r="50" stroke="purple" strokeWidth=".5" fill="violet" />
-                            </Svg>
                         </View>
 
                         <View style={styles.locationSubContainer}>
@@ -129,7 +126,7 @@ const HomeDashboard = () => {
                                 </>)}
                         </View>
                     </View>
-                    <Pressable onPress={() => navigation.navigate('ProfileScreen')}>
+                    <Pressable onPress={() => navigation.navigate('ProductScreen')}>
                         <FontAwesome name={"user-circle"} color={"#000000"} size={35} />
                     </Pressable>
 
