@@ -37,6 +37,7 @@ import { formatAmount } from "../../utils/GlobalFunctions";
 
 import Svg, { Circle } from 'react-native-svg';
 import InfoBox from "../../components/InfoBox";
+import TrendingView from "../../components/TrendingView";
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
@@ -100,7 +101,7 @@ const HomeDashboard = () => {
             })
             .catch(error => {
                 const { code, message } = error;
-                console.warn(code, message);
+                // console.warn(code, message);
             })
 
     }
@@ -123,7 +124,7 @@ const HomeDashboard = () => {
                 Alert.alert("Location persmiion denied")
             }
         } catch (err) {
-            console.warn(err)
+            // console.warn(err)
         }
     }
 
@@ -364,6 +365,24 @@ const HomeDashboard = () => {
                         </TouchableOpacity>
                     ))}
 
+                </View>
+
+                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
+                    <Text style={styles.onDemandTextStyle}>Trending Now</Text>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                        <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
+                        <RightArrowIcon width={25} height={25} />
+                    </TouchableOpacity>
+                </View>
+
+                <TrendingView />
+
+                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
+                    <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                        <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
+                        <RightArrowIcon width={25} height={25} />
+                    </TouchableOpacity>
                 </View>
 
                 <FlatList
