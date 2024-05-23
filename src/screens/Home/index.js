@@ -39,6 +39,7 @@ import WantChef from '../../assets/svgs/chefDriver/chef.svg';
 import Svg, { Circle } from 'react-native-svg';
 import InfoBox from "../../components/InfoBox";
 import TrendingView from "../../components/TrendingView";
+import TrendingShirtImg from '../../assets/svgs/shirtTrending.svg';
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
@@ -63,6 +64,11 @@ const HomeDashboard = () => {
 
     const images = [SwipperOne, SwipperOne, SwipperOne]; //svg images for swipper  
     const wantChefDriver = [WantChef, WantDriver];  
+    const trendingImageList = [{name:'Levis Full-Sleeve Blue Shirt',image:TrendingShirtImg},
+    {name:'Delicious meals in 1 mins',image:TrendingShirtImg},
+    {name:'MAX blue full hands',image:TrendingShirtImg},
+    {name:'MAX blue full hands i',image:TrendingShirtImg},
+    {name:'levis bluew5555',image:TrendingShirtImg},];
 
     const newData = [{ name: 'Clothes', image: require('../../assets/clothesIcon.png') },
     { name: 'Jewellery', image: require('../../assets/clothesIcon.png') },
@@ -198,9 +204,9 @@ const HomeDashboard = () => {
     const navigation = useNavigation();
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F6F5" }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
             <ScrollView style={{ marginBottom: 70 }} >
-                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FDFAF5', '#FFFFFF']} style={{ flex: 1 }}>
+                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1 }}>
                     <View style={styles.topContainer}>
                         <View style={styles.locationContainer}>
                             <Text style={styles.currentLoc}>Your current location</Text>
@@ -292,11 +298,21 @@ const HomeDashboard = () => {
                     </View>
                 </LinearGradient>
 
+                <View style={{marginTop:40,}}>
+                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
+                    <Text style={styles.onDemandTextStyle}>Trending Now</Text>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                        <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
+                        <RightArrowIcon width={25} height={25} />
+                    </TouchableOpacity>
+                </View>
 
-                <SwiperFlatList
-                            autoplay
-                            autoplayDelay={2}
-                            autoplayLoop
+                <TrendingView 
+                data={trendingImageList}
+                />
+                </View>
+
+                        <SwiperFlatList
                             index={2}
                             showPagination
                             paginationDefaultColor='#DDD4F3'
@@ -306,23 +322,13 @@ const HomeDashboard = () => {
                             paginationStyleItemInactive={{ width: 8, height: 8 }}
                             paginationStyleItemActive={{ height: 8, width: 20 }}
                             data={wantChefDriver}
-                            style={{}}
+                            style={{width}}
                             renderItem={({ item: Item }) => (
-                                <View style={{ width, flex: 1, alignItems: "center" }}>
+                                <View style={{ width, flex: 1, alignItems: "center"}}>
                                     <Item />
                                 </View>
                             )}
                         />
-
-                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
-                    <Text style={styles.onDemandTextStyle}>Trending Now</Text>
-                    <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
-                        <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
-                        <RightArrowIcon width={25} height={25} />
-                    </TouchableOpacity>
-                </View>
-
-                <TrendingView />
 
                 <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
                     <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>

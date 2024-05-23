@@ -8,6 +8,15 @@ import HomeDashboard from '../screens/Home';
 import Events from '../screens/Events';
 import Categories from '../screens/Categories';
 import MyBox from '../screens/MyBox';
+import HomeIcon from '../assets/svgs/tabIcons/home.svg';
+import CollectionIcon from '../assets/svgs/tabIcons/collections.svg';
+import FocusedHomeIcon from '../assets/svgs/tabIcons/focusedHome.svg';
+import FocusedCollection from '../assets/svgs/tabIcons/focusedCollection.svg';
+import EventsIcon from '../assets/svgs/tabIcons/events.svg';
+import FocusedEvents from '../assets/svgs/tabIcons/focusedEvents.svg';
+import HireIcon from '../assets/svgs/tabIcons/hire.svg';
+import FocusedHire from '../assets/svgs/tabIcons/focusedHire.svg';
+import SwitchIcon from '../assets/svgs/tabIcons/profile.svg';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -43,15 +52,7 @@ const Tab4Screen = ({ navigation }) => {
   
     return (
       <TouchableOpacity onPress={handleTabPress}>
-       <Image
-          source={require('../assets/eventsicon.png')}
-          style={{
-            width: 20,
-            height: 20,
-            marginTop: os === 'ios' ? 30 : 0,
-            tintColor: focused ? 'black' : 'gray',
-          }}
-        />
+        {focused ? <FocusedHomeIcon/> : <SwitchIcon/>}
       </TouchableOpacity>
     );
   };
@@ -64,93 +65,69 @@ const Tab4Screen = ({ navigation }) => {
       screenOptions={props => {
         return {
           tabBarShowLabel: false,
-          // tabBarActiveTintColor: 'blue', // Change the active tab color
-          // tabBarInactiveTintColor: 'white', // Change the inactive tab color
           tabBarStyle: {
             backgroundColor: 'white',
-            height: 45,
+            height: 50,
             position: 'absolute',
+          },
+          tabBarActiveTintColor: '#ED9D20',
+          tabBarInactiveTintColor: '#AAAEBB',
+          tabBarLabelStyle: {
+            fontSize: 12,fontWeight:"400",
           },
         };
       }}>
 
-     <Tab.Screen
-     name="Homie"
-     component={HomeDashboard}
-     options={({ focused }) => ({
-     tabBarIcon: ({focused}) => (
-        <Image
-        source={require('../assets/homie.png')}
-        style={{
-          width: 20,
-          height: 20,
-          marginTop: os === 'ios' ? 30 : 0,
-          tintColor: focused ? 'black' : 'gray',
+        <Tab.Screen
+        name="Homie"
+        component={HomeDashboard}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            focused ? <FocusedHomeIcon /> : <HomeIcon />
+          ),
+          tabBarLabel: 'Home',
+          tabBarShowLabel:true,
+          headerShown: false,
         }}
       />
-    ),
-    headerShown: false,
-  })}
-/>
 
  <Tab.Screen
   name="Category"
   component={Categories}
-  options={({ focused }) => ({
-    tabBarIcon: ({focused}) => (
-      
-        <Image
-        source={require('../assets/categories.png')}
-        style={{
-          width: 20,
-          height: 20,
-          marginTop: os === 'ios' ? 30 : 0,
-          tintColor: focused ? 'black' : 'gray',
-        }}
-      />
+  options={{
+    tabBarIcon: ({ focused }) => (
+      focused ? <FocusedCollection /> : <CollectionIcon />
     ),
+    tabBarLabel: 'Collections',
+    tabBarShowLabel:true,
     headerShown: false,
-  })}
+  }}
 />
 
 <Tab.Screen
   name="Events"
   component={Events}
-  options={({ focused }) => ({
-    tabBarIcon: ({focused}) => (
-      
-        <Image
-        source={require('../assets/eventsicon.png')}
-        style={{
-          width: 20,
-          height: 20,
-          marginTop: os === 'ios' ? 30 : 0,
-          tintColor: focused ? 'black' : 'gray',
-        }}
-      />
+  options={{
+    tabBarIcon: ({ focused }) => (
+      focused ? <FocusedEvents /> : <EventsIcon />
     ),
+    tabBarLabel: 'Events',
+    tabBarShowLabel:true,
     headerShown: false,
-  })}
+  }}
 />
 
 <Tab.Screen
   name="My Box"
   component={MyBox}
-  options={({ focused }) => ({
-    tabBarIcon: ({focused}) => (
-     
-        <Image
-          source={require('../assets/Home.png')}
-          style={{
-            width: 20,
-            height: 20,
-            marginTop: os === 'ios' ? 30 : 0,
-            tintColor: focused ? 'black' : 'gray',
-          }}
-        />
+  options={{
+    tabBarIcon: ({ focused }) => (
+      focused ? <FocusedHire /> : <HireIcon />
     ),
+    tabBarLabel: 'Hire',
+    tabBarShowLabel:true,
     headerShown: false,
-  })}
+  }}
 />
 
 <Tab.Screen
