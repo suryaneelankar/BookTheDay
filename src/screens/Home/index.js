@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Dimensions, ImageBackground, PermissionsAndroid, Pressable, StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
+import { View, Text, Dimensions, ImageBackground, FlatList, PermissionsAndroid, Pressable, StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import Wedding from '../../assets/wedding.png';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
@@ -12,20 +12,34 @@ import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import GetLocation from 'react-native-get-location'
 import { LinearGradient } from 'react-native-linear-gradient';
 import FilterIcon from '../../assets/svgs/filter.svg';
-import Svg, { Circle } from 'react-native-svg';
+import RightArrowIcon from '../../assets/svgs/rightArrow.svg';
+import themevariable from "../../utils/themevariable";
+import { formatAmount } from "../../utils/GlobalFunctions";
+
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
     const [address, setAddress] = useState('');
+    const [eventsData, setEventsData] = useState([]);
 
     useEffect(() => {
         getPermissions();
-        getCategories();
+        // getCategories();
+        getAllEvents();
     }, []);
+
+    const getAllEvents = async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}/all-events`);
+            setEventsData(response?.data?.data)
+        } catch (error) {
+            console.log("events data error>>::", error);
+        }
+    }
 
 
     const getLocation = async () => {
-        console.log("getting location", location);
+        // console.log("getting location", location);
         GetLocation.getCurrentPosition({
             enableHighAccuracy: true,
             timeout: 60000,
@@ -48,7 +62,7 @@ const HomeDashboard = () => {
             })
             .catch(error => {
                 const { code, message } = error;
-                console.warn(code, message);
+                console.log(code, message);
             })
 
     }
@@ -71,7 +85,7 @@ const HomeDashboard = () => {
                 Alert.alert("Location persmiion denied")
             }
         } catch (err) {
-            console.warn(err)
+            console.log(err)
         }
     }
 
@@ -89,6 +103,56 @@ const HomeDashboard = () => {
         }
     }
 
+    const renderItem = ({ item }) => {
+
+        return (
+            <View style={{}}>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
+                    style={{ width: Dimensions.get('window').width / 1.3, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', marginHorizontal: 16, marginTop: 15, height: 'auto' }}>
+                    <Image source={{ uri: item?.mainImageUrl }} style={{ borderRadius: 8, width: '100%', padding: 90 }}
+                        resizeMode="stretch"
+
+                    />
+                    <View style={{ marginTop: 15, justifyContent: 'space-between', }}>
+
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignSelf: 'center', alignItems: 'center' }}>
+                            <Text style={{ fontWeight: '700', color: '#131313', fontSize: 16, fontFamily: 'InterBold', width: '48%' }}>{item?.name}</Text>
+                            <Text style={{ fontWeight: '700', color: themevariable.Color_B46609, fontSize: 18, fontFamily: 'InterBold' }}>{formatAmount(item?.price)}/day</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignSelf: 'center', alignItems: 'center' }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                                <FontAwesome name={"map-marker"} color={themevariable.Color_777777} size={20} style={{}} />
+                                <Text style={{ fontWeight: '500', marginHorizontal: 5, color: themevariable.Color_777777, fontSize: 13, marginTop: 5, fontFamily: 'InterBold', bottom: 3 }}>Madhapur,Hyderabad</Text>
+                            </View>
+                            <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
+                                <Text style={styles.strickedoffer}>{formatAmount(item?.price + 1000)}</Text>
+                                <Text style={styles.off}> 20% off</Text>
+                            </View>
+                        </View>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "60%", marginTop: 10, padding: 5 }}>
+
+                        <View style={{ backgroundColor: item?.available ? "#dcfcf0" : themevariable.Color_FFF8DF, flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
+                            <Image source={require('../../assets/available.png')} style={{ width: 15, height: 15 }} />
+                            {item?.available ?
+                                <Text style={{ fontWeight: '600', color: 'black', fontSize: 12, marginHorizontal: 5,fontFamily: 'InterBold' }}>Available</Text>
+                                :
+                                <Text style={{ fontWeight: '600', color: themevariable.Color_EB772F, fontSize: 12, marginHorizontal: 5,fontFamily: 'InterBold' }}>Booked</Text>
+                            }
+                        </View>
+                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5,backgroundColor:themevariable.Color_FFF8DF }}>
+                            <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} />
+                            <Text style={{ marginHorizontal: 2 ,fontFamily: 'InterRegular',fontWeight:'600'}}> 300-500</Text>
+                        </View>
+
+                    </View>
+                </TouchableOpacity>
+            </View>
+        )
+    }
+
     const { width } = Dimensions.get('window');
     const navigation = useNavigation();
     const images = [
@@ -103,7 +167,7 @@ const HomeDashboard = () => {
     ]
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F6F5" }}>
             <ScrollView style={{ marginBottom: 70 }} >
 
                 <View style={styles.topContainer}>
@@ -114,9 +178,6 @@ const HomeDashboard = () => {
                             <Text style={{ fontFamily: 'ManropeRegular', color: '#1A1E25', fontSize: 16, fontWeight: '400', marginHorizontal: 5 }}>Gachibowli, Hyderabad</Text>
                             <FontAwesome name={"chevron-down"} color={"#000000"} size={15} style={{ marginHorizontal: 5 }} />
                             <FilterIcon width={20} height={20} />
-                            <Svg height="50%" width="50%" viewBox="0 0 100 100" >
-                                <Circle cx="50" cy="50" r="50" stroke="purple" strokeWidth=".5" fill="violet" />
-                            </Svg>
                         </View>
 
                         <View style={styles.locationSubContainer}>
@@ -175,65 +236,21 @@ const HomeDashboard = () => {
                     />
                 </View>
 
-                <View style={{ marginTop: 20 }}>
-                    <View style={{ flexDirection: "row", alignSelf: "center", justifyContent: "space-between", width: "90%" }}>
-                        <Text style={{ color: "black", fontSize: 14, fontWeight: "400" }}>Trending Now</Text>
-                        <Text style={{ color: "black", fontSize: 12, fontWeight: "400" }}>View All {'>'}</Text>
-                    </View>
-                    <ScrollView horizontal style={{ marginHorizontal: 10, }} showsHorizontalScrollIndicator={false}>
-                        {categories.filter(item => item.type === 'Trending Now').map((item, index) => (
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate('ViewTrendingDetails', { categoryId: item?._id })}
-                                key={index} style={styles.card}>
-                                <Image source={{ uri: item.catImageUrl }} style={{
-                                    width: 100,
-                                    height: 150,
-                                    resizeMode: "contain",
-                                }} />
-                                <Text style={styles.title}>{item?.name}</Text>
-                                <Text style={[styles.status, { color: item?.rented ? "#a85705" : "white", backgroundColor: item?.rented ? "#fabdb6" : "green" }]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text>
-                            </TouchableOpacity>
-                        ))}
-                    </ScrollView>
-
+                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: 30 }}>
+                    <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                        <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
+                        <RightArrowIcon width={25} height={25} />
+                    </TouchableOpacity>
                 </View>
 
-                <View style={{ marginTop: 20 }}>
-                    <View style={{ flexDirection: "row", alignSelf: "center", justifyContent: "space-between", width: "90%" }}>
-                        <Text style={{ color: "black", fontSize: 14, fontWeight: "400" }}>Brand New</Text>
-                        <Text style={{ color: "black", fontSize: 12, fontWeight: "400" }}>View All {'>'}</Text>
-                    </View>
-                    <ScrollView horizontal style={{ marginHorizontal: 10, }} showsHorizontalScrollIndicator={false}>
-                        {categories.filter(item => item.type === 'Brand New').map((item, index) => (
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate('ViewTrendingDetails', { categoryId: item?._id })}
-                                key={index} style={styles.card}>
-                                <Image source={{ uri: item.catImageUrl }} style={{
-                                    width: 100,
-                                    height: 150,
-                                    resizeMode: "contain"
-                                }} />
-                                <Text style={styles.title}>{item?.name}</Text>
-                                <Text style={[styles.status, { color: item?.rented ? "#a85705" : "white", backgroundColor: item?.rented ? "#fabdb6" : "green" }]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text>
-                            </TouchableOpacity>
-                        ))}
-                    </ScrollView>
-
-                </View>
-                <View style={{ marginTop: 30 }}>
-                    {editsData.map((item, index) => (
-                        <View key={index} style={styles.listcard}>
-                            <Image source={item.image} style={{
-                                width: "100%",
-                                height: 120,
-                                borderRadius: 10,
-                                // marginBottom: 10,
-                            }} />
-
-                            <Text style={{ position: "absolute", left: 20, top: 30, color: "black" }}>{item?.name}</Text>
-                        </View>
-                    ))}
-                </View>
+                <FlatList
+                    data={eventsData}
+                    renderItem={renderItem}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                />
+                
 
 
 
@@ -248,6 +265,25 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center', backgroundColor: "yellow",
         height: 200, // Adjust the height as needed
+    },
+    onDemandTextStyle: {
+        fontFamily: 'ManropeRegular',
+        color: themevariable.Color_202020,
+        fontSize: 16,
+        fontWeight: '700',
+        alignSelf: 'center'
+    },
+    strickedoffer: {
+        fontSize: 12,
+        color: "#57A64F",
+        fontWeight: "400",
+        marginLeft: 7,
+        textDecorationLine: 'line-through'
+    },
+    off: {
+        fontSize: 13,
+        color: "#57A64F",
+        fontWeight: "bold"
     },
     swiperContainer: {
         flex: 1,

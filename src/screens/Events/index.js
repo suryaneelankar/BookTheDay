@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import SwiperFlatList from 'react-native-swiper-flatlist';
 import axios from "axios";
 import { useNavigation } from '@react-navigation/native';
+import {formatAmount} from '../../utils/GlobalFunctions'
 
 
 const Events = () => {
@@ -44,14 +45,6 @@ const Events = () => {
         } catch (error) {
             console.log("events data error>>::", error);
         }
-    }
-
-    function formatAmount(amount) {
-        const amountStr = `${amount}`;
-        const [integerPart, decimalPart] = amountStr.split('.');
-        const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        const formattedAmount = decimalPart ? `${formattedIntegerPart}.${decimalPart}` : formattedIntegerPart;
-        return `₹${formattedAmount}`;
     }
 
     const renderItem = ({ item }) => {

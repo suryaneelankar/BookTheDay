@@ -9,6 +9,11 @@ export default {
   figtree_semiBold600: 'Figtree-SemiBold', //600
   figtree_font: 'Figtree',
   filter_gray: 'grayscale(0%)',
+  Color_202020: '#202020',
+  Color_B46609: '#B46609',
+  Color_777777: '#777777',
+  Color_FFF8DF: '#FFF8DF',
+  Color_EB772F: '#EB772F',
   Color_000000: '#000000',
   Color_dfdfdf: '#DFDFDF',
   Color_111111: '#111111',
