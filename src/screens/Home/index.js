@@ -218,7 +218,7 @@ const HomeDashboard = () => {
                             <View style={styles.searchProHeader}>
                                 <SearchIcon style={{ marginLeft: 10 }} />
                                 <TextInput
-                                    placeholder="Search by products,"
+                                    placeholder="Search by products"
                                     style={styles.textInput} />
                             </View>
                         </View>
