@@ -1218,6 +1218,11 @@
   resolved "https://registry.npmjs.org/@eslint/js/-/js-8.57.0.tgz"
   integrity sha512-Ys+3g2TaW7gADOJzPt83SJtCDhMjndcDMFVQ/Tj9iA1BfJzFKD9mAUXT3OenpuPHbI6P/myECxRJrofUsDx/5g==
 
+"@fanchenbao/react-native-scroll-indicator@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.npmjs.org/@fanchenbao/react-native-scroll-indicator/-/react-native-scroll-indicator-0.2.2.tgz"
+  integrity sha512-NtckpDnGF52/Ojbq4KAN5t253hI5CaNGZXPTKf7/RE1bmTo0/jVXfH7xwihzoP7TEOPebR2FUHxtkHFeZKRDsQ==
+
 "@hapi/hoek@^9.0.0", "@hapi/hoek@^9.3.0":
   version "9.3.0"
   resolved "https://registry.npmjs.org/@hapi/hoek/-/hoek-9.3.0.tgz"
