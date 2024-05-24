@@ -34,10 +34,12 @@ import FilterIcon from '../../assets/svgs/filter.svg';
 import RightArrowIcon from '../../assets/svgs/rightArrow.svg';
 import themevariable from "../../utils/themevariable";
 import { formatAmount } from "../../utils/GlobalFunctions";
-
+import WantDriver from '../../assets/svgs/chefDriver/driver.svg';
+import WantChef from '../../assets/svgs/chefDriver/chef.svg';
 import Svg, { Circle } from 'react-native-svg';
 import InfoBox from "../../components/InfoBox";
 import TrendingView from "../../components/TrendingView";
+import TrendingShirtImg from '../../assets/svgs/shirtTrending.svg';
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
@@ -45,7 +47,7 @@ const HomeDashboard = () => {
     const [eventsData, setEventsData] = useState([]);
 
     useEffect(() => {
-        getPermissions();
+        // getPermissions();
         // getCategories();
         getAllEvents();
     }, []);
@@ -61,6 +63,12 @@ const HomeDashboard = () => {
 
 
     const images = [SwipperOne, SwipperOne, SwipperOne]; //svg images for swipper  
+    const wantChefDriver = [WantChef, WantDriver];  
+    const trendingImageList = [{name:'Levis Full-Sleeve Blue Shirt',image:TrendingShirtImg},
+    {name:'Delicious meals in 1 mins',image:TrendingShirtImg},
+    {name:'MAX blue full hands',image:TrendingShirtImg},
+    {name:'MAX blue full hands i',image:TrendingShirtImg},
+    {name:'levis bluew5555',image:TrendingShirtImg},];
 
     const newData = [{ name: 'Clothes', image: require('../../assets/clothesIcon.png') },
     { name: 'Jewellery', image: require('../../assets/clothesIcon.png') },
@@ -91,7 +99,7 @@ const HomeDashboard = () => {
                     )
                         .then(response => response.json())
                         .then(data => {
-                            console.log("address is::::::", data)
+                            // console.log("address is::::::", data)
                             setAddress(data?.address);
                         })
                         .catch(error => {
@@ -131,10 +139,10 @@ const HomeDashboard = () => {
 
 
     const getCategories = async () => {
-        console.log("IAM CALLING API in home")
+        // console.log("IAM CALLING API in home")
         try {
             const response = await axios.get(`${BASE_URL}/all-category`);
-            console.log("categories::::::::::", response?.data?.data);
+            // console.log("categories::::::::::", response?.data?.data);
             setCategories(response?.data?.data)
         } catch (error) {
             console.log("categories::::::::::", error);
@@ -196,9 +204,9 @@ const HomeDashboard = () => {
     const navigation = useNavigation();
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#F8F6F5" }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
             <ScrollView style={{ marginBottom: 70 }} >
-                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FDFAF5', '#FFFFFF']} style={{ flex: 1 }}>
+                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1 }}>
                     <View style={styles.topContainer}>
                         <View style={styles.locationContainer}>
                             <Text style={styles.currentLoc}>Your current location</Text>
@@ -218,7 +226,7 @@ const HomeDashboard = () => {
                             <View style={styles.searchProHeader}>
                                 <SearchIcon style={{ marginLeft: 10 }} />
                                 <TextInput
-                                    placeholder="Search by products,"
+                                    placeholder="Search by products"
                                     style={styles.textInput} />
                             </View>
                         </View>
@@ -290,83 +298,7 @@ const HomeDashboard = () => {
                     </View>
                 </LinearGradient>
 
-
-                <View style={{ marginTop: 20 }}>
-                    <View style={{ flexDirection: "row", alignSelf: "center", justifyContent: "space-between", width: "90%" }}>
-                        <Text style={{ color: "black", fontSize: 14, fontWeight: "400" }}>Trending Now</Text>
-                        {/* <Text style={{color:"black", fontSize:12, fontWeight:"400"}}>View All {'>'}</Text> */}
-                    </View>
-                    <ScrollView horizontal style={{ marginHorizontal: 10, marginTop: 15 }} showsHorizontalScrollIndicator={false}>
-                        {categories.filter(item => item.type === 'Trending Now').map((item, index) => (
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate('ViewTrendingDetails', { categoryId: item?._id })}
-                                key={index} style={{ width: moderateScale(140), marginLeft: 10 }}>
-                                <Image source={{ uri: item.catImageUrl }} style={{
-                                    width: "100%",
-                                    height: 90,
-                                    backgroundColor: "yellow",
-                                    resizeMode: "cover",
-                                }} />
-                                <Text style={styles.title}>{item?.name}</Text>
-                                {/* <Text style={[styles.status,{color:item?.rented ?  "#a85705" : "white", backgroundColor:item?.rented ? "#fabdb6" :"green"}]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text> */}
-                            </TouchableOpacity>
-                        ))}
-                    </ScrollView>
-
-                </View>
-
-                <View style={{ marginTop: 20 }}>
-                    <View style={{ flexDirection: "row", alignSelf: "center", justifyContent: "space-between", width: "90%" }}>
-                        <Text style={{ color: "black", fontSize: 14, fontWeight: "400" }}>Brand New</Text>
-                        {/* <Text style={{color:"black", fontSize:12, fontWeight:"400"}}>View All {'>'}</Text> */}
-                    </View>
-                    <ScrollView horizontal style={{ marginHorizontal: 10, marginTop: 15 }} showsHorizontalScrollIndicator={false}>
-                        {categories.filter(item => item.type === 'Brand New').map((item, index) => (
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate('ViewTrendingDetails', { categoryId: item?._id })}
-                                key={index} style={{ width: moderateScale(110), marginLeft: 10 }} >
-                                <Image source={{ uri: item.catImageUrl }} style={{
-                                    width: "100%",
-                                    height: 200,
-                                    resizeMode: "cover"
-                                }} />
-                                <Text style={styles.title}>{item?.name}</Text>
-                                {/* <Text style={[styles.status,{color:item?.rented ?  "#a85705" : "white" , backgroundColor:item?.rented ? "#fabdb6" :"green" }]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text> */}
-                            </TouchableOpacity>
-                        ))}
-                    </ScrollView>
-
-                </View>
-
-                <View style={{ marginTop: 20, marginBottom: "10%" }}>
-                    <View style={{ flexDirection: "row", alignSelf: "center", justifyContent: "space-between", width: "90%" }}>
-                        <Text style={{ color: "black", fontSize: 14, fontWeight: "400" }}>Subcription</Text>
-                        {/* <Text style={{color:"black", fontSize:12, fontWeight:"400"}}>View All {'>'}</Text> */}
-                    </View>
-                    {categories.filter(item => item.type === 'Trending Now').map((item, index) => (
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('ViewTrendingDetails', { categoryId: item?._id })}
-                            key={index} style={{ marginHorizontal: 15, backgroundColor: "lightgray", paddingHorizontal: 5, paddingVertical: 10, flexDirection: "row", marginTop: 10 }} >
-                            <Image source={{ uri: item.catImageUrl }} style={{
-                                width: "20%",
-                                height: 60,
-                                resizeMode: "cover"
-                            }} />
-                            <View style={{ marginLeft: 10, width: "59%" }}>
-                                <Text style={{ color: "black", fontSize: 14, fontWeight: "800" }}>Cooking subscription</Text>
-                                <Text style={{ color: "black", fontSize: 12, fontWeight: "300", marginTop: 5 }}>Cooking subscription lorem ispusm is simply dummy text to the prinitng</Text>
-                            </View>
-
-                            <TouchableOpacity style={{ elevation: 10, width: 40, height: 40, borderRadius: 20, backgroundColor: "white", alignSelf: "center", alignItems: "center", justifyContent: "center" }}>
-                                <Icon name="chevron-right" size={10} color="black" />
-                            </TouchableOpacity>
-
-                            {/* <Text style={[styles.status,{color:item?.rented ?  "#a85705" : "white" , backgroundColor:item?.rented ? "#fabdb6" :"green" }]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text> */}
-                        </TouchableOpacity>
-                    ))}
-
-                </View>
-
+                <View style={{marginTop:40,}}>
                 <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
                     <Text style={styles.onDemandTextStyle}>Trending Now</Text>
                     <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
@@ -375,7 +307,28 @@ const HomeDashboard = () => {
                     </TouchableOpacity>
                 </View>
 
-                <TrendingView />
+                <TrendingView 
+                data={trendingImageList}
+                />
+                </View>
+
+                        <SwiperFlatList
+                            index={2}
+                            showPagination
+                            paginationDefaultColor='#DDD4F3'
+                            paginationActiveColor='#ECA73C'
+                            paginationStyle={{bottom: -20}}
+                            paginationStyleItem={{ backgroundColor: "red" }}
+                            paginationStyleItemInactive={{ width: 8, height: 8 }}
+                            paginationStyleItemActive={{ height: 8, width: 20 }}
+                            data={wantChefDriver}
+                            style={{width}}
+                            renderItem={({ item: Item }) => (
+                                <View style={{ width, flex: 1, alignItems: "center"}}>
+                                    <Item />
+                                </View>
+                            )}
+                        />
 
                 <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
                     <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
