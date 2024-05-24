@@ -1,56 +1,73 @@
-import {View,Text,FlatList,StyleSheet} from "react-native"
+import {View,Text,FlatList,StyleSheet,Image} from "react-native"
+import shirtIcon from "../../assets/shirtIcon.png"
 
 const Tags=()=>{
     const DATA = [
         {
           id: 0,
-          title: 'All',
+          title: 'product 1',
+          imageUrl:shirtIcon
         },
         {
           id: 1,
-          title: 'Wedding dress',
+          title: 'product 2',
+          imageUrl:shirtIcon
         },
         {
           id: 2,
-          title: 'Designer coats',
+          title: 'product 3',
+          imageUrl:shirtIcon
+        },
+        {
+          id: 3,
+          title: 'product 3',
+          imageUrl:shirtIcon
+        },
+        {
+          id: 4,
+          title: 'product 3',
+          imageUrl:shirtIcon
+        },
+        {
+          id: 5,
+          title: 'product 3',
+          imageUrl:shirtIcon
         },
       ];
 
-    const Item = ({title}) => (
+    const Item = ({item}) => (
     <View style={styles.item}>
-        <Text style={styles.title}>{title}</Text>
+      <Image style={styles.productImage} source={item.imageUrl} resizeMode="contain" />
+        <Text style={styles.title}>{item.title}</Text>
     </View>
     );
 
     return(
+      <>
+      <Text>Categories ({DATA.length})</Text>
         <FlatList
             data={DATA}
-            renderItem={({item}) => <Item title={item.title} />}
+            renderItem={({item}) => <Item item={item} />}
             keyExtractor={item => item.id}
             horizontal={true}
             style={styles.tagsList}
         />
+      </>
     )
 }
 export default Tags
 
 const styles = StyleSheet.create({
     item:{
-        borderWidth:0.7,
-        borderColor:"#E3E3E7",
-        backgroundColor:'#FFFFFF',
         margin:10,
-        padding:8,
-       
-        
         borderRadius:25,
-        fontFamily:'Manrope'
+        fontFamily:'Manrope',
+        alignItems:'center',
     },
     title:{
-        paddingLeft:10,
-        paddingRight:10,
     },
     tagsList:{
         
-    }
+    },
+    productImage:{}
 })

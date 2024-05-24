@@ -3,6 +3,7 @@ import Tags from "./Tags"
 import DiscountComponent from './DiscountComponent'
 import TrendingNow from './TrendingNow'
 import shirtImg from '../../assets/shirt.png'
+import HowItWorks from './HowItWorks'
 
 const ProductScreen = () => {
     const DATA = [
@@ -86,6 +87,7 @@ const ProductScreen = () => {
             <Tags />
             <DiscountComponent data={DATA}/>
             <TrendingNow data={DATA} discountList={discountList}/>
+            <HowItWorks/>
         </ScrollView>
     )
 }
@@ -94,7 +96,7 @@ export default ProductScreen
 
 const styles=StyleSheet.create({
     root:{
-        
+        backgroudColor:'#F9F9F9',
         marginLeft:20,
         marginRight:20
     }

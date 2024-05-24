@@ -1,5 +1,5 @@
 import {Text,View,FlatList,StyleSheet,Image} from "react-native"
-
+import FilterIcon from '../../assets/svgs/filter.svg';
 
 const DiscountComponent=({data})=>{
     const Item = ({product}) => {
@@ -7,9 +7,9 @@ const DiscountComponent=({data})=>{
         <View style={styles.productContainer}>
             <View style={styles.firstContainer}>
                 <View style={styles.imageContainer}>
-                    <Text style={styles.productDiscount}>
+                    {/* <Text style={styles.productDiscount}>
                         {product.productDiscount}%
-                    </Text>
+                    </Text> */}
                     <Image style={styles.productImage} source={product.imageUrl} resizeMode="contain" />
                 </View>
             </View>
@@ -24,7 +24,10 @@ const DiscountComponent=({data})=>{
 
     return(
         <>
-        <Text>20% Discount</Text>
+        <View style={styles.topContainer}>
+            <Text>Products You may Like</Text>
+            <FilterIcon width={20} height={20} />
+        </View>
         <FlatList
             data={data}
             renderItem={({item}) => <Item product={item} />}
@@ -38,6 +41,10 @@ const DiscountComponent=({data})=>{
 export default DiscountComponent
 
 const styles = StyleSheet.create({
+    topContainer:{
+        flexDirection:'row',
+        justifyContent:'space-between'
+    },
     productContainer:{
         height:200,
         width:170,

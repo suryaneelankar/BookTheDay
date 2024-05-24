@@ -1,5 +1,5 @@
 import {Text,View,FlatList,StyleSheet,Image} from "react-native"
-
+import BackButton from '../../assets/svgs/backButton.svg'
 
 const TrendingNow=({data,discountList})=>{
     const Item = ({product}) => {
@@ -27,10 +27,13 @@ const TrendingNow=({data,discountList})=>{
     }
 
     return(
-        <>
+        <View style={styles.rootContainer}>
         <View style={styles.topContainer}>
             <Text>Trending Now</Text>
-            <Text>See All</Text>
+            <View style={styles.sellAllContainer}>
+                <Text>See All</Text>
+                <BackButton width={20} height={20} style={styles.backButton}/>
+            </View>
         </View>
 
         <FlatList
@@ -48,12 +51,15 @@ const TrendingNow=({data,discountList})=>{
             horizontal={true}
             // numColumns={2}
         />
-        </>
+        </View>
     )
 }
 export default TrendingNow
 
 const styles = StyleSheet.create({
+    rootContainer:{
+        backgroundColor:'#FEF8D8',
+    },
     topContainer:{
         marginTop:50,
         flexDirection:'row',
@@ -61,6 +67,12 @@ const styles = StyleSheet.create({
     },
     discountFlatList:{
         backgroundColor:'white'
+    },
+    sellAllContainer:{
+        flexDirection:'row',
+    },
+    backButton:{
+        marginLeft:8,
     },
     discountValue:{
         color:'black',
