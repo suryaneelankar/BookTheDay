@@ -100,7 +100,7 @@ const Tab4Screen = ({ navigation }) => {
     ),
     tabBarLabel: 'Collections',
     tabBarShowLabel:true,
-    headerShown: false,
+    headerShown: true,
   }}
 />
 

@@ -47,7 +47,7 @@ const HomeDashboard = () => {
     const [eventsData, setEventsData] = useState([]);
 
     useEffect(() => {
-        getPermissions();
+        // getPermissions();
         // getCategories();
         getAllEvents();
     }, []);
@@ -99,7 +99,7 @@ const HomeDashboard = () => {
                     )
                         .then(response => response.json())
                         .then(data => {
-                            console.log("address is::::::", data)
+                            // console.log("address is::::::", data)
                             setAddress(data?.address);
                         })
                         .catch(error => {
@@ -139,10 +139,10 @@ const HomeDashboard = () => {
 
 
     const getCategories = async () => {
-        console.log("IAM CALLING API in home")
+        // console.log("IAM CALLING API in home")
         try {
             const response = await axios.get(`${BASE_URL}/all-category`);
-            console.log("categories::::::::::", response?.data?.data);
+            // console.log("categories::::::::::", response?.data?.data);
             setCategories(response?.data?.data)
         } catch (error) {
             console.log("categories::::::::::", error);
