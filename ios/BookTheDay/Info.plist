@@ -52,6 +52,9 @@
 		<string>ManropeRegular.ttf</string>
 		<string>PoppinsRegular.ttf</string>
 		<string>InterRegular.ttf</string>
+		<string>InterMedium.ttf</string>
+		<string>InterSemiBold.ttf</string>
+		<string>InterBold.ttf</string>
 	</array>
 </dict>
 </plist>
