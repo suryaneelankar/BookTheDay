@@ -27,6 +27,9 @@ import ReferAndEarn from "../screens/Profile/ProfileSubScreens/ReferAndEarn";
 import RefundPolicy from "../screens/Profile/ProfileSubScreens/RefundPolicy";
 import TermsAndCondition from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
 import BookingConfirm from "../screens/Bookings/BookingConfirmScreen";
+import NavigationHeader from "../components/NavigationHeader";
+import ViewHireDetails from "../screens/MyBox/ViewHireDetails";
+import SelectDateTimeScreen from "../screens/MyBox/SelectDateTime";
 
 const MainNavigation = () => {
 
@@ -53,6 +56,25 @@ const MainNavigation = () => {
                 <Stack.Screen name="ViewTrendingDetails" component={ViewTrendingDetails} options={{ headerShown: true }} />
                 <Stack.Screen name="CategoriesList" component={CategoriesList} options={{ headerShown: false }} />
                 <Stack.Screen name="ViewEvents" component={ViewEvents} options={{ headerShown: true }} />
+               
+               <Stack.Screen 
+               name="ViewHireDetails"
+                component={ViewHireDetails}  
+                options={{
+                         header: () => <NavigationHeader Icon={true} title="Hire Professionals" />,
+                         headerShown: true,
+                }}
+                />
+                <Stack.Screen 
+               name="SelectDateTime"
+                component={SelectDateTimeScreen}  
+                options={{
+                         header: () => (''),
+                         headerShown: false,
+                }}
+                />
+               
+               
                  {/* ############### profile Screens ################# */}
                 <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{headerShown: true}} />
                 <Stack.Screen name="AboutUs" component={AboutUs} options={{headerShown: true}}/>

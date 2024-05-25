@@ -37,7 +37,7 @@ import { formatAmount } from "../../utils/GlobalFunctions";
 import WantDriver from '../../assets/svgs/chefDriver/driver.svg';
 import WantChef from '../../assets/svgs/chefDriver/chef.svg';
 import Svg, { Circle } from 'react-native-svg';
-import InfoBox from "../../components/InfoBox";
+import { InfoBox } from "../../components/InfoBox";
 import TrendingView from "../../components/TrendingView";
 import TrendingShirtImg from '../../assets/svgs/shirtTrending.svg';
 
