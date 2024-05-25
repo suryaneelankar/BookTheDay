@@ -1,18 +1,20 @@
 import React, { useState } from "react";
-import { View, Text, SafeAreaView, Image, ScrollView, TouchableOpacity, Dimensions, StyleSheet } from "react-native";
+import { View, Text, SafeAreaView, Image, ScrollView, TouchableOpacity, Dimensions, StyleSheet, Animated } from "react-native";
 import Avatar from "../../components/NameAvatar";
 import TruestedMarkGray from '../../assets/svgs/trustedMarkGray.svg';
 import VegNonVegIcon from '../../assets/svgs/vegNonveg.svg';
 import { formatAmount } from "../../utils/GlobalFunctions";
-import {HireDetails, PaginationDots } from "../../components/InfoBox";
+import { HireDetails, PaginationDots } from "../../components/InfoBox";
 import PricingOptions from "../../components/PriceOptions";
 import Swiper from 'react-native-swiper';
 import LinearGradient from "react-native-linear-gradient";
 import BookDatesButton from "../../components/GradientButton";
 import { useNavigation } from "@react-navigation/native";
-import { moderateScale, verticalScale } from "../../utils/scalingMetrics";
+import { horizontalScale, moderateScale, verticalScale } from "../../utils/scalingMetrics";
 import themevariable from "../../utils/themevariable";
 import Modal from 'react-native-modal';
+import { Calendar } from "react-native-calendars";
+import SelectDateTimeScreen from "./SelectDateTime";
 
 
 const ViewHireDetails = () => {
@@ -22,7 +24,10 @@ const ViewHireDetails = () => {
     const { width: viewportWidth } = Dimensions.get('window');
     const [activeIndex, setActiveIndex] = useState(0);
     const navigation = useNavigation();
-    const [isVisible,setIsVisible] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+    const [selectedDate, setSelectedDate] = useState('');
+    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+    const [selectedTime, setSelectedTime] = useState('');
 
 
     const photos = [
@@ -49,7 +54,8 @@ const ViewHireDetails = () => {
     const handleBookDatesPress = () => {
         setIsVisible(true)
         //  navigation.navigate('SelectDateTime')
-      };
+    };
+    const touchCoordinates = new Animated.Value(0);
 
     return (
         <SafeAreaView>
@@ -125,38 +131,105 @@ const ViewHireDetails = () => {
                     <PaginationDots total={photos.length} activeIndex={activeIndex} />
 
                 </View>
-                <BookDatesButton onPress={handleBookDatesPress} />    
-        </ScrollView>
+                <BookDatesButton onPress={handleBookDatesPress} />
+            </ScrollView>
 
-      <Modal
-      isVisible={isVisible}
-      onBackdropPress={() => setIsVisible(false)}
-      backdropOpacity={0.8}
-      backdropColor={themevariable.Color_000000}
-      hideModalContentWhileAnimating={true}
-      animationOutTiming={500}
-      backdropTransitionInTiming={500}
-      backdropTransitionOutTiming={500}
-      animationInTiming={500}
-      style={{
-        justifyContent: 'center',
-        alignItems: 'center',
-        top:20
-        // margin: 0,
-      }}
-      onBackButtonPress={() => {
-        setIsVisible(false)
-      }}
-      animationOut={'slideOutDown'}
-      animationType={'slideInUp'}>
-        </Modal>
+            <Modal
+                isVisible={isVisible}
+                onBackdropPress={() => setIsVisible(false)}
+                backdropOpacity={0.9}
+                backdropColor={themevariable.Color_000000}
+                hideModalContentWhileAnimating={true}
+                animationOutTiming={500}
+                backdropTransitionInTiming={500}
+                backdropTransitionOutTiming={500}
+                animationInTiming={500}
+                style={{
+                    flex: 1,
+                    top: 20,
+                    // margin: 0,
+                }}
+                onBackButtonPress={() => {
+                    setIsVisible(false)
+                }}
+                animationOut={'slideOutDown'}
+                animationType={'slideInUp'}
+            >
+                <View style={{ flex: 1, width: "100%" }}>
+                    <Text style={{ alignSelf: "center", color: "#FFFFFF", fontSize: 20, marginBottom: 20, fontWeight: "800", fontFamily: "ManropeRegular", }}>Select Date & Time</Text>
 
-        <View style={{marginTop:20, backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',}}>
-            <Text style={{color:"red",fontSize: 18,marginBottom: 20,}}>Select Date & Time</Text>
-        </View>
+                    <Calendar
+                        onDayPress={(day) => setSelectedDate(day.dateString)}
+                        markedDates={{ [selectedDate]: { selected: true, marked: true, selectedColor: 'red' } }}
+                        theme={{
+                            arrowColor: 'black',
+                            todayTextColor: 'red',
+                            selectedDayBackgroundColor: '#FFC107',
+                        }}
+                        style={{ marginTop: 20 }}
+                    />
+
+                    <Animated.View
+                        style={{
+                            flex: 1,
+                            top: touchCoordinates,
+                        }}>
+                        <View
+                            onStartShouldSetResponder={() => true}
+                            onResponderMove={e => {
+                                touchCoordinates.setValue(e.nativeEvent.pageY - 30);
+                            }}
+                            onResponderRelease={e => {
+                                if (e.nativeEvent.pageY > 500) {
+                                    setIsVisible(false)
+                                }
+                                Animated.spring(touchCoordinates, {
+                                    toValue: 0,
+                                    delay: 50,
+                                    useNativeDriver: false,
+                                }).start();
+                            }}
+                            style={{}}>
+                            <View style={{
+                                alignSelf: 'center',
+                                backgroundColor: themevariable.Color_CCCCCC,
+                                height: verticalScale(5),
+                                width: horizontalScale(57),
+                                borderRadius: moderateScale(20),
+                                top: 80,
+                                position: 'absolute',
+                            }} />
+                        </View>
+                        <View style={{
+                            flex: 1,
+                            // borderRadius: moderateScale(10),
+                            borderTopLeftRadius: moderateScale(10),
+                            borderTopRightRadius: moderateScale(10),
+                            backgroundColor: themevariable.Color_FFFFFF,
+                            paddingHorizontal: horizontalScale(20),
+                            paddingVertical: verticalScale(20),
+                            width: "100%",
+                            marginTop: 100,
+                            shadowColor: '#000000',
+                            shadowOffset: {
+                                width: 0,
+                                height: 2,
+                            },
+                            shadowOpacity: 0.17,
+                            shadowRadius: 2.54,
+                        }}>
+                            <Text style={{color:"#333333",fontSize:16, fontWeight:"700",fontFamily: "ManropeRegular",}}>Select Time Slot</Text>
+                          <Text style={{marginTop:10,color:"#333333",fontSize:16, fontWeight:"500",fontFamily: "ManropeRegular",}}>Preferred Time</Text>
+                        
+                       <BookDatesButton/>
+                        </View>
+
+
+                    </Animated.View>
+
+                </View>
+
+            </Modal>
 
         </SafeAreaView>
     )
@@ -181,16 +254,16 @@ const styles = StyleSheet.create({
     container: {
         backgroundColor: '#fff',
         borderRadius: 10,
-        marginHorizontal:15,
+        marginHorizontal: 15,
         marginTop: 15,
-        marginBottom:20,
-        paddingHorizontal:20,paddingVertical:10
+        marginBottom: 20,
+        paddingHorizontal: 20, paddingVertical: 10
     },
     title: {
         fontSize: 17,
         fontWeight: '700',
         marginBottom: 10,
-        color:'#121212',
+        color: '#121212',
         fontFamily: "ManropeRegular",
     },
     wrapper: {
@@ -221,17 +294,17 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         marginHorizontal: 20,
         marginVertical: 10,
-      },
-      gradient: {
+    },
+    gradient: {
         paddingVertical: 15,
         paddingHorizontal: 30,
         borderRadius: 25,
         justifyContent: 'center',
         alignItems: 'center',
-      },
-      buttonText: {
+    },
+    buttonText: {
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
-      },
+    },
 })
