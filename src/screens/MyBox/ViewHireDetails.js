@@ -15,6 +15,7 @@ import themevariable from "../../utils/themevariable";
 import Modal from 'react-native-modal';
 import { Calendar } from "react-native-calendars";
 import SelectDateTimeScreen from "./SelectDateTime";
+import ClockIcon from '../../assets/svgs/clock.svg';
 
 
 const ViewHireDetails = () => {
@@ -25,6 +26,7 @@ const ViewHireDetails = () => {
     const [activeIndex, setActiveIndex] = useState(0);
     const navigation = useNavigation();
     const [isVisible, setIsVisible] = useState(false);
+    const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState('');
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [selectedTime, setSelectedTime] = useState('');
@@ -52,8 +54,8 @@ const ViewHireDetails = () => {
     };
 
     const handleBookDatesPress = () => {
-        setIsVisible(true)
-        //  navigation.navigate('SelectDateTime')
+        // setIsVisible(true)
+         navigation.navigate('SelectDateTime')
     };
     const touchCoordinates = new Animated.Value(0);
 
@@ -131,10 +133,10 @@ const ViewHireDetails = () => {
                     <PaginationDots total={photos.length} activeIndex={activeIndex} />
 
                 </View>
-                <BookDatesButton onPress={handleBookDatesPress} />
+                <BookDatesButton onPress={handleBookDatesPress} width={25} text={'Book Dates'} padding={12}/>
             </ScrollView>
 
-            <Modal
+            {/* <Modal
                 isVisible={isVisible}
                 onBackdropPress={() => setIsVisible(false)}
                 backdropOpacity={0.9}
@@ -146,7 +148,9 @@ const ViewHireDetails = () => {
                 animationInTiming={500}
                 style={{
                     flex: 1,
-                    top: 20,
+                    width:"100%",
+                    alignSelf:"center"
+                    // top: 20,
                     // margin: 0,
                 }}
                 onBackButtonPress={() => {
@@ -155,24 +159,27 @@ const ViewHireDetails = () => {
                 animationOut={'slideOutDown'}
                 animationType={'slideInUp'}
             >
-                <View style={{ flex: 1, width: "100%" }}>
+                <View style={{ flex: 1,  }}>
                     <Text style={{ alignSelf: "center", color: "#FFFFFF", fontSize: 20, marginBottom: 20, fontWeight: "800", fontFamily: "ManropeRegular", }}>Select Date & Time</Text>
 
                     <Calendar
                         onDayPress={(day) => setSelectedDate(day.dateString)}
-                        markedDates={{ [selectedDate]: { selected: true, marked: true, selectedColor: 'red' } }}
+                        headerStyle={{backgroundColor:"#FDEEBC"}}
+                        // customHeaderTitle={}
+                        markedDates={{ [selectedDate]: { selected: true, marked: true, selectedColor: '#ED5065' } }}
                         theme={{
                             arrowColor: 'black',
-                            todayTextColor: 'red',
+                            todayTextColor: '#ED5065',
                             selectedDayBackgroundColor: '#FFC107',
                         }}
-                        style={{ marginTop: 20 }}
+                        style={{ marginTop: 20 ,marginHorizontal:25,borderRadius:10}}
                     />
 
                     <Animated.View
                         style={{
                             flex: 1,
                             top: touchCoordinates,
+                            bottom:0
                         }}>
                         <View
                             onStartShouldSetResponder={() => true}
@@ -189,7 +196,7 @@ const ViewHireDetails = () => {
                                     useNativeDriver: false,
                                 }).start();
                             }}
-                            style={{}}>
+                            style={{bottom:0}}>
                             <View style={{
                                 alignSelf: 'center',
                                 backgroundColor: themevariable.Color_CCCCCC,
@@ -217,11 +224,18 @@ const ViewHireDetails = () => {
                             },
                             shadowOpacity: 0.17,
                             shadowRadius: 2.54,
+                            bottom:0,top:0
                         }}>
                             <Text style={{color:"#333333",fontSize:16, fontWeight:"700",fontFamily: "ManropeRegular",}}>Select Time Slot</Text>
                           <Text style={{marginTop:10,color:"#333333",fontSize:16, fontWeight:"500",fontFamily: "ManropeRegular",}}>Preferred Time</Text>
-                        
-                       <BookDatesButton/>
+                         
+                         <View>
+                            <TouchableOpacity style={{flexDirection:"row",alignItems:"center",marginBottom:40,marginTop:10,padding:10,borderRadius:5,borderColor:'#CFD0D5', borderWidth:1}}>
+                              <Text style={{width:"90%",color:"#ABABAB",fontSize:14, fontWeight:"400",fontFamily: "ManropeRegular",}}>Pick A Time</Text>
+                             <ClockIcon/>
+                            </TouchableOpacity>
+                         </View>
+                          <BookDatesButton onPress={() => setThankYouCardVisible(true)} width={0} text={'Submit'} padding={15}/>
                         </View>
 
 
@@ -229,7 +243,7 @@ const ViewHireDetails = () => {
 
                 </View>
 
-            </Modal>
+            </Modal> */}
 
         </SafeAreaView>
     )

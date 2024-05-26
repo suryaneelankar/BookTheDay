@@ -17,12 +17,15 @@ import RightArrow from '../../assets/svgs/rightarrowOrange.svg';
 import TruestedMarkOrange from '../../assets/svgs/trustedOrange.svg';
 import HowItWorks from "../../components/HowItWorks";
 import { useNavigation } from "@react-navigation/native";
+import CarSteering from '../../assets/svgs/carSteering.svg';
 
 
 const Hire = () =>{
 
     const [selectedImage, setSelectedImage] = useState(null);
     const [showAll, setShowAll] = useState(false);
+    const [selectToggle, setSelectToggle] = useState(false);
+
     const navigation = useNavigation();
     const chefDetails =[{name:'Shruti Kedia', price: '600', cookingType:'North Indian', vareity:'Meals', experience:7,availability:'All Days',image:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'},
     {name:'Swetha Kedia', price: '700', cookingType:'South Indian', vareity:'Meals', experience:9,availability:'Weekends'},
@@ -34,6 +37,18 @@ const Hire = () =>{
     {name:'Mr.Neelankar', price: '700', cookingType:'South Indian', vareity:'Chinese', experience:6,availability:'Weekends'},
     {name:'Mrs.Shruti Kedia', price: '600', cookingType:'North Indian', vareity:'Snacks', experience:4,availability:'All Days'},
     {name:'Mrs.Shruti Kedia', price: '300', cookingType:'South Indian', vareity:'Meals', experience:8,availability:'Weekends'}
+    ]
+
+    const driverDetails =[{name:'Rahul', price: '60', carModal:'Hyundai',cookingType:'North Indian', vareity:'Meals', experience:7,availability:'All Days',image:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'},
+    {name:'Kedia', price: '70', carModal:'Hyundai-Eeon',cookingType:'South Indian', vareity:'Meals', experience:9,availability:'Weekends'},
+    {name:'Varadhi farms', price: '400',carModal:'Hyundai-creta', cookingType:'North Indian', vareity:'Thali', experience:2,availability:'Weekends',image:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'},
+    {name:'Surya', price: '80',carModal:'Suzuki', cookingType:'South Indian', vareity:'Tiffins', experience:3,availability:'All Days',image:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'},
+    {name:'Rrinivas Siva', price: '30',carModal:'Hyundai', cookingType:'North Indian', vareity:'Meals', experience:9,availability:'All Days'},
+    {name:'Mrs.Sujitha', price: '90',carModal:'Hyundai', cookingType:'North Indian', vareity:'Meals', experience:10,availability:'All Days'},
+    {name:'Mrs.Neha sharma', price: '80',carModal:'Hyundai', cookingType:'North Indian', vareity:'Meals', experience:17,availability:'Weekends'},
+    {name:'Mr.Neelankar', price: '70', carModal:'Hyundai',cookingType:'South Indian', vareity:'Chinese', experience:6,availability:'Weekends'},
+    {name:'Mrs.Shruti Kedia', price: '60',carModal:'Hyundai', cookingType:'North Indian', vareity:'Snacks', experience:4,availability:'All Days'},
+    {name:'Mrs.Shruti Kedia', price: '30', carModal:'Hyundai',cookingType:'South Indian', vareity:'Meals', experience:8,availability:'Weekends'}
     ]
 
     useEffect(() => {
@@ -122,7 +137,8 @@ const Hire = () =>{
       };
 
       const onSelectSwitch = index => {
-        Alert.alert('Selected index: ' + index);
+        // Alert.alert('Selected index: ' + index);
+        setSelectToggle(!selectToggle)
       };
 
       const chefsNear = ({item}) =>{
@@ -138,15 +154,18 @@ const Hire = () =>{
           <View style={{alignSelf:"center",alignItems:"center",marginTop:12}}>
           <Avatar widthDyn={54} heightDyn={54} borderRadiusDyn={24} name={item?.name} imageUrl={item?.image} />
           <Text style={{marginTop:12,color:"#333333",fontSize:12, fontWeight:"600",fontFamily: "ManropeRegular",}}>{item?.name}</Text>
-          <Text style={{marginTop:3,color:"#A9A9A9",fontSize:10, fontWeight:"500",fontFamily: "ManropeRegular",}}>{formatAmount(item?.price)}<Text style={{color:"#A9A9A9",fontSize:10, fontWeight:"500",fontFamily: "ManropeRegular",}}>/hours</Text></Text>
-         
+          {!selectToggle ?
+           <Text style={{marginTop:3,color:"#A9A9A9",fontSize:10, fontWeight:"500",fontFamily: "ManropeRegular",}}>{formatAmount(item?.price)}<Text style={{color:"#A9A9A9",fontSize:10, fontWeight:"500",fontFamily: "ManropeRegular",}}>/hours</Text></Text>
+           :
+           <Text style={{marginTop:3,color:"#A9A9A9",fontSize:10, fontWeight:"500",fontFamily: "ManropeRegular",}}>{formatAmount(item?.price)}<Text style={{color:"#A9A9A9",fontSize:10, fontWeight:"500",fontFamily: "ManropeRegular",}}>/km</Text></Text>
+          }
           </View>
          </TouchableOpacity>
         )
       }
 
 
-      const renderChefs = ({item}) =>{
+      const renderHires = ({item}) =>{
         return(
           <TouchableOpacity onPress={() => navigation.navigate('ViewHireDetails')} style={{borderRadius:10,backgroundColor:"white",marginHorizontal:15,marginTop:10,paddingHorizontal:10,paddingVertical:10}}>
                    <View style={{flexDirection:"row"}}>
@@ -154,7 +173,11 @@ const Hire = () =>{
 
                    <View style={{marginLeft:10,width:"50%"}}>
                     <Text style={{marginTop:5,color:"#101010",fontSize:14, fontWeight:"500",fontFamily: "ManropeRegular",}}>{item?.name}</Text>
+                    {!selectToggle ? 
                     <Text style={{marginTop:0,color:"#A8A8A8",fontSize:12, fontWeight:"400",fontFamily: "ManropeRegular",}}>{item?.cookingType} | {item?.vareity}</Text>
+                    :
+                    <Text style={{marginTop:0,color:"#A8A8A8",fontSize:12, fontWeight:"400",fontFamily: "ManropeRegular",}}>{item?.carModal}</Text>
+                    }
                     <View style={{marginTop:5,flexDirection:"row",backgroundColor:"#F5F5F5",alignItems:"center",justifyContent:"center",paddingVertical:2,borderRadius:5,paddingHorizontal:5,width:57}}> 
                       <TruestedMarkGray style={{marginHorizontal:2}}/>
                       <Text style={{color:'#6B779A',fontSize:9, fontFamily: "ManropeRegular",fontWeight:"800"}}>Verified</Text>
@@ -163,14 +186,17 @@ const Hire = () =>{
                    </View>
 
                    <View style={{flexDirection:"row"}}>
-                    <VegNonVegIcon/>
-                    <Text style={{marginLeft:5,color:"#101010",fontSize:14, fontWeight:"800",fontFamily: "ManropeRegular",}}>{formatAmount(item?.price)}<Text style={{color:"#101010",fontSize:14, fontWeight:"400",fontFamily: "ManropeRegular",}}> /hr</Text></Text>
+                   {!selectToggle ? 
+                    <VegNonVegIcon/> : null}
+                    <Text style={{marginLeft: !selectToggle ? 5 :35,color:"#101010",fontSize:14, fontWeight:"800",fontFamily: "ManropeRegular",}}>{formatAmount(item?.price)}<Text style={{color:"#101010",fontSize:14, fontWeight:"400",fontFamily: "ManropeRegular",}}> /{!selectToggle ? 'hr' : 'km'}</Text></Text>
                    </View>
                    </View>
 
                    <View style={{flexDirection:"row",marginTop:7,marginLeft:5}}>
                       <View style={{flexDirection:"row",alignItems:"center",width:Dimensions.get('window').width/5.7,}}>
+                        {!selectToggle ?
                         <HireIcon/>
+                        : <CarSteering/> }
                         <Text style={{marginLeft:5,color:"#4A4A4A",fontSize:12, fontWeight:"400",fontFamily: "ManropeRegular",}}>{item?.experience} years</Text>
                       </View>
                       <View style={{flexDirection:"row",alignItems:"center",marginLeft:5,width:"50%"}}>
@@ -187,9 +213,11 @@ const Hire = () =>{
         )
 
       }
-
-      const dataToShow = showAll ? chefDetails : chefDetails.slice(0, 4);
-      const remainingCount = chefDetails.length - 4;
+      // selectToggle ? 'Drivers': 'Chefs'
+      const dataToShow = showAll 
+      ? (selectToggle ? driverDetails : chefDetails) 
+      : (selectToggle ? driverDetails.slice(0, 4) : chefDetails.slice(0, 4));  
+      const remainingCount = selectToggle ?  driverDetails?.length -4 : chefDetails?.length - 4;
     
     return(
         <SafeAreaView style={{flex:1, }}>
@@ -207,8 +235,8 @@ const Hire = () =>{
 
         <View style={{alignItems:"center",marginHorizontal:24,marginTop:20,marginBottom:10, flexDirection:"row",justifyContent:"space-between"}}>
           <View>
-          <Text style={{fontSize:18, fontWeight:"700",color:"#333333",fontFamily: "ManropeRegular",}}>Chefs Near your location</Text>
-          <Text style={{fontSize:13, fontWeight:"400",color:"#7D7F88",fontFamily: "ManropeRegular",}}>243 Chef in Bangalore</Text>
+          <Text style={{fontSize:18, fontWeight:"700",color:"#333333",fontFamily: "ManropeRegular",}}>{selectToggle ? 'Drivers': 'Chefs' } Near your location</Text>
+          <Text style={{fontSize:13, fontWeight:"400",color:"#7D7F88",fontFamily: "ManropeRegular",}}>243 {selectToggle ? 'Drivers': 'Chefs' } in Bangalore</Text>
 
           </View>
           <FilterIcon />
@@ -218,7 +246,7 @@ const Hire = () =>{
          <ScrollView style={{marginBottom:"15%"}}>
           <FlatList
           data={dataToShow}
-          renderItem={renderChefs}/>
+          renderItem={renderHires}/>
          
          {remainingCount > 0 && !showAll && (
         <TouchableOpacity onPress={() => setShowAll(true)} style={styles.showMoreButton}>
@@ -237,7 +265,7 @@ const Hire = () =>{
 
         <FlatList
         horizontal
-        data={chefDetails}
+        data={ !selectToggle ? chefDetails : driverDetails}
         contentContainerStyle={{marginTop:15,marginLeft:5}}
         renderItem={chefsNear}/>
       </View>
