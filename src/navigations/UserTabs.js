@@ -17,6 +17,8 @@ import FocusedEvents from '../assets/svgs/tabIcons/focusedEvents.svg';
 import HireIcon from '../assets/svgs/tabIcons/hire.svg';
 import FocusedHire from '../assets/svgs/tabIcons/focusedHire.svg';
 import SwitchIcon from '../assets/svgs/tabIcons/profile.svg';
+import Hire from '../screens/MyBox';
+import NavigationHeader from '../components/NavigationHeader';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -119,14 +121,15 @@ const Tab4Screen = ({ navigation }) => {
 
 <Tab.Screen
   name="My Box"
-  component={MyBox}
+  component={Hire}
   options={{
     tabBarIcon: ({ focused }) => (
       focused ? <FocusedHire /> : <HireIcon />
     ),
     tabBarLabel: 'Hire',
     tabBarShowLabel:true,
-    headerShown: false,
+    header: () => <NavigationHeader Icon={false} title="Hire Professionals" />,
+    headerShown: true,
   }}
 />
 
