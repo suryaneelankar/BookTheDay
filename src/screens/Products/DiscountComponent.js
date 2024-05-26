@@ -1,5 +1,7 @@
 import {Text,View,FlatList,StyleSheet,Image} from "react-native"
 import FilterIcon from '../../assets/svgs/filter.svg';
+import { formatAmount } from "../../utils/GlobalFunctions";
+import themevariable from '../../utils/themevariable'
 
 const DiscountComponent=({data})=>{
     const Item = ({product}) => {
@@ -15,17 +17,17 @@ const DiscountComponent=({data})=>{
             </View>
             <Text style={styles.productName}>{product.productName}</Text>
         <View style={styles.priceContainer}>
-            <Text style={styles.price}>{product.productPrice}</Text>
-            <Text style={styles.discount}>{product.productDiscount}</Text>
+            <Text style={styles.price}>{formatAmount(product.productPrice)}</Text>
+            <Text style={styles.discount}>{formatAmount(product.productDiscount)}</Text>
         </View>
         </View>
     )
     }
 
     return(
-        <>
+        <View style={styles.rootContainer}>
         <View style={styles.topContainer}>
-            <Text>Products You may Like</Text>
+            <Text style={styles.productText}>Products You may Like</Text>
             <FilterIcon width={20} height={20} />
         </View>
         <FlatList
@@ -35,28 +37,37 @@ const DiscountComponent=({data})=>{
             horizontal={false}
             numColumns={2}
         />
-        </>
+        </View>
     )
 }
 export default DiscountComponent
 
 const styles = StyleSheet.create({
+    rootContainer:{
+        marginHorizontal:20,
+    },
     topContainer:{
         flexDirection:'row',
-        justifyContent:'space-between'
+        justifyContent:'space-between',
+        marginBottom:11,
     },
     productContainer:{
-        height:200,
+        height:250,
         width:170,
-        margin:10,
+        marginHorizontal:5,
+        marginVertical:10,
         borderRadius:10,
+    },
+    productText:{
+        fontFamily:'ManropeRegular',
+        fontWeight:'700',
+        fontSize:18,
+        color:themevariable.Color_202020
     },
     productDiscount:{
         alignSelf:'flex-end',
         width:40,
-        backgroundColor:'#B46609',
-        marginRight:10,
-        marginTop:10,
+        backgroundColor:themevariable.Color_B46609,
         borderTopLeftRadius:5,
         borderTopRightRadius:5,
         borderBottomLeftRadius:5,
@@ -65,40 +76,34 @@ const styles = StyleSheet.create({
         textAlign:'center'
     },
     firstContainer:{
-        backgroundColor:'#ffffff',
-        height:150,
-        width:150,
+        backgroundColor:themevariable.Color_FFFFFF,
         borderRadius:7,
     },
     imageContainer:{
-        marginBottom:5
     },
     productImage:{
-        alignItems:'center',
-        height:120,
-        width:130,
-        marginLeft:8,
-        borderRadius:8,
-        
+        alignSelf:'center',
+        marginBottom:8,
+        borderRadius:10,        
     },
     productName:{
-        fontWeight:'Manrope',
+        fontFamily:'ManropeRegular',
         color:'black',
-        paddingLeft:10,
-        paddingRight:10,
+        marginVertical:5,
+        marginHorizontal:3,
     },
     priceContainer:{
         flexDirection:'row',
-        marginLeft:10
+        marginLeft:5
         
     },
     price:{
-        color:"black",
+        color:themevariable.Color_202020,
         fontWeight:'bold',
         fontSize:20
     },
     discount:{
-        color:'#FF00006E',
+        color:themevariable.Color_ECA73C99,
         fontWeight:'bold',
         fontSize:18,
         textAlignVertical:'center',

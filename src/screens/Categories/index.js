@@ -12,7 +12,11 @@ import SwipperOne from '../../assets/svgs/homeSwippers/swipperOne.svg';
 import { formatAmount } from "../../utils/GlobalFunctions";
 import OfferStikcer from '../../assets/svgs/offerSticker.svg';
 import Svg, { Image as SvgImage } from 'react-native-svg';
-import LinearGradient from "react-native-linear-gradient";
+import { LinearGradient } from 'react-native-linear-gradient';
+import DiscountComponent from "../Products/DiscountComponent";
+import shirtImg from '../../assets/shirt.png'
+import TrendingNow from "../Products/TrendingNow";
+import HowItWorks from "../Products/HowItWorks";
 
 
 const Categories = () => {
@@ -25,8 +29,84 @@ const Categories = () => {
 
     const categoryFilterList = [{name:'Chains'},{name:'Rings'},{name:'Bridal'},{name:'Anklet'},{name:'Bangles'}]; //svg images for swipper  
 
-
-    
+    //Products you may like data
+    const DATA = [
+        {
+          id: 0,
+          productName: 'Trail Running Jacket Nike Windrunner',
+          productPrice:700,
+          productDiscount:20,
+          discountPercentage:20,
+          imageUrl:shirtImg
+        },
+        {
+          id: 1,
+          productName: 'Trail Running Jacket Nike Windrunner',
+          productPrice:700,
+          productDiscount:20,
+          discountPercentage:20,
+          imageUrl:shirtImg,
+        },
+        {
+          id: 2,
+          productName: 'Trail Running Jacket Nike Windrunner',
+          productPrice:700,
+          productDiscount:20,
+          discountPercentage:20,
+          imageUrl:shirtImg,
+        },
+        {
+            id:3,
+            productName: 'Trail Running Jacket Nike Windrunner',
+            productPrice:700,
+            productDiscount:20,
+            discountPercentage:20,
+            imageUrl:shirtImg,
+        },
+        {
+            id:4,
+            productName: 'Trail Running Jacket Nike Windrunner',
+            productPrice:700,
+            productDiscount:20,
+            discountPercentage:20,
+            imageUrl:shirtImg,
+        },
+        {
+            id:5,
+            productName: 'Trail Running Jacket Nike Windrunner',
+            productPrice:700,
+            productDiscount:20,
+            discountPercentage:20,
+            imageUrl:shirtImg,
+        }
+      ];
+      const discountList = [
+        {
+          id: 0,
+          value: 'All',
+        },
+        {
+          id: 1,
+          value: '10%',
+        },
+        {
+          id: 2,
+          value: '20%',
+        },
+        {
+            id:3,
+            value: '30%',
+        },
+        {
+            id:4,
+            value: '40%',
+        },
+        {
+            id:5,
+            value: '50%',
+        },
+      ];
+       
     useEffect(() => {
         getCategories();
     }, []);
@@ -74,7 +154,7 @@ const Categories = () => {
         )
     }
 
-    const renderJewellery = ({ item }) => {
+    const   renderJewellery = ({ item }) => {
 
         return (
             <View style={{}}>
@@ -118,7 +198,7 @@ const Categories = () => {
     }
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#F9F9F9" }}>
             <ScrollView style={{ marginBottom: 70 }} >
                         <View style={styles.searchProduct}>
                             <View style={styles.searchProHeader}>
@@ -168,7 +248,9 @@ const Categories = () => {
                         data={categories}
                         contentContainerStyle={{backgroundColor:"#FDF7D7",paddingVertical:20}}
                         renderItem={renderJewellery}/>
-                    
+                        <DiscountComponent data={DATA}/>
+                        <TrendingNow data={DATA} discountList={discountList}/>
+                        <HowItWorks/>
                    
 
             </ScrollView>
