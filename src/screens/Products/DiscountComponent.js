@@ -44,6 +44,7 @@ export default DiscountComponent
 
 const styles = StyleSheet.create({
     rootContainer:{
+        marginTop:30,
         marginHorizontal:20,
     },
     topContainer:{

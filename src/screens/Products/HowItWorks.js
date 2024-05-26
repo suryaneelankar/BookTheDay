@@ -87,7 +87,7 @@ const styles=StyleSheet.create({
     stepsContainer:{
         backgroundColor:themevariable.Color_FDF9EE,
         paddingBottom:20,
-        paddingLeft:20,
+        paddingLeft:10,
         paddingRight:20,
 
     },
