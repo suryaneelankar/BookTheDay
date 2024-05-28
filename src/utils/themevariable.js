@@ -57,6 +57,13 @@ export default {
   Color_FFEAC1: '#FFEAC1',
   Color_DDDDDD: '#DDDDDD',
   Color_8195D7: '#8195D7',
+  Color_FEF8D8: '#FEF8D8',
+  Color_EB3C54:'#EB3C54',
+  Color_7D7F88:'#7D7F88',
+  Color_FDF9EE:'#FDF9EE',
+  Color_F5E7B6:'#F5E7B6',
+  Color_131313:'#131313',
+
   green: 'green',
   Color_FAFAFA: '#FAFAFA',
   lightgray:'#e0dede',
@@ -68,7 +75,10 @@ export default {
     'linear-gradient(131.94deg, #FDF2E9 0%, #F9EEF3 43.57%, #EBE9F1 100%)',
   Color_EF7E2233: '#ef7e2233',
   Color_009C4D33: '#009c4d33',
+  Color_ECA73C99:'#ECA73C99',
+  Color_13131380:'#13131380',
   Color_009C4D01: 'rgba(0, 156, 77, 0.1)',
   Color_E9003801: 'rgba(233, 0, 56, 0.1)',
+
 };
 
