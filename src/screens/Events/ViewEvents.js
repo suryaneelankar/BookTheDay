@@ -37,7 +37,7 @@ const ViewEvents = ({ route,navigation }) => {
     console.log("IAM CALLING API")
     try {
       const response = await axios.get(`${BASE_URL}/getEvent/${categoryId}`);
-      console.log("events view details ::::::::::", response?.data?.data);
+      // console.log("events view details ::::::::::", response?.data?.data);
       setEventsDetails(response?.data?.data)
     } catch (error) {
       console.log("categories::::::::::", error);

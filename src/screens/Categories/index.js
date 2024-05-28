@@ -35,7 +35,7 @@ const Categories = () => {
         console.log("IAM CALLING API in home")
         try {
             const response = await axios.get(`${BASE_URL}/all-category`);
-            console.log("categories::::::::::", response?.data?.data);
+            // console.log("categories::::::::::", response?.data?.data);
             setCategories(response?.data?.data)
         } catch (error) {
             console.log("categories::::::::::", error);

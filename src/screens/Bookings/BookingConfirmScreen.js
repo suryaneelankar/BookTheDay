@@ -20,7 +20,7 @@ const BookingConfirm = ({ route, navigation }) => {
         }
         try {
             const response = await axios.get(`${BASE_URL}/get-event-by-bookingid`,bookingIdData,);
-            console.log("events over view ::::::::::", response?.data?.data);
+            // console.log("events over view ::::::::::", response?.data?.data);
             setEventsDetails(response?.data?.data)
         } catch (error) {
             console.log("categories::::::::::", error);
