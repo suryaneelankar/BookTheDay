@@ -9,6 +9,7 @@ import moment from 'moment';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const ViewEvents = ({ route,navigation }) => {
+
   const { width } = Dimensions.get('window');
   const [eventsDetails, setEventsDetails] = useState([])
   const [selectedStartDate, setSelectedStartDate] = useState('');

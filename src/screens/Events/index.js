@@ -9,6 +9,8 @@ import { formatAmount } from '../../utils/GlobalFunctions';
 import SearchIcon from '../../assets/svgs/searchIcon.svg';
 import FilterIcon from '../../assets/svgs/filter.svg';
 import TentHouseIcon from '../../assets/svgs/TentHouseIcon.svg';
+import Swiper from "react-native-swiper";
+import LocationMarkIcon from '../../assets/svgs/location.svg';
 
 const Events = () => {
     const navigation = useNavigation();
@@ -52,54 +54,40 @@ const Events = () => {
 
     const renderItem = ({ item }) => {
 
-        const scrollToFirstonEnd = (index) => {
-            console.log(index, item?.subImages?.length - 1, 'lenths aree')
-
-            if (index == 2) {
-                setCurrentIndex(0);
-            }
-        }
-
-        const onPressEventImage = () => {
-            navigation.navigate('ViewEvents', { categoryId: item?._id });
-        }
-
         return (
-            <View style={{ marginBottom: 15 }}>
+            <View style={{ }}>
                 <View style={styles.container}>
-                    <SwiperFlatList
-                        index={currentIndex}
-                        showPagination
-                        paginationDefaultColor='white'
-                        paginationActiveColor='white'
-                        paginationStyle={{ bottom: 5 }}
-                        paginationStyleItem={{ alignSelf: 'center' }}
-                        paginationStyleItemInactive={{ width: 7, height: 7 }}
-                        paginationStyleItemActive={{ width: 10, height: 10 }}
-                        data={item?.subImages}
-                        style={{ borderRadius: 15 }}
-                        onChangeIndex={({ index, prevIndex }) => scrollToFirstonEnd(index)}
-                        renderItem={({ item }) => (
-                            <TouchableOpacity style={[{ backgroundColor: item, alignSelf: 'center', borderRadius: 15, width: Dimensions.get('window').width - 50, justifyContent: 'center', height: 220 }]}
-                                onPress={() => onPressEventImage()}
+                    <Swiper
+                        style={styles.wrapper}
+                        loop={false}
+                        onIndexChanged={() => {}}
+                        activeDotColor="#FFFFFF"
+                        dotColor="#FFFFFF"
+                        activeDotStyle={{width:12,height:12,borderRadius:6}}
+                        dot={<View style={{backgroundColor:'#FFFFFF',width:8,height:8,borderRadius:6,marginHorizontal:8}} />}
+                    >
+                        {item?.subImages.map((item, index) => (
+                            <TouchableOpacity style={styles.slide} key={index}
+                            onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
                             >
-                                <Image source={{ uri: item }} style={styles.image}
-                                    resizeMethod="resize"
-                                    resizeMode="cover" />
+                                <Image source={{ uri: item }} style={styles.image} />
                             </TouchableOpacity>
-                        )}
-                    />
+                        ))}
+                    </Swiper>
                 </View>
                 <TouchableOpacity
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
-                    style={{ width: Dimensions.get('window').width - 50, alignSelf: 'center' }}>
-                    <View style={{ marginTop: 15, flexDirection: 'row', justifyContent: 'space-between', }}>
-                        <View>
-                            <Text style={{ fontWeight: '600', color: 'black', fontSize: 17 }}>{item?.name}</Text>
-                            <Text style={{ fontWeight: '500', color: '#696969', fontSize: 13, marginTop: 5 }}>Madhapur,Hyderabad</Text>
+                    style={{ width: Dimensions.get('window').width - 50,padding:15,bottom:15, alignSelf: 'center',backgroundColor:'#FFFFFF',borderBottomLeftRadius:20,borderBottomRightRadius:20 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
+                        <View style={{width:'60%',}}>
+                            <Text style={{ color: 'black', fontSize: 17,fontWeight: "700", fontFamily: "ManropeRegular"}} >{item?.name}</Text>
+                            <View style={{flexDirection:'row',alignItems:'center',}}>
+                            <LocationMarkIcon style={{marginTop:5}}/>
+                            <Text style={{ fontWeight: '500',marginHorizontal:5, color: '#696969', fontSize: 13, marginTop: 5,fontFamily: "ManropeRegular" }}>Alice Springs NT 0870</Text>
+                            </View>
                         </View>
                         <View>
-                            <Text style={{ fontWeight: '600', color: 'black', fontSize: 18 }}>{formatAmount(item?.price)}<Text style={{ color: "gray", fontSize: 16 }}>/day</Text></Text>
+                            <Text style={{ fontWeight: '700', color: '#202020', fontSize: 18,fontFamily: "ManropeRegular" }}>{formatAmount(item?.price)}<Text style={{ color: "gray", fontSize: 16 }}> /day</Text></Text>
                             <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
                                 <Text style={styles.strickedoffer}>₹20000</Text>
                                 <Text style={styles.off}> 20% off</Text>
@@ -112,17 +100,17 @@ const Events = () => {
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "50%" }}>
 
-                        <View style={{ backgroundColor: item?.available ? "#dcfcf0" : "#ff6347", flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
+                        <View style={{ backgroundColor: item?.available ? "#FEF7DE" : "#FEF7DE", flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
                             <Image source={require('../../assets/available.png')} style={{ width: 15, height: 15 }} />
                             {item?.available ?
-                                <Text style={{ fontWeight: '600', color: 'black', fontSize: 12, marginHorizontal: 5 }}>Available</Text>
+                                <Text style={{ fontWeight: '600', color: '#4A4A4A', fontSize: 13, marginHorizontal: 5,fontFamily: "ManropeRegular" }}>Available</Text>
                                 :
-                                <Text style={{ fontWeight: '600', color: 'black', fontSize: 12, marginHorizontal: 5 }}>Booked</Text>
+                                <Text style={{ fontWeight: '600', color: '#4A4A4A', fontSize: 13, marginHorizontal: 5,fontFamily: "ManropeRegular" }}>Booked</Text>
                             }
                         </View>
-                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5 }}>
+                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5,backgroundColor: "#FEF7DE",borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2}}>
                             <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} />
-                            <Text style={{ marginHorizontal: 2 }}> 300-500</Text>
+                            <Text style={{ marginHorizontal: 2,color:'#4A4A4A',fontFamily: "ManropeRegular",fontSize:13 }}> 300-500</Text>
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -131,7 +119,7 @@ const Events = () => {
     }
 
     return (
-        <View style={{ flex: 1, backgroundColor: 'white' }}>
+        <View style={{ flex: 1, backgroundColor: '#F0F5FA' }}>
             <View style={styles.searchContainer}>
                 <View style={styles.searchProduct}>
                     <View style={styles.searchProHeader}>
@@ -145,14 +133,6 @@ const Events = () => {
                     <FilterIcon />
                 </View>
             </View>
-            <View style={{ flexDirection: 'row',backgroundColor:'#FFEFC0' }}>
-                {Cats.map((IconComponent, index) => (
-                    <TouchableOpacity>
-                        <IconComponent key={index} width={100} height={100} />
-                    </TouchableOpacity>
-                ))}
-            </View>
-
             <FlatList
                 data={filteredSuggestions}
                 contentContainerStyle={{}}
@@ -166,20 +146,16 @@ const Events = () => {
                 keyExtractor={(item) => item}
                 style={{ maxHeight: 200 }}
             />
-
-            <View style={{ padding: 10, flexDirection: 'row', justifyContent: 'space-around' }}>
-                <TouchableOpacity style={{ backgroundColor: '#FFF2F8F8', borderRadius: 10, padding: 10 }}>
-                    <Text>Price <Icon name="chevron-down" size={15} color="grey" /></Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={{ backgroundColor: '#FFF2F8F8', borderRadius: 10, padding: 10 }}>
-                    <Text>Rating <Icon name="chevron-down" size={15} color="grey" /></Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={{ backgroundColor: '#FFF2F8F8', borderRadius: 10, padding: 10 }}>
-                    <Text>Popular <Icon name="chevron-down" size={15} color="grey" /></Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={{ backgroundColor: '#FFF2F8F8', borderRadius: 10, padding: 10 }}>
-                    <Text>Location <Icon name="chevron-down" size={15} color="grey" /></Text>
-                </TouchableOpacity>
+            <View style={{ flexDirection: 'row',backgroundColor:'#FFEFC0' }}>
+                {Cats.map((IconComponent, index) => (
+                    <TouchableOpacity>
+                        <IconComponent key={index} width={100} height={100} />
+                    </TouchableOpacity>
+                ))}
+            </View>
+            <View style={{marginHorizontal:25}}>
+            <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
+            <Text style={{ marginTop: 15, color: "#7D7F88",bottom:10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>243 Decoration Service in Bangalore</Text>
             </View>
             <FlatList
                 data={eventsData}
@@ -197,6 +173,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF2F1F7',
         flexDirection: 'row',
         justifyContent: 'space-between'
+    },
+    wrapper: {
+        height: 200,
     },
     strickedoffer: {
         fontSize: 12,
@@ -241,13 +220,24 @@ const styles = StyleSheet.create({
         flex: 1,
         alignSelf: 'center',
         width: Dimensions.get('window').width - 50,
-        backgroundColor: 'white',
+        // backgroundColor:'red'
     },
     image: {
         width: '100%',
         height: "95%",
         resizeMode: 'cover',
-        borderRadius: 4
+        borderTopLeftRadius:20,
+        borderTopRightRadius:20,
+        backgroundColor:'#F0F5FA'
+    },
+    slide: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height: "95%",
+        borderTopLeftRadius:20,
+        borderTopRightRadius:20,
+        // backgroundColor:'red'
     },
     off: {
         fontSize: 13,
