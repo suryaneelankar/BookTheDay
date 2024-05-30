@@ -52,6 +52,7 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     marginLeft: verticalScale(5),
+    alignItems:"center"
   },
   text:{
     color:"#404348",
@@ -63,7 +64,9 @@ const styles = StyleSheet.create({
    color:'#333333',
    fontSize:12,
    fontWeight:"500",
-   fontFamily:'ManropeRegular'
+   fontFamily:'ManropeRegular',
+   alignSelf:"center",
+   textAlign:"center"
   },
   subText:{
     color:"#FD813B",

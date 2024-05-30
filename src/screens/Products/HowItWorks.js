@@ -71,7 +71,7 @@ const styles=StyleSheet.create({
         marginHorizontal:20,
     },
     topContainer:{
-        marginVertical:20
+        marginVertical:20,
     },
     worksText:{
         color:themevariable.Color_333333,
@@ -89,6 +89,7 @@ const styles=StyleSheet.create({
         paddingBottom:20,
         paddingLeft:10,
         paddingRight:20,
+        borderRadius:15
 
     },
     listContainer:{

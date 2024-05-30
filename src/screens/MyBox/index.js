@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import {View, Text, TouchableOpacity, Linking,StyleSheet, Platform, Alert, PermissionsAndroid, SafeAreaView, ScrollView, Dimensions, FlatList} from 'react-native';
+import {View, Text, TouchableOpacity, Linking,StyleSheet, Platform, Alert, PermissionsAndroid, SafeAreaView, ScrollView, Dimensions, FlatList, Image} from 'react-native';
 import ImagePicker, { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import BASE_URL from "../../apiconfig";
 import axios from "axios";
@@ -8,24 +8,27 @@ import FilterIcon from '../../assets/svgs/filterBlack.svg';
 import Svg, { Circle, Text as SvgText } from 'react-native-svg';
 import Avatar from "../../components/NameAvatar";
 import TruestedMarkGray from '../../assets/svgs/trustedMarkGray.svg';
-import NonVeg from '../../assets/svgs/nonVeg.svg';
-import VegNonVegIcon from '../../assets/svgs/vegNonveg.svg';
+import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
+import VegIcon from '../../assets/svgs/foodtype/veg.svg';
+import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
+
 import { formatAmount } from "../../utils/GlobalFunctions";
 import HireIcon from '../../assets/svgs/hireIcon.svg';
 import ClockIcon from '../../assets/svgs/clock.svg';
 import RightArrow from '../../assets/svgs/rightarrowOrange.svg';
 import TruestedMarkOrange from '../../assets/svgs/trustedOrange.svg';
-import HowItWorks from "../../components/HowItWorks";
 import { useNavigation } from "@react-navigation/native";
 import CarSteering from '../../assets/svgs/carSteering.svg';
-
+import { SvgCss } from 'react-native-svg';
+import HowItWorks from "../Products/HowItWorks";
 
 const Hire = () =>{
 
     const [selectedImage, setSelectedImage] = useState(null);
     const [showAll, setShowAll] = useState(false);
     const [selectToggle, setSelectToggle] = useState(false);
-
+    const [chefListDetails, setChefListDetails] = useState([]);
+    const [driverListDetails, setDriverListDetails] = useState([]);
     const navigation = useNavigation();
     const chefDetails =[{name:'Shruti Kedia', price: '600', cookingType:'North Indian', vareity:'Meals', experience:7,availability:'All Days',image:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'},
     {name:'Swetha Kedia', price: '700', cookingType:'South Indian', vareity:'Meals', experience:9,availability:'Weekends'},
@@ -52,9 +55,23 @@ const Hire = () =>{
     ]
 
     useEffect(() => {
+      getChefDriver();
         // requestGalleryPermission();
       }, []);
     
+      const getChefDriver = async() =>{
+        try {
+          const response = await axios.get(`${BASE_URL}/getDriverChefs`);
+          const filteredData = response?.data.filter(item => item?.serviceType === 'driver');
+          const filteredChefData = response?.data.filter(item => item?.serviceType === 'chef');
+
+          setDriverListDetails(filteredData);
+          setChefListDetails(filteredChefData);
+      } catch (error) {
+          console.log("hire data error>>::", error);
+      }
+      }
+      
       const requestGalleryPermission = async () => {
         if (Platform.OS === 'android') {
           try {
@@ -164,19 +181,18 @@ const Hire = () =>{
         )
       }
 
-
       const renderHires = ({item}) =>{
         return(
-          <TouchableOpacity onPress={() => navigation.navigate('ViewHireDetails')} style={{borderRadius:10,backgroundColor:"white",marginHorizontal:15,marginTop:10,paddingHorizontal:10,paddingVertical:10}}>
+          <TouchableOpacity onPress={() => navigation.navigate('ViewHireDetails',{Catid: item?._id})} style={{borderRadius:10,backgroundColor:"white",marginHorizontal:15,marginTop:10,paddingHorizontal:10,paddingVertical:10}}>
                    <View style={{flexDirection:"row"}}>
-                   <Avatar  widthDyn={61} heightDyn={61} borderRadiusDyn={8} name={item?.name} imageUrl={item?.image} />
+                   <Avatar  widthDyn={61} heightDyn={61} borderRadiusDyn={8} name={item?.name} imageUrl={item?.professionalImage?.url} />
 
                    <View style={{marginLeft:10,width:"50%"}}>
                     <Text style={{marginTop:5,color:"#101010",fontSize:14, fontWeight:"500",fontFamily: "ManropeRegular",}}>{item?.name}</Text>
                     {!selectToggle ? 
-                    <Text style={{marginTop:0,color:"#A8A8A8",fontSize:12, fontWeight:"400",fontFamily: "ManropeRegular",}}>{item?.cookingType} | {item?.vareity}</Text>
+                    <Text style={{marginTop:0,color:"#A8A8A8",fontSize:12, fontWeight:"400",fontFamily: "ManropeRegular",}}>{item?.expertiseFood[0]} | {item?.vareity}</Text>
                     :
-                    <Text style={{marginTop:0,color:"#A8A8A8",fontSize:12, fontWeight:"400",fontFamily: "ManropeRegular",}}>{item?.carModal}</Text>
+                    <Text style={{marginTop:0,color:"#A8A8A8",fontSize:12, fontWeight:"400",fontFamily: "ManropeRegular",}}>{item?.vehicleType}</Text>
                     }
                     <View style={{marginTop:5,flexDirection:"row",backgroundColor:"#F5F5F5",alignItems:"center",justifyContent:"center",paddingVertical:2,borderRadius:5,paddingHorizontal:5,width:57}}> 
                       <TruestedMarkGray style={{marginHorizontal:2}}/>
@@ -186,8 +202,15 @@ const Hire = () =>{
                    </View>
 
                    <View style={{flexDirection:"row"}}>
-                   {!selectToggle ? 
-                    <VegNonVegIcon/> : null}
+                   {!selectToggle && (
+                       item?.foodType === 'veg' ? (
+                        <VegIcon />
+                    ) : item?.foodType === 'nonveg' ? (
+                       <NonVegIcon />
+                    ) : item?.foodType === 'both' ? (
+                       <VegNonVegIcon />
+                     ) : null
+                  )}
                     <Text style={{marginLeft: !selectToggle ? 5 :35,color:"#101010",fontSize:14, fontWeight:"800",fontFamily: "ManropeRegular",}}>{formatAmount(item?.price)}<Text style={{color:"#101010",fontSize:14, fontWeight:"400",fontFamily: "ManropeRegular",}}> /{!selectToggle ? 'hr' : 'km'}</Text></Text>
                    </View>
                    </View>
@@ -200,8 +223,8 @@ const Hire = () =>{
                         <Text style={{marginLeft:5,color:"#4A4A4A",fontSize:12, fontWeight:"400",fontFamily: "ManropeRegular",}}>{item?.experience} years</Text>
                       </View>
                       <View style={{flexDirection:"row",alignItems:"center",marginLeft:5,width:"50%"}}>
-                        <ClockIcon/>
-                        <Text style={{marginLeft:5,color:"#4A4A4A",fontSize:12, fontWeight:"400",fontFamily: "ManropeRegular",}}>{item?.availability}</Text>
+                        <ClockIcon />
+                        <Text style={{marginLeft:5,color:"#4A4A4A",fontSize:12, fontWeight:"400",fontFamily: "ManropeRegular",}}>{item?.available ? 'Available' : 'Not Available'}</Text>
                       </View>
                       <TouchableOpacity style={{borderRadius:5,backgroundColor:"#FFF8F0",paddingHorizontal:15,paddingVertical:5}}>
                         <Text style={{color:"#FD813B",fontSize:12, fontWeight:"700",fontFamily: "ManropeRegular",}}>Book Now</Text>
@@ -215,9 +238,9 @@ const Hire = () =>{
       }
       // selectToggle ? 'Drivers': 'Chefs'
       const dataToShow = showAll 
-      ? (selectToggle ? driverDetails : chefDetails) 
-      : (selectToggle ? driverDetails.slice(0, 4) : chefDetails.slice(0, 4));  
-      const remainingCount = selectToggle ?  driverDetails?.length -4 : chefDetails?.length - 4;
+      ? (selectToggle ? driverListDetails : chefListDetails) 
+      : (selectToggle ? driverListDetails.slice(0, 4) : chefListDetails.slice(0, 4));  
+      const remainingCount = selectToggle ?  driverListDetails?.length -4 : chefListDetails?.length - 4;
     
     return(
         <SafeAreaView style={{flex:1, }}>
@@ -235,8 +258,8 @@ const Hire = () =>{
 
         <View style={{alignItems:"center",marginHorizontal:24,marginTop:20,marginBottom:10, flexDirection:"row",justifyContent:"space-between"}}>
           <View>
-          <Text style={{fontSize:18, fontWeight:"700",color:"#333333",fontFamily: "ManropeRegular",}}>{selectToggle ? 'Drivers': 'Chefs' } Near your location</Text>
-          <Text style={{fontSize:13, fontWeight:"400",color:"#7D7F88",fontFamily: "ManropeRegular",}}>243 {selectToggle ? 'Drivers': 'Chefs' } in Bangalore</Text>
+          <Text style={{fontSize:18, fontWeight:"700",color:"#333333",fontFamily: "ManropeRegular",}}>{selectToggle ?  'Drivers' : 'Chefs' } Near your location</Text>
+          <Text style={{fontSize:13, fontWeight:"400",color:"#7D7F88",fontFamily: "ManropeRegular",}}>{selectToggle ? `${driverListDetails?.length} Drivers`:`${chefListDetails?.length} Chefs` } in Bangalore</Text>
 
           </View>
           <FilterIcon />
@@ -254,7 +277,7 @@ const Hire = () =>{
         </TouchableOpacity>
       )}
 
-      <View>
+      {/* <View>
         <View style={{flexDirection:"row",marginHorizontal:20,marginTop:30,alignItems:"center"}}>
           <Text style={{width:"85%",color:"#333333",fontSize:18,fontWeight:"700",fontFamily: "ManropeRegular",}}>Feature Chef near You</Text>
           <TouchableOpacity style={{flexDirection:"row",alignItems:"center"}}>
@@ -268,19 +291,9 @@ const Hire = () =>{
         data={ !selectToggle ? chefDetails : driverDetails}
         contentContainerStyle={{marginTop:15,marginLeft:5}}
         renderItem={chefsNear}/>
-      </View>
-
-      <View style={{marginHorizontal:20,marginTop:20}}>
-        <Text style={{color:"#333333", fontSize:18, fontWeight:"700",fontFamily: "ManropeRegular",}}>How it works?</Text>
-        <Text style={{marginTop:5,color:"#7D7F88", fontSize:13, fontWeight:"400",fontFamily: "ManropeRegular",}}>Simple 3 step</Text>
-        
-        <View style={{marginTop:10}}>
-             <HowItWorks/>
-        </View>
-      </View>
-     
-      </ScrollView>
-           
+      </View> */} 
+           <HowItWorks/>
+      </ScrollView>      
         </SafeAreaView>
     )
 }

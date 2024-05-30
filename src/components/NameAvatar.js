@@ -11,12 +11,12 @@ const Avatar = ({widthDyn,heightDyn,borderRadiusDyn, name, imageUrl }) => {
     return firstNameInitial + lastNameInitial;
   };
 
-  const initials = getInitials(name);
-
+  const initials = getInitials(name).toUpperCase();
+const updatedImgUrl = imageUrl !== undefined ? imageUrl.replace('localhost', '192.168.1.8') : imageUrl;
   return (
     <View style={[styles.container,{width:widthDyn, height:heightDyn, borderRadius:borderRadiusDyn}]}>
-      {imageUrl ? (
-        <Image source={{ uri: imageUrl }} style={styles.image} />
+      {updatedImgUrl ? (
+        <Image source={{ uri: updatedImgUrl }} style={[styles.image, { width: widthDyn, height: heightDyn, borderRadius: borderRadiusDyn }]} />
       ) : (
         <Svg height="100" width="100">
           <Circle cx="50" cy="50" r="50" fill="#FEF7DE" />

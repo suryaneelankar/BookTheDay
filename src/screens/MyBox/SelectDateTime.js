@@ -11,11 +11,13 @@ import themevariable from '../../utils/themevariable';
 import LeftArrow from '../../assets/svgs/leftarrowWhite.svg';
 import { useNavigation } from '@react-navigation/native';
 
-const SelectDateTimeScreen = () => {
+const SelectDateTimeScreen = ({ route }) => {
+  const { productNav } = route.params;
+  console.log("product nav is:::::", productNav);
   const [selectedDate, setSelectedDate] = useState('');
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [selectedTime, setSelectedTime] = useState('');
-  const { navigation, goBack } = useNavigation();
+  const navigation = useNavigation();
   const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
 
   const handleDateConfirm = (date) => {
@@ -37,6 +39,9 @@ const SelectDateTimeScreen = () => {
   const touchCoordinates = new Animated.Value(0);
   const [isVisible, setIsVisible] = useState(true);
 
+  const callNavigation =() =>{
+    navigation.navigate('BookingDetailsScreen')
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -58,14 +63,14 @@ const SelectDateTimeScreen = () => {
           // margin: 0,
         }}
         onBackButtonPress={() => {
-         goBack()
+          navigation.goBack()
         }}
         animationOut={'slideOutDown'}
         animationType={'slideInUp'}
       >
         <View style={{ flex: 1, }}>
           <View style={{ flexDirection: "row", alignItems: "center", }}>
-            <TouchableOpacity onPress={() => goBack()}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <LeftArrow style={{ marginTop: 3, marginHorizontal: 50 }} />
             </TouchableOpacity>
             <Text style={{ color: "#FFFFFF", fontSize: 20, fontWeight: "800", fontFamily: "ManropeRegular", }}>Select Date & Time</Text>
@@ -145,7 +150,14 @@ const SelectDateTimeScreen = () => {
                   <ClockIcon />
                 </TouchableOpacity>
               </View>
-              <BookDatesButton onPress={() => setThankYouCardVisible(true)} width={0} text={'Submit'} padding={15} />
+              <BookDatesButton onPress={() => {
+                if (productNav) {
+                  callNavigation()
+                } else {
+                  setThankYouCardVisible(true);
+                }
+              }} 
+              width={0} text={'Submit'} padding={15} />
             </View>
 
 
@@ -177,10 +189,10 @@ const SelectDateTimeScreen = () => {
         animationType={'slideInUp'}
       >
         <View style={styles.Thankcontainer}>
-        <LinearGradient colors={['#D2453B', '#A0153E']}
+          <LinearGradient colors={['#D2453B', '#A0153E']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            style={{width:"55%",padding:4,}}>
+            style={{ width: "55%", padding: 4, }}>
             {/* <View style={{borderWidth:4, width:"50%", }}/> */}
           </LinearGradient>
 
@@ -196,7 +208,7 @@ const SelectDateTimeScreen = () => {
           <LinearGradient colors={['#D2453B', '#A0153E']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            style={styles.doneButton}> 
+            style={styles.doneButton}>
             <TouchableOpacity onPress={() => setThankYouCardVisible(false)}>
               <Text style={styles.doneButtonText}>Done</Text>
             </TouchableOpacity>
@@ -285,7 +297,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   iconContainer: {
-    margin:20
+    margin: 20
   },
   iconBackground: {
     width: 80,
@@ -322,7 +334,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "#333333",
     fontFamily: "ManropeRegular",
-    marginTop:20
+    marginTop: 20
   },
   subtitle: {
     fontSize: 14,
@@ -357,7 +369,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     fontFamily: "ManropeRegular",
     fontSize: 12,
-    marginBottom:30
+    marginBottom: 30
   },
 });
 

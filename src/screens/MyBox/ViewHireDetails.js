@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { View, Text, SafeAreaView, Image, ScrollView, TouchableOpacity, Dimensions, StyleSheet, Animated } from "react-native";
 import Avatar from "../../components/NameAvatar";
 import TruestedMarkGray from '../../assets/svgs/trustedMarkGray.svg';
-import VegNonVegIcon from '../../assets/svgs/vegNonveg.svg';
 import { formatAmount } from "../../utils/GlobalFunctions";
+import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
+import VegIcon from '../../assets/svgs/foodtype/veg.svg';
+import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 import { HireDetails, PaginationDots } from "../../components/InfoBox";
 import PricingOptions from "../../components/PriceOptions";
 import Swiper from 'react-native-swiper';
@@ -16,28 +18,58 @@ import Modal from 'react-native-modal';
 import { Calendar } from "react-native-calendars";
 import SelectDateTimeScreen from "./SelectDateTime";
 import ClockIcon from '../../assets/svgs/clock.svg';
+import axios from "axios";
+import BASE_URL from "../../apiconfig";
 
 
-const ViewHireDetails = () => {
-
+const ViewHireDetails = ({route}) => {
+    const {Catid} = route.params;
     const [selectedOption, setSelectedOption] = useState(null);
     const [selectedPrice, setSelectedPrice] = useState(null);
+    const [specificDetails, setSpecificDetails] = useState('');
+
     const { width: viewportWidth } = Dimensions.get('window');
     const [activeIndex, setActiveIndex] = useState(0);
     const navigation = useNavigation();
     const [isVisible, setIsVisible] = useState(false);
+    const [specifcadditionalImages, setSpecificAdditionImages] = useState([]);
+    const [HireImage, setHireImage] = useState('');
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState('');
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [selectedTime, setSelectedTime] = useState('');
 
-
+    
     const photos = [
         { uri: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg' },
         { uri: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg' },
         { uri: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg' },
         // Add more photos as needed
     ];
+    useEffect(() => {
+        getSpecificDetails();
+          // requestGalleryPermission();
+        }, []);
+      
+        const getSpecificDetails = async() =>{
+          try {
+            const response = await axios.get(`${BASE_URL}/getDriverChef/${Catid}`);
+            console.log("specifi RESPONSE::::;;;;", JSON.stringify(response?.data))
+            setSpecificDetails(response?.data);
+
+            const photos = response?.data?.additionalImages.flat().map(image => ({
+                uri: image.url.replace('localhost', '192.168.1.8'),  // Replace 'localhost' with '192.168.1.8'
+              }));
+            const updateImage = response?.data?.professionalImage?.url;
+             setSpecificAdditionImages(photos);
+
+             const updatedImgUrl = updateImage  ? updateImage.replace('localhost', '192.168.1.8') : updateImage;
+             setHireImage(updatedImgUrl)
+
+        } catch (error) {
+            console.log("specifc hire data error>>::", error);
+        }
+        }
 
     const renderPagination = (index, total) => {
         return (
@@ -55,7 +87,7 @@ const ViewHireDetails = () => {
 
     const handleBookDatesPress = () => {
         // setIsVisible(true)
-         navigation.navigate('SelectDateTime')
+        navigation.navigate('SelectDateTime',{productNav: false})
     };
     const touchCoordinates = new Animated.Value(0);
 
@@ -64,53 +96,59 @@ const ViewHireDetails = () => {
             <ScrollView >
                 <View style={{ borderRadius: 10, backgroundColor: "white", marginHorizontal: 15, marginTop: 15, paddingHorizontal: 10, paddingVertical: 10 }}>
                     <View style={{ flexDirection: "row" }}>
-                        <Avatar widthDyn={92} heightDyn={87} borderRadiusDyn={5} name={'Neelankar'} imageUrl={'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'} />
+                        <Avatar widthDyn={92} heightDyn={87} borderRadiusDyn={5} name={'Neelankar'} imageUrl={HireImage} />
 
                         <View style={{ marginLeft: 10, width: "58%" }}>
-                            <Text style={{ marginTop: 5, color: "#333333", fontSize: 16, fontWeight: "500", fontFamily: "ManropeRegular", }}>Mrs. Srinivas</Text>
-                            <Text style={{ color: "#939191", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}> South Indian | Meals</Text>
+                            <Text style={{ marginTop: 5, color: "#333333", fontSize: 16, fontWeight: "500", fontFamily: "ManropeRegular", }}>{specificDetails?.name}</Text>
+                            <Text style={{ color: "#939191", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>{specificDetails?.serviceType === 'chef' ? specificDetails?.expertiseFood : specificDetails?.vehicleType}</Text>
                             <View style={{ marginTop: 5, flexDirection: "row", backgroundColor: "#F5F5F5", alignItems: "center", justifyContent: "center", paddingVertical: 2, borderRadius: 5, paddingHorizontal: 5, width: 57 }}>
                                 <TruestedMarkGray style={{ marginHorizontal: 2 }} />
                                 <Text style={{ color: '#6B779A', fontSize: 9, fontFamily: "ManropeRegular", fontWeight: "800" }}>Verified</Text>
                             </View>
                         </View>
-                        <VegNonVegIcon />
+                          {specificDetails?.foodType === 'veg' ? (
+                            <VegIcon />
+                          ) : specificDetails?.foodType === 'nonveg' ? (
+                            <NonVegIcon />
+                          ) : specificDetails?.foodType === 'both' ? (
+                            <VegNonVegIcon />
+                          ) : null}
                         {/* <Text style={{marginLeft:5,color:"#101010",fontSize:14, fontWeight:"800",fontFamily: "ManropeRegular",}}>{formatAmount('900')}<Text style={{color:"#101010",fontSize:14, fontWeight:"400",fontFamily: "ManropeRegular",}}> /hr</Text></Text> */}
                     </View>
 
                     <View style={styles.infoBoxContainer}>
                         <HireDetails
                             mainText="Experience"
-                            subText="10+ years"
+                            subText={specificDetails?.experience}
                         />
                         <View style={styles.verticalLine} />
                         <HireDetails
-                            mainText="Events"
-                            subText="900+"
+                            mainText="Trusted"
+                            subText="Yes"
                         />
                         <View style={styles.verticalLine} />
                         <HireDetails
                             mainText="Availability"
-                            subText="All Days"
+                            subText={`${specificDetails?.avalable ? 'All Days' : 'Not Available'}`}
                         />
                     </View>
 
                     <TouchableOpacity style={{ backgroundColor: '#AF243E', borderRadius: 5, marginTop: 15, width: Dimensions.get('window').width / 1.3, alignSelf: "center", marginBottom: 10, alignItems: "center", paddingVertical: 8 }}>
-                        <Text style={{ color: "#FFFFFF", fontSize: 14, fontWeight: "700", fontFamily: "ManropeRegular", }}>{formatAmount('900')}/month<Text style={{ color: "#FFFFFF", fontSize: 14, fontWeight: "800", fontFamily: "ManropeRegular", }}> | Subscribe</Text></Text>
+                        <Text style={{ color: "#FFFFFF", fontSize: 14, fontWeight: "700", fontFamily: "ManropeRegular", }}>{formatAmount(specificDetails?.subscriptionChargesPerMonth)}/month<Text style={{ color: "#FFFFFF", fontSize: 14, fontWeight: "800", fontFamily: "ManropeRegular", }}> | Subscribe</Text></Text>
                     </TouchableOpacity>
 
                 </View>
 
                 <View style={{ borderRadius: 10, backgroundColor: "white", marginHorizontal: 15, marginTop: 15, paddingHorizontal: 20, paddingVertical: 20 }}>
                     <Text style={{ color: "#121212", fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular", }}>Description</Text>
-                    <Text style={{ marginTop: 5, color: "#393C47", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>Our resort offers a perfect blend of tranquility, breathtaking beauty, and impeccable service. Located along the pristine white sands and azure waters will perfect for your holiday.</Text>
+                    <Text style={{ marginTop: 5, color: "#393C47", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>{specificDetails?.description}</Text>
 
                 </View>
                 <View style={{ marginTop: 10 }}>
                     <PricingOptions
                         onSelect={handleSelect}
-                        dailyPrice={'400'}
-                        monthlyPrice={'8000'}
+                        dailyPrice={specificDetails?.price}
+                        monthlyPrice={specificDetails?.subscriptionChargesPerMonth}
                     />
                 </View>
 
@@ -121,19 +159,19 @@ const ViewHireDetails = () => {
                         loop={false}
                         onIndexChanged={(index) => setActiveIndex(index)}
                         renderPagination={renderPagination}
-                        activeDotColor="#FD813B"
-                        dotColor="#c4c4c4"
+                        dotStyle={styles.dot}
+                        activeDotStyle={styles.activeDot}
                     >
-                        {photos.map((item, index) => (
+                        {specifcadditionalImages.map((item, index) => (
                             <View style={styles.slide} key={index}>
                                 <Image source={{ uri: item.uri }} style={[styles.image, { width: viewportWidth * 0.9 }]} />
                             </View>
                         ))}
                     </Swiper>
-                    <PaginationDots total={photos.length} activeIndex={activeIndex} />
+                    <PaginationDots total={specifcadditionalImages?.length} activeIndex={activeIndex} />
 
                 </View>
-                <BookDatesButton onPress={handleBookDatesPress} width={25} text={'Book Dates'} padding={12}/>
+                <BookDatesButton onPress={handleBookDatesPress} width={25} text={'Book Dates'} padding={12} />
             </ScrollView>
 
             {/* <Modal
@@ -264,6 +302,20 @@ const styles = StyleSheet.create({
         height: "80%",
         width: 1.5,
         alignSelf: "center"
+    },
+    dot: {
+        backgroundColor: '#DCD7FD',
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        margin: 3,
+    },
+    activeDot: {
+        backgroundColor: '#FF6347',
+        width: 18,
+        height: 8,
+        borderRadius: 4,
+        margin: 3,
     },
     container: {
         backgroundColor: '#fff',

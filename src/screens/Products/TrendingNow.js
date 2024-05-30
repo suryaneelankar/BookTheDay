@@ -1,11 +1,13 @@
-import {Text,View,FlatList,StyleSheet,Image, TouchableOpacity} from "react-native"
+import {Text,View,FlatList,StyleSheet,Image, TouchableOpacity, Dimensions} from "react-native"
 import { useState } from "react"
 import BackButton from '../../assets/svgs/backButton.svg'
 import { formatAmount } from "../../utils/GlobalFunctions"
 import themevariable from '../../utils/themevariable'
+import Svg, { Path } from 'react-native-svg';
+import { horizontalScale, verticalScale } from "../../utils/scalingMetrics"
 
-const TrendingNow=({data,discountList})=>{
-    const [selectedDiscount,setSelectedDiscount] = useState('')
+const TrendingNow=({data,discountList, textHeader})=>{
+    const [selectedDiscount,setSelectedDiscount] = useState('All')
 
 
 
@@ -26,12 +28,40 @@ const TrendingNow=({data,discountList})=>{
     const DiscountItem=({item})=>{
         return(
             <TouchableOpacity 
-            onPress={()=>{setSelectedDiscount(selectedDiscount == item.value ? '' : item.value)}}
-            style={selectedDiscount == item.value ? styles.selectedDiscountContainer : styles.discountFlatList}>
-                <Text style={selectedDiscount == item.value ? styles.selectedDiscountValue : styles.discountValue}>
-                    {item.value}
+            onPress={()=>{setSelectedDiscount(selectedDiscount == item?.value ? '' : item?.value)}}
+            style={selectedDiscount == item?.value ? styles.selectedDiscountContainer : styles.discountFlatList}>
+               {selectedDiscount === item?.value && (
+                 <Svg height="6" width="12" style={styles.arrow}>
+                 <Path d="M0 0 L6 6 L12 0" fill="#CE423D" />
+                 </Svg>
+               )}
+                <Text style={selectedDiscount == item?.value ? styles.selectedDiscountValue : styles.discountValue}>
+                    {item?.value}
                 </Text>
             </TouchableOpacity>
+        )
+    }
+
+    const renderOfferDetails = ({ item }) => {
+
+        return (
+            <View style={{}}>
+                <TouchableOpacity
+                    style={{ width: Dimensions.get('window').width /2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto',marginLeft:16}}>
+                    <Image source={{ uri: item?.catImageUrl }} style={{ borderTopLeftRadius:8,borderTopRightRadius:8,width: '90%',alignSelf:"center",marginTop:5, height:Dimensions.get('window').height/5 }}
+                    />
+                    <View style={{ marginTop: 15,marginHorizontal:6 }}>
+                            <Text numberOfLines={2} style={{ fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular' }}>{item?.productName}</Text>
+                            <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5,marginBottom:10 }}>
+                            {/* <Text style={{ fontWeight: '700', color:'#202020', fontSize: 14, fontFamily: 'ManropeRegular' }}>{formatAmount(item?.price)}/day</Text> */}
+                            <Text style={{ fontWeight: '700', color:'#202020', fontSize: 14, fontFamily: 'ManropeRegular' }}>{formatAmount('700')}</Text>
+ 
+                                <Text style={styles.strickedoffer}>{formatAmount(900 + 1000)}</Text>
+                            </View>   
+                                              
+                    </View>
+                </TouchableOpacity>
+            </View>
         )
     }
 
@@ -39,7 +69,7 @@ const TrendingNow=({data,discountList})=>{
         <View style={styles.rootContainer}>
         <View style={styles.subContainer}>
         <View style={styles.topContainer}>
-            <Text style={styles.trendingText}>Trending Now</Text>
+            <Text style={styles.trendingText}>{textHeader}</Text>
             <View style={styles.sellAllContainer}>
                 <Text style={styles.seeAllText}>See All</Text>
                 <BackButton width={20} height={20} style={styles.backButton}/>
@@ -54,14 +84,22 @@ const TrendingNow=({data,discountList})=>{
             // numColumns={2}
         />
         </View>
+        </View>
         <FlatList
+        horizontal
+        data={data}
+        contentContainerStyle={{paddingVertical:verticalScale(20),marginLeft:horizontalScale(5)}}
+        renderItem={renderOfferDetails}
+        showsHorizontalScrollIndicator={false}
+        />
+        {/* <FlatList
             data={data}
             renderItem={({item}) => <Item product={item} />}
             keyExtractor={item => item.id}
             horizontal={true}
             // numColumns={2}
-        />
-        </View>
+        /> */}
+       
         </View>
     )
 }
@@ -73,7 +111,7 @@ const styles = StyleSheet.create({
         marginTop:30
     },
     subContainer:{
-        marginHorizontal:30,
+        marginHorizontal:20,
     },
     topContainer:{
         flexDirection:'row',
@@ -83,26 +121,41 @@ const styles = StyleSheet.create({
     discountContainer:{
         backgroundColor:'white',
         borderRadius:10,
-        width:280,
-        marginBottom:10
+        width:"97%",
     },
     discountFlatList:{
-        padding:5,
+        paddingVertical:3,
+        paddingHorizontal:10
+       
     },
+    arrow: {
+        // position: 'absolute',
+        top: -2,
+        alignSelf:"center"
+      },
     selectedDiscountContainer:{
-        borderColor:themevariable.Color_EB3C54,
+        borderColor:'#CE423D',
         borderWidth:3,
-        borderRadius:15,
+        borderRadius:25,
         fontFamily:'ManropeRegular',
         color:themevariable.Color_000000,
         fontWeight:'bold',
-        marginHorizontal:10,
-        justifyContent:'center'
+        // marginHorizontal:10,
+        justifyContent:'center',
+        paddingHorizontal:10
     },
     selectedDiscountValue:{
-        color:'#EB3C54',
+        color:'#CE423D',
         marginHorizontal:5,
         fontWeight:'bold',
+    },
+    strickedoffer: {
+        fontSize: 14,
+        color: "#9A2143",
+        fontWeight: "700",
+        fontFamily:'ManropeRegular',
+        marginLeft: 4,
+        textDecorationLine: 'line-through'
     },
     trendingText:{
         fontFamily:'ManropeRegular',
@@ -116,7 +169,8 @@ const styles = StyleSheet.create({
     seeAllText:{
         fontWeight:'700',
         fontSize:18,
-        color:themevariable.Color_202020
+        color:themevariable.Color_202020,
+        fontFamily:'ManropeRegular',
     },
     backButton:{
         marginLeft:12,

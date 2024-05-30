@@ -31,6 +31,8 @@ import ProductScreen from "../screens/Products/ProductScreen";
 import NavigationHeader from "../components/NavigationHeader";
 import ViewHireDetails from "../screens/MyBox/ViewHireDetails";
 import SelectDateTimeScreen from "../screens/MyBox/SelectDateTime";
+import ViewCatDetails from "../screens/Categories/ViewCatDetails";
+import BookingDetailsScreen from "../screens/Categories/ViewCartDetails";
 
 const MainNavigation = () => {
 
@@ -63,6 +65,22 @@ const MainNavigation = () => {
                 component={ViewHireDetails}  
                 options={{
                          header: () => <NavigationHeader Icon={true} title="Hire Professionals" />,
+                         headerShown: true,
+                }}
+                />
+                <Stack.Screen 
+               name="ViewCatDetails"
+                component={ViewCatDetails}  
+                options={{
+                         header: () => <NavigationHeader Icon={true} title="Hire Professionals" />,
+                         headerShown: true,
+                }}
+                />
+                <Stack.Screen 
+               name="BookingDetailsScreen"
+                component={BookingDetailsScreen}  
+                options={{
+                         header: () => <NavigationHeader Icon={true} title="Cart" />,
                          headerShown: true,
                 }}
                 />

@@ -17,14 +17,14 @@ import LocationMarkIcon from '../../assets/svgs/location.svg';
 import SearchIcon from '../../assets/svgs/searchIcon.svg';
 import HomeSwipper from '../../assets/svgs/homeswippers.svg';
 import ArrowDown from '../../assets/svgs/arrowDown.svg';
-import TentHouseIcon from '../../assets/svgs/categories/tentHouse.svg';
-import FuntionalHall from '../../assets/svgs/categories/funtionHalls.svg';
-import DecorationsIcon from '../../assets/svgs/categories/decorations.svg';
-import CateringIcon from '../../assets/svgs/categories/catering.svg';
-import DriversIcon from '../../assets/svgs/categories/drivers.svg';
-import ChefIcon from '../../assets/svgs/categories/chefs.svg';
-import JewelleryIcon from '../../assets/svgs/categories/jewellery.svg';
-import ClothesIcon from '../../assets/svgs/categories/clothes.svg';
+import TentHouseIcon from '../../assets/svgs/categories/home_tenthouseimage.svg';
+import FuntionalHall from '../../assets/svgs/categories/home_hallimage.svg';
+import DecorationsIcon from '../../assets/svgs/categories/home_decorationimage.svg';
+import CateringIcon from '../../assets/svgs/categories/home_cateringimage.svg';
+import DriversIcon from '../../assets/svgs/categories/home_driverimage.svg';
+import ChefIcon from '../../assets/svgs/categories/home_chefimage.svg';
+import JewelleryIcon from '../../assets/svgs/categories/jewellery_icon.svg';
+import ClothesIcon from '../../assets/svgs/categories/home_clothesimage.svg';
 import SwipperOne from '../../assets/svgs/homeSwippers/swipperOne.svg';
 import MoneyWavy from '../../assets/svgs/MoneyWavy.svg';
 import Cloth from '../../assets/svgs/cloth.svg';
@@ -40,12 +40,20 @@ import Svg, { Circle } from 'react-native-svg';
 import { InfoBox } from "../../components/InfoBox";
 import TrendingView from "../../components/TrendingView";
 import TrendingShirtImg from '../../assets/svgs/shirtTrending.svg';
+import TrendingNow from "../Products/TrendingNow";
+import shirtImg from '../../assets/shirt.png'
+import DiscountComponent from "../Products/DiscountComponent";
+import FooterBackGround from '../../assets/svgs/categories/home_footerbg.svg';
+import Swiper from "react-native-swiper";
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
     const [address, setAddress] = useState('');
     const [eventsData, setEventsData] = useState([]);
-
+     const bannerImages = [{ image: require('../../assets/svgs/productBanners/productBannerone.png') },
+    { image: require('../../assets/svgs/productBanners/productBannerone.png') },
+    { image: require('../../assets/svgs/productBanners/productBannerone.png') },
+    ]
     useEffect(() => {
         // getPermissions();
         // getCategories();
@@ -79,7 +87,104 @@ const HomeDashboard = () => {
     { name: 'Decoration', image: require('../../assets/clothesIcon.png') },
     { name: 'Catering', image: require('../../assets/clothesIcon.png') },
     ]
+    const categoryLabels = [
+        { icon: ClothesIcon, label: 'Clothes' },
+        { icon: JewelleryIcon, label: 'Jewellery' },
+        { icon: ChefIcon, label: 'Chefs' },
+        { icon: DriversIcon, label: 'Driver' },
+        { icon: TentHouseIcon, label: 'Tent House' },
+        { icon: FuntionalHall, label: 'Hall' },
+        { icon: DecorationsIcon, label: 'Decoration' },
+        { icon: CateringIcon, label: 'Catering' },
+      ];
 
+      const DATA = [
+        {
+          id: 0,
+          productName: 'Trail Running Jacket Nike Windrunner',
+          productPrice:700,
+          productDiscount:20,
+          discountPercentage:20,
+          imageUrl:shirtImg,
+          catImageUrl:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
+        },
+        {
+          id: 1,
+          productName: 'Trail Running Jacket Nike Windrunner',
+          productPrice:700,
+          productDiscount:20,
+          discountPercentage:20,
+          imageUrl:shirtImg,
+          catImageUrl:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
+
+        },
+        {
+          id: 2,
+          productName: 'Trail Running Jacket Nike Windrunner',
+          productPrice:700,
+          productDiscount:20,
+          discountPercentage:20,
+          imageUrl:shirtImg,
+          catImageUrl:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
+
+        },
+        {
+            id:3,
+            productName: 'Trail Running Jacket Nike Windrunner',
+            productPrice:700,
+            productDiscount:20,
+            discountPercentage:20,
+            imageUrl:shirtImg,
+            catImageUrl:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
+
+        },
+        {
+            id:4,
+            productName: 'Trail Running Jacket Nike Windrunner',
+            productPrice:700,
+            productDiscount:20,
+            discountPercentage:20,
+            imageUrl:shirtImg,
+            catImageUrl:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
+
+        },
+        {
+            id:5,
+            productName: 'Trail Running Jacket Nike Windrunner',
+            productPrice:700,
+            productDiscount:20,
+            discountPercentage:20,
+            imageUrl:shirtImg,
+            catImageUrl:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
+
+        }
+      ];
+      const discountList = [
+        {
+          id: 0,
+          value: 'All',
+        },
+        {
+          id: 1,
+          value: '10%',
+        },
+        {
+          id: 2,
+          value: '20%',
+        },
+        {
+            id:3,
+            value: '30%',
+        },
+        {
+            id:4,
+            value: '40%',
+        },
+        {
+            id:5,
+            value: '50%',
+        },
+      ];
 
     useEffect(() => {
         getPermissions();
@@ -235,7 +340,20 @@ const HomeDashboard = () => {
                         </View>
                     </View>
                     <View style={{ width: "100%" }}>
-                        <SwiperFlatList
+                    <Swiper
+                    autoplay
+                    autoplayTimeout={3}
+                    dotStyle={styles.dot}
+                    activeDotStyle={styles.activeDot}
+                    style={{ height: Dimensions.get('window').height / 3.3, marginHorizontal: 20, marginTop: 10 }}
+                >
+                    {bannerImages.map((image, index) => (
+                        <View style={{}} key={index}>
+                            <Image source={image?.image} />
+                        </View>
+                    ))}
+                </Swiper>
+                        {/* <SwiperFlatList
                             autoplay
                             autoplayDelay={2}
                             autoplayLoop
@@ -255,7 +373,7 @@ const HomeDashboard = () => {
                                 </View>
 
                             )}
-                        />
+                        /> */}
                     </View>
 
                     <View style={styles.infoBoxContainer}>
@@ -282,7 +400,7 @@ const HomeDashboard = () => {
 
                     <View style={{ marginTop: 10, marginHorizontal: 20 }}>
                         <Text style={{ fontFamily: "ManropeRegular", fontWeight: "700", fontSize: 16, color: '#202020' }}>Categories</Text>
-                        <FlatList
+                        {/* <FlatList
                             data={newData}
                             renderItem={({ item }) => {
                                 return (
@@ -294,11 +412,26 @@ const HomeDashboard = () => {
                             }}
                             showsHorizontalScrollIndicator={false}
                             numColumns={4}
-                        />
+                        /> */}
+                         <View style={styles.grid}>
+        {categoryLabels.map((category, index) => {
+          const IconComponent = category.icon;
+          return (
+            <TouchableOpacity key={index} style={styles.category}>
+              <View style={styles.iconContainer}>
+                <IconComponent width={50} height={50} />
+              </View>
+              <Text style={styles.label}>{category.label}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
                     </View>
                 </LinearGradient>
 
-                <View style={{marginTop:40,}}>
+               <TrendingNow data={DATA} discountList={discountList} textHeader={'Live Offers!'}/>
+
+                <View style={{marginTop:30,}}>
                 <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
                     <Text style={styles.onDemandTextStyle}>Trending Now</Text>
                     <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
@@ -344,6 +477,9 @@ const HomeDashboard = () => {
                     horizontal
                     showsHorizontalScrollIndicator={false}
                 />
+
+          <FooterBackGround style={{alignSelf:"center"}}/>
+
 
             </ScrollView>
         </SafeAreaView>
@@ -403,6 +539,32 @@ const styles = StyleSheet.create({
     locationIcon: {
         marginRight: 8,
     },
+    grid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+      },
+      category: {
+        alignItems: 'center',
+        marginBottom: 16,
+        width: '22%',
+      },
+      iconContainer: {
+        backgroundColor: '#fff',
+        borderRadius: 50,
+        padding: 10,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+      },
+      label: {
+        marginTop: 8,
+        textAlign: 'center',
+        fontSize: 14,
+        color: '#555',
+      },
     locationName: {
         fontWeight: '900',
         fontSize: 12,

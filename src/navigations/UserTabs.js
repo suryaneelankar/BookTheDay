@@ -102,6 +102,7 @@ const Tab4Screen = ({ navigation }) => {
     ),
     tabBarLabel: 'Collections',
     tabBarShowLabel:true,
+    header: () => <NavigationHeader Icon={false} title="Products" />,
     headerShown: true,
   }}
 />
