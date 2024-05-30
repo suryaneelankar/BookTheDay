@@ -164,7 +164,7 @@ const ViewHireDetails = ({route}) => {
                     >
                         {specifcadditionalImages.map((item, index) => (
                             <View style={styles.slide} key={index}>
-                                <Image source={{ uri: item.uri }} style={[styles.image, { width: viewportWidth * 0.9 }]} />
+                                <Image source={{ uri: item.uri }} resizeMode="contain" style={[styles.image, { width: viewportWidth * 0.9 }]} />
                             </View>
                         ))}
                     </Swiper>

@@ -24,7 +24,7 @@ import CateringIcon from '../../assets/svgs/categories/home_cateringimage.svg';
 import DriversIcon from '../../assets/svgs/categories/home_driverimage.svg';
 import ChefIcon from '../../assets/svgs/categories/home_chefimage.svg';
 import JewelleryIcon from '../../assets/svgs/categories/jewellery_icon.svg';
-import ClothesIcon from '../../assets/svgs/categories/home_clothesimage.svg';
+import ClothesIcon from '../../assets/svgs/categories/clothes_icon.svg';
 import SwipperOne from '../../assets/svgs/homeSwippers/swipperOne.svg';
 import MoneyWavy from '../../assets/svgs/MoneyWavy.svg';
 import Cloth from '../../assets/svgs/cloth.svg';
@@ -50,7 +50,7 @@ const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
     const [address, setAddress] = useState('');
     const [eventsData, setEventsData] = useState([]);
-     const bannerImages = [{ image: require('../../assets/svgs/productBanners/productBannerone.png') },
+    const bannerImages = [{ image: require('../../assets/svgs/homeSwippers/home_jewellerycard.png') },
     { image: require('../../assets/svgs/productBanners/productBannerone.png') },
     { image: require('../../assets/svgs/productBanners/productBannerone.png') },
     ]
@@ -71,21 +71,21 @@ const HomeDashboard = () => {
 
 
     const images = [SwipperOne, SwipperOne, SwipperOne]; //svg images for swipper  
-    const wantChefDriver = [WantChef, WantDriver];  
-    const trendingImageList = [{name:'Levis Full-Sleeve Blue Shirt',image:TrendingShirtImg},
-    {name:'Delicious meals in 1 mins',image:TrendingShirtImg},
-    {name:'MAX blue full hands',image:TrendingShirtImg},
-    {name:'MAX blue full hands i',image:TrendingShirtImg},
-    {name:'levis bluew5555',image:TrendingShirtImg},];
+    const wantChefDriver = [WantChef, WantDriver];
+    const trendingImageList = [{ name: 'Levis Full-Sleeve Blue Shirt', image: TrendingShirtImg },
+    { name: 'Delicious meals in 1 mins', image: TrendingShirtImg },
+    { name: 'MAX blue full hands', image: TrendingShirtImg },
+    { name: 'MAX blue full hands i', image: TrendingShirtImg },
+    { name: 'levis bluew5555', image: TrendingShirtImg },];
 
-    const newData = [{ name: 'Clothes', image: require('../../assets/clothesIcon.png') },
-    { name: 'Jewellery', image: require('../../assets/clothesIcon.png') },
-    { name: 'Chefs', image: require('../../assets/clothesIcon.png') },
-    { name: 'Driver', image: require('../../assets/clothesIcon.png') },
-    { name: 'Tent House', image: require('../../assets/clothesIcon.png') },
-    { name: 'Halls', image: require('../../assets/clothesIcon.png') },
-    { name: 'Decoration', image: require('../../assets/clothesIcon.png') },
-    { name: 'Catering', image: require('../../assets/clothesIcon.png') },
+    const newData = [{ name: 'Clothes', image: require('../../assets/categoriesPngs/clothes_icon.png') },
+    { name: 'Jewellery', image: require('../../assets/categoriesPngs/jewellery_icon.png') },
+    { name: 'Chefs', image: require('../../assets/categoriesPngs/chef_icon.png') },
+    { name: 'Driver', image: require('../../assets/categoriesPngs/driver_icon.png') },
+    { name: 'Tent House', image: require('../../assets/categoriesPngs/tenthouse_icon.png') },
+    { name: 'Halls', image: require('../../assets/categoriesPngs/hall_icon.png') },
+    { name: 'Decoration', image: require('../../assets/categoriesPngs/decoration_icon.png') },
+    { name: 'Catering', image: require('../../assets/categoriesPngs/catering_icon.png') },
     ]
     const categoryLabels = [
         { icon: ClothesIcon, label: 'Clothes' },
@@ -96,95 +96,95 @@ const HomeDashboard = () => {
         { icon: FuntionalHall, label: 'Hall' },
         { icon: DecorationsIcon, label: 'Decoration' },
         { icon: CateringIcon, label: 'Catering' },
-      ];
+    ];
 
-      const DATA = [
+    const DATA = [
         {
-          id: 0,
-          productName: 'Trail Running Jacket Nike Windrunner',
-          productPrice:700,
-          productDiscount:20,
-          discountPercentage:20,
-          imageUrl:shirtImg,
-          catImageUrl:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
-        },
-        {
-          id: 1,
-          productName: 'Trail Running Jacket Nike Windrunner',
-          productPrice:700,
-          productDiscount:20,
-          discountPercentage:20,
-          imageUrl:shirtImg,
-          catImageUrl:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
-
-        },
-        {
-          id: 2,
-          productName: 'Trail Running Jacket Nike Windrunner',
-          productPrice:700,
-          productDiscount:20,
-          discountPercentage:20,
-          imageUrl:shirtImg,
-          catImageUrl:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
-
-        },
-        {
-            id:3,
+            id: 0,
             productName: 'Trail Running Jacket Nike Windrunner',
-            productPrice:700,
-            productDiscount:20,
-            discountPercentage:20,
-            imageUrl:shirtImg,
-            catImageUrl:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
+            productPrice: 700,
+            productDiscount: 20,
+            discountPercentage: 20,
+            imageUrl: shirtImg,
+            catImageUrl: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
+        },
+        {
+            id: 1,
+            productName: 'Trail Running Jacket Nike Windrunner',
+            productPrice: 700,
+            productDiscount: 20,
+            discountPercentage: 20,
+            imageUrl: shirtImg,
+            catImageUrl: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
 
         },
         {
-            id:4,
+            id: 2,
             productName: 'Trail Running Jacket Nike Windrunner',
-            productPrice:700,
-            productDiscount:20,
-            discountPercentage:20,
-            imageUrl:shirtImg,
-            catImageUrl:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
+            productPrice: 700,
+            productDiscount: 20,
+            discountPercentage: 20,
+            imageUrl: shirtImg,
+            catImageUrl: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
 
         },
         {
-            id:5,
+            id: 3,
             productName: 'Trail Running Jacket Nike Windrunner',
-            productPrice:700,
-            productDiscount:20,
-            discountPercentage:20,
-            imageUrl:shirtImg,
-            catImageUrl:'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
+            productPrice: 700,
+            productDiscount: 20,
+            discountPercentage: 20,
+            imageUrl: shirtImg,
+            catImageUrl: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
+
+        },
+        {
+            id: 4,
+            productName: 'Trail Running Jacket Nike Windrunner',
+            productPrice: 700,
+            productDiscount: 20,
+            discountPercentage: 20,
+            imageUrl: shirtImg,
+            catImageUrl: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
+
+        },
+        {
+            id: 5,
+            productName: 'Trail Running Jacket Nike Windrunner',
+            productPrice: 700,
+            productDiscount: 20,
+            discountPercentage: 20,
+            imageUrl: shirtImg,
+            catImageUrl: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
 
         }
-      ];
-      const discountList = [
+    ];
+    const discountList = [
         {
-          id: 0,
-          value: 'All',
+            id: 0,
+            value: 'All',
         },
         {
-          id: 1,
-          value: '10%',
+            id: 1,
+            value: '10%',
         },
         {
-          id: 2,
-          value: '20%',
+            id: 2,
+            value: '20%',
         },
         {
-            id:3,
+            id: 3,
             value: '30%',
         },
         {
-            id:4,
+            id: 4,
             value: '40%',
         },
         {
-            id:5,
+            id: 5,
             value: '50%',
         },
-      ];
+    ];
 
     useEffect(() => {
         getPermissions();
@@ -339,42 +339,19 @@ const HomeDashboard = () => {
                             <FilterIcon />
                         </View>
                     </View>
-                    <View style={{ width: "100%" }}>
-                    <Swiper
-                    autoplay
-                    autoplayTimeout={3}
-                    dotStyle={styles.dot}
-                    activeDotStyle={styles.activeDot}
-                    style={{ height: Dimensions.get('window').height / 3.3, marginHorizontal: 20, marginTop: 10 }}
-                >
-                    {bannerImages.map((image, index) => (
-                        <View style={{}} key={index}>
-                            <Image source={image?.image} />
-                        </View>
-                    ))}
-                </Swiper>
-                        {/* <SwiperFlatList
+                    {/* <View style={{ width: "100%" }}> */}
+                        <Swiper
                             autoplay
-                            autoplayDelay={2}
-                            autoplayLoop
-                            index={2}
-                            showPagination
-                            paginationDefaultColor='#DDD4F3'
-                            paginationActiveColor='#ECA73C'
-                            paginationStyle={{ bottom: -20, }}
-                            paginationStyleItem={{ backgroundColor: "red" }}
-                            paginationStyleItemInactive={{ width: 8, height: 8 }}
-                            paginationStyleItemActive={{ height: 8, width: 20 }}
-                            data={images}
-                            style={{}}
-                            renderItem={({ item: Item }) => (
-                                <View style={{ width, flex: 1, alignItems: "center" }}>
-                                    <Item />
-                                </View>
-
-                            )}
-                        /> */}
-                    </View>
+                            autoplayTimeout={3}
+                            dotStyle={styles.dot}
+                            activeDotStyle={styles.activeDot}
+                            style={{ height: Dimensions.get('window').height /4, }}
+                        >
+                            {bannerImages.map((image, index) => (
+                                <Image source={image?.image} resizeMode="contain" style={{ width: "90%", height: "100%", alignSelf: "center" }} />
+                            ))}
+                        </Swiper>
+                    {/* </View> */}
 
                     <View style={styles.infoBoxContainer}>
 
@@ -398,70 +375,54 @@ const HomeDashboard = () => {
 
                     </View>
 
-                    <View style={{ marginTop: 10, marginHorizontal: 20 }}>
-                        <Text style={{ fontFamily: "ManropeRegular", fontWeight: "700", fontSize: 16, color: '#202020' }}>Categories</Text>
-                        {/* <FlatList
+                    <View style={{  }}>
+                        <Text style={{ marginHorizontal:20,fontFamily: "ManropeRegular", fontWeight: "700", fontSize: 16, color: '#202020' }}>Categories</Text>
+                        <FlatList
                             data={newData}
                             renderItem={({ item }) => {
                                 return (
-                                    <View style={{ padding: 5, alignItems: "center", marginRight: 20 }} >
-                                        <Image source={item.image} style={{ height: 60, width: 60, borderRadius: 30, elevation: 2 }} />
+                                    <TouchableOpacity style={{ alignItems: "center",alignSelf:"center" ,justifyContent:"center" ,width:Dimensions.get('window').width/4}} >
+                                        <Image source={item.image} style={{ height: 65, width: 65, }} />
                                         <Text style={{ marginTop: 5, fontSize: 13, fontWeight: "500", color: '#202020', fontFamily: "ManropeRegular", }}>{item?.name}</Text>
-                                    </View>
+                                    </TouchableOpacity>
                                 )
                             }}
                             showsHorizontalScrollIndicator={false}
                             numColumns={4}
-                        /> */}
-                         <View style={styles.grid}>
-        {categoryLabels.map((category, index) => {
-          const IconComponent = category.icon;
-          return (
-            <TouchableOpacity key={index} style={styles.category}>
-              <View style={styles.iconContainer}>
-                <IconComponent width={50} height={50} />
-              </View>
-              <Text style={styles.label}>{category.label}</Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
+                        />
+                        {/* <View style={styles.grid}>
+                            {categoryLabels.map((category, index) => {
+                                const IconComponent = category.icon;
+                                return (
+                                    <TouchableOpacity key={index} style={styles.category}>
+                                        <View style={styles.iconContainer}>
+                                            <IconComponent width={50} height={50} />
+                                        </View>
+                                        <Text style={styles.label}>{category.label}</Text>
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </View> */}
                     </View>
                 </LinearGradient>
 
-               <TrendingNow data={DATA} discountList={discountList} textHeader={'Live Offers!'}/>
+                <TrendingNow data={DATA} discountList={discountList} textHeader={'Live Offers!'} />
 
-                <View style={{marginTop:30,}}>
-                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
-                    <Text style={styles.onDemandTextStyle}>Trending Now</Text>
-                    <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
-                        <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
-                        <RightArrowIcon width={25} height={25} />
-                    </TouchableOpacity>
+                <View style={{ marginTop: 30, }}>
+                    <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
+                        <Text style={styles.onDemandTextStyle}>Trending Now</Text>
+                        <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                            <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
+                            <RightArrowIcon width={25} height={25} />
+                        </TouchableOpacity>
+                    </View>
+
+                    <TrendingView
+                        data={trendingImageList}
+                    />
                 </View>
 
-                <TrendingView 
-                data={trendingImageList}
-                />
-                </View>
 
-                        <SwiperFlatList
-                            index={2}
-                            showPagination
-                            paginationDefaultColor='#DDD4F3'
-                            paginationActiveColor='#ECA73C'
-                            paginationStyle={{bottom: -20}}
-                            paginationStyleItem={{ backgroundColor: "red" }}
-                            paginationStyleItemInactive={{ width: 8, height: 8 }}
-                            paginationStyleItemActive={{ height: 8, width: 20 }}
-                            data={wantChefDriver}
-                            style={{width}}
-                            renderItem={({ item: Item }) => (
-                                <View style={{ width, flex: 1, alignItems: "center"}}>
-                                    <Item />
-                                </View>
-                            )}
-                        />
 
                 <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
                     <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
@@ -475,10 +436,11 @@ const HomeDashboard = () => {
                     data={eventsData}
                     renderItem={renderItem}
                     horizontal
+                    keyExtractor={(item) => item?._id}
                     showsHorizontalScrollIndicator={false}
                 />
 
-          <FooterBackGround style={{alignSelf:"center"}}/>
+                <FooterBackGround style={{ alignSelf: "center" }} />
 
 
             </ScrollView>
@@ -536,6 +498,22 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginHorizontal: 20,
     },
+    dot: {
+        backgroundColor: '#DCD7FD',
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        bottom: 0,
+        top:35
+    },
+    activeDot: {
+        backgroundColor: '#FF6347',
+        width: 18,
+        height: 8,
+        borderRadius: 4,
+        bottom: 0,
+        top:35
+    },
     locationIcon: {
         marginRight: 8,
     },
@@ -543,13 +521,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
-      },
-      category: {
+    },
+    category: {
         alignItems: 'center',
         marginBottom: 16,
         width: '22%',
-      },
-      iconContainer: {
+    },
+    iconContainer: {
         backgroundColor: '#fff',
         borderRadius: 50,
         padding: 10,
@@ -558,13 +536,13 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 2,
-      },
-      label: {
+    },
+    label: {
         marginTop: 8,
         textAlign: 'center',
         fontSize: 14,
         color: '#555',
-      },
+    },
     locationName: {
         fontWeight: '900',
         fontSize: 12,
@@ -673,7 +651,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-evenly",
         backgroundColor: "#FFFFFF",
         padding: 8,
-        marginVertical: 25,
+        marginVertical: 20,
         borderRadius: 10
     },
     verticalLine: {
