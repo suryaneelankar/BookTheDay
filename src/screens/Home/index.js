@@ -14,6 +14,7 @@ import GetLocation from 'react-native-get-location'
 import { height, moderateScale } from "../../utils/scalingMetrics";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LocationMarkIcon from '../../assets/svgs/location.svg';
+import Home_banner_chef from '../../assets/svgs/homeSwippers/Home_banner_chef.svg';
 import SearchIcon from '../../assets/svgs/searchIcon.svg';
 import HomeSwipper from '../../assets/svgs/homeswippers.svg';
 import ArrowDown from '../../assets/svgs/arrowDown.svg';
@@ -43,7 +44,7 @@ import TrendingShirtImg from '../../assets/svgs/shirtTrending.svg';
 import TrendingNow from "../Products/TrendingNow";
 import shirtImg from '../../assets/shirt.png'
 import DiscountComponent from "../Products/DiscountComponent";
-import FooterBackGround from '../../assets/svgs/categories/home_footerbg.svg';
+import FooterBackGround from '../../assets/svgs/categories/home_footer_bg.svg';
 import Swiper from "react-native-swiper";
 
 const HomeDashboard = () => {
@@ -78,15 +79,16 @@ const HomeDashboard = () => {
     { name: 'MAX blue full hands i', image: TrendingShirtImg },
     { name: 'levis bluew5555', image: TrendingShirtImg },];
 
-    const newData = [{ name: 'Clothes', image: require('../../assets/categoriesPngs/clothes_icon.png') },
-    { name: 'Jewellery', image: require('../../assets/categoriesPngs/jewellery_icon.png') },
-    { name: 'Chefs', image: require('../../assets/categoriesPngs/chef_icon.png') },
-    { name: 'Driver', image: require('../../assets/categoriesPngs/driver_icon.png') },
-    { name: 'Tent House', image: require('../../assets/categoriesPngs/tenthouse_icon.png') },
-    { name: 'Halls', image: require('../../assets/categoriesPngs/hall_icon.png') },
-    { name: 'Decoration', image: require('../../assets/categoriesPngs/decoration_icon.png') },
-    { name: 'Catering', image: require('../../assets/categoriesPngs/catering_icon.png') },
-    ]
+    const newData =
+        [{ name: 'Clothes', image: require('../../assets/categoriesPngs/clothes_icon.png') },
+        { name: 'Jewellery', image: require('../../assets/categoriesPngs/jewellery_icon.png') },
+        { name: 'Chefs', image: require('../../assets/categoriesPngs/chef_icon.png') },
+        { name: 'Driver', image: require('../../assets/categoriesPngs/driver_icon.png') },
+        { name: 'Tent House', image: require('../../assets/categoriesPngs/tenthouse_icon.png') },
+        { name: 'Halls', image: require('../../assets/categoriesPngs/hall_icon.png') },
+        { name: 'Decoration', image: require('../../assets/categoriesPngs/decoration_icon.png') },
+        { name: 'Catering', image: require('../../assets/categoriesPngs/catering_icon.png') },
+        ]
     const categoryLabels = [
         { icon: ClothesIcon, label: 'Clothes' },
         { icon: JewelleryIcon, label: 'Jewellery' },
@@ -317,6 +319,7 @@ const HomeDashboard = () => {
                             <Text style={styles.currentLoc}>Your current location</Text>
                             <TouchableOpacity onPress={getLocation} style={styles.getLoc}>
                                 <LocationMarkIcon />
+
                                 <Text style={styles.retrievedLoc}>{address?.neighbourhood}, {address?.city}</Text>
                                 <ArrowDown />
                             </TouchableOpacity>
@@ -340,17 +343,17 @@ const HomeDashboard = () => {
                         </View>
                     </View>
                     {/* <View style={{ width: "100%" }}> */}
-                        <Swiper
-                            autoplay
-                            autoplayTimeout={3}
-                            dotStyle={styles.dot}
-                            activeDotStyle={styles.activeDot}
-                            style={{ height: Dimensions.get('window').height /4, }}
-                        >
-                            {bannerImages.map((image, index) => (
-                                <Image source={image?.image} resizeMode="contain" style={{ width: "90%", height: "100%", alignSelf: "center" }} />
-                            ))}
-                        </Swiper>
+                    <Swiper
+                        autoplay
+                        autoplayTimeout={3}
+                        dotStyle={styles.dot}
+                        activeDotStyle={styles.activeDot}
+                        style={{ height: Dimensions.get('window').height / 4, }}
+                    >
+                        {bannerImages.map((image, index) => (
+                            <Image source={image?.image} resizeMode="contain" style={{ width: "90%", height: "100%", alignSelf: "center" }} />
+                        ))}
+                    </Swiper>
                     {/* </View> */}
 
                     <View style={styles.infoBoxContainer}>
@@ -375,14 +378,21 @@ const HomeDashboard = () => {
 
                     </View>
 
-                    <View style={{  }}>
-                        <Text style={{ marginHorizontal:20,fontFamily: "ManropeRegular", fontWeight: "700", fontSize: 16, color: '#202020' }}>Categories</Text>
+                    <View style={{}}>
+                        <Text style={{ marginHorizontal: 20, fontFamily: "ManropeRegular", fontWeight: "700", fontSize: 16, color: '#202020' }}>Categories</Text>
                         <FlatList
                             data={newData}
                             renderItem={({ item }) => {
                                 return (
-                                    <TouchableOpacity style={{ alignItems: "center",alignSelf:"center" ,justifyContent:"center" ,width:Dimensions.get('window').width/4}} >
+                                    <TouchableOpacity style={{ alignItems: "center", alignSelf: "center", justifyContent: "center", width: Dimensions.get('window').width / 4 }} >
                                         <Image source={item.image} style={{ height: 65, width: 65, }} />
+                                        {/* <View style={{ flexDirection: 'row',backgroundColor:'#FFEFC0' }}>
+                                                {Cats.map((IconComponent, index) => (
+                                                    <TouchableOpacity>
+                                                        <IconComponent key={index} width={100} height={100} />
+                                                    </TouchableOpacity>
+                                                ))}
+                                            </View> */}
                                         <Text style={{ marginTop: 5, fontSize: 13, fontWeight: "500", color: '#202020', fontFamily: "ManropeRegular", }}>{item?.name}</Text>
                                     </TouchableOpacity>
                                 )
@@ -504,7 +514,7 @@ const styles = StyleSheet.create({
         height: 8,
         borderRadius: 4,
         bottom: 0,
-        top:35
+        top: 35
     },
     activeDot: {
         backgroundColor: '#FF6347',
@@ -512,7 +522,7 @@ const styles = StyleSheet.create({
         height: 8,
         borderRadius: 4,
         bottom: 0,
-        top:35
+        top: 35
     },
     locationIcon: {
         marginRight: 8,

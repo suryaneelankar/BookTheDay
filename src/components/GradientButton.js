@@ -1,5 +1,5 @@
 import React from "react";
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet, Dimensions} from 'react-native';
 import LinearGradient from "react-native-linear-gradient";
 import { horizontalScale, moderateScale, verticalScale } from "../utils/scalingMetrics";
 import RightArrow from '../assets/svgs/rightSidearrowWhite.svg';
@@ -11,7 +11,7 @@ const BookDatesButton = ({ onPress, width, text,padding }) => {
           colors={['#D2453B', '#A0153E']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
-          style={[styles.buttonView,{marginHorizontal:horizontalScale(width),padding:moderateScale(padding)}]}
+          style={[styles.buttonView,{width:Dimensions.get('window').width-50, padding:padding ? moderateScale(padding) : 0,alignSelf:'center'}]}
         > 
         <View style={{flexDirection:"row",alignItems:"center"}}>
           {text === 'Book Dates' ?
@@ -32,6 +32,7 @@ const BookDatesButton = ({ onPress, width, text,padding }) => {
     container:{
         backgroundColor:"white",
         paddingVertical: verticalScale(15),
+        width:Dimensions.get('window').width
     },
     buttonView:{
         // marginHorizontal:horizontalScale(25),

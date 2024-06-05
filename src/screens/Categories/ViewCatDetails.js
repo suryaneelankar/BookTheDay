@@ -64,7 +64,7 @@ const ViewCatDetails = () => {
 
     return (
         <SafeAreaView>
-            <ScrollView >
+            <ScrollView style={{marginBottom:'15%'}}>
             <View style={{ backgroundColor: "white", }}>
 
                      <Swiper
@@ -112,8 +112,11 @@ const ViewCatDetails = () => {
                 </View>
 
                
-                <BookDatesButton onPress={handleBookDatesPress} width={25} text={'Book Dates'} padding={12} />
+                {/* <BookDatesButton onPress={handleBookDatesPress} width={25} text={'Book Dates'} padding={12} /> */}
             </ScrollView>
+            <View style={{position:'absolute',bottom:0}}>
+                <BookDatesButton onPress={handleBookDatesPress} text={'Book Dates'} padding={12} />
+            </View>
 
 
         </SafeAreaView>

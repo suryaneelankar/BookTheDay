@@ -19,7 +19,7 @@ import { Calendar } from "react-native-calendars";
 import SelectDateTimeScreen from "./SelectDateTime";
 import ClockIcon from '../../assets/svgs/clock.svg';
 import axios from "axios";
-import BASE_URL from "../../apiconfig";
+import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 
 
 const ViewHireDetails = ({route}) => {
@@ -58,12 +58,12 @@ const ViewHireDetails = ({route}) => {
             setSpecificDetails(response?.data);
 
             const photos = response?.data?.additionalImages.flat().map(image => ({
-                uri: image.url.replace('localhost', '192.168.1.8'),  // Replace 'localhost' with '192.168.1.8'
+                uri: image.url.replace('localhost', LocalHostUrl),  // Replace 'localhost' with '192.168.1.8'
               }));
             const updateImage = response?.data?.professionalImage?.url;
              setSpecificAdditionImages(photos);
 
-             const updatedImgUrl = updateImage  ? updateImage.replace('localhost', '192.168.1.8') : updateImage;
+             const updatedImgUrl = updateImage  ? updateImage.replace('localhost', LocalHostUrl) : updateImage;
              setHireImage(updatedImgUrl)
 
         } catch (error) {
@@ -171,8 +171,11 @@ const ViewHireDetails = ({route}) => {
                     <PaginationDots total={specifcadditionalImages?.length} activeIndex={activeIndex} />
 
                 </View>
-                <BookDatesButton onPress={handleBookDatesPress} width={25} text={'Book Dates'} padding={12} />
+            
             </ScrollView>
+            <View style={{position:'absolute',bottom:0}}>
+                <BookDatesButton onPress={handleBookDatesPress} text={'Book Dates'} padding={12} />
+            </View>
 
             {/* <Modal
                 isVisible={isVisible}

@@ -15,10 +15,10 @@ const DiscountComponent=({data})=>{
                     <Image style={styles.productImage} source={product.imageUrl} resizeMode="contain" />
                 </View>
             </View>
-            <Text style={styles.productName}>{product.productName}</Text>
+            <Text style={styles.productName}>{product?.productName}</Text>
         <View style={styles.priceContainer}>
-            <Text style={styles.price}>{formatAmount(product.productPrice)}</Text>
-            <Text style={styles.discount}>{formatAmount(product.productDiscount)}</Text>
+            <Text style={styles.price}>{formatAmount(product?.rentPricePerDay)}</Text>
+            <Text style={styles.discount}>{formatAmount(product?.rentPricePerDay + 500)}</Text>
         </View>
         </View>
     )

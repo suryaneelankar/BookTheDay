@@ -1,17 +1,49 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import React, {useState,useEffect} from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, BackHandler,Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import EditButton from '../../assets/svgs/categories/editButton.svg';
+import CalendarIcon from '../../assets/svgs/calendarOrangeIcon.svg';
+import CartBanner from '../../assets/svgs/cartBanner.svg';
+import ExclamationIcon from '../../assets/svgs/exclamationmark.svg';
+import Modal from 'react-native-modal';
+import themevariable from '../../utils/themevariable';
+import LeftArrow from '../../assets/svgs/leftarrowWhite.svg';
 
-const BookingDetailsScreen = () => {
+const BookingDetailsScreen = ({navigation}) => {
+
+  const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
+
+  useEffect(() => {
+    const backAction = () => {
+      navigation.pop(2)
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
+  }, []);
+
+
   return (
     <ScrollView style={styles.container}>
+      <View style={{ flexDirection: "row", alignItems: "center", }}>
+            <TouchableOpacity onPress={() => navigation.pop(2)}>
+              <LeftArrow style={{ marginTop: 3, marginHorizontal: 50 }} />
+            
+            <Text style={{ color: "red", fontSize: 20, fontWeight: "800", fontFamily: "ManropeRegular", }}>Select Date & Time</Text>
+            </TouchableOpacity>
+
+          </View>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Shipping Address</Text>
-        <View style={{flexDirection:"row"}}>
-        <Text style={styles.address}>26, Duong So 2, Thao Dien Ward, An Phu, District 2, Ho Chi Minh city</Text>
-        <EditButton/>
+        <View style={{ flexDirection: "row" }}>
+          <Text style={styles.address}>26, Duong So 2, Thao Dien Ward, An Phu, District 2, Ho Chi Minh city</Text>
+          <EditButton />
         </View>
       </View>
 
@@ -21,8 +53,9 @@ const BookingDetailsScreen = () => {
           <View style={styles.productDetails}>
             <Text style={styles.productTitle}>Gold Necklace</Text>
             <Text style={styles.productSubTitle}>Pink, Size M</Text>
-            <Text style={styles.productPrice}>₹ 700 /day</Text>
+            <Text style={styles.productPrice}>₹ 700 <Text style={styles.productPriceperDay}>/day</Text></Text>
             <View style={styles.dateContainer}>
+              <CalendarIcon />
               {/* <Icon name="calendar-outline" size={14} color="#FFB156" /> */}
               <Text style={styles.dateText}>26 Feb - 26 Mar 2023</Text>
             </View>
@@ -30,12 +63,13 @@ const BookingDetailsScreen = () => {
         </View>
       </View>
 
-      <View style={styles.section}>
+      <View style={styles.Pricesection}>
         <Text style={styles.sectionTitle}>Price Details</Text>
         <View style={styles.priceDetailRow}>
           <Text style={styles.priceDetailLabel}>Rent / Day</Text>
           <Text style={styles.priceDetailValue}>₹ 2000</Text>
         </View>
+        <View style={{ width: "100%", borderColor: "#D8D8D8", borderWidth: 0.5, marginBottom: 5 }} />
         <View style={styles.priceDetailRow}>
           <Text style={styles.priceDetailLabel}>No. rental days</Text>
           <Text style={styles.priceDetailValue}>2 days</Text>
@@ -48,46 +82,108 @@ const BookingDetailsScreen = () => {
           <Text style={styles.priceDetailLabel}>Delivery charges</Text>
           <Text style={styles.priceDetailValue}>₹ 400</Text>
         </View>
+        <View style={{ width: "100%", borderColor: "#D8D8D8", borderWidth: 0.5, marginBottom: 5 }} />
         <View style={styles.priceDetailRow}>
-          <Text style={styles.priceDetailLabel}>Grand Total</Text>
-          <Text style={styles.priceDetailValue}>₹ 4500</Text>
+          <View style={{}}>
+            <Text style={styles.priceDetailLabel}>Grand Total</Text>
+            <Text style={styles.note}>*Inclusive of all taxes and GST</Text>
+          </View>
+          <Text style={styles.finalpriceDetailValue}>₹ 4500</Text>
         </View>
-        <Text style={styles.note}>*Inclusive of all taxes and GST</Text>
       </View>
 
-      <View style={styles.section}>
+      <View style={styles.confrimSection}>
         <Text style={styles.sectionTitle}>Confirm Your Booking</Text>
-        <View style={styles.priceDetailRow}>
-          <Text style={styles.priceDetailLabel}>Security deposit</Text>
-          <Text style={styles.priceDetailValue}>₹ 200</Text>
-        </View>
-        <View style={styles.priceDetailRow}>
-          <Text style={styles.priceDetailLabel}>Platform charges</Text>
-          <Text style={styles.priceDetailValue}>₹ 100</Text>
-        </View>
-        <View style={styles.priceDetailRow}>
-          <Text style={styles.priceDetailLabel}>Total Deposit</Text>
-          <Text style={styles.priceDetailValue}>₹ 300</Text>
+        <View style={{ borderColor: "#FD813B", borderWidth: 1.5, marginTop: 10, marginHorizontal: 25 }} />
+
+        <View style={{ backgroundColor: "white", borderRadius: 10, elevation: 3, paddingHorizontal: 5 }}>
+          <View style={styles.priceDetailRow}>
+            <Text style={styles.priceDetailLabel}>Security deposit</Text>
+            <Text style={styles.priceDetailValue}>₹ 200</Text>
+          </View>
+          <View style={styles.priceDetailRow}>
+            <Text style={styles.priceDetailLabel}>Platform charges</Text>
+            <Text style={styles.priceDetailValue}>₹ 100</Text>
+          </View>
+          <View style={{ width: "90%", borderColor: "#D8D8D8", borderWidth: 0.5, marginVertical: 5, alignSelf: "center" }} />
+          <View style={styles.priceDetailRow}>
+            <Text style={styles.priceDetailLabel}>Total Deposit</Text>
+            <Text style={styles.priceDetailValue}>₹ 300</Text>
+          </View>
         </View>
       </View>
 
-      <View style={styles.section}>
-        <Image source={{ uri: 'https://via.placeholder.com/200x100' }} style={styles.bannerImage} />
-        <Text style={styles.bannerText}>Support For Porters</Text>
-        <Text style={styles.bannerSubText}>Service charges we charge is provided for our porters.</Text>
-      </View>
+      {/* <Image source={require('../../assets/cartBanner/cartBanner.png')}/> */}
+      <CartBanner style={{ alignSelf: "center", marginTop: 20 }} />
+
 
       <View style={styles.footer}>
-        <Text style={styles.footerNote}>Security Deposit confirms your order 90%</Text>
+        <View style={styles.footerNoteView}>
+          <ExclamationIcon />
+          <Text style={styles.footerNote} >Security Deposit confirms your order 90%</Text>
+        </View>
         <View style={styles.footerButtons}>
-          <TouchableOpacity style={[styles.button, styles.payLaterButton]}>
+          <TouchableOpacity style={[styles.button,{width:"35%"}]}>
             <Text style={styles.buttonText}>Pay Later</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, styles.confirmBookingButton]}>
-            <Text style={styles.buttonText}>Confirm Booking | ₹ 300</Text>
+          <TouchableOpacity onPress={() => setThankYouCardVisible(true)} style={[styles.button,{width:"60%",marginLeft:10, backgroundColor:"#D2453B"}]}>
+            <Text style={[styles.buttonText,{color:"white"}]}>Confirm Booking | ₹ 300</Text>
           </TouchableOpacity>
         </View>
       </View>
+
+      <Modal
+        isVisible={thankyouCardVisible}
+        onBackdropPress={() => setThankYouCardVisible(false)}
+        backdropOpacity={0.9}
+        backdropColor={themevariable.Color_000000}
+        hideModalContentWhileAnimating={true}
+        animationOutTiming={500}
+        backdropTransitionInTiming={500}
+        backdropTransitionOutTiming={500}
+        animationInTiming={500}
+        style={{
+          flex: 1,
+          bottom: "10%"
+        }}
+        onBackButtonPress={() => {
+          setThankYouCardVisible(false)
+        }}
+        animationOut={'slideOutDown'}
+        animationType={'slideInUp'}
+      >
+        <View style={styles.Thankcontainer}>
+          <LinearGradient colors={['#D2453B', '#A0153E']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={{ width: "55%", padding: 4, }}>
+            {/* <View style={{borderWidth:4, width:"50%", }}/> */}
+          </LinearGradient>
+
+          <View style={styles.iconContainer}>
+            <View style={styles.iconBackground}>
+              {/* <Image source={{ uri: 'thumbs_up_icon_url' }} style={styles.icon} /> */}
+
+            </View>
+          </View>
+          <Text style={styles.title}>Thank You!</Text>
+          <Text style={styles.subtitle}>Your Booking Initiated.</Text>
+          <Text style={styles.description}>Our team will deliver the update to you in less than 2 hours</Text>
+          <LinearGradient colors={['#D2453B', '#A0153E']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.doneButton}>
+            <TouchableOpacity onPress={() => setThankYouCardVisible(false)}>
+              <Text style={styles.doneButtonText}>Done</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+          <TouchableOpacity>
+            <Text style={styles.trackProgressText}>Track your Booking Progress</Text>
+          </TouchableOpacity>
+        </View>
+
+      </Modal>
+
     </ScrollView>
   );
 };
@@ -95,40 +191,48 @@ const BookingDetailsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:"white"
+    backgroundColor: "white"
   },
   section: {
     backgroundColor: '#F9F9F9',
-    paddingHorizontal:15,
-    paddingVertical:10,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     marginBottom: 8,
     borderRadius: 8,
-    marginHorizontal:20,
-    marginTop:10
+    marginHorizontal: 20,
+    marginTop: 10
+  },
+  confrimSection: {
+    marginHorizontal: 20,
+    marginTop: 10
+  },
+  Pricesection: {
+    marginBottom: 10,
+    marginHorizontal: 20,
+    marginTop: 15
   },
   imgsection: {
     backgroundColor: 'white',
-    paddingHorizontal:5,
-    paddingVertical:5,
+    paddingHorizontal: 5,
+    paddingVertical: 5,
     marginBottom: 8,
     borderRadius: 8,
-    marginHorizontal:20,
-    marginTop:10,
-    elevation:1.5
+    marginHorizontal: 20,
+    marginTop: 10,
+    elevation: 1.5
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    marginBottom: 8,
-    color:"#202020",
+    color: "#FD813B",
     fontFamily: "ManropeRegular",
   },
   address: {
     fontSize: 14,
-    fontWeight:"400",
+    fontWeight: "400",
     color: '#000000',
     fontFamily: "ManropeRegular",
-    width:"90%"
+    width: "90%"
   },
   editIcon: {
     position: 'absolute',
@@ -140,7 +244,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   productImage: {
-    width: Dimensions.get('window').width/4.5,
+    width: Dimensions.get('window').width / 4.5,
     height: 80,
     borderRadius: 8,
     marginRight: 16,
@@ -150,44 +254,72 @@ const styles = StyleSheet.create({
   },
   productTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '700',
+    color: "#100D25",
+    fontFamily: "ManropeRegular",
   },
   productSubTitle: {
     fontSize: 14,
-    color: '#7E7E7E',
+    color: '#000000',
+    fontFamily: "ManropeRegular",
+    fontWeight: "500",
+    marginTop: 2,
   },
   productPrice: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#000',
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#202020',
+    fontFamily: "ManropeRegular",
+    marginTop: 10,
+  },
+  productPriceperDay: {
+    fontSize: 18,
+    fontWeight: '400',
+    color: '#202020',
+    fontFamily: "ManropeRegular",
   },
   dateContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 8,
   },
   dateText: {
-    marginLeft: 4,
+    marginLeft: 10,
     fontSize: 12,
-    color: '#FFB156',
+    color: '#FE8235',
+    fontWeight: "600",
+    fontFamily: "ManropeRegular",
+
   },
   priceDetailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 4,
+    marginHorizontal: 5,
+    marginVertical: 5
   },
   priceDetailLabel: {
-    fontSize: 14,
-    color: '#7E7E7E',
+    fontSize: 15,
+    color: '#000000',
+    fontWeight: "400",
+    fontFamily: "ManropeRegular",
   },
   priceDetailValue: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 15,
+    color: '#000000',
+    fontWeight: "400",
+    fontFamily: "ManropeRegular",
+  },
+  finalpriceDetailValue: {
+    fontSize: 16,
+    color: '#1A1E25',
+    fontWeight: "800",
+    fontFamily: "ManropeRegular",
   },
   note: {
-    fontSize: 12,
-    color: '#7E7E7E',
-    marginTop: 8,
+    fontSize: 10,
+    color: '##ADADAD',
+    fontWeight: "400",
+    fontFamily: "ManropeRegular",
   },
   bannerImage: {
     width: '100%',
@@ -205,36 +337,137 @@ const styles = StyleSheet.create({
   },
   footer: {
     backgroundColor: '#FFF',
-    padding: 16,
     marginTop: 8,
     borderRadius: 8,
   },
+  footerNoteView: {
+    backgroundColor: "#FFF4CF",
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal:40
+  },
   footerNote: {
-    fontSize: 12,
-    color: '#7E7E7E',
-    marginBottom: 8,
+    fontSize: 14,
+    color: '#000105',
+    backgroundColor: "#FFF4CF",
+    fontWeight: "700",
+    textAlign: "center",
+    marginLeft:10
   },
   footerButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    marginHorizontal:20,
+    paddingVertical:15
   },
   button: {
-    flex: 1,
     alignItems: 'center',
     padding: 12,
     borderRadius: 8,
+    borderColor:"#D2453B",
+    borderWidth:1,
   },
   payLaterButton: {
-    backgroundColor: '#F5F5F5',
-    marginRight: 8,
+ 
   },
   confirmBookingButton: {
     backgroundColor: '#D9534F',
   },
   buttonText: {
     fontSize: 14,
+    fontWeight: '800',
+    color: '#D2453B',
+    fontFamily: "ManropeRegular",
+
+  },
+  Thankcontainer: {
+    marginTop: 30,
+    alignItems: 'center',
+    backgroundColor: 'white',
+    // paddingVertical: 50,
+    marginHorizontal: 20,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  iconContainer: {
+    margin: 20
+  },
+  iconBackground: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FFD700',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  icon: {
+    width: 40,
+    height: 40,
+  },
+  badgeContainer: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: 'white',
     fontWeight: 'bold',
-    color: '#FFF',
+    fontSize: 12,
+  },
+  title: {
+    fontSize: 27,
+    fontWeight: '800',
+    marginBottom: 10,
+    color: "#333333",
+    fontFamily: "ManropeRegular",
+    marginTop: 20
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#FF730D',
+    fontWeight: "500",
+    fontFamily: "ManropeRegular",
+    marginBottom: 10,
+  },
+  description: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: '#677294',
+    marginBottom: 20,
+    fontWeight: "500",
+    fontFamily: "ManropeRegular",
+    marginHorizontal: 20
+  },
+  doneButton: {
+    width: '100%',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  doneButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  trackProgressText: {
+    color: '#FF730D',
+    textDecorationLine: 'underline',
+    fontWeight: "400",
+    fontFamily: "ManropeRegular",
+    fontSize: 12,
+    marginBottom: 30
   },
 });
 

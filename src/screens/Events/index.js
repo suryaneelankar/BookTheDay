@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions, FlatList, Pressable } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions, FlatList, Pressable, SafeAreaView } from 'react-native';
 import BASE_URL from "../../apiconfig";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import SwiperFlatList from 'react-native-swiper-flatlist';
@@ -8,9 +8,12 @@ import { useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../utils/GlobalFunctions';
 import SearchIcon from '../../assets/svgs/searchIcon.svg';
 import FilterIcon from '../../assets/svgs/filter.svg';
-import TentHouseIcon from '../../assets/svgs/TentHouseIcon.svg';
 import Swiper from "react-native-swiper";
 import LocationMarkIcon from '../../assets/svgs/location.svg';
+import { verticalScale } from "../../utils/scalingMetrics";
+import TentHouseIcon from '../../assets/svgs/categories/home_tenthouseimage.svg';
+import CategoryFilter from "../../components/CategoryFilter";
+
 
 const Events = () => {
     const navigation = useNavigation();
@@ -55,8 +58,8 @@ const Events = () => {
     const renderItem = ({ item }) => {
 
         return (
-            <View style={{ }}>
-                <View style={styles.container}>
+            <View style={{borderRadius:20,marginHorizontal:20,marginBottom:5,elevation:-10}}>
+                <View style={[styles.container]}>
                     <Swiper
                         style={styles.wrapper}
                         loop={false}
@@ -119,21 +122,20 @@ const Events = () => {
     }
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#F0F5FA' }}>
-            <View style={styles.searchContainer}>
-                <View style={styles.searchProduct}>
+        <SafeAreaView style={{ flex: 1 }}>
+            <View style={{backgroundColor:"white"}}>
+               <View style={styles.searchProduct}>
                     <View style={styles.searchProHeader}>
-                        <SearchIcon style={{ marginLeft: 10 }} />
+                        <SearchIcon style={{ marginLeft: verticalScale(20) }} />
                         <TextInput
-                            placeholder="Search by products"
+                            placeholder="Search fashion"
                             style={styles.textInput} />
-                    </View>
+                            <FilterIcon/>
+                    </View> 
                 </View>
-                <View style={styles.filterView}>
-                    <FilterIcon />
+                <CategoryFilter/>
                 </View>
-            </View>
-            <FlatList
+            {/* <FlatList
                 data={filteredSuggestions}
                 contentContainerStyle={{}}
                 renderItem={({ item }) => (
@@ -145,15 +147,15 @@ const Events = () => {
                 )}
                 keyExtractor={(item) => item}
                 style={{ maxHeight: 200 }}
-            />
-            <View style={{ flexDirection: 'row',backgroundColor:'#FFEFC0' }}>
+            /> */}
+            {/* <View style={{ flexDirection: 'row',backgroundColor:'#FFEFC0' }}>
                 {Cats.map((IconComponent, index) => (
                     <TouchableOpacity>
                         <IconComponent key={index} width={100} height={100} />
                     </TouchableOpacity>
                 ))}
-            </View>
-            <View style={{marginHorizontal:25}}>
+            </View> */}
+            <View style={{marginHorizontal:20}}>
             <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
             <Text style={{ marginTop: 15, color: "#7D7F88",bottom:10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>243 Decoration Service in Bangalore</Text>
             </View>
@@ -161,7 +163,7 @@ const Events = () => {
                 data={eventsData}
                 renderItem={renderItem}
             />
-        </View>
+        </SafeAreaView>
     )
 }
 
@@ -196,10 +198,15 @@ const styles = StyleSheet.create({
     },
     searchProduct: {
         height: 45,
-        width: "85%",
+        backgroundColor: '#F2F2F3',
+        marginHorizontal: 20,
         flexDirection: "row",
         alignItems: "center",
-        borderRadius: 10,
+        borderRadius: 50,
+        borderColor: "#E3E3E7",
+        borderWidth: 0.8,
+        marginTop:10,
+        marginBottom:15
     },
     searchProHeader: {
         flexDirection: "row",
@@ -208,7 +215,8 @@ const styles = StyleSheet.create({
     },
     textInput: {
         marginLeft: 10,
-        alignSelf: "center"
+        alignSelf: "center",
+        width:"80%"
     },
     filterView: {
         height: 45,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Animated } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -9,7 +9,7 @@ import { horizontalScale, moderateScale, verticalScale } from '../../utils/scali
 import Modal from 'react-native-modal';
 import themevariable from '../../utils/themevariable';
 import LeftArrow from '../../assets/svgs/leftarrowWhite.svg';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 const SelectDateTimeScreen = ({ route }) => {
   const { productNav } = route.params;
@@ -19,6 +19,7 @@ const SelectDateTimeScreen = ({ route }) => {
   const [selectedTime, setSelectedTime] = useState('');
   const navigation = useNavigation();
   const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   const handleDateConfirm = (date) => {
     const formattedDate = date.toISOString().split('T')[0];
@@ -37,7 +38,6 @@ const SelectDateTimeScreen = ({ route }) => {
   };
 
   const touchCoordinates = new Animated.Value(0);
-  const [isVisible, setIsVisible] = useState(true);
 
   const callNavigation =() =>{
     navigation.navigate('BookingDetailsScreen')
@@ -47,7 +47,7 @@ const SelectDateTimeScreen = ({ route }) => {
     <SafeAreaView style={styles.container}>
       <Modal
         isVisible={isVisible}
-        onBackdropPress={() => goBack()}
+        // onBackdropPress={() =>  navigation.goBack()}
         backdropOpacity={0.9}
         backdropColor={themevariable.Color_000000}
         hideModalContentWhileAnimating={true}
@@ -94,7 +94,7 @@ const SelectDateTimeScreen = ({ route }) => {
             style={{
               flex: 1,
               top: touchCoordinates,
-              bottom: 0
+              bottom: 0,
             }}>
             <View
               onStartShouldSetResponder={() => true}
@@ -111,7 +111,7 @@ const SelectDateTimeScreen = ({ route }) => {
                   useNativeDriver: false,
                 }).start();
               }}
-              style={{ bottom: 0 }}>
+              >
               <View style={{
                 alignSelf: 'center',
                 backgroundColor: themevariable.Color_CCCCCC,
@@ -131,7 +131,9 @@ const SelectDateTimeScreen = ({ route }) => {
               paddingHorizontal: horizontalScale(20),
               paddingVertical: verticalScale(20),
               width: "100%",
-              marginTop: 100,
+              bottom:0,
+              position:'absolute',
+              // marginTop: 100,
               shadowColor: '#000000',
               shadowOffset: {
                 width: 0,
@@ -139,17 +141,18 @@ const SelectDateTimeScreen = ({ route }) => {
               },
               shadowOpacity: 0.17,
               shadowRadius: 2.54,
-              bottom: 0, top: 0
+              alignSelf:'center',
+              alignItems:'center',
+              bottom:-20
+              //  top: 0
             }}>
               <Text style={{ color: "#333333", fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular", }}>Select Time Slot</Text>
               <Text style={{ marginTop: 10, color: "#333333", fontSize: 16, fontWeight: "500", fontFamily: "ManropeRegular", }}>Preferred Time</Text>
 
-              <View>
                 <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", marginBottom: 40, marginTop: 10, padding: 10, borderRadius: 5, borderColor: '#CFD0D5', borderWidth: 1 }}>
                   <Text style={{ width: "90%", color: "#ABABAB", fontSize: 14, fontWeight: "400", fontFamily: "ManropeRegular", }}>Pick A Time</Text>
                   <ClockIcon />
                 </TouchableOpacity>
-              </View>
               <BookDatesButton onPress={() => {
                 if (productNav) {
                   callNavigation()
@@ -157,7 +160,7 @@ const SelectDateTimeScreen = ({ route }) => {
                   setThankYouCardVisible(true);
                 }
               }} 
-              width={0} text={'Submit'} padding={15} />
+               text={'Submit'} padding={10} />
             </View>
 
 
@@ -180,7 +183,7 @@ const SelectDateTimeScreen = ({ route }) => {
         animationInTiming={500}
         style={{
           flex: 1,
-          bottom: "10%"
+          // bottom: "10%"
         }}
         onBackButtonPress={() => {
           setThankYouCardVisible(false)
@@ -226,7 +229,7 @@ const SelectDateTimeScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'red',
   },
   header: {
     padding: 15,
@@ -270,13 +273,13 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     overflow: 'hidden',
   },
-  gradient: {
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  // gradient: {
+    // paddingVertical: 15,
+    // paddingHorizontal: 30,
+    // borderRadius: 25,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+  // },
   submitButtonText: {
     color: '#fff',
     fontSize: 16,

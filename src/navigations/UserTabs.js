@@ -116,7 +116,8 @@ const Tab4Screen = ({ navigation }) => {
     ),
     tabBarLabel: 'Events',
     tabBarShowLabel:true,
-    headerShown: false,
+    header: () => <NavigationHeader Icon={false} title="Event Management" />,
+    headerShown: true,
   }}
 />
 

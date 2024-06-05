@@ -3,7 +3,7 @@ import { View, Text, Dimensions, ImageBackground, StyleSheet, FlatList, Image, S
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import Wedding from '../../assets/wedding.png';
 import { useNavigation } from '@react-navigation/native';
-import BASE_URL from "../../apiconfig";
+import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";
 import { horizontalScale, verticalScale, moderateScale } from "../../utils/scalingMetrics";
 import themevariable from "../../utils/themevariable";
@@ -27,9 +27,11 @@ const Categories = () => {
     const images = [SwipperOne, SwipperOne, SwipperOne]; //svg images for swipper  
     const { width } = Dimensions.get('window');
     const [categories, setCategories] = useState([]);
+    const [jewelleryCategory, setJewelleryCategory] = useState([]);
+
     const [productYouMayLike, setProductYouMayLike] = useState([]);
 
-    const [selectedItem, setSelectedItem] = useState(null);
+    // const [selectedItem, setSelectedItem] = useState(null);
     const { width: viewportWidth } = Dimensions.get('window');
 
     const bannerImages = [{ image: require('../../assets/svgs/productBanners/productBannerone.png') },
@@ -38,6 +40,7 @@ const Categories = () => {
     ]
 
     const categoryFilterList = [{ name: 'Chains' }, { name: 'Rings' }, { name: 'Bridal' }, { name: 'Anklet' }, { name: 'Bangles' }]; //svg images for swipper  
+    const [selectedItem, setSelectedItem] = useState(categoryFilterList[0]?.name);
 
     //Products you may like data
     const DATA = [
@@ -124,10 +127,12 @@ const Categories = () => {
     const getCategories = async () => {
         console.log("IAM CALLING API in home")
         try {
-            const response = await axios.get(`${BASE_URL}/all-category`);
-            console.log("categories::::::::::", response?.data?.data);
-            setCategories(response?.data?.data)
-            const filteredCategories = categories.filter(category => category.catType === 'cloth');
+            const response = await axios.get(`${BASE_URL}/getAllClothesJewels`);
+            console.log("categories::::::::::", JSON.stringify(response?.data));
+            setCategories(response?.data)
+            const filteredCategories = response?.data.filter(category => category?.categoryType === 'clothes');
+            const filteredJewelleryCategories = response?.data.filter(category => category?.categoryType === 'jewels');
+            setJewelleryCategory(filteredJewelleryCategories)
             setProductYouMayLike(filteredCategories)
         } catch (error) {
             console.log("categories::::::::::", error);
@@ -152,7 +157,7 @@ const Categories = () => {
             <TouchableOpacity onPress={() => setSelectedItem(isSelected ? null : item?.name)}>
                 <View style={{ height: 60, width: 80, }}>
                     {isSelected ?
-                        <LinearGradient start={{ x: 0, y: 1.2 }} end={{ x: 0, y: 0 }} colors={['#FFF3CD', '#FFDB7E',]} style={{ flex: 1, }}>
+                        <LinearGradient start={{ x: 0, y: 1.2 }} end={{ x: 0, y: -1 }} colors={['#FFF3CD', '#FFDB7E']} style={{ flex: 1, }}>
                             <View style={{ width: "auto", height: 4, backgroundColor: "#D2453B", borderTopRightRadius: 5, borderTopLeftRadius: 5, }} />
                             <Text style={{ marginTop: 10, alignSelf: "center", color: "#D2453B", fontSize: 11, fontWeight: "400", fontFamily: "ManropeRegular", }}>{item?.name}</Text>
                         </LinearGradient>
@@ -167,12 +172,13 @@ const Categories = () => {
     }
 
     const renderJewellery = ({ item }) => {
-
+        const updatedImgUrl = item?.professionalImage?.url  ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+        //  console.log("UPDATED IMAGE IN CATEGEROIES IS:::::::::", item?.professionalImage?.url)
         return (
             <View style={{}}>
                 <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails')}
                     style={{ width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginLeft: 16 }}>
-                    <Image source={{ uri: item?.catImageUrl }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '100%', height: Dimensions.get('window').height / 5 }}
+                    <Image source={{ uri: updatedImgUrl }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '100%', height: Dimensions.get('window').height / 5 }}
                     />
                     <OfferStikcer style={{
                         position: 'absolute',
@@ -196,12 +202,12 @@ const Categories = () => {
                         <Text numberOfLines={1} style={{ fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular' }}>{item?.name}</Text>
                         <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
                             {/* <Text style={{ fontWeight: '700', color:'#202020', fontSize: 14, fontFamily: 'ManropeRegular' }}>{formatAmount(item?.price)}/day</Text> */}
-                            <Text style={{ fontWeight: '700', color: '#202020', fontSize: 14, fontFamily: 'ManropeRegular' }}>{formatAmount('700')}/day</Text>
+                            <Text style={{ fontWeight: '700', color: '#202020', fontSize: 14, fontFamily: 'ManropeRegular' }}>{formatAmount(item?.rentPricePerDay)}/day</Text>
 
-                            <Text style={styles.strickedoffer}>{formatAmount(item?.price + 1000)}</Text>
+                            <Text style={styles.strickedoffer}>{formatAmount(item?.rentPricePerDay + 500)}</Text>
                         </View>
                         <TouchableOpacity style={{ width: "100%", borderColor: "#D0433C", borderWidth: 1, borderRadius: 5, alignSelf: "center", alignItems: "center", padding: 5, marginVertical: 10 }}>
-                            <Text style={{ color: "#D0433C", fontSize: 12, fontWeight: "700", fontFamily: 'ManropeRegular' }}>Rent Now</Text>
+                            <Text style={{ color: "#D0433C", fontSize: 12, fontWeight: "700", fontFamily: 'ManropeRegular' }}>{item?.available ? 'Rent Now' : 'Not Available'}</Text>
                         </TouchableOpacity>
                     </View>
                 </TouchableOpacity>
@@ -252,7 +258,7 @@ const Categories = () => {
 
                 <FlatList
                     horizontal
-                    data={categories}
+                    data={jewelleryCategory}
                     contentContainerStyle={{ backgroundColor: "#FDF7D7", paddingVertical: 20 }}
                     renderItem={renderJewellery} />
                 {/* <DiscountComponent data={productYouMayLike} /> */}

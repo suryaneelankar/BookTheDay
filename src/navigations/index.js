@@ -81,7 +81,7 @@ const MainNavigation = () => {
                 component={BookingDetailsScreen}  
                 options={{
                          header: () => <NavigationHeader Icon={true} title="Cart" />,
-                         headerShown: true,
+                         headerShown: false,
                 }}
                 />
                 <Stack.Screen 

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import Svg, { Circle, Text as SvgText } from 'react-native-svg';
 import { height, moderateScale } from '../utils/scalingMetrics';
+import BASE_URL, { LocalHostUrl } from '../apiconfig';
 
 const Avatar = ({widthDyn,heightDyn,borderRadiusDyn, name, imageUrl }) => {
   const getInitials = (name) => {
@@ -12,7 +13,8 @@ const Avatar = ({widthDyn,heightDyn,borderRadiusDyn, name, imageUrl }) => {
   };
 
   const initials = getInitials(name).toUpperCase();
-const updatedImgUrl = imageUrl !== undefined ? imageUrl.replace('localhost', '192.168.1.8') : imageUrl;
+  console.log("VADATR IMAGE:::::", imageUrl)
+const updatedImgUrl = imageUrl !== undefined ? imageUrl.replace('localhost', LocalHostUrl) : imageUrl;
   return (
     <View style={[styles.container,{width:widthDyn, height:heightDyn, borderRadius:borderRadiusDyn}]}>
       {updatedImgUrl ? (
