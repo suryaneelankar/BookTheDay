@@ -301,10 +301,10 @@ const HomeDashboard = () => {
                 <View style={{marginTop:40,}}>
                 <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
                     <Text style={styles.onDemandTextStyle}>Trending Now</Text>
-                    <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                    <Pressable style={{ flexDirection: 'row', alignSelf: 'flex-end' }} onPress={() => navigation.navigate('RentOnProducts')}>
                         <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
                         <RightArrowIcon width={25} height={25} />
-                    </TouchableOpacity>
+                    </Pressable>
                 </View>
 
                 <TrendingView 

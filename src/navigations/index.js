@@ -31,6 +31,7 @@ import ProductScreen from "../screens/Products/ProductScreen";
 import NavigationHeader from "../components/NavigationHeader";
 import ViewHireDetails from "../screens/MyBox/ViewHireDetails";
 import SelectDateTimeScreen from "../screens/MyBox/SelectDateTime";
+import RentOnProducts from "../screens/GiveOnRent/RentOnProducts";
 
 const MainNavigation = () => {
 
@@ -101,6 +102,8 @@ const MainNavigation = () => {
                 <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: true }} />
                 <Stack.Screen name="BookingOverView" component={BookingOverView} options={{ headerShown: true }} />
                 <Stack.Screen name="BookingConfirm" component={BookingConfirm} options={{ headerShown:false }}/>
+
+                <Stack.Screen name="RentOnProducts" component={RentOnProducts} options={{ headerShown:false }}/>
 
             </Stack.Navigator>
         </NavigationContainer>

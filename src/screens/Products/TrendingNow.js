@@ -1,11 +1,13 @@
-import {Text,View,FlatList,StyleSheet,Image, TouchableOpacity} from "react-native"
+import {Text,View,FlatList,StyleSheet,Image, TouchableOpacity, Pressable} from "react-native"
 import { useState } from "react"
 import BackButton from '../../assets/svgs/backButton.svg'
 import { formatAmount } from "../../utils/GlobalFunctions"
 import themevariable from '../../utils/themevariable'
+import { useNavigation } from "@react-navigation/native"
 
 const TrendingNow=({data,discountList})=>{
     const [selectedDiscount,setSelectedDiscount] = useState('')
+    const navigation = useNavigation()
 
 
 
@@ -42,7 +44,9 @@ const TrendingNow=({data,discountList})=>{
             <Text style={styles.trendingText}>Trending Now</Text>
             <View style={styles.sellAllContainer}>
                 <Text style={styles.seeAllText}>See All</Text>
-                <BackButton width={20} height={20} style={styles.backButton}/>
+                <Pressable >
+                    <BackButton width={20} height={20} style={styles.backButton}/>
+                </Pressable>
             </View>
         </View>
         <View style={styles.discountContainer}>
