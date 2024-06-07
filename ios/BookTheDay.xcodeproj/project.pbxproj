@@ -20,6 +20,7 @@
 		73794DCF6DBF4A75A2F6478E /* InterMedium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 77277993C84F48FFA3628CB6 /* InterMedium.ttf */; };
 		65B7EF768F1E4C21849386EE /* InterSemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5595F9F5A0B840B99E5817AE /* InterSemiBold.ttf */; };
 		BCAC7A50656B447695BEC3C4 /* InterBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 57C7CE26FC45491A9A7408E6 /* InterBold.ttf */; };
+		B4F5D34AF9D74147A6ED2696 /* LeagueSpartanRegular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 66C7208DEBC945D589D533D4 /* LeagueSpartanRegular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 		77277993C84F48FFA3628CB6 /* InterMedium.ttf */ = {isa = PBXFileReference; name = "InterMedium.ttf"; path = "../src/assets/fonts/InterMedium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		5595F9F5A0B840B99E5817AE /* InterSemiBold.ttf */ = {isa = PBXFileReference; name = "InterSemiBold.ttf"; path = "../src/assets/fonts/InterSemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		57C7CE26FC45491A9A7408E6 /* InterBold.ttf */ = {isa = PBXFileReference; name = "InterBold.ttf"; path = "../src/assets/fonts/InterBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		66C7208DEBC945D589D533D4 /* LeagueSpartanRegular.ttf */ = {isa = PBXFileReference; name = "LeagueSpartanRegular.ttf"; path = "../src/assets/fonts/LeagueSpartanRegular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,6 +174,7 @@
 				77277993C84F48FFA3628CB6 /* InterMedium.ttf */,
 				5595F9F5A0B840B99E5817AE /* InterSemiBold.ttf */,
 				57C7CE26FC45491A9A7408E6 /* InterBold.ttf */,
+				66C7208DEBC945D589D533D4 /* LeagueSpartanRegular.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -278,6 +281,7 @@
 				73794DCF6DBF4A75A2F6478E /* InterMedium.ttf in Resources */,
 				65B7EF768F1E4C21849386EE /* InterSemiBold.ttf in Resources */,
 				BCAC7A50656B447695BEC3C4 /* InterBold.ttf in Resources */,
+				B4F5D34AF9D74147A6ED2696 /* LeagueSpartanRegular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -4,6 +4,7 @@ import React from 'react';
 import {Image, Platform,View, TouchableOpacity, Text, Button} from 'react-native';
 import { useDispatch } from 'react-redux';
 import { getLoginUserId } from '../../redux/actions';
+import VendorDashBoardTab from '../screens/VendorScreens/VendorDashBoard/DashBoard';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -11,41 +12,14 @@ const Tab = createBottomTabNavigator();
 const VendorTabs = () => {
     const dispatch = useDispatch();
 
-  const StackNavigation = () => {
-    return (
-      <Stack.Navigator initialRouteName="Tab1Screen">
-           <Stack.Screen name="Tab1" component={Tab1Screen} />
-           <Stack.Screen name="Tab2" component={Tab2Screen} />
-
-      </Stack.Navigator>
-    );
-  };
-
-
-  const EventsNavigation = () => {
-    return (
-      <Stack.Navigator initialRouteName="Events" >
-       <Stack.Screen name="Tabevent1" component={Tab1Screen} />
-           <Stack.Screen name="Tabevent2" component={Tab2Screen} />
-      </Stack.Navigator>
-    );
-  };
-  const StackCategoriesNavigation = () => {
-    return (
-      <Stack.Navigator initialRouteName="Categories" >
-        <Stack.Screen name="Tabcat1" component={Tab1Screen} />
-           <Stack.Screen name="Tabcat2" component={Tab2Screen} />
-      </Stack.Navigator>
-    );
-  };
-  const Tab1Screen = ({ navigation }) => {
-    return (
-        <View>
-            <Text>Tab 1 HOME vendors  Screen</Text>
-            <Button title="Go to Details" onPress={() => navigation.navigate('Details')} />
-        </View>
-    );
-};
+//   const Tab1Screen = ({ navigation }) => {
+//     return (
+//         <View>
+//             <Text>Tab 1 HOME vendors  Screen</Text>
+//             <Button title="Go to Details" onPress={() => navigation.navigate('Details')} />
+//         </View>
+//     );
+// };
 const Tab2Screen = ({ navigation }) => {
     return (
         <View>
@@ -119,7 +93,7 @@ const Tab4Screen = ({ navigation }) => {
 
      <Tab.Screen
      name="Home"
-     component={Tab1Screen}
+     component={VendorDashBoardTab}
      options={({ focused }) => ({
      tabBarIcon: ({focused}) => (
         <Image
