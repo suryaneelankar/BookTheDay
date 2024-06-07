@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import { View, Text, SafeAreaView, Image, ScrollView, TouchableOpacity, Dimensions, StyleSheet, Animated } from "react-native";
 import Avatar from "../../components/NameAvatar";
 import TruestedMarkGray from '../../assets/svgs/trustedMarkGray.svg';
@@ -18,21 +18,46 @@ import { Calendar } from "react-native-calendars";
 import ClockIcon from '../../assets/svgs/clock.svg';
 import TruestedMarkOrange from '../../assets/svgs/trustedOrange.svg';
 import ProductInfoCard from "../../components/ProductInfoCard";
+import axios from "axios";
+import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 
 
-
-const ViewCatDetails = () => {
+const ViewCatDetails = ({route}) => {
 
     const [selectedOption, setSelectedOption] = useState(null);
     const [selectedPrice, setSelectedPrice] = useState(null);
     const { width: viewportWidth } = Dimensions.get('window');
     const [activeIndex, setActiveIndex] = useState(0);
     const navigation = useNavigation();
+    const {catId} = route.params;
+    const [specifcadditionalImages, setSpecificAdditionImages] = useState([]);
+
+    const [jewelleryDetails, setJewelleryDetails]  = useState()
     const [isVisible, setIsVisible] = useState(false);
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
     const [selectedDate, setSelectedDate] = useState('');
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [selectedTime, setSelectedTime] = useState('');
+
+    useEffect(() => {
+        getCategoriesDetails();
+    }, []);
+
+    const getCategoriesDetails  = async() => {
+        try {
+            const response = await axios.get(`${BASE_URL}/getClothJewelsById/${catId}`);
+            console.log("categories each ::::::::::", JSON.stringify(response?.data));
+            setJewelleryDetails(response?.data)
+
+            const photos = response?.data?.additionalImages.flat().map(image => ({
+                uri: image.url.replace('localhost', LocalHostUrl),  // Replace 'localhost' with '192.168.1.8'
+              }));
+             setSpecificAdditionImages(photos);
+             
+        } catch (error) {
+            console.log("categories::::::::::", error);
+        }
+    }
 
 
     const photos = [
@@ -74,20 +99,20 @@ const ViewCatDetails = () => {
                         dotStyle={styles.dot}
                         activeDotStyle={styles.activeDot}
                     >
-                        {photos.map((item, index) => (
+                        {specifcadditionalImages.map((item, index) => (
                             <View style={styles.slide} key={index}>
-                                <Image source={{ uri: item.uri }} style={[styles.image, { width: viewportWidth * 0.9 }]} />
+                                <Image resizeMode="contain" source={{ uri: item.uri }} style={[styles.image, { width: viewportWidth * 0.9 }]} />
                             </View>
                         ))}
                     </Swiper>
 
                     <View style={{marginHorizontal:20, flexDirection:"row", alignItems:"center", justifyContent:"space-between"}}>
-                        <Text style={{color:"#100D25", fontSize:20, fontWeight:"700",fontFamily: "ManropeRegular",}}>GoldNecklace</Text>
-                        <Text style={{color:"#100D25", fontSize:18, fontWeight:"700",fontFamily: "ManropeRegular",}}>{formatAmount('800')}</Text>
+                        <Text style={{color:"#100D25", fontSize:20, fontWeight:"700",fontFamily: "ManropeRegular",}}>{jewelleryDetails?.productName}</Text>
+                        <Text style={{color:"#100D25", fontSize:18, fontWeight:"700",fontFamily: "ManropeRegular",}}>{formatAmount(jewelleryDetails?.rentPricePerDay)}</Text>
                     </View>
 
                     <View style={{marginBottom:20,marginHorizontal:20, flexDirection:"row", alignItems:"center", justifyContent:"space-between"}}>
-                        <Text style={{color:"#9095A6", fontSize:12, fontWeight:"500",fontFamily: "ManropeRegular",}}>Size : (M) 83cm</Text>
+                        <Text style={{color:"#9095A6", fontSize:12, fontWeight:"500",fontFamily: "ManropeRegular",}}>Size : (M) {jewelleryDetails?.professionalImage?.size} cm</Text>
                         
                         <View style={{flexDirection:"row",backgroundColor:"#FFF8F0",paddingVertical:5,paddingHorizontal:10,borderRadius:10}}>
                         <TruestedMarkOrange/>
@@ -100,14 +125,14 @@ const ViewCatDetails = () => {
                 <View style={{ borderRadius: 10, backgroundColor: "white", marginHorizontal: 15, marginTop: 15, paddingHorizontal: 20, paddingVertical: 20 }}>
                     <Text style={{ color: "#121212", fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular", }}>Description</Text>
                     
-                    <Text style={{marginBottom:20, marginTop: 5, color: "#393C47", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>Our resort offers a perfect blend of tranquility, breathtaking beauty, and impeccable service. Located along the pristine white sands and azure waters will perfect for your holiday.</Text>
+                    <Text style={{marginBottom:20, marginTop: 5, color: "#393C47", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>{jewelleryDetails?.description}</Text>
                    <ProductInfoCard/>
                     </View>
                 <View style={{ marginTop: 10 ,marginBottom:20}}>
                     <PricingOptions
                         onSelect={handleSelect}
-                        dailyPrice={'400'}
-                        monthlyPrice={'8000'}
+                        dailyPrice={jewelleryDetails?.rentPricePerDay}
+                        monthlyPrice={jewelleryDetails?.rentPricePerMonth}
                     />
                 </View>
 
@@ -145,7 +170,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 15,
         marginTop: 15,
         marginBottom: 20,
-        paddingHorizontal: 20, paddingVertical: 10
+        paddingHorizontal: 20, 
+        paddingVertical: 10
     },
     dot: {
         backgroundColor: '#DCD7FD',

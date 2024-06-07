@@ -125,20 +125,22 @@ const Categories = () => {
     }, []);
 
     const getCategories = async () => {
-        console.log("IAM CALLING API in home")
         try {
             const response = await axios.get(`${BASE_URL}/getAllClothesJewels`);
-            console.log("categories::::::::::", JSON.stringify(response?.data));
             setCategories(response?.data)
-            const filteredCategories = response?.data.filter(category => category?.categoryType === 'clothes');
+            const filteredClothesCategories = response?.data.filter(category => category?.categoryType === 'clothes');
             const filteredJewelleryCategories = response?.data.filter(category => category?.categoryType === 'jewels');
             setJewelleryCategory(filteredJewelleryCategories)
-            setProductYouMayLike(filteredCategories)
+            setProductYouMayLike(filteredClothesCategories)
         } catch (error) {
             console.log("categories::::::::::", error);
 
         }
     }
+    const limitedData = productYouMayLike.slice(0, 6);
+
+
+    console.log("CLOTHES CATE is::::::::", JSON.stringify(productYouMayLike))
     const category = [
         { image: require('../../assets/jwelleryIcon.png'), name: 'Jewellery', status: 'Available' },
         { image: require('../../assets/furbitureIcon.png'), name: 'Furniture', status: 'Available' },
@@ -176,7 +178,7 @@ const Categories = () => {
         //  console.log("UPDATED IMAGE IN CATEGEROIES IS:::::::::", item?.professionalImage?.url)
         return (
             <View style={{}}>
-                <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails')}
+                <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', {catId : item?._id})}
                     style={{ width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginLeft: 16 }}>
                     <Image source={{ uri: updatedImgUrl }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '100%', height: Dimensions.get('window').height / 5 }}
                     />
@@ -215,10 +217,29 @@ const Categories = () => {
         )
     }
 
+    const renderClothesCat = ({item, index}) =>{
+        const updatedImgUrl = item?.professionalImage?.url  ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+
+      return(
+        <View style={styles.productContainer}>
+            <View style={styles.firstContainer}>
+                    <Image resizeMode="contain" source={{ uri: updatedImgUrl }} style={{ borderRadius:8, width: '100%', height: Dimensions.get('window').height / 4 }}
+                    />
+            </View>
+            <Text style={styles.productName}>{item?.productName}</Text>
+        <View style={styles.priceContainer}>
+            <Text style={styles.price}>{formatAmount(item?.rentPricePerDay)}</Text>
+            <Text style={styles.discount}>{formatAmount(item?.rentPricePerDay + 500)}</Text>
+        </View>
+        </View>
+      )
+    }
+
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#F9F9F9" }}>
+        <SafeAreaView style={{ flex: 1,  }}>
             <ScrollView style={{ marginBottom: 70 }} >
+                <View style={{backgroundColor: "#F9F9F9"}}>
                 <View style={styles.searchProduct}>
                     <View style={styles.searchProHeader}>
                         <SearchIcon style={{ marginLeft: verticalScale(20) }} />
@@ -261,8 +282,24 @@ const Categories = () => {
                     data={jewelleryCategory}
                     contentContainerStyle={{ backgroundColor: "#FDF7D7", paddingVertical: 20 }}
                     renderItem={renderJewellery} />
+                    </View>
+
+
+                    <View style={{ marginHorizontal: 20 , flexDirection:"row", justifyContent:"space-between",marginTop:25,marginBottom:5}}>
+                    <Text style={{ fontFamily: "ManropeRegular", fontWeight: "700", fontSize: 16, color: '#202020' }}>Products You May Like</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('CategoriesList',{catType: 'Jewellery'})} style={styles.sellAllContainer}>
+                        <Text style={styles.seeAllText}>See All</Text>
+                        <BackButton width={20} height={20} style={styles.backButton} />
+                    </TouchableOpacity>
+                </View>
+
+                    <FlatList
+                    data={limitedData}
+                    numColumns={2}
+                    contentContainerStyle={{alignSelf:"center"}}
+                    renderItem={renderClothesCat} />
                 {/* <DiscountComponent data={productYouMayLike} /> */}
-                <DiscountComponent data={DATA} />
+                {/* <DiscountComponent data={DATA} /> */}
                 <TrendingNow data={DATA} discountList={discountList} textHeader={'Trending Now'} />
                 <HowItWorks />
 
@@ -291,6 +328,50 @@ const styles = StyleSheet.create({
         borderColor: themevariable.cementgray,
         backgroundColor: themevariable.cementgray,
         borderWidth: 1,
+    },
+    productContainer:{
+        // paddingVertical:10,
+        // paddingHorizontal:10,
+        // backgroundColor:"pink",
+        margin:5,
+        width:Dimensions.get('window').width/2.2,
+        // height:250,
+        // width:170,
+        // marginHorizontal:5,
+        // marginVertical:10,
+        
+    },
+    firstContainer:{
+        backgroundColor:themevariable.Color_FFFFFF,
+        borderRadius:7,
+        paddingHorizontal:5,
+        paddingVertical:8,
+        // elevation:10
+
+    },
+    productName:{
+        fontFamily:'ManropeRegular',
+        color:'black',
+        marginHorizontal:5,
+    },
+    priceContainer:{
+        flexDirection:'row',
+        marginLeft:5
+        
+    },
+    price:{
+        color:themevariable.Color_202020,
+        fontWeight:'bold',
+        fontSize:20
+    },
+    discount:{
+        color:themevariable.Color_ECA73C99,
+        fontWeight:'bold',
+        fontSize:18,
+        textAlignVertical:'center',
+        marginLeft:8,
+        textDecorationLine:'line-through'
+
     },
     serachIcon: {
         height: moderateScale(15),

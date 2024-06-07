@@ -9,6 +9,8 @@ import ExclamationIcon from '../../assets/svgs/exclamationmark.svg';
 import Modal from 'react-native-modal';
 import themevariable from '../../utils/themevariable';
 import LeftArrow from '../../assets/svgs/leftarrowWhite.svg';
+import BASE_URL from '../../apiconfig';
+import axios from 'axios';
 
 const BookingDetailsScreen = ({navigation}) => {
 
@@ -28,6 +30,24 @@ const BookingDetailsScreen = ({navigation}) => {
     return () => backHandler.remove();
   }, []);
 
+  const ConfirmBooking = async() => {
+    const payload = {
+      productId: "6661a51bfcaa73d7c573674a",
+      startDate: "08 June 2024",
+      endDate: "17 June 2024",
+      numOfDays: 5,
+      totalAmount: 2000
+    }
+    try {
+      const bookingResponse = await axios.post(`${BASE_URL}/create-cloth-jewel-booking`, payload);
+      console.log("Booking response:::::::", bookingResponse);
+      if(bookingResponse?.status === 201){
+        setThankYouCardVisible(true)
+      }
+    } catch (error) {
+      console.error("Error during booking:", error);
+    }
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -126,7 +146,7 @@ const BookingDetailsScreen = ({navigation}) => {
           <TouchableOpacity style={[styles.button,{width:"35%"}]}>
             <Text style={styles.buttonText}>Pay Later</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setThankYouCardVisible(true)} style={[styles.button,{width:"60%",marginLeft:10, backgroundColor:"#D2453B"}]}>
+          <TouchableOpacity onPress={() => ConfirmBooking()} style={[styles.button,{width:"60%",marginLeft:10, backgroundColor:"#D2453B"}]}>
             <Text style={[styles.buttonText,{color:"white"}]}>Confirm Booking | ₹ 300</Text>
           </TouchableOpacity>
         </View>
