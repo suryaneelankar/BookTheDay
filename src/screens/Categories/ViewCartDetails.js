@@ -1,5 +1,5 @@
-import React, {useState,useEffect} from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, BackHandler,Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, BackHandler, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
 import EditButton from '../../assets/svgs/categories/editButton.svg';
@@ -9,39 +9,82 @@ import ExclamationIcon from '../../assets/svgs/exclamationmark.svg';
 import Modal from 'react-native-modal';
 import themevariable from '../../utils/themevariable';
 import LeftArrow from '../../assets/svgs/leftarrowWhite.svg';
-import BASE_URL from '../../apiconfig';
+import BASE_URL, { LocalHostUrl } from '../../apiconfig';
 import axios from 'axios';
+import { formatAmount } from '../../utils/GlobalFunctions';
+import moment from 'moment';
 
-const BookingDetailsScreen = ({navigation}) => {
+const BookingDetailsScreen = ({ navigation, route }) => {
+
+
 
   const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
+  const [productDetails, setProductDetails] = useState();
+  const [productImage, setProductImage] = useState();
+
+
+  const { catId, NumOfDays, isDayOrMonthly, startDate, endDate, monthlyPrice } = route.params;
+  console.log("RECIED PARMS::::::::, ", catId, NumOfDays, isDayOrMonthly, startDate, endDate)
+
 
   useEffect(() => {
-    const backAction = () => {
-      navigation.pop(2)
-      return true;
-    };
-
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction,
-    );
-
-    return () => backHandler.remove();
+    getSelectedProductDetails();
   }, []);
 
-  const ConfirmBooking = async() => {
+  const getSelectedProductDetails = async () => {
+    console.log("IAM CALLING INSIDE CART")
+    try {
+      const response = await axios.get(`${BASE_URL}/getClothJewelsById/${catId}`);
+      console.log(" selected product::::::::::", JSON.stringify(response?.data));
+      setProductDetails(response?.data);
+      const updatedImgUrl = response?.data?.professionalImage?.url !== undefined ? response?.data?.professionalImage?.url.replace('localhost', LocalHostUrl) : response?.data?.professionalImage?.url;
+      setProductImage(updatedImgUrl);
+    } catch (error) {
+      console.log("categories::::::::::", error);
+    }
+  }
+
+  // useEffect(() => {
+  //   const backAction = () => {
+  //     navigation.pop(2)
+  //     return true;
+  //   };
+
+  //   const backHandler = BackHandler.addEventListener(
+  //     'hardwareBackPress',
+  //     backAction,
+  //   );
+
+  //   return () => backHandler.remove();
+  // }, []);
+
+  const formatDateRange = (startDate, endDate) => {
+    const start = moment(startDate).format('DD MMM');
+    const end = moment(endDate).format('DD MMM YYYY');
+    return `${start} - ${end}`;
+  };
+
+  const calculateTotalPrice = () => {
+    if (isDayOrMonthly === 'daily') {
+      const days = NumOfDays || 0;
+      const rentPricePerDay = productDetails?.rentPricePerDay || 0;
+      return days * rentPricePerDay;
+    } else {
+      return monthlyPrice;
+    }
+  };
+
+  const ConfirmBooking = async () => {
     const payload = {
-      productId: "6661a51bfcaa73d7c573674a",
-      startDate: "08 June 2024",
-      endDate: "17 June 2024",
-      numOfDays: 5,
-      totalAmount: 2000
+      productId: catId,
+      startDate: moment(startDate).format('DD MMMM YYYY'),
+      endDate: moment(endDate).format('DD MMMM YYYY'),
+      numOfDays: NumOfDays,
+      totalAmount: calculateTotalPrice()
     }
     try {
       const bookingResponse = await axios.post(`${BASE_URL}/create-cloth-jewel-booking`, payload);
-      console.log("Booking response:::::::", bookingResponse);
-      if(bookingResponse?.status === 201){
+      if (bookingResponse?.status === 201) {
         setThankYouCardVisible(true)
       }
     } catch (error) {
@@ -49,18 +92,17 @@ const BookingDetailsScreen = ({navigation}) => {
     }
   }
 
+  console.log("product iamge :::::::", productImage)
   return (
     <ScrollView style={styles.container}>
       <View style={{ flexDirection: "row", alignItems: "center", }}>
-            <TouchableOpacity onPress={() => navigation.pop(2)}>
-              <LeftArrow style={{ marginTop: 3, marginHorizontal: 50 }} />
-            
-            <Text style={{ color: "red", fontSize: 20, fontWeight: "800", fontFamily: "ManropeRegular", }}>Select Date & Time</Text>
-            </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.pop(2)}>
+          <LeftArrow style={{ marginTop: 3, marginHorizontal: 50 }} />
+        </TouchableOpacity>
 
-          </View>
+      </View>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Shipping Address</Text>
+        <Text style={[styles.sectionTitle, { color: "#202020" }]}>Shipping Address</Text>
         <View style={{ flexDirection: "row" }}>
           <Text style={styles.address}>26, Duong So 2, Thao Dien Ward, An Phu, District 2, Ho Chi Minh city</Text>
           <EditButton />
@@ -69,34 +111,34 @@ const BookingDetailsScreen = ({navigation}) => {
 
       <View style={[styles.imgsection]}>
         <View style={styles.productContainer}>
-          <Image source={{ uri: 'https://via.placeholder.com/80' }} style={styles.productImage} />
+          <Image source={{ uri: productImage }} style={styles.productImage} resizeMode='cover' />
           <View style={styles.productDetails}>
-            <Text style={styles.productTitle}>Gold Necklace</Text>
-            <Text style={styles.productSubTitle}>Pink, Size M</Text>
-            <Text style={styles.productPrice}>₹ 700 <Text style={styles.productPriceperDay}>/day</Text></Text>
+            <Text style={styles.productTitle}>{productDetails?.productName}</Text>
+            <Text style={styles.productSubTitle}>Pink,{productDetails?.professionalImage?.size}</Text>
+            <Text style={styles.productPrice}>{formatAmount(productDetails?.rentPricePerDay)}<Text style={styles.productPriceperDay}>/day</Text></Text>
             <View style={styles.dateContainer}>
               <CalendarIcon />
               {/* <Icon name="calendar-outline" size={14} color="#FFB156" /> */}
-              <Text style={styles.dateText}>26 Feb - 26 Mar 2023</Text>
+              <Text style={styles.dateText}>{formatDateRange(startDate, endDate)}</Text>
             </View>
           </View>
         </View>
       </View>
 
       <View style={styles.Pricesection}>
-        <Text style={styles.sectionTitle}>Price Details</Text>
+        <Text style={[styles.sectionTitle, { color: "#202020" }]}>Price Details</Text>
         <View style={styles.priceDetailRow}>
           <Text style={styles.priceDetailLabel}>Rent / Day</Text>
-          <Text style={styles.priceDetailValue}>₹ 2000</Text>
+          <Text style={styles.priceDetailValue}>{formatAmount(productDetails?.rentPricePerDay)}</Text>
         </View>
         <View style={{ width: "100%", borderColor: "#D8D8D8", borderWidth: 0.5, marginBottom: 5 }} />
         <View style={styles.priceDetailRow}>
           <Text style={styles.priceDetailLabel}>No. rental days</Text>
-          <Text style={styles.priceDetailValue}>2 days</Text>
+          <Text style={styles.priceDetailValue}>{isDayOrMonthly === 'daily' ? NumOfDays : 30} days</Text>
         </View>
         <View style={styles.priceDetailRow}>
           <Text style={styles.priceDetailLabel}>Total rent to be paid</Text>
-          <Text style={styles.priceDetailValue}>₹ 4000</Text>
+          <Text style={styles.priceDetailValue}>{formatAmount(calculateTotalPrice())}</Text>
         </View>
         <View style={styles.priceDetailRow}>
           <Text style={styles.priceDetailLabel}>Delivery charges</Text>
@@ -108,7 +150,7 @@ const BookingDetailsScreen = ({navigation}) => {
             <Text style={styles.priceDetailLabel}>Grand Total</Text>
             <Text style={styles.note}>*Inclusive of all taxes and GST</Text>
           </View>
-          <Text style={styles.finalpriceDetailValue}>₹ 4500</Text>
+          <Text style={styles.finalpriceDetailValue}>{formatAmount(calculateTotalPrice())}</Text>
         </View>
       </View>
 
@@ -143,11 +185,11 @@ const BookingDetailsScreen = ({navigation}) => {
           <Text style={styles.footerNote} >Security Deposit confirms your order 90%</Text>
         </View>
         <View style={styles.footerButtons}>
-          <TouchableOpacity style={[styles.button,{width:"35%"}]}>
+          <TouchableOpacity style={[styles.button, { width: "35%" }]}>
             <Text style={styles.buttonText}>Pay Later</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => ConfirmBooking()} style={[styles.button,{width:"60%",marginLeft:10, backgroundColor:"#D2453B"}]}>
-            <Text style={[styles.buttonText,{color:"white"}]}>Confirm Booking | ₹ 300</Text>
+          <TouchableOpacity onPress={() => ConfirmBooking()} style={[styles.button, { width: "60%", marginLeft: 10, backgroundColor: "#D2453B" }]}>
+            <Text style={[styles.buttonText, { color: "white" }]}>Confirm Booking | {formatAmount(calculateTotalPrice())}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -264,8 +306,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   productImage: {
-    width: Dimensions.get('window').width / 4.5,
-    height: 80,
+    width: Dimensions.get('window').width / 4,
+    height: Dimensions.get('window').height / 6,
     borderRadius: 8,
     marginRight: 16,
   },
@@ -365,7 +407,7 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal:40
+    paddingHorizontal: 40
   },
   footerNote: {
     fontSize: 14,
@@ -373,22 +415,22 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF4CF",
     fontWeight: "700",
     textAlign: "center",
-    marginLeft:10
+    marginLeft: 10
   },
   footerButtons: {
     flexDirection: 'row',
-    marginHorizontal:20,
-    paddingVertical:15
+    marginHorizontal: 20,
+    paddingVertical: 15
   },
   button: {
     alignItems: 'center',
     padding: 12,
     borderRadius: 8,
-    borderColor:"#D2453B",
-    borderWidth:1,
+    borderColor: "#D2453B",
+    borderWidth: 1,
   },
   payLaterButton: {
- 
+
   },
   confirmBookingButton: {
     backgroundColor: '#D9534F',

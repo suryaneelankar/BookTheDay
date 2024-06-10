@@ -6,12 +6,12 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import { useNavigation } from '@react-navigation/native';
-import BASE_URL from "../../apiconfig";
+import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";
 import Geolocation from '@react-native-community/geolocation';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import GetLocation from 'react-native-get-location'
-import { height, moderateScale } from "../../utils/scalingMetrics";
+import { height, horizontalScale, moderateScale, verticalScale } from "../../utils/scalingMetrics";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LocationMarkIcon from '../../assets/svgs/location.svg';
 import Home_banner_chef from '../../assets/svgs/homeSwippers/Home_banner_chef.svg';
@@ -51,13 +51,16 @@ const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
     const [address, setAddress] = useState('');
     const [eventsData, setEventsData] = useState([]);
+    const [discountProducts, setDiscountProducts] = useState([]);
+    const [newlyAddedProducts, setNewlyAddedProducts] = useState([]);
+
     const bannerImages = [{ image: require('../../assets/svgs/homeSwippers/home_jewellerycard.png') },
     { image: require('../../assets/svgs/productBanners/productBannerone.png') },
     { image: require('../../assets/svgs/productBanners/productBannerone.png') },
     ]
     useEffect(() => {
         // getPermissions();
-        // getCategories();
+        getCategories();
         getAllEvents();
     }, []);
 
@@ -67,6 +70,22 @@ const HomeDashboard = () => {
             setEventsData(response?.data?.data)
         } catch (error) {
             console.log("events data error>>::", error);
+        }
+    };
+
+    const getCategories = async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}/getAllClothesJewels`);
+            console.log("Products res:::::::", JSON.stringify(response?.data))
+            setCategories(response?.data)
+            const filteredDiscountItems = response?.data.filter(category => category?.componentType === 'discount');
+            const filteredNewItems = response?.data.filter(category => category?.componentType === 'new');
+
+            setDiscountProducts(filteredDiscountItems);
+            setNewlyAddedProducts(filteredNewItems)
+        } catch (error) {
+            console.log("categories discount::::::::::", error);
+
         }
     }
 
@@ -190,7 +209,6 @@ const HomeDashboard = () => {
 
     useEffect(() => {
         getPermissions();
-        getCategories();
     }, []);
 
     const getLocation = async () => {
@@ -245,17 +263,48 @@ const HomeDashboard = () => {
 
 
 
-    const getCategories = async () => {
-        // console.log("IAM CALLING API in home")
-        try {
-            const response = await axios.get(`${BASE_URL}/all-category`);
-            // console.log("categories::::::::::", response?.data?.data);
-            setCategories(response?.data?.data)
-        } catch (error) {
-            console.log("categories::::::::::", error);
+    // const getCategories = async () => {
+    //     // console.log("IAM CALLING API in home")
+    //     try {
+    //         const response = await axios.get(`${BASE_URL}/all-category`);
+    //         // console.log("categories::::::::::", response?.data?.data);
+    //         setCategories(response?.data?.data)
+    //     } catch (error) {
+    //         console.log("categories::::::::::", error);
 
-        }
+    //     }
+    // }
+
+    const renderNewlyAddedDetails = ({ item }) => {
+        const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+
+        const originalPrice = item?.rentPricePerDay;
+        const discountPercentage = item?.discountPercentage;
+        const strikethroughPrice = discountPercentage
+            ? Math.round(originalPrice * (1 + discountPercentage / 100))
+            : originalPrice;
+
+        return (
+            <View style={{}}>
+                <TouchableOpacity
+                    style={{elevation:5, width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginLeft: 16 }}>
+                    <Image resizeMode="contain" source={{ uri: updatedImgUrl }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '90%', alignSelf: "center", marginTop: 5, height: Dimensions.get('window').height / 5 }}
+                    />
+                    <View style={{ marginTop: 15, marginHorizontal: 6 }}>
+                        <Text numberOfLines={2} style={{ fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular' }}>{item?.productName}</Text>
+                        <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5, marginBottom: 10 }}>
+                            {/* <Text style={{ fontWeight: '700', color:'#202020', fontSize: 14, fontFamily: 'ManropeRegular' }}>{formatAmount(item?.price)}/day</Text> */}
+                            <Text style={{ fontWeight: '700', color: '#202020', fontSize: 14, fontFamily: 'ManropeRegular' }}>{formatAmount(item?.rentPricePerDay)}</Text>
+
+                            <Text style={styles.strickedoffer}>{formatAmount(strikethroughPrice)}</Text>
+                        </View>
+
+                    </View>
+                </TouchableOpacity>
+            </View>
+        )
     }
+
 
     const renderItem = ({ item }) => {
 
@@ -386,13 +435,6 @@ const HomeDashboard = () => {
                                 return (
                                     <TouchableOpacity style={{ alignItems: "center", alignSelf: "center", justifyContent: "center", width: Dimensions.get('window').width / 4 }} >
                                         <Image source={item.image} style={{ height: 65, width: 65, }} />
-                                        {/* <View style={{ flexDirection: 'row',backgroundColor:'#FFEFC0' }}>
-                                                {Cats.map((IconComponent, index) => (
-                                                    <TouchableOpacity>
-                                                        <IconComponent key={index} width={100} height={100} />
-                                                    </TouchableOpacity>
-                                                ))}
-                                            </View> */}
                                         <Text style={{ marginTop: 5, fontSize: 13, fontWeight: "500", color: '#202020', fontFamily: "ManropeRegular", }}>{item?.name}</Text>
                                     </TouchableOpacity>
                                 )
@@ -416,7 +458,7 @@ const HomeDashboard = () => {
                     </View>
                 </LinearGradient>
 
-                <TrendingNow data={DATA} discountList={discountList} textHeader={'Live Offers!'} />
+                <TrendingNow data={discountProducts}  textHeader={'Live Offers!'} />
 
                 <View style={{ marginTop: 30, }}>
                     <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
@@ -431,6 +473,21 @@ const HomeDashboard = () => {
                         data={trendingImageList}
                     />
                 </View>
+
+                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
+                        <Text style={styles.onDemandTextStyle}>Newly Added</Text>
+                        <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                            <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
+                            <RightArrowIcon width={25} height={25} />
+                        </TouchableOpacity>
+                    </View>
+                <FlatList
+                horizontal
+                data={newlyAddedProducts}
+                contentContainerStyle={{ paddingVertical: verticalScale(20), marginLeft: horizontalScale(5) }}
+                renderItem={renderNewlyAddedDetails}
+                showsHorizontalScrollIndicator={false}
+            />
 
 
 

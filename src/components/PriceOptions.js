@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-nati
 import { formatAmount } from '../utils/GlobalFunctions';
 
 const PricingOptions = ({ onSelect ,dailyPrice,monthlyPrice}) => {
-  const [selectedOption, setSelectedOption] = useState('monthly');
+  const [selectedOption, setSelectedOption] = useState('daily');
   const [selectedPrice, setSelectedPrice] = useState(600);
 
   const handleSelect = (option, price) => {
