@@ -34,6 +34,10 @@ import SelectDateTimeScreen from "../screens/MyBox/SelectDateTime";
 import ViewCatDetails from "../screens/Categories/ViewCatDetails";
 import BookingDetailsScreen from "../screens/Categories/ViewCartDetails";
 import RequestConfirmation from "../screens/VendorScreens/VendorDashBoard/RequestConfirmation";
+import ViewProfile from "../screens/Profile/ViewProfile";
+import EditProfile from "../screens/Profile/EditProfile";
+import ViewMyBookings from "../screens/Profile/MyBookings";
+import ViewMyLendings from "../screens/Profile/ViewMyLendings";
 
 const MainNavigation = () => {
 
@@ -58,7 +62,10 @@ const MainNavigation = () => {
             <Stack.Navigator>
                 <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="ViewTrendingDetails" component={ViewTrendingDetails} options={{ headerShown: true }} />
-                <Stack.Screen name="CategoriesList" component={CategoriesList} options={{ headerShown: false }} />
+                <Stack.Screen name="CategoriesList" component={CategoriesList}  options={{
+                         header: () => <NavigationHeader Icon={true} title="View Products" />,
+                         headerShown: true,
+                }} />
                 <Stack.Screen name="ViewEvents" component={ViewEvents} options={{ headerShown: true }} />
                
                <Stack.Screen 
@@ -66,6 +73,38 @@ const MainNavigation = () => {
                 component={ViewHireDetails}  
                 options={{
                          header: () => <NavigationHeader Icon={true} title="Hire Professionals" />,
+                         headerShown: true,
+                }}
+                />
+                <Stack.Screen 
+               name="ViewProfile"
+                component={ViewProfile}  
+                options={{
+                         header: () => <NavigationHeader Icon={true} title="View Profile" />,
+                         headerShown: true,
+                }}
+                />
+                <Stack.Screen 
+               name="EditProfile"
+                component={EditProfile}  
+                options={{
+                         header: () => <NavigationHeader Icon={true} title="Edit Profile" />,
+                         headerShown: true,
+                }}
+                />
+                 <Stack.Screen 
+               name="ViewMyBookings"
+                component={ViewMyBookings}  
+                options={{
+                         header: () => <NavigationHeader Icon={true} title="My Bookings" />,
+                         headerShown: true,
+                }}
+                />
+                  <Stack.Screen 
+               name="ViewMyLendings"
+                component={ViewMyLendings}  
+                options={{
+                         header: () => <NavigationHeader Icon={true} title="My Lendings" />,
                          headerShown: true,
                 }}
                 />
@@ -82,7 +121,7 @@ const MainNavigation = () => {
                 component={BookingDetailsScreen}  
                 options={{
                          header: () => <NavigationHeader Icon={true} title="Cart" />,
-                         headerShown: false,
+                         headerShown: true,
                 }}
                 />
                 <Stack.Screen 
