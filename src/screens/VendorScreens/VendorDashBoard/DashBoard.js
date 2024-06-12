@@ -81,7 +81,9 @@ const VendorDashBoardTab = ({ navigation }) => {
         const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
 
         return (
-            <TouchableOpacity style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
+            <TouchableOpacity 
+            onPress={() => navigation.navigate('RequestConfirmation',{productId:item?.productId})}
+            style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" />
                     <View style={{ margin: 10 }}>

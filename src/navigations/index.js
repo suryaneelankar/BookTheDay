@@ -33,6 +33,7 @@ import ViewHireDetails from "../screens/MyBox/ViewHireDetails";
 import SelectDateTimeScreen from "../screens/MyBox/SelectDateTime";
 import ViewCatDetails from "../screens/Categories/ViewCatDetails";
 import BookingDetailsScreen from "../screens/Categories/ViewCartDetails";
+import RequestConfirmation from "../screens/VendorScreens/VendorDashBoard/RequestConfirmation";
 
 const MainNavigation = () => {
 
@@ -119,6 +120,14 @@ const MainNavigation = () => {
                 <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: true }} />
                 <Stack.Screen name="BookingOverView" component={BookingOverView} options={{ headerShown: true }} />
                 <Stack.Screen name="BookingConfirm" component={BookingConfirm} options={{ headerShown:false }}/>
+
+                {/* //////////////////////      VENDOR SCREENS     ///////////////////////////////////////////// */}
+
+                <Stack.Screen name="RequestConfirmation" component={RequestConfirmation}  options={{
+                         header: () => <NavigationHeader Icon={true} title="Request Details" />,
+                         headerShown: true,
+                }}/>
+
 
             </Stack.Navigator>
         </NavigationContainer>

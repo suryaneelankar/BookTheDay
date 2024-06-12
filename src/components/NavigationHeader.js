@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   container: {
     // height: verticalScale(64),
     // paddingLeft: horizontalScale(10),
-    paddingVertical: verticalScale(10),
+    paddingVertical: verticalScale(20),
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: themevariable.Color_FFFFFF,
