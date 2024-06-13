@@ -44,8 +44,32 @@ import TrendingShirtImg from '../../assets/svgs/shirtTrending.svg';
 import TrendingNow from "../Products/TrendingNow";
 import shirtImg from '../../assets/shirt.png'
 import DiscountComponent from "../Products/DiscountComponent";
-import FooterBackGround from '../../assets/svgs/categories/home_footer_bg.svg';
+import FooterBackGround from '../../assets/svgs/categories/home_footer_banner.svg';
 import Swiper from "react-native-swiper";
+import HomeChefIcon from '../../assets/svgs/newHomeCheficon.svg';
+import TrendingRingBanner from '../../assets/svgs/trendingNow/home_trendingnow_ring.svg';
+import TrendingBracelet from '../../assets/svgs/trendingNow/home_trendingnow_bracelets.svg';
+import TrendingBridal from '../../assets/svgs/trendingNow/home_trendingnow_bridal.svg';
+import TrendingCatering from '../../assets/svgs/trendingNow/home_trendingnow_catering.svg';
+import TrendingChef from '../../assets/svgs/trendingNow/home_trendingnow_chef.svg';
+import TrendingDriver from '../../assets/svgs/trendingNow/home_trendingnow_driver.svg';
+import TrendingEarrings from '../../assets/svgs/trendingNow/home_trendingnow_earrings.svg';
+import TrendingJewellery from '../../assets/svgs/trendingNow/home_trendingnow_jewellery.svg';
+import TrendingNecklace from '../../assets/svgs/trendingNow/home_trendingnow_necklaces.svg';
+import TrendingTshirt from '../../assets/svgs/trendingNow/home_trendingnow_tshirt.svg';
+import CatCatering from '../../assets/svgs/categories/home_categories_catering_icon.svg';
+import CatChef from '../../assets/svgs/categories/home_categories_chef_icon.svg';
+import CatClothes from '../../assets/svgs/categories/home_categories_clothes_icon.svg';
+import CatDecoration from '../../assets/svgs/categories/home_categories_decoration_icon.svg';
+import CatDriver from '../../assets/svgs/categories/home_categories_driver_icon.svg';
+import CatHalls from '../../assets/svgs/categories/home_categories_hall_icon.svg';
+import CatJewellery from '../../assets/svgs/categories/home_categories_jewellery_icon.svg';
+import CatTentHouse from '../../assets/svgs/categories/home_categories_tent_icon.svg';
+import DriverCard from '../../assets/svgs/chefDriver/home_drivercardnew.svg';
+import ChefCard from '../../assets/svgs/chefDriver/home_chefcard.svg';
+import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.svg';
+import ClothesCard from '../../assets/svgs/homeSwippers/home_shirtcard.svg'; 
+
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
@@ -54,10 +78,40 @@ const HomeDashboard = () => {
     const [discountProducts, setDiscountProducts] = useState([]);
     const [newlyAddedProducts, setNewlyAddedProducts] = useState([]);
 
-    const bannerImages = [{ image: require('../../assets/svgs/homeSwippers/home_jewellerycard.png') },
-    { image: require('../../assets/svgs/productBanners/productBannerone.png') },
-    { image: require('../../assets/svgs/productBanners/productBannerone.png') },
-    ]
+    const bannerImages = [
+        { image: JewelleryCard },
+        { image: ClothesCard },
+    ];
+
+    const DriverChefCardImages = [
+        { image: DriverCard },
+        { image: ChefCard },
+    ];
+ 
+       
+    const CategoriesData = [
+        { name: 'Clothes', image: CatClothes },
+        { name: 'Jewellery', image: CatJewellery },
+        { name: 'Chefs', image: CatChef },
+        { name: 'Driver', image: CatDriver },
+        { name: 'Tent House', image: CatTentHouse },
+        { name: 'Halls', image: CatHalls },
+        { name: 'Decoration', image: CatDecoration },
+        { name: 'Catering', image: CatCatering }
+    ];
+
+    const trendingData = [
+        { id: '1', Component: TrendingBracelet },
+        { id: '2', Component: TrendingBridal },
+        { id: '3', Component: TrendingCatering },
+        { id: '4', Component: TrendingChef },
+        { id: '5', Component: TrendingDriver },
+        { id: '6', Component: TrendingRingBanner },
+        { id: '7', Component: TrendingEarrings },
+        { id: '8', Component: TrendingJewellery },
+        { id: '9', Component: TrendingNecklace },
+        { id: '10', Component: TrendingTshirt },
+    ];
     useEffect(() => {
         // getPermissions();
         getCategories();
@@ -89,123 +143,6 @@ const HomeDashboard = () => {
         }
     }
 
-
-    const images = [SwipperOne, SwipperOne, SwipperOne]; //svg images for swipper  
-    const wantChefDriver = [WantChef, WantDriver];
-    const trendingImageList = [{ name: 'Levis Full-Sleeve Blue Shirt', image: TrendingShirtImg },
-    { name: 'Delicious meals in 1 mins', image: TrendingShirtImg },
-    { name: 'MAX blue full hands', image: TrendingShirtImg },
-    { name: 'MAX blue full hands i', image: TrendingShirtImg },
-    { name: 'levis bluew5555', image: TrendingShirtImg },];
-
-    const newData =
-        [{ name: 'Clothes', image: require('../../assets/categoriesPngs/clothes_icon.png') },
-        { name: 'Jewellery', image: require('../../assets/categoriesPngs/jewellery_icon.png') },
-        { name: 'Chefs', image: require('../../assets/categoriesPngs/chef_icon.png') },
-        { name: 'Driver', image: require('../../assets/categoriesPngs/driver_icon.png') },
-        { name: 'Tent House', image: require('../../assets/categoriesPngs/tenthouse_icon.png') },
-        { name: 'Halls', image: require('../../assets/categoriesPngs/hall_icon.png') },
-        { name: 'Decoration', image: require('../../assets/categoriesPngs/decoration_icon.png') },
-        { name: 'Catering', image: require('../../assets/categoriesPngs/catering_icon.png') },
-        ]
-    const categoryLabels = [
-        { icon: ClothesIcon, label: 'Clothes' },
-        { icon: JewelleryIcon, label: 'Jewellery' },
-        { icon: ChefIcon, label: 'Chefs' },
-        { icon: DriversIcon, label: 'Driver' },
-        { icon: TentHouseIcon, label: 'Tent House' },
-        { icon: FuntionalHall, label: 'Hall' },
-        { icon: DecorationsIcon, label: 'Decoration' },
-        { icon: CateringIcon, label: 'Catering' },
-    ];
-
-    const DATA = [
-        {
-            id: 0,
-            productName: 'Trail Running Jacket Nike Windrunner',
-            productPrice: 700,
-            productDiscount: 20,
-            discountPercentage: 20,
-            imageUrl: shirtImg,
-            catImageUrl: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
-        },
-        {
-            id: 1,
-            productName: 'Trail Running Jacket Nike Windrunner',
-            productPrice: 700,
-            productDiscount: 20,
-            discountPercentage: 20,
-            imageUrl: shirtImg,
-            catImageUrl: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
-
-        },
-        {
-            id: 2,
-            productName: 'Trail Running Jacket Nike Windrunner',
-            productPrice: 700,
-            productDiscount: 20,
-            discountPercentage: 20,
-            imageUrl: shirtImg,
-            catImageUrl: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
-
-        },
-        {
-            id: 3,
-            productName: 'Trail Running Jacket Nike Windrunner',
-            productPrice: 700,
-            productDiscount: 20,
-            discountPercentage: 20,
-            imageUrl: shirtImg,
-            catImageUrl: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
-
-        },
-        {
-            id: 4,
-            productName: 'Trail Running Jacket Nike Windrunner',
-            productPrice: 700,
-            productDiscount: 20,
-            discountPercentage: 20,
-            imageUrl: shirtImg,
-            catImageUrl: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
-
-        },
-        {
-            id: 5,
-            productName: 'Trail Running Jacket Nike Windrunner',
-            productPrice: 700,
-            productDiscount: 20,
-            discountPercentage: 20,
-            imageUrl: shirtImg,
-            catImageUrl: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg'
-
-        }
-    ];
-    const discountList = [
-        {
-            id: 0,
-            value: 'All',
-        },
-        {
-            id: 1,
-            value: '10%',
-        },
-        {
-            id: 2,
-            value: '20%',
-        },
-        {
-            id: 3,
-            value: '30%',
-        },
-        {
-            id: 4,
-            value: '40%',
-        },
-        {
-            id: 5,
-            value: '50%',
-        },
-    ];
 
     useEffect(() => {
         getPermissions();
@@ -287,7 +224,7 @@ const HomeDashboard = () => {
         return (
             <View style={{}}>
                 <TouchableOpacity
-                    style={{elevation:5, width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginLeft: 16 }}>
+                    style={{ elevation: 5, width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginLeft: 16 }}>
                     <Image resizeMode="contain" source={{ uri: updatedImgUrl }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '90%', alignSelf: "center", marginTop: 5, height: Dimensions.get('window').height / 5 }}
                     />
                     <View style={{ marginTop: 15, marginHorizontal: 6 }}>
@@ -359,6 +296,15 @@ const HomeDashboard = () => {
     const { width } = Dimensions.get('window');
     const navigation = useNavigation();
 
+    const renderTrendingView = ({ item }) => {
+        const SvgComponent = item.Component;
+        return (
+            <View style={{ marginHorizontal: 10 }}>
+                <SvgComponent />
+            </View>
+        );
+    };
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
             <ScrollView style={{ marginBottom: 70 }} >
@@ -399,9 +345,17 @@ const HomeDashboard = () => {
                         activeDotStyle={styles.activeDot}
                         style={{ height: Dimensions.get('window').height / 4, }}
                     >
-                        {bannerImages.map((image, index) => (
-                            <Image source={image?.image} resizeMode="contain" style={{ width: "90%", height: "100%", alignSelf: "center" }} />
-                        ))}
+                       {bannerImages.map((item, index) => {
+                        const SvgComponent = item?.image;
+                        return (
+                            <SvgComponent
+                                key={index}
+                                width="90%"
+                                height="100%"
+                                style={{ alignSelf: "center"}}
+                            />
+                        );
+                    })}
                     </Swiper>
                     {/* </View> */}
 
@@ -430,35 +384,25 @@ const HomeDashboard = () => {
                     <View style={{}}>
                         <Text style={{ marginHorizontal: 20, fontFamily: "ManropeRegular", fontWeight: "700", fontSize: 16, color: '#202020' }}>Categories</Text>
                         <FlatList
-                            data={newData}
+                            data={CategoriesData}
                             renderItem={({ item }) => {
+                                const SvgComponent = item.image;
                                 return (
                                     <TouchableOpacity style={{ alignItems: "center", alignSelf: "center", justifyContent: "center", width: Dimensions.get('window').width / 4 }} >
-                                        <Image source={item.image} style={{ height: 65, width: 65, }} />
-                                        <Text style={{ marginTop: 5, fontSize: 13, fontWeight: "500", color: '#202020', fontFamily: "ManropeRegular", }}>{item?.name}</Text>
+                                        <SvgComponent width={65} height={65} />
+                                        <Text style={{ marginTop: 5, fontSize: 13, fontWeight: "500", color: '#202020', fontFamily: "ManropeRegular" }}>
+                                            {item?.name}
+                                        </Text>
                                     </TouchableOpacity>
-                                )
+                                );
                             }}
                             showsHorizontalScrollIndicator={false}
                             numColumns={4}
                         />
-                        {/* <View style={styles.grid}>
-                            {categoryLabels.map((category, index) => {
-                                const IconComponent = category.icon;
-                                return (
-                                    <TouchableOpacity key={index} style={styles.category}>
-                                        <View style={styles.iconContainer}>
-                                            <IconComponent width={50} height={50} />
-                                        </View>
-                                        <Text style={styles.label}>{category.label}</Text>
-                                    </TouchableOpacity>
-                                );
-                            })}
-                        </View> */}
                     </View>
                 </LinearGradient>
 
-                <TrendingNow data={discountProducts}  textHeader={'Live Offers!'} />
+                <TrendingNow data={discountProducts} textHeader={'Live Offers!'} />
 
                 <View style={{ marginTop: 30, }}>
                     <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
@@ -469,27 +413,31 @@ const HomeDashboard = () => {
                         </TouchableOpacity>
                     </View>
 
-                    <TrendingView
-                        data={trendingImageList}
+                    <FlatList
+                        data={trendingData}
+                        horizontal
+                        renderItem={renderTrendingView}
+                        keyExtractor={item => item.id}
+                        contentContainerStyle={{ paddingHorizontal: 10, }}
+                        showsHorizontalScrollIndicator={false}
                     />
+                   
                 </View>
 
                 <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
-                        <Text style={styles.onDemandTextStyle}>Newly Added</Text>
-                        <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
-                            <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
-                            <RightArrowIcon width={25} height={25} />
-                        </TouchableOpacity>
-                    </View>
+                    <Text style={styles.onDemandTextStyle}>Newly Added</Text>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                        <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
+                        <RightArrowIcon width={25} height={25} />
+                    </TouchableOpacity>
+                </View>
                 <FlatList
-                horizontal
-                data={newlyAddedProducts}
-                contentContainerStyle={{ paddingVertical: verticalScale(20), marginLeft: horizontalScale(5) }}
-                renderItem={renderNewlyAddedDetails}
-                showsHorizontalScrollIndicator={false}
-            />
-
-
+                    horizontal
+                    data={newlyAddedProducts}
+                    contentContainerStyle={{ paddingVertical: verticalScale(20), marginLeft: horizontalScale(5) }}
+                    renderItem={renderNewlyAddedDetails}
+                    showsHorizontalScrollIndicator={false}
+                />
 
                 <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
                     <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
@@ -507,9 +455,39 @@ const HomeDashboard = () => {
                     showsHorizontalScrollIndicator={false}
                 />
 
-                <FooterBackGround style={{ alignSelf: "center" }} />
+                <Swiper
+                    showsPagination={false}
+                    style={{ height: Dimensions.get('window').height / 4 }}
+                >
+                    {DriverChefCardImages.map((item, index) => {
+                        const SvgComponent = item?.image;
+                        return (
+                            <SvgComponent
+                                key={index}
+                                width="90%"
+                                height="100%"
+                                style={{ alignSelf: "center" }}
+                            />
+                        );
+                    })}
+                </Swiper>
 
-
+                <View style={{
+                    alignItems: 'center',
+                    // justifyContent: 'center',
+                    position: 'relative',
+                    width: "100%",
+                    marginTop:10
+                }}>
+                    <FooterBackGround style={{ width: "100%" }} />
+                    <View style={styles.textContainer}>
+                        <Text style={styles.title}>Expect More With Less</Text>
+                        <Text style={styles.subtitle}>We are here for your every need.</Text>
+                        <TouchableOpacity style={styles.button}>
+                            <Text style={{ fontSize: 11, fontWeight: "700", color: "#FFFFFF", fontFamily: 'ManropeRegular', }} >About us  &raquo;</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
             </ScrollView>
         </SafeAreaView>
     )
@@ -517,10 +495,34 @@ const HomeDashboard = () => {
 
 
 const styles = StyleSheet.create({
+    textContainer: {
+        position: 'absolute',
+        alignItems: 'center',
+        marginTop: Dimensions.get('window').height / 9
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: '800',
+        color: '#000000',
+        fontFamily: 'ManropeRegular',
+    },
+    subtitle: {
+        fontSize: 12,
+        fontFamily: 'ManropeRegular',
+        fontWeight: "500",
+        color: '#000000',
+    },
+    button: {
+        backgroundColor: '#EB8D46',
+        paddingVertical: 8,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        marginTop: 10,
+    },
     imageContainer: {
         justifyContent: 'center',
         alignItems: 'center', backgroundColor: "yellow",
-        height: 200, // Adjust the height as needed
+        height: 200,
     },
     onDemandTextStyle: {
         fontFamily: 'ManropeRegular',
