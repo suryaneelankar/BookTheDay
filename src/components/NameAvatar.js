@@ -13,7 +13,7 @@ const Avatar = ({widthDyn,heightDyn,borderRadiusDyn, name, imageUrl }) => {
   };
 
   const initials = getInitials(name).toUpperCase();
-  console.log("VADATR IMAGE:::::", imageUrl)
+  // console.log("VADATR IMAGE:::::", imageUrl)
 const updatedImgUrl = imageUrl !== undefined ? imageUrl.replace('localhost', LocalHostUrl) : imageUrl;
   return (
     <View style={[styles.container,{width:widthDyn, height:heightDyn, borderRadius:borderRadiusDyn}]}>

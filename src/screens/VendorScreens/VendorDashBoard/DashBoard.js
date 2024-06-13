@@ -22,7 +22,8 @@ const VendorDashBoardTab = ({ navigation }) => {
     const [vendorListing, setVendorListings] = useState([]);
 
     useEffect(() => {
-        getVendorBookings();
+        getVendorClothJewelBookings();
+        getVendorDriverChefBookings();
         getVendorListings();
     }, [])
 
@@ -31,22 +32,35 @@ const VendorDashBoardTab = ({ navigation }) => {
         const vendorMobileNumber = "8297735285"
         try {
             const response = await axios.get(`${BASE_URL}/getAllVendorProductsAdded/${vendorMobileNumber}`);
-            console.log("postsposts::::::::::", response?.data?.posts);
+            // console.log("postsposts::::::::::", response?.data?.posts);
             setVendorListings(response?.data?.posts)
         } catch (error) {
             console.log("categories::::::::::", error);
         }
     }
 
+    const getVendorDriverChefBookings = async () => {
+        const vendorMobileNumber = "8297735285"
+        try {
+            const response = await axios.get(`${BASE_URL}/driverChefBookingsGotForVendor/${vendorMobileNumber}`);
+            // console.log("setAllBookings::::::::::", response?.data?.data);
+            setWholeBookingData(response?.data?.data);
+            // const output = consolidateByProductId(response?.data?.data);
+            // console.log('output is ::>>', output);
+            // setAllBookings(output)
+        } catch (error) {
+            console.log("categories::::::::::", error);
+        }
+    }
 
-    const getVendorBookings = async () => {
+    const getVendorClothJewelBookings = async () => {
         const vendorMobileNumber = "8297735285"
         try {
             const response = await axios.get(`${BASE_URL}/clothJewelBookingsGotForVendor/${vendorMobileNumber}`);
             // console.log("setAllBookings::::::::::", response?.data?.data);
             setWholeBookingData(response?.data?.data)
             const output = consolidateByProductId(response?.data?.data);
-            console.log('output is ::>>', output);
+            // console.log('output is ::>>', output);
             setAllBookings(output)
         } catch (error) {
             console.log("categories::::::::::", error);
@@ -57,14 +71,14 @@ const VendorDashBoardTab = ({ navigation }) => {
         const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
 
         return (
-            <TouchableOpacity style={{ backgroundColor: 'white',marginTop:10, width: '48%',marginHorizontal:5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10 }}>
-                <View style={{ marginTop:5, width: '100%', marginHorizontal: 5 }}>
+            <TouchableOpacity style={{ backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10 }}>
+                <View style={{ marginTop: 5, width: '100%', marginHorizontal: 5 }}>
                     <Image style={{ width: '95%', height: 200, backgroundColor: 'red', borderRadius: 10 }} source={{ uri: convertedImageUrl }} resizeMode="cover" />
                     <Text style={styles.productName}>{capitalizeFirstLetters(item?.productName)}</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center',marginTop:5,justifyContent:'space-between',width:'90%',bottom:5 }}>
-                        <View style={{flexDirection:'row',alignItems:'center',marginHorizontal:5}}>
-                        <ListedTimeIcon />
-                        <Text style={styles.price}>22 April</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, justifyContent: 'space-between', width: '90%', bottom: 5 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 }}>
+                            <ListedTimeIcon />
+                            <Text style={styles.price}>22 April</Text>
                         </View>
                         <EditButton />
                     </View>
@@ -81,19 +95,25 @@ const VendorDashBoardTab = ({ navigation }) => {
         const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
 
         return (
-            <TouchableOpacity 
-            onPress={() => navigation.navigate('RequestConfirmation',{productId:item?.productId})}
-            style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
+            <TouchableOpacity
+                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId })}
+                style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" />
                     <View style={{ margin: 10 }}>
-                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{capitalizeFirstLetters(item?.productName)}</Text>
+                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500',width:Dimensions.get('window').width/4 }}>{capitalizeFirstLetters(item?.productName)} </Text>
                         <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.perDayPrice)}</Text>
                     </View>
                 </View>
-                <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', alignItems: 'center', padding: 8, borderRadius: 5 }}>
-                    <Text style={{ color: '#FD813B' }}>{item?.count} Requests</Text>
-                    <ArrowRight style={{ marginHorizontal: 10, marginTop: 3 }} />
+                <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', height:35, borderRadius: 5,position:'absolute',right:10 }}>
+                    <Text style={{ color: '#FD813B',marginHorizontal:5 }}>{item?.count == 1 ? '1 Request ' : `${item?.count} Requests `}</Text>
+                    {item?.count == 1 ? <PersonOne  /> :
+                        <>
+                            <PersonOne style={{ marginRight: -10 }} />
+                            <PersonTwo style={{ marginRight: -10 }} />
+                            <PersonThree />
+                        </>}
+                    <ArrowRight style={{ marginTop: 3 ,marginHorizontal:10 }} />
                 </View>
 
 
@@ -126,7 +146,7 @@ const VendorDashBoardTab = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <View style={{ flexDirection: 'row', alignItems: 'center',backgroundColor:'white' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'white' }}>
                 <ProfileIcon style={{}} />
                 <View>
                     <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular' }}>Hi, Surya Neelankar</Text>
@@ -135,7 +155,7 @@ const VendorDashBoardTab = ({ navigation }) => {
             </View>
 
 
-            <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF3CD', '#FFDB7E']} style={{ width: '90%', alignSelf: 'center', padding: 20, borderRadius: 10,marginTop:20 }}>
+            <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF3CD', '#FFDB7E']} style={{ width: '90%', alignSelf: 'center', padding: 20, borderRadius: 10, marginTop: 20 }}>
                 <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
                     <View>
                         <Text style={{ color: '#1A1F36', fontSize: 14, fontWeight: 700, color: '#1A1F36' }}>Total Earning:</Text>
@@ -164,7 +184,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                     <FlatList
                         data={vendorListing}
                         renderItem={renderVendorList}
-                        contentContainerStyle={{ borderRadius: 15, margin: 15,bottom:20 }}
+                        contentContainerStyle={{ borderRadius: 15, margin: 15, bottom: 20 }}
                         numColumns={2}
                     />
                 </View>
@@ -197,8 +217,8 @@ const styles = StyleSheet.create({
         fontFamily: 'ManropeRegular',
         fontSize: 12,
         color: '#202020',
-        width:'90%',
-        margin:5
+        width: '90%',
+        margin: 5
     },
     price: {
         color: themevariable.Color_202020,
@@ -206,8 +226,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: 'ManropeRegular',
         color: '#202020',
-        marginHorizontal:5,
-        margin:5
+        marginHorizontal: 5,
+        margin: 5
     },
 
 
