@@ -101,7 +101,7 @@ const HomeDashboard = () => {
     ];
 
     const trendingData = [
-        { id: '1', Component: TrendingBracelet },
+        { id: '1', Component: TrendingTshirt },
         { id: '2', Component: TrendingBridal },
         { id: '3', Component: TrendingCatering },
         { id: '4', Component: TrendingChef },
@@ -110,7 +110,7 @@ const HomeDashboard = () => {
         { id: '7', Component: TrendingEarrings },
         { id: '8', Component: TrendingJewellery },
         { id: '9', Component: TrendingNecklace },
-        { id: '10', Component: TrendingTshirt },
+        { id: '10', Component: TrendingBracelet },
     ];
     useEffect(() => {
         // getPermissions();
@@ -249,12 +249,12 @@ const HomeDashboard = () => {
             <View style={{}}>
                 <TouchableOpacity
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
-                    style={{ width: Dimensions.get('window').width / 1.3, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', marginHorizontal: 16, marginTop: 15, height: 'auto' }}>
-                    <Image source={{ uri: item?.mainImageUrl }} style={{ borderRadius: 8, width: '100%', padding: 90 }}
+                    style={{ marginBottom:5,elevation:5,backgroundColor:"white",width: Dimensions.get('window').width / 1.3, alignSelf: 'center', borderRadius: 8, marginHorizontal: 16, marginTop: 15, height: 'auto' }}>
+                    <Image source={{ uri: item?.mainImageUrl }} style={{ borderRadius: 8, width: '95%', padding: 90,alignSelf:"center" ,marginTop:8}}
                         resizeMode="stretch"
 
                     />
-                    <View style={{ marginTop: 15, justifyContent: 'space-between', }}>
+                    <View style={{ marginTop: 15, justifyContent: 'space-between',}}>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignSelf: 'center', alignItems: 'center' }}>
                             <Text style={{ fontWeight: '700', color: '#131313', fontSize: 16, fontFamily: 'InterBold', width: '48%' }}>{item?.name}</Text>
@@ -272,7 +272,7 @@ const HomeDashboard = () => {
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "60%", marginTop: 10, padding: 5 }}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between', width: "60%", marginTop: 10, padding: 5,marginBottom:5 }}>
 
                         <View style={{ backgroundColor: item?.available ? "#dcfcf0" : themevariable.Color_FFF8DF, flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
                             <Image source={require('../../assets/available.png')} style={{ width: 15, height: 15 }} />
@@ -404,14 +404,7 @@ const HomeDashboard = () => {
 
                 <TrendingNow data={discountProducts} textHeader={'Live Offers!'} />
 
-                <View style={{ marginTop: 30, }}>
-                    <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
-                        <Text style={styles.onDemandTextStyle}>Trending Now</Text>
-                        <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
-                            <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
-                            <RightArrowIcon width={25} height={25} />
-                        </TouchableOpacity>
-                    </View>
+                <View style={{ marginTop: 20, }}>
 
                     <FlatList
                         data={trendingData}
@@ -424,7 +417,7 @@ const HomeDashboard = () => {
                    
                 </View>
 
-                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between',marginTop:20 }}>
                     <Text style={styles.onDemandTextStyle}>Newly Added</Text>
                     <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
                         <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
@@ -457,7 +450,7 @@ const HomeDashboard = () => {
 
                 <Swiper
                     showsPagination={false}
-                    style={{ height: Dimensions.get('window').height / 4 }}
+                    style={{ height: Dimensions.get('window').height / 4 ,marginTop:5}}
                 >
                     {DriverChefCardImages.map((item, index) => {
                         const SvgComponent = item?.image;
@@ -481,7 +474,7 @@ const HomeDashboard = () => {
                 }}>
                     <FooterBackGround style={{ width: "100%" }} />
                     <View style={styles.textContainer}>
-                        <Text style={styles.title}>Expect More With Less</Text>
+                        <Text style={styles.footerTitle}>Expect More With Less</Text>
                         <Text style={styles.subtitle}>We are here for your every need.</Text>
                         <TouchableOpacity style={styles.button}>
                             <Text style={{ fontSize: 11, fontWeight: "700", color: "#FFFFFF", fontFamily: 'ManropeRegular', }} >About us  &raquo;</Text>
@@ -500,7 +493,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: Dimensions.get('window').height / 9
     },
-    title: {
+    footerTitle: {
         fontSize: 20,
         fontWeight: '800',
         color: '#000000',
