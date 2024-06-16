@@ -9,14 +9,14 @@ import { formatAmount } from "../../utils/GlobalFunctions";
 import OfferStikcer from '../../assets/svgs/offerSticker.svg';
 
 const CategoriesList = ({ route }) => {
-    const { catType } = route.params;
+    const { catType,componentType } = route.params;
     // console.log("RECEIED TYPE IS:::", catType)
     // const CategoryType = catType == 'Jewellery' ? 'jewellery' : catType == 'Furniture' ? 'furniture' : catType == 'Events' ? 'event' : catType == 'Electronics' ? 'electronic' : catType == 'Drivers Rentals' ? 'driver' : catType == 'Clothes' ? 'cloth' : catType == 'Master Chefs' ? 'chef' : null;
     // console.log("final catetype:::::::::::", CategoryType)
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true); // Add loading state
 
-    console.log("passed cat type ::::", catType)
+    console.log("passed cat type ::::", catType, componentType)
 
     useEffect(() => {
         getCategories();
@@ -25,8 +25,13 @@ const CategoriesList = ({ route }) => {
     const getCategories = async () => {
         try {
             const response = await axios.get(`${BASE_URL}/getAllClothesJewels`);
+            if(componentType === 'discount' || componentType === 'new'){
+                const filteredDiscountItems = response?.data.filter(category => category?.componentType === componentType);
+                setCategories(filteredDiscountItems);
+            }else{
             const filteredCategories = response?.data.filter(category => category?.categoryType === catType);
             setCategories(filteredCategories);
+            }
         } catch (error) {
             console.log("categories::::::::::", error);
         } finally {

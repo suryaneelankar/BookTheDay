@@ -38,6 +38,7 @@ import ViewProfile from "../screens/Profile/ViewProfile";
 import EditProfile from "../screens/Profile/EditProfile";
 import ViewMyBookings from "../screens/Profile/MyBookings";
 import ViewMyLendings from "../screens/Profile/ViewMyLendings";
+import ViewHireCartDetails from "../screens/MyBox/ViewHireCartDetails";
 
 const MainNavigation = () => {
 
@@ -119,6 +120,14 @@ const MainNavigation = () => {
                 <Stack.Screen 
                name="BookingDetailsScreen"
                 component={BookingDetailsScreen}  
+                options={{
+                         header: () => <NavigationHeader Icon={true} title="Cart" />,
+                         headerShown: true,
+                }}
+                />
+                <Stack.Screen 
+               name="ViewHireCartDetails"
+                component={ViewHireCartDetails}  
                 options={{
                          header: () => <NavigationHeader Icon={true} title="Cart" />,
                          headerShown: true,

@@ -68,7 +68,7 @@ import CatTentHouse from '../../assets/svgs/categories/home_categories_tent_icon
 import DriverCard from '../../assets/svgs/chefDriver/home_drivercardnew.svg';
 import ChefCard from '../../assets/svgs/chefDriver/home_chefcard.svg';
 import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.svg';
-import ClothesCard from '../../assets/svgs/homeSwippers/home_shirtcard.svg'; 
+import ClothesCard from '../../assets/svgs/homeSwippers/home_shirtcard.svg';
 
 
 const HomeDashboard = () => {
@@ -79,16 +79,16 @@ const HomeDashboard = () => {
     const [newlyAddedProducts, setNewlyAddedProducts] = useState([]);
 
     const bannerImages = [
-        { image: JewelleryCard },
-        { image: ClothesCard },
+        { id: '1', image: JewelleryCard },
+        { id: '2', image: ClothesCard },
     ];
 
     const DriverChefCardImages = [
         { image: DriverCard },
         { image: ChefCard },
     ];
- 
-       
+
+
     const CategoriesData = [
         { name: 'Clothes', image: CatClothes },
         { name: 'Jewellery', image: CatJewellery },
@@ -249,12 +249,12 @@ const HomeDashboard = () => {
             <View style={{}}>
                 <TouchableOpacity
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
-                    style={{ marginBottom:5,elevation:5,backgroundColor:"white",width: Dimensions.get('window').width / 1.3, alignSelf: 'center', borderRadius: 8, marginHorizontal: 16, marginTop: 15, height: 'auto' }}>
-                    <Image source={{ uri: item?.mainImageUrl }} style={{ borderRadius: 8, width: '95%', padding: 90,alignSelf:"center" ,marginTop:8}}
+                    style={{ marginBottom: 5, elevation: 5, backgroundColor: "white", width: Dimensions.get('window').width / 1.3, alignSelf: 'center', borderRadius: 8, marginHorizontal: 16, marginTop: 15, height: 'auto' }}>
+                    <Image source={{ uri: item?.mainImageUrl }} style={{ borderRadius: 8, width: '95%', padding: 90, alignSelf: "center", marginTop: 8 }}
                         resizeMode="stretch"
 
                     />
-                    <View style={{ marginTop: 15, justifyContent: 'space-between',}}>
+                    <View style={{ marginTop: 15, justifyContent: 'space-between', }}>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignSelf: 'center', alignItems: 'center' }}>
                             <Text style={{ fontWeight: '700', color: '#131313', fontSize: 16, fontFamily: 'InterBold', width: '48%' }}>{item?.name}</Text>
@@ -272,7 +272,7 @@ const HomeDashboard = () => {
                         </View>
                     </View>
 
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between', width: "60%", marginTop: 10, padding: 5,marginBottom:5 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "60%", marginTop: 10, padding: 5, marginBottom: 5 }}>
 
                         <View style={{ backgroundColor: item?.available ? "#dcfcf0" : themevariable.Color_FFF8DF, flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
                             <Image source={require('../../assets/available.png')} style={{ width: 15, height: 15 }} />
@@ -303,6 +303,15 @@ const HomeDashboard = () => {
                 <SvgComponent />
             </View>
         );
+    };
+
+    const handlePress = (name) => {
+        if (name === 'Clothes') {
+            navigation.navigate('CategoriesList', { catType: 'clothes' });
+        } else if (name === 'Jewellery') {
+            navigation.navigate('CategoriesList', { catType: 'jewels' });
+        }
+        // Add other conditions for different categories if needed
     };
 
     return (
@@ -345,17 +354,27 @@ const HomeDashboard = () => {
                         activeDotStyle={styles.activeDot}
                         style={{ height: Dimensions.get('window').height / 4, }}
                     >
-                       {bannerImages.map((item, index) => {
-                        const SvgComponent = item?.image;
-                        return (
-                            <SvgComponent
-                                key={index}
-                                width="90%"
-                                height="100%"
-                                style={{ alignSelf: "center"}}
-                            />
-                        );
-                    })}
+                        {bannerImages.map((item, index) => {
+                            const SvgComponent = item?.image;
+                            return (
+                                <TouchableOpacity
+                                    key={index}
+                                    onPress={() => {
+                                        if (item.id === '1') {
+                                            navigation.navigate('CategoriesList', { catType: 'jewels' });
+                                        } else if (item.id === '2') {
+                                            navigation.navigate('CategoriesList', { catType: 'clothes' });
+                                        }
+                                    }}
+                                >
+                                    <SvgComponent
+                                        width="90%"
+                                        height="100%"
+                                        style={{ alignSelf: "center" }}
+                                    />
+                                </TouchableOpacity>
+                            );
+                        })}
                     </Swiper>
                     {/* </View> */}
 
@@ -388,7 +407,7 @@ const HomeDashboard = () => {
                             renderItem={({ item }) => {
                                 const SvgComponent = item.image;
                                 return (
-                                    <TouchableOpacity style={{ alignItems: "center", alignSelf: "center", justifyContent: "center", width: Dimensions.get('window').width / 4 }} >
+                                    <TouchableOpacity  onPress={() => handlePress(item?.name)}    style={{ alignItems: "center", alignSelf: "center", justifyContent: "center", width: Dimensions.get('window').width / 4 }} >
                                         <SvgComponent width={65} height={65} />
                                         <Text style={{ marginTop: 5, fontSize: 13, fontWeight: "500", color: '#202020', fontFamily: "ManropeRegular" }}>
                                             {item?.name}
@@ -414,12 +433,12 @@ const HomeDashboard = () => {
                         contentContainerStyle={{ paddingHorizontal: 10, }}
                         showsHorizontalScrollIndicator={false}
                     />
-                   
+
                 </View>
 
-                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between',marginTop:20 }}>
+                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: 20 }}>
                     <Text style={styles.onDemandTextStyle}>Newly Added</Text>
-                    <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                    <TouchableOpacity onPress={() => navigation.navigate('CategoriesList', { componentType: 'new' })} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
                         <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
                         <RightArrowIcon width={25} height={25} />
                     </TouchableOpacity>
@@ -434,7 +453,7 @@ const HomeDashboard = () => {
 
                 <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
                     <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
-                    <TouchableOpacity style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Events')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
                         <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
                         <RightArrowIcon width={25} height={25} />
                     </TouchableOpacity>
@@ -450,17 +469,19 @@ const HomeDashboard = () => {
 
                 <Swiper
                     showsPagination={false}
-                    style={{ height: Dimensions.get('window').height / 4 ,marginTop:5}}
+                    style={{ height: Dimensions.get('window').height / 4, marginTop: 5 }}
                 >
                     {DriverChefCardImages.map((item, index) => {
                         const SvgComponent = item?.image;
                         return (
+                            <TouchableOpacity onPress={() => navigation.navigate('My Box')}>
                             <SvgComponent
                                 key={index}
                                 width="90%"
                                 height="100%"
                                 style={{ alignSelf: "center" }}
                             />
+                            </TouchableOpacity>
                         );
                     })}
                 </Swiper>
@@ -470,7 +491,7 @@ const HomeDashboard = () => {
                     // justifyContent: 'center',
                     position: 'relative',
                     width: "100%",
-                    marginTop:10
+                    marginTop: 10
                 }}>
                     <FooterBackGround style={{ width: "100%" }} />
                     <View style={styles.textContainer}>

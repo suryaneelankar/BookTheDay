@@ -5,9 +5,11 @@ import { formatAmount } from "../../utils/GlobalFunctions"
 import themevariable from '../../utils/themevariable'
 import Svg, { Path } from 'react-native-svg';
 import { horizontalScale, verticalScale } from "../../utils/scalingMetrics"
-import { LocalHostUrl } from "../../apiconfig"
+import { LocalHostUrl } from "../../apiconfig";
+import { useNavigation } from "@react-navigation/native"
 
 const TrendingNow = ({ data, textHeader }) => {
+    const navigation = useNavigation();
     const [selectedDiscount, setSelectedDiscount] = useState('All')
 
 
@@ -41,7 +43,6 @@ const TrendingNow = ({ data, textHeader }) => {
     const renderOfferDetails = ({ item }) => {
 
         const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
-        // console.log("IMAGE URL IS:::::::", updatedImgUrl)
         const originalPrice = item?.rentPricePerDay;
         const discountPercentage = item?.discountPercentage;
         const strikethroughPrice = discountPercentage
@@ -74,10 +75,10 @@ const TrendingNow = ({ data, textHeader }) => {
             <View style={styles.subContainer}>
                 <View style={styles.topContainer}>
                     <Text style={styles.trendingText}>{textHeader}</Text>
-                    <View style={styles.sellAllContainer}>
+                    <TouchableOpacity onPress={() => navigation.navigate('CategoriesList', { componentType: 'discount' })} style={styles.sellAllContainer}>
                         <Text style={styles.seeAllText}>See All</Text>
                         <BackButton width={20} height={20} style={styles.backButton} />
-                    </View>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.discountContainer}>
                     <FlatList
