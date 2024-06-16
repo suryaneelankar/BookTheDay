@@ -41,7 +41,7 @@ const TrendingNow = ({ data, textHeader }) => {
     const renderOfferDetails = ({ item }) => {
 
         const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
-        console.log("IMAGE URL IS:::::::", updatedImgUrl)
+        // console.log("IMAGE URL IS:::::::", updatedImgUrl)
         const originalPrice = item?.rentPricePerDay;
         const discountPercentage = item?.discountPercentage;
         const strikethroughPrice = discountPercentage

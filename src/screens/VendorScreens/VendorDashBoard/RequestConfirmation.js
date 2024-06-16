@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, Alert, FlatList } from 'react-native';
 import BASE_URL from "../../../apiconfig";
 import axios from "axios";
 import { LocalHostUrl } from "../../../apiconfig";
@@ -10,23 +10,47 @@ import RejectIcon from "../../../assets/vendorIcons/RejectIcon.svg";
 import AcceptIcon from "../../../assets/vendorIcons/AcceptIcon.svg";
 import themevariable from "../../../utils/themevariable";
 import LinearGradient from 'react-native-linear-gradient';
+import { formatAmount } from "../../../utils/GlobalFunctions";
 
 const RequestConfirmation = ({ navigation, route }) => {
     const { productId } = route?.params;
     const [productDetails, setProductDetails] = useState([]);
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
-    const [isVisible,setIsVisible] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+    const [wholeBookingData, setWholeBookingData] = useState([]);
 
     useEffect(() => {
         getProductDetails();
+        getVendorClothJewelBookings();
     }, [])
+
+    const getVendorClothJewelBookings = async () => {
+        const vendorMobileNumber = "8297735285"
+        try {
+            const response = await axios.get(`${BASE_URL}/clothJewelBookingsGotForVendor/${vendorMobileNumber}`);
+            // console.log("response?.data?.data::::::::::", response?.data?.data);
+            // setWholeBookingData(response?.data?.data)
+            groupByFilterData(response?.data?.data);
+        } catch (error) {
+            console.log("categories::::::::::", error);
+        }
+    }
+
+    const groupByFilterData = (data) => {
+        var result = data.reduce((x, y) => {
+            (x[y.productId] = x[y.productId] || []).push(y);
+            return x;
+        }, {});
+        setWholeBookingData(result[`${productId}`]);
+        console.log('final res is ::>>', result[`${productId}`]);
+    }
 
 
     const getProductDetails = async () => {
         console.log('productId is ::>>', productId)
         try {
             const response = await axios.get(`${BASE_URL}/getClothJewelsById/${productId}`);
-            console.log("getClothJewelsById::::::::::", response?.data);
+            // console.log("getClothJewelsById::::::::::", response?.data);
             setProductDetails(response?.data)
         } catch (error) {
             console.log("categories::::::::::", error);
@@ -38,47 +62,8 @@ const RequestConfirmation = ({ navigation, route }) => {
         return convertedImageUrl;
     }
 
-    const renderProductDetails = () => {
-        return (
-            <View onPress={() => { }} style={{ borderRadius: 10, backgroundColor: "white", marginHorizontal: 15, marginTop: 10, paddingHorizontal: 10, paddingVertical: 10 }}>
-                <View style={{ flexDirection: "row" }}>
-                    <Avatar widthDyn={61} heightDyn={61} borderRadiusDyn={8} name={'Surya Neelankar'} imageUrl={''} />
-                    <View style={{ marginLeft: 10, width: "50%" }}>
-                        <Text style={{ marginTop: 5, color: "#101010", fontSize: 14, fontWeight: "500", fontFamily: "ManropeRegular", }}>Surya Neelankar</Text>
-                        <View style={{ marginTop: 10 }}>
-                            <Text style={{ color: "#1A1E25", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular" }}>Banglore, KA</Text>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
-                                <Text style={{ color: '#6B779A', fontSize: 9, fontFamily: "ManropeRegular", fontWeight: "800", }}>14 JUNE - 21 JUNE</Text>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 12 }}>
-                                    <DollarIcon style={{ marginHorizontal: 5 }} />
-                                    <Text style={{ color: "#4A4A4A", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>₹2,000</Text>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                    <View style={{ alignItems: 'center', alignSelf: 'center' }}>
-                        <TouchableOpacity style={{ alignItems: 'center', borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
-                         onPress={() => {showAlert("Are you sure you want to accept the order?")}}
-                        >
-                            <AcceptIcon />
-                            <Text style={{ color: "#57A64F", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Accept</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={{ alignItems: 'center', marginTop: 10, borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
-                        onPress={() => {showAlert("Are you sure you want to reject/cancel the order?")}}
-                        >
-                            <RejectIcon />
-                            <Text style={{ color: "#EF0000", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Reject</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-
-
-            </View>
-        )
-    }
-
     const renderModal = () => {
-        return(
+        return (
             <Modal
                 isVisible={isVisible}
                 onBackdropPress={() => setIsVisible(false)}
@@ -131,33 +116,102 @@ const RequestConfirmation = ({ navigation, route }) => {
         )
     }
 
+    const RequestConfirmationAcceptOrReject = async (bookingStatus) => {
+        const updatedParams = {
+            productId: productId,
+            accepted: bookingStatus
+        }
+        console.log('updatedParams is::>>',updatedParams);
+        try {
+            const response = await axios.get(`${BASE_URL}/bookingConfirmationFromVendor`, {
+                method: 'PATCH',
+                body: updatedParams
+            });
+            console.log("accept confirm response::::::::::", response?.data);
+        } catch (error) {
+            console.log("accept::::::::::", error);
+        }
+    }
+
+    const callConfirmationWithStatus = (alertText) => {
+        if (alertText.includes('accept')) {
+            RequestConfirmationAcceptOrReject(true)
+        } else {
+            RequestConfirmationAcceptOrReject(false);
+        }
+    }
+
     const showAlert = (alertText) => {
         Alert.alert(
-          "Confirmation",
-          alertText,
-          [
-            {
-              text: "No",
-              onPress: () => console.log("No Pressed"),
-              style: "cancel"
-            },
-            { text: "Yes", onPress: () => console.log("Yes Pressed") }
-          ],
-          { cancelable: false }
+            "Confirmation",
+            alertText,
+            [
+                {
+                    text: "No",
+                    onPress: () => console.log("No Pressed"),
+                    style: "cancel"
+                },
+                { text: "Yes", onPress: () => callConfirmationWithStatus(alertText) }
+            ],
+            { cancelable: false }
         );
-      };
+    };
+
+    const renderItem = ({ item }) => {
+        return (
+            <View onPress={() => { }} style={{ borderRadius: 10, backgroundColor: "white", marginHorizontal: 15, marginTop: 10, paddingHorizontal: 10, paddingVertical: 10 }}>
+                <View style={{ flexDirection: "row", alignItems: 'center' }}>
+                    <Avatar widthDyn={61} heightDyn={61} borderRadiusDyn={8} name={'Surya Neelankar'} imageUrl={''} />
+                    <View style={{ marginLeft: 10, width: "50%" }}>
+                        <Text style={{ marginTop: 5, color: "#101010", fontSize: 14, fontWeight: "500", fontFamily: "ManropeRegular", }}>Surya Neelankar</Text>
+                        <View style={{ marginTop: 5 }}>
+                            <Text style={{ color: "#1A1E25", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular" }}>Banglore, KA</Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+                                <DollarIcon style={{}} />
+                                <Text style={{ color: "#4A4A4A", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", marginHorizontal: 5 }}>{formatAmount(item?.totalAmount)}</Text>
+                            </View>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+                                <Text style={{ color: '#6B779A', fontSize: 9, fontFamily: "ManropeRegular", fontWeight: "800", }}>{item?.startDate} - {item?.endDate}</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={{ alignItems: 'center', alignSelf: 'center' }}>
+                        <TouchableOpacity style={{ alignItems: 'center', borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
+                            onPress={() => { showAlert("Are you sure you want to accept the order?") }}
+                        >
+                            <AcceptIcon />
+                            <Text style={{ color: "#57A64F", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Accept</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{ alignItems: 'center', marginTop: 10, borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
+                            onPress={() => { showAlert("Are you sure you want to reject/cancel the order?") }}
+                        >
+                            <RejectIcon />
+                            <Text style={{ color: "#EF0000", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Reject</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+
+            </View>
+        )
+    }
 
 
     return (
-        <View style={{flex:1}}>
-            <Image style={{ width: '90%', alignSelf: 'center', height: 200, backgroundColor: 'red', borderRadius: 10 }} source={{ uri: convertUrlToIp() }} resizeMode="contain" />
+        <View style={{ flex: 1 }}>
+            <Image style={{ width: '90%', alignSelf: 'center', height: 200, borderRadius: 10 }} source={{ uri: convertUrlToIp() }} resizeMode="contain" />
             <Text style={{ color: '#121212', width: '90%', alignSelf: 'center', fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 16, marginTop: 10 }}>Product Availability</Text>
 
             <Text style={{ color: '#969696', width: '90%', alignSelf: 'center', fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 16, marginTop: 10 }}>Product Details</Text>
-            {renderProductDetails()}
+            <FlatList
+                data={wholeBookingData}
+                renderItem={renderItem}
+            />
+
+            {/* {renderProductDetails()} */}
             {/* {renderModal()} */}
-            
-            
+
+
         </View>
     )
 }
@@ -175,11 +229,11 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 5,
         elevation: 5,
-      },
-      iconContainer: {
+    },
+    iconContainer: {
         margin: 20
-      },
-      iconBackground: {
+    },
+    iconBackground: {
         width: 80,
         height: 80,
         borderRadius: 40,
@@ -187,12 +241,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         position: 'relative',
-      },
-      icon: {
+    },
+    icon: {
         width: 40,
         height: 40,
-      },
-      badgeContainer: {
+    },
+    badgeContainer: {
         position: 'absolute',
         top: -5,
         right: -5,
@@ -202,28 +256,28 @@ const styles = StyleSheet.create({
         backgroundColor: '#007AFF',
         justifyContent: 'center',
         alignItems: 'center',
-      },
-      badgeText: {
+    },
+    badgeText: {
         color: 'white',
         fontWeight: 'bold',
         fontSize: 12,
-      },
-      title: {
+    },
+    title: {
         fontSize: 27,
         fontWeight: '800',
         marginBottom: 10,
         color: "#333333",
         fontFamily: "ManropeRegular",
         marginTop: 20
-      },
-      subtitle: {
+    },
+    subtitle: {
         fontSize: 14,
         color: '#FF730D',
         fontWeight: "500",
         fontFamily: "ManropeRegular",
         marginBottom: 10,
-      },
-      description: {
+    },
+    description: {
         fontSize: 14,
         textAlign: 'center',
         color: '#677294',
@@ -231,27 +285,27 @@ const styles = StyleSheet.create({
         fontWeight: "500",
         fontFamily: "ManropeRegular",
         marginHorizontal: 20
-      },
-      doneButton: {
+    },
+    doneButton: {
         width: '100%',
         padding: 15,
         borderRadius: 10,
         marginBottom: 10,
-      },
-      doneButtonText: {
+    },
+    doneButtonText: {
         color: 'white',
         fontWeight: 'bold',
         textAlign: 'center',
-      },
-      trackProgressText: {
+    },
+    trackProgressText: {
         color: '#FF730D',
         textDecorationLine: 'underline',
         fontWeight: "400",
         fontFamily: "ManropeRegular",
         fontSize: 12,
         marginBottom: 30
-      },
-   
+    },
+
 });
 
 export default RequestConfirmation;

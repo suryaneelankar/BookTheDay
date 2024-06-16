@@ -57,10 +57,10 @@ const VendorDashBoardTab = ({ navigation }) => {
         const vendorMobileNumber = "8297735285"
         try {
             const response = await axios.get(`${BASE_URL}/clothJewelBookingsGotForVendor/${vendorMobileNumber}`);
-            // console.log("setAllBookings::::::::::", response?.data?.data);
+            console.log("setAllBookings::::::::::", response?.data?.data);
             setWholeBookingData(response?.data?.data)
             const output = consolidateByProductId(response?.data?.data);
-            // console.log('output is ::>>', output);
+            console.log('output is ::>>', output);
             setAllBookings(output)
         } catch (error) {
             console.log("categories::::::::::", error);
