@@ -90,7 +90,7 @@ const ViewHireCartDetails = ({ navigation, route }) => {
       startDate: moment(startDate).format('DD MMMM YYYY'),
       endDate: moment(endDate).format('DD MMMM YYYY'),
       numOfDays: NumOfDays,
-      totalAmount:  productDetails?.serviceType === 'driver' ? isDayOrMonthly === 'daily' ? productDetails?.price*10 + 800 : productDetails?.subscriptionChargesPerMonth*10 + 800 : calculateTotalPrice()
+      totalAmount:  productDetails?.serviceType === 'driver' ? isDayOrMonthly === 'daily' ? productDetails?.price*10 + 800 : productDetails?.subscriptionChargesPerMonth*10 + 800 : (calculateChefTotalPrice(totalAmountToBePaid.toFixed(2)) + 400)
     }
     console.log("hoire payuload", payload)
     try {
