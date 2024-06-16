@@ -7,6 +7,7 @@ import { verticalScale, moderateScale, horizontalScale } from "../../utils/scali
 import { Calendar } from 'react-native-calendars';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Swiper from "react-native-swiper";
 
 const ViewEvents = ({ route,navigation }) => {
 
@@ -38,7 +39,7 @@ const ViewEvents = ({ route,navigation }) => {
     console.log("IAM CALLING API")
     try {
       const response = await axios.get(`${BASE_URL}/getEvent/${categoryId}`);
-      // console.log("events view details ::::::::::", response?.data?.data);
+      console.log("events view details ::::::::::", response?.data?.data);
       setEventsDetails(response?.data?.data)
     } catch (error) {
       console.log("categories::::::::::", error);
@@ -162,6 +163,29 @@ const ViewEvents = ({ route,navigation }) => {
             )}
           />
         </View>
+
+        {/* <Swiper
+            index={0}
+            dotColor='white'
+            activeDotColor='white'
+            paginationStyle={{ bottom: 5 }}
+            showPagination={true}
+            dotStyle={{ width: 7, height: 7, borderRadius: 3.5 }}
+            activeDotStyle={{ width: 10, height: 10, borderRadius: 5 }}
+            style={{ alignSelf: "center", height: Dimensions.get('window').height / 2.5,}}
+        >
+            {eventsDetails?.subImages.map((item, index) => (
+                <View key={index} style={{ width: Dimensions.get('window').width, justifyContent: 'center', height: Dimensions.get('window').height / 2.5, }}>
+                    <Image
+                        source={{ uri: item }}
+                        style={{width:"100%",height: Dimensions.get('window').height / 2.5,borderBottomLeftRadius:30,borderBottomRightRadius}}
+                        resizeMethod="auto"
+                        resizeMode="cover"
+                    />
+                </View>
+            ))}
+        </Swiper> */}
+
         <View style={{ flex: 1, marginTop: 30, marginHorizontal: 20 }}>
 
           <View style={{ flexDirection: "row", alignItems: "center" }}>

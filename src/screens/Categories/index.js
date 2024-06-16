@@ -16,6 +16,8 @@ import shirtImg from '../../assets/shirt.png'
 import TrendingNow from "../Products/TrendingNow";
 import HowItWorks from "../Products/HowItWorks";
 import Swiper from 'react-native-swiper';
+import EarRingsIcon from '../../assets/svgs/jewelleryCategories/earrings.svg';
+import ChainIcon from '../../assets/svgs/jewelleryCategories/chains.svg';
 
 const Categories = () => {
 
@@ -30,7 +32,7 @@ const Categories = () => {
     { image: require('../../assets/svgs/productBanners/productBannerone.png') },
     ]
 
-    const categoryFilterList = [{ name: 'Chains' }, { name: 'Rings' }, { name: 'Bridal' }, { name: 'Bangles' }, { name: 'EarRings' }, { name: 'Bracelets' }]; //svg images for swipper  
+    const categoryFilterList = [{ name: 'Chains', image: ChainIcon }, { name: 'Rings', image: EarRingsIcon }, { name: 'Bridal', image: EarRingsIcon  }, { name: 'Bangles', image:EarRingsIcon  }, { name: 'EarRings', image:EarRingsIcon  }, { name: 'Bracelets' , image: EarRingsIcon }]; //svg images for swipper  
     const [selectedJewelFilter, setSelectedJewelFilter] = useState(categoryFilterList[0]?.name);
 
 
@@ -85,18 +87,21 @@ const Categories = () => {
 
     const renderFilterBox = ({ item }) => {
         const isSelected = selectedJewelFilter === item?.name;
+        const SvgComponent = item?.image;
 
         return (
             <TouchableOpacity onPress={() => setSelectedJewelFilter(isSelected ? null : item?.name)}>
-                <View style={{ height: 60, width: 80, }}>
+                <View style={{ width: 80, }}>
                     {isSelected ?
                         <LinearGradient start={{ x: 0, y: 1.2 }} end={{ x: 0, y: -1 }} colors={['#FFF3CD', '#FFDB7E']} style={{ flex: 1, }}>
-                            <View style={{ width: "auto", height: 4, backgroundColor: "#D2453B", borderTopRightRadius: 5, borderTopLeftRadius: 5, }} />
+                            <View style={{ alignItems:"center",width: "auto", height: 4, backgroundColor: "#D2453B", borderTopRightRadius: 5, borderTopLeftRadius: 5, }} />
                             <Text style={{ marginTop: 10, alignSelf: "center", color: "#D2453B", fontSize: 11, fontWeight: "400", fontFamily: "ManropeRegular", }}>{item?.name}</Text>
+                            <SvgComponent style={{alignSelf:"center",marginTop:5,marginBottom:5}} />
                         </LinearGradient>
                         :
                         <View>
                             <Text style={{ marginTop: 10, alignSelf: "center", color: "#000000", fontSize: 11, fontWeight: "400", fontFamily: "ManropeRegular", }}>{item?.name}</Text>
+                            <SvgComponent style={{alignSelf:"center",marginTop:8,marginBottom:5}} />
                         </View>
                     }
                 </View>

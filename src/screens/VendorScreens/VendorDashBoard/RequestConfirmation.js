@@ -150,7 +150,7 @@ const RequestConfirmation = ({ navigation, route }) => {
 
     return (
         <View style={{flex:1}}>
-            <Image style={{ width: '90%', alignSelf: 'center', height: 200, backgroundColor: 'red', borderRadius: 10 }} source={{ uri: convertUrlToIp() }} resizeMode="contain" />
+            <Image style={{ width: '90%', alignSelf: 'center', height: 200,  borderRadius: 10 }} source={{ uri: convertUrlToIp() }} resizeMode="contain" />
             <Text style={{ color: '#121212', width: '90%', alignSelf: 'center', fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 16, marginTop: 10 }}>Product Availability</Text>
 
             <Text style={{ color: '#969696', width: '90%', alignSelf: 'center', fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 16, marginTop: 10 }}>Product Details</Text>

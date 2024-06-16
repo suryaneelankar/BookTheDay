@@ -32,7 +32,8 @@ const BookDatesButton = ({ onPress, width, text,padding }) => {
     container:{
         backgroundColor:"white",
         paddingVertical: verticalScale(15),
-        width:Dimensions.get('window').width
+        width:Dimensions.get('window').width,
+        alignSelf:"center"
     },
     buttonView:{
         // marginHorizontal:horizontalScale(25),
