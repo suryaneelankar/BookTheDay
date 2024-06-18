@@ -28,8 +28,6 @@ const RequestConfirmation = ({ navigation, route }) => {
         const vendorMobileNumber = "8297735285"
         try {
             const response = await axios.get(`${BASE_URL}/clothJewelBookingsGotForVendor/${vendorMobileNumber}`);
-            // console.log("response?.data?.data::::::::::", response?.data?.data);
-            // setWholeBookingData(response?.data?.data)
             groupByFilterData(response?.data?.data);
         } catch (error) {
             console.log("categories::::::::::", error);
@@ -123,10 +121,7 @@ const RequestConfirmation = ({ navigation, route }) => {
         }
         console.log('updatedParams is::>>',updatedParams);
         try {
-            const response = await axios.get(`${BASE_URL}/bookingConfirmationFromVendor`, {
-                method: 'PATCH',
-                body: updatedParams
-            });
+            const response = await axios.patch(`${BASE_URL}/bookingConfirmationFromVendor`,updatedParams);
             console.log("accept confirm response::::::::::", response?.data);
         } catch (error) {
             console.log("accept::::::::::", error);
