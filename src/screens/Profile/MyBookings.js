@@ -1,5 +1,7 @@
-import React from 'react';
+import React,{useEffect, useState} from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import BASE_URL, { LocalHostUrl } from '../../apiconfig';
+import axios from 'axios';
 
 const data = [
   { id: '1', name: 'Mr. Riya Trivedi', role: 'Chef - Accord', rating: 4.5, status: 'Requested', image: 'chef-image-url' },
@@ -17,12 +19,41 @@ const ongoingRental = {
   status: 'Deposit Paid',
 };
 
+
+
 const ViewMyBookings = () => {
-  const renderItem = ({ item }) => (
+  const [myBookings, setMyBookings] = useState();
+
+
+  useEffect(() => {
+    getMyBookings();
+  }, []);
+
+  const getMyBookings = async () => {
+    try {
+        const response = await axios.get(`${BASE_URL}/getUserBookings`);
+        console.log("BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+        setMyBookings(response?.data?.data)
+    } catch (error) {
+        console.log("My Bookings data error>>::", error);
+    }
+};
+
+
+  const renderItem = ({ item }) =>  {
+    const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+
+    return(
     <View style={styles.card}>
-      <Image source={{ uri: item.image }} style={styles.cardImage} />
+      <Image resizeMode='contain' source={{ uri: updatedImgUrl }} style={styles.cardImage} />
       <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{item.name}</Text>
+        <Text style={styles.cardTitle}>{item?.productName}</Text>
+        <Text style={styles.cardTitle}>{item?.totalAmount}</Text>
+
+        <Text style={styles.cardTitle}> Start Date: {item?.startDate}</Text>
+        <Text style={styles.cardTitle}> End Date: {item?.endDate}</Text>
+        <Text style={styles.cardTitle}>{item?.accepted ? 'Booking Confirmed' : 'Rejected'}</Text>
+
         <Text style={styles.cardSubtitle}>{item.role}</Text>
         <View style={styles.cardFooter}>
           <Text style={styles.cardRating}>{item.rating}</Text>
@@ -30,7 +61,7 @@ const ViewMyBookings = () => {
         </View>
       </View>
     </View>
-  );
+  )};
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -48,7 +79,7 @@ const ViewMyBookings = () => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={data}
+        data={myBookings}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         numColumns={2}

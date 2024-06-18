@@ -79,7 +79,7 @@ const Events = () => {
                     </Swiper>
                 </View>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
+                    onPress={() => navigation.navigate('ViewTentHouse', { categoryId: item?._id })}
                     style={{ width: Dimensions.get('window').width - 50,padding:15,bottom:15, alignSelf: 'center',backgroundColor:'#FFFFFF',borderBottomLeftRadius:20,borderBottomRightRadius:20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                         <View style={{width:'60%',}}>
