@@ -17,16 +17,16 @@ const SelectField = ()=>{
         { label: 'Item 8', value: '8' },
       ];
     
-      const renderLabel = () => {
-        if (value || isFocus) {
-          return (
-            <Text style={[styles.label, isFocus && { color: 'blue' }]}>
-              Dropdown label
-            </Text>
-          );
-        }
-        return null;
-      };
+      // const renderLabel = () => {
+      //   if (value || isFocus) {
+      //     return (
+      //       <Text style={[styles.label, isFocus && { color: 'blue' }]}>
+      //         Dropdown label
+      //       </Text>
+      //     );
+      //   }
+      //   return null;
+      // };
 
       return(
         <View style={styles.container}>

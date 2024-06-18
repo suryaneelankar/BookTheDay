@@ -130,7 +130,7 @@ const HomeDashboard = () => {
     const getCategories = async () => {
         try {
             const response = await axios.get(`${BASE_URL}/getAllClothesJewels`);
-            console.log("Products res:::::::", JSON.stringify(response?.data))
+            // console.log("Products res:::::::", JSON.stringify(response?.data))
             setCategories(response?.data)
             const filteredDiscountItems = response?.data.filter(category => category?.componentType === 'discount');
             const filteredNewItems = response?.data.filter(category => category?.componentType === 'new');
@@ -453,7 +453,7 @@ const HomeDashboard = () => {
 
                 <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
                     <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Events')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                    <TouchableOpacity onPress={() => navigation.navigate('RentOnProducts')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
                         <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
                         <RightArrowIcon width={25} height={25} />
                     </TouchableOpacity>

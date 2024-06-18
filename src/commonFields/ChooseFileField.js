@@ -1,8 +1,8 @@
-import {Pressable, Text,View,StyleSheet} from 'react-native'
+import {Pressable, Text,View,StyleSheet, TouchableOpacity} from 'react-native'
 import themevariable from '../utils/themevariable'
 
 const ChooseFileField = (props)=>{
-    const {label,placeholder,isRequired} = props
+    const {label,placeholder,isRequired,onPressChooseFile} = props
     return(
         <View style={styles.root}>
             <Text style={styles.label}>
@@ -11,9 +11,11 @@ const ChooseFileField = (props)=>{
             </Text>
             <View style={styles.fieldContainer}>
                 <Text style={styles.placeholder }>{placeholder}</Text>
-                <Pressable style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.buttonContainer}
+                onPress={onPressChooseFile}
+                >
                     <Text style={styles.text}>Choose File</Text>
-                </Pressable>
+                </TouchableOpacity>
             </View>
         </View>
     )

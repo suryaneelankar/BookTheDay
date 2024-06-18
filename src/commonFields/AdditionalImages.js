@@ -48,8 +48,6 @@ const AdditionalImages = ()=>{
 export default AdditionalImages
 
 const styles=StyleSheet.create({
-    root:{
-    },
     title:{
         fontFamily:'ManropeRegular',
         fontWeight:'bold',
@@ -65,11 +63,9 @@ const styles=StyleSheet.create({
         marginBottom:10,
         marginLeft:8
     },
-    imageContainer:{},
     image:{
         marginLeft:15,
         marginRight:7,
         marginTop:5
     },
-    selectedImage:{}
 })
