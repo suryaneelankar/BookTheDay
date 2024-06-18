@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "@fanchenbao/react-native-scroll-indicator": "^0.2.2",
-    "@react-native-community/datetimepicker": "^8.1.0",
+    "@react-native-community/checkbox": "0.5.13",
+    "@react-native-community/datetimepicker": "^8.1.1",
     "@react-native-community/geolocation": "^3.2.1",
     "@react-native-masked-view/masked-view": "^0.3.1",
     "@react-navigation/bottom-tabs": "^6.5.20",
@@ -26,6 +27,7 @@
     "react-native": "0.74.0",
     "react-native-autocomplete-input": "^5.4.0",
     "react-native-calendars": "^1.1305.0",
+    "react-native-element-dropdown": "^2.12.0",
     "react-native-geolocation-service": "^5.3.1",
     "react-native-gesture-handler": "^2.16.0",
     "react-native-get-location": "^4.0.1",

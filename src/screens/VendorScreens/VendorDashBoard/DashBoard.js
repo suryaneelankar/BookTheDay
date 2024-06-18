@@ -14,16 +14,19 @@ import PersonThree from '../../../assets/vendorIcons/personThree.svg';
 import themevariable from "../../../utils/themevariable";
 import ListedTimeIcon from '../../../assets/vendorIcons/listedTimeIcon.svg';
 import EditButton from '../../../assets/vendorIcons/editButton.svg';
+import Avatar from "../../../components/NameAvatar";
 
 const VendorDashBoardTab = ({ navigation }) => {
 
     const [allBookings, setAllBookings] = useState([]);
     const [wholeBookingData, setWholeBookingData] = useState([]);
     const [vendorListing, setVendorListings] = useState([]);
+    const [driverChefBookingsData, setDriverChefBookingsData] = useState([]);
 
     useEffect(() => {
         getVendorClothJewelBookings();
         getVendorDriverChefBookings();
+        getVendorChefDriverBookings();
         getVendorListings();
     }, [])
 
@@ -67,6 +70,19 @@ const VendorDashBoardTab = ({ navigation }) => {
         }
     }
 
+    const getVendorChefDriverBookings = async () => {
+        console.log("getVendorChefDriverBookings::::::::::");
+        const vendorMobileNumber = "8297735285"
+        try {
+            const response = await axios.get(`${BASE_URL}/driverChefBookingsGotForVendor/${vendorMobileNumber}`);
+            console.log('resp driver ::>>', response?.data?.data);
+            setDriverChefBookingsData(response?.data?.data);
+
+        } catch (error) {
+            console.log("categories::::::::::", error);
+        }
+    }
+
     const renderVendorList = ({ item }) => {
         const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
 
@@ -87,6 +103,36 @@ const VendorDashBoardTab = ({ navigation }) => {
         )
     }
 
+    const renderChefDriverItem = ({ item }) => {
+        const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+
+        return (
+            <TouchableOpacity
+                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId })}
+                style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" />
+                    <View style={{ margin: 10 }}>
+                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 4 }}>Test </Text>
+                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.perDayPrice)}</Text>
+                    </View>
+                </View>
+                <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', height: 35, borderRadius: 5, position: 'absolute', right: 10 }}>
+                    <Text style={{ color: '#FD813B', marginHorizontal: 5 }}>{item?.count == 1 ? '1 Request ' : `${item?.count} Requests `}</Text>
+                    {item?.count == 1 ? <PersonOne /> :
+                        <>
+                            <PersonOne style={{ marginRight: -10 }} />
+                            <PersonTwo style={{ marginRight: -10 }} />
+                            <PersonThree />
+                        </>}
+                    <ArrowRight style={{ marginTop: 3, marginHorizontal: 10 }} />
+                </View>
+
+
+            </TouchableOpacity>
+        )
+    }
+
     function capitalizeFirstLetters(str) {
         return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
     }
@@ -101,19 +147,19 @@ const VendorDashBoardTab = ({ navigation }) => {
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" />
                     <View style={{ margin: 10 }}>
-                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500',width:Dimensions.get('window').width/4 }}>{capitalizeFirstLetters(item?.productName)} </Text>
+                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 4 }}>{capitalizeFirstLetters(item?.productName)} </Text>
                         <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.perDayPrice)}</Text>
                     </View>
                 </View>
-                <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', height:35, borderRadius: 5,position:'absolute',right:10 }}>
-                    <Text style={{ color: '#FD813B',marginHorizontal:5 }}>{item?.count == 1 ? '1 Request ' : `${item?.count} Requests `}</Text>
-                    {item?.count == 1 ? <PersonOne  /> :
+                <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', height: 35, borderRadius: 5, position: 'absolute', right: 10 }}>
+                    <Text style={{ color: '#FD813B', marginHorizontal: 5 }}>{item?.count == 1 ? '1 Request ' : `${item?.count} Requests `}</Text>
+                    {item?.count == 1 ? <PersonOne /> :
                         <>
                             <PersonOne style={{ marginRight: -10 }} />
                             <PersonTwo style={{ marginRight: -10 }} />
                             <PersonThree />
                         </>}
-                    <ArrowRight style={{ marginTop: 3 ,marginHorizontal:10 }} />
+                    <ArrowRight style={{ marginTop: 3, marginHorizontal: 10 }} />
                 </View>
 
 
@@ -175,6 +221,12 @@ const VendorDashBoardTab = ({ navigation }) => {
                     <FlatList
                         data={allBookings}
                         renderItem={renderItem}
+                        contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
+                        ItemSeparatorComponent={ItemSeparator}
+                    />
+                      <FlatList
+                        data={driverChefBookingsData}
+                        renderItem={renderChefDriverItem}
                         contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
                         ItemSeparatorComponent={ItemSeparator}
                     />
