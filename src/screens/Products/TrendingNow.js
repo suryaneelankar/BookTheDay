@@ -1,4 +1,4 @@
-import { Text, View, FlatList, StyleSheet, Image, TouchableOpacity, Dimensions } from "react-native"
+import { Text, View, FlatList, StyleSheet, Image, TouchableOpacity, Dimensions,Pressable } from "react-native"
 import { useState } from "react"
 import BackButton from '../../assets/svgs/backButton.svg'
 import { formatAmount } from "../../utils/GlobalFunctions"
@@ -11,7 +11,6 @@ import { useNavigation } from "@react-navigation/native"
 const TrendingNow = ({ data, textHeader }) => {
     const navigation = useNavigation();
     const [selectedDiscount, setSelectedDiscount] = useState('All')
-
 
     const discountPercentages = data.map(item => item.discountPercentage);
 

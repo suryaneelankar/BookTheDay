@@ -39,6 +39,7 @@ import EditProfile from "../screens/Profile/EditProfile";
 import ViewMyBookings from "../screens/Profile/MyBookings";
 import ViewMyLendings from "../screens/Profile/ViewMyLendings";
 import ViewHireCartDetails from "../screens/MyBox/ViewHireCartDetails";
+import RentOnProducts from "../screens/GiveOnRent/RentOnProducts";
 
 const MainNavigation = () => {
 
@@ -176,6 +177,7 @@ const MainNavigation = () => {
                          headerShown: true,
                 }}/>
 
+                <Stack.Screen name="RentOnProducts" component={RentOnProducts} options={{ headerShown:false }}/>
 
             </Stack.Navigator>
         </NavigationContainer>

@@ -130,7 +130,7 @@ const HomeDashboard = () => {
     const getCategories = async () => {
         try {
             const response = await axios.get(`${BASE_URL}/getAllClothesJewels`);
-            // console.log("Products res:::::::", JSON.stringify(response?.data))
+            console.log("Products res:::::::", JSON.stringify(response?.data))
             setCategories(response?.data)
             const filteredDiscountItems = response?.data.filter(category => category?.componentType === 'discount');
             const filteredNewItems = response?.data.filter(category => category?.componentType === 'new');
