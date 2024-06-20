@@ -453,7 +453,10 @@ const HomeDashboard = () => {
 
                 <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
                     <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('RentOnProducts')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                    {/* HireChefOrDriverForm */}
+                    {/* RentOnProducts */}
+                    {/* AddTentHouse */}
+                    <TouchableOpacity onPress={() => navigation.navigate('AddTentHouse')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
                         <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
                         <RightArrowIcon width={25} height={25} />
                     </TouchableOpacity>

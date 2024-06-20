@@ -14,6 +14,7 @@ const TextField = (props)=>{
                 value={value}
                 placeholder={placeholder}
                 keyboardType={keyboardType}
+                
         />
         </View>
     )

@@ -42,6 +42,8 @@ import ViewHireCartDetails from "../screens/MyBox/ViewHireCartDetails";
 import ViewTentHouse from "../screens/Events/ViewTentHouse";
 import RentOnProducts from "../screens/GiveOnRent/RentOnProducts";
 import ViewDecors from "../screens/Events/ViewDecors";
+import HireChefOrDriverForm from "../screens/VendorScreens/VendorHireChefOrDriver/HireChefOrDriverForm";
+import AddTentHouse from "../screens/VendorScreens/VendorAddTentHouse/AddTentHouse";
 
 const MainNavigation = () => {
 
@@ -194,6 +196,16 @@ const MainNavigation = () => {
                          header: () => <NavigationHeader Icon={true} title="Request Details" />,
                          headerShown: true,
                 }}/>
+                <Stack.Screen name="HireChefOrDriverForm" component={HireChefOrDriverForm} options={{
+                     header: () => <NavigationHeader Icon={true} title="Hire Driver" />,
+                     headerShown: true,
+                }}/>
+
+                <Stack.Screen name="AddTentHouse" component={AddTentHouse} options={{
+                     header: () => <NavigationHeader Icon={true} title="Tent House" />,
+                     headerShown: true,
+                }}/>
+                {/* AddTentHouse */}
 
                 <Stack.Screen name="RentOnProducts" component={RentOnProducts} options={{ headerShown:false }}/>
 

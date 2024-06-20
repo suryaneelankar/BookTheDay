@@ -12,9 +12,10 @@ import BASE_URL from '../../../apiconfig';
 import axios from 'axios';
 
 const GeneralDetails = () => {
-    const [productName, setProductName] = useState('');
-    const [productBrand, setProductBrand] = useState('');
+    const [totalExperience, setTotalExperience] = useState();
+    const [vehicleName, setVehicleName] = useState('');
     const [mainImageUrl, setMainImageUrl] = useState('');
+    const [driverName,setDriverName] = useState('');
     const [productDescription, setProductDescription] = useState('');
     const [additionalImages, setAdditionalImages] = useState({
         additionalImageOne: undefined,
@@ -22,31 +23,35 @@ const GeneralDetails = () => {
         additionalImageThree: undefined,
         additionalImageFour: undefined
     });
-    const [productAddress, setProductAddress] = useState('');
-    const [productCity, setProductCity] = useState('');
-    const [productPinCode, setProductPinCode] = useState();
+    const [driverAddress, setDriverAddress] = useState('');
+    const [driverCity, setdriverCity] = useState('');
+    const [driverPinCode, setdriverPinCode] = useState();
     const [perDayRentPrice, setPerDayRentPrice] = useState();
+    const [perKMPrice,setPerKMPrice] = useState();
     const [perMonthRentPrice, setPerMonthRentPrice] = useState();
     const [securityDeposit, setSecurityDeposit] = useState();
     const [available, setAvailable] = useState();
     const [advanceAmount, setAdvanceAmount] = useState();
     const [discountPercentage, setDiscountPercentage] = useState();
-    const [isSelected, setSelection] = useState(false);
 
-    const inputHandler = (value) => {
-        console.log("general details inputhandler", value)
+    const onChangePerKMChargePrice = (value) => {
+        setPerKMPrice(value);
     }
 
-    const onChangeProductName = (value) => {
-        setProductName(value);
+    const onChangeTotalExperience = (value) => {
+        setTotalExperience(value);
     }
 
-    const onChangeProductBrand = (value) => {
-        setProductBrand(value);
+    const onChangeVehicleOwnedName = (value) => {
+        setVehicleName(value);
     }
 
     const onChangeDescription = (value) => {
         setProductDescription(value);
+    }
+
+    const onChangeDriverName = (value) => {
+        setDriverName(value);
     }
 
     const onChangePerDayRentPrice = (value) => {
@@ -69,16 +74,16 @@ const GeneralDetails = () => {
         setDiscountPercentage(value);
     }
 
-    const onChangeAddress = (value) => {
-        setProductAddress(value);
+    const onChangeDriverAddress = (value) => {
+        setDriverAddress(value);
     }
 
-    const onChangeCity = (value) => {
-        setProductCity(value);
+    const onChangeDriverCity = (value) => {
+        setdriverCity(value);
     }
 
-    const onChangePinCode = (value) => {
-        setProductPinCode(value);
+    const onChangeDriverPinCode = (value) => {
+        setdriverPinCode(value);
     }
 
     const data = [
@@ -225,51 +230,54 @@ const GeneralDetails = () => {
             name: additionalImages?.additionalImageFour?.assets[0]?.fileName,
         });
 
-        formData.append('categoryType', 'clothes');
+        formData.append('serviceType', 'driver');
         formData.append('description', productDescription);
-        formData.append('rentPricePerMonth', perMonthRentPrice);
-        formData.append('productName', productName);
-        formData.append('brandName', productBrand);
-        formData.append('rentPricePerDay', perDayRentPrice);
-        formData.append('itemAvailableAddress', productAddress);
+        // formData.append('subscriptionChargesPerMonth', perMonthRentPrice);
+        formData.append('serviceTitle', 'Professional Driver');
+        formData.append('vehicleType', vehicleName);
+        formData.append('price', perDayRentPrice);
+        formData.append('experience', totalExperience);
         formData.append('available', true);
-        formData.append('itemAvailablePinCode', productPinCode);
-        formData.append('itemAvailableCity', productCity);
-        formData.append('securityDepositAmount', securityDeposit);
+        formData.append('driverOrChefAddress',driverAddress)
+        formData.append('driverOrChefPinCode', driverPinCode);
+        formData.append('driverOrChefCity', driverCity);
+        // formData.append('securityDepositAmount', securityDeposit);
         formData.append('vendorMobileNumber', vendorMobileNumber);
         formData.append('advanceAmount', advanceAmount);
         formData.append('discountPercentage', discountPercentage);
+        formData.append('name',driverName);
+        formData.append('perKMCharge',perKMPrice);
+        
+        console.log('formdata is ::>>', formData);
 
-        console.log('formdata is ::>>',formData);
- 
-          try {
-            const response = await axios.post(`${BASE_URL}/AddClothJewels`, formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              },
+        try {
+            const response = await axios.post(`${BASE_URL}/AddDriverChef`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
             if (response.status === 201) {
-             console.log('Success', `uploaded successfully`);
-             Alert.alert(
-                "Confirmation",
-                "Your proudct posted successfully",
-                [
-                    {
-                        text: "No",
-                        onPress: () => console.log("No Pressed"),
-                        style: "cancel"
-                    },
-                    { text: "Yes", onPress: () => console.log("yes pressed") }
-                ],
-                { cancelable: false }
-            );
+                console.log('Success', `uploaded successfully`);
+                Alert.alert(
+                    "Confirmation",
+                    "Your proudct posted successfully",
+                    [
+                        {
+                            text: "No",
+                            onPress: () => console.log("No Pressed"),
+                            style: "cancel"
+                        },
+                        { text: "Yes", onPress: () => console.log("yes pressed") }
+                    ],
+                    { cancelable: false }
+                );
             } else {
-             console.log('Error', 'Failed to upload document');
+                console.log('Error', 'Failed to upload document');
             }
-          } catch (error) {
+        } catch (error) {
             console.error('Error uploading document:', error);
-           console.log('Error', 'Failed to upload document');
-          }
+            console.log('Error', 'Failed to upload document');
+        }
     }
 
 
@@ -277,7 +285,7 @@ const GeneralDetails = () => {
         <View>
             <View style={styles.mainContainer}>
                 <ChooseFileField
-                    label={'Product Image'}
+                    label={'Professional Image'}
                     isRequired={true}
                     placeholder={'Main Image'}
                     onPressChooseFile={openGalleryOrCamera}
@@ -299,70 +307,78 @@ const GeneralDetails = () => {
                     horizontal
                     contentContainerStyle={{ width: '100%', justifyContent: 'space-around' }}
                 />
-                <TextField
-                    label='Product Name'
-                    placeholder="Please Enter Product Name"
-                    value={productName}
-                    onChangeHandler={onChangeProductName}
+                 <TextField
+                    label='Name'
+                    placeholder="Please Enter Name"
+                    value={driverName}
+                    onChangeHandler={onChangeDriverName}
                     keyboardType='default'
                     isRequired={true}
                 />
 
                 <TextField
-                    label='Product`s Brand'
-                    placeholder="Please Enter Brand"
-                    value={productBrand}
-                    onChangeHandler={onChangeProductBrand}
-                    keyboardType='default'
-                    isRequired={false}
-                />
-
-                <TextField
-                    label='Description'
-                    placeholder="Please Enter Description"
+                    label='About'
+                    placeholder="Describe yourself about your driving skills"
                     value={productDescription}
                     onChangeHandler={onChangeDescription}
                     keyboardType='default'
                     isRequired={true}
                     isDescriptionField={true}
                 />
+                <TextField
+                    label='Vehicle Owned'
+                    placeholder="Enter your vehicle name"
+                    value={vehicleName}
+                    onChangeHandler={onChangeVehicleOwnedName}
+                    keyboardType='default'
+                    isRequired={false}
+                />
+                <TextField
+                    label='Total Experience'
+                    placeholder="Total Experience"
+                    value={totalExperience}
+                    onChangeHandler={onChangeTotalExperience}
+                    keyboardType='default'
+                    isRequired={true}
+                />
             </View>
-            <Text style={styles.title}>Rent Type</Text>
+            <Text style={styles.title}>Pricing Details</Text>
             <View style={styles.mainContainer}>
                 <TextField
-                    label='Day Price (₹ / 1day)*'
-                    placeholder="Please Enter per Day Price"
+                    label='Price Per KM*'
+                    placeholder="Please Enter per KM Price"
+                    value={perKMPrice}
+                    onChangeHandler={onChangePerKMChargePrice}
+                    keyboardType='default'
+                    isRequired={true}
+                />
+
+                <TextField
+                    label='Per Day Charge (₹/ Per Day)*'
+                    placeholder="Please Enter per Day Charge"
                     value={perDayRentPrice}
                     onChangeHandler={onChangePerDayRentPrice}
                     keyboardType='default'
                     isRequired={true}
                 />
-                <TextField
-                    label='Monthly Price (₹ / 30 days)*'
-                    placeholder="Please Enter Monthly Price"
+                {/* <TextField
+                    label='Per Month Charge (₹/ 30 days)*'
+                    placeholder="Please Enter Monthly Charge"
                     value={perMonthRentPrice}
                     onChangeHandler={onChangePerMonthRentPrice}
                     keyboardType='default'
                     isRequired={false}
-                />
+                /> */}
                 <TextField
-                    label='Security Deposit'
-                    placeholder="Please Enter Security Deposit"
-                    value={securityDeposit}
-                    onChangeHandler={onChangeSecurityDepositAmount}
-                    keyboardType='default'
-                    isRequired={true}
-                />
-                <TextField
-                    label='Advance Amount'
-                    placeholder="Please Enter Advance Amount"
+                    label='Advance Booking Amount'
+                    placeholder="Please Enter Advance Booking Amount"
                     value={advanceAmount}
                     onChangeHandler={onChangeAdvanceAmount}
                     keyboardType='default'
                     isRequired={true}
                 />
                 <TextField
-                    label='Discount'
+                    label='Discount if Any'
                     placeholder="Please Enter Discount Percentage"
                     value={discountPercentage}
                     onChangeHandler={onChangeDiscountPercentage}
@@ -375,32 +391,32 @@ const GeneralDetails = () => {
                 <TextField
                     label='Address'
                     placeholder="Please Enter Address"
-                    value={productAddress}
-                    onChangeHandler={onChangeAddress}
+                    value={driverAddress}
+                    onChangeHandler={onChangeDriverAddress}
                     keyboardType='default'
                     isRequired={true}
                 />
                 <TextField
                     label='City'
                     placeholder="Please Enter City"
-                    value={productCity}
-                    onChangeHandler={onChangeCity}
+                    value={driverCity}
+                    onChangeHandler={onChangeDriverCity}
                     keyboardType='default'
                     isRequired={true}
                 />
                 <TextField
                     label='Pin code'
                     placeholder="Please Enter Pin code"
-                    value={productPinCode}
-                    onChangeHandler={onChangePinCode}
+                    value={driverPinCode}
+                    onChangeHandler={onChangeDriverPinCode}
                     keyboardType='default'
                     isRequired={true}
                 />
             </View>
 
             {/* <Text style={{ fontFamily: 'InterRegular', color: '#5F6377', fontSize: 15, fontWeight: '600' }}>I Accept Terms and Conditions</Text> */}
-            <TouchableOpacity onPress={() => {onPressSaveAndPost()}} style={{padding:10,backgroundColor:'#FFF5E3',alignSelf:'center',borderRadius:5,borderColor:'#ECA73C',borderWidth:2,marginTop:40,bottom:20}}>
-                <Text style={{color:'#ECA73C'}}> Save & Post </Text>
+            <TouchableOpacity onPress={() => { onPressSaveAndPost() }} style={{ padding: 10, backgroundColor: '#FFF5E3', alignSelf: 'center', borderRadius: 5, borderColor: '#ECA73C', borderWidth: 2, marginTop: 40, bottom: 20 }}>
+                <Text style={{ color: '#ECA73C' }}> Save & Post </Text>
             </TouchableOpacity>
 
 

@@ -16,6 +16,7 @@ const PricingOptions = ({ onSelect ,dailyPrice,monthlyPrice}) => {
 
   return (
     <View style={styles.container}>
+      {dailyPrice ?
       <TouchableOpacity
         style={[styles.optionContainer, selectedOption === 'daily' && styles.selectedOption]}
         onPress={() => handleSelect('daily', 300)}
@@ -28,8 +29,8 @@ const PricingOptions = ({ onSelect ,dailyPrice,monthlyPrice}) => {
           <Text style={styles.chargeLabel}>Per Day Charges</Text>
         </View>
         <Text style={styles.priceText}>{formatAmount(dailyPrice)}</Text>
-      </TouchableOpacity>
-
+      </TouchableOpacity> : null}
+      {monthlyPrice ?
       <TouchableOpacity
         style={[styles.optionContainer, selectedOption === 'monthly' && styles.selectedOption]}
         onPress={() => handleSelect('monthly', 600)}
@@ -37,12 +38,14 @@ const PricingOptions = ({ onSelect ,dailyPrice,monthlyPrice}) => {
         <View style={[styles.radioButton,{borderColor: selectedOption === 'monthly' ? "#CC403C" : "gray"}]}>
           {selectedOption === 'monthly' && <View style={styles.radioButtonSelected} />}
         </View>
+
         <Text style={styles.optionText}>Monthly</Text>
         <View style={styles.chargeContainer}>
           <Text style={styles.chargeLabel}>30 Days Charges</Text>
         </View>
         <Text style={styles.priceText}>{formatAmount(monthlyPrice)}</Text>
       </TouchableOpacity>
+      : null}
     </View>
   );
 };

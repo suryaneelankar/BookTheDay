@@ -304,7 +304,7 @@ const ViewHireDetails = ({ route }) => {
                     <PricingOptions
                         onSelect={handleSelect}
                         dailyPrice={specificDetails?.price}
-                        monthlyPrice={specificDetails?.subscriptionChargesPerMonth}
+                        // monthlyPrice={specificDetails?.subscriptionChargesPerMonth}
                     />
                 </View>
 
