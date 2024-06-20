@@ -255,7 +255,7 @@ const ViewEvents = ({ route, navigation }) => {
 
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Text style={{ fontSize: 20, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular' }}>{eventsDetails?.name}</Text>
-            <Text style={{ fontSize: 16, color: "#100D25", marginLeft: 5, fontFamily: 'ManropeRegular' }}>{eventsDetails?.title}</Text>
+            {/* <Text style={{ fontSize: 16, color: "#100D25", marginLeft: 5, fontFamily: 'ManropeRegular' }}>{eventsDetails?.title}</Text> */}
 
           </View>
 

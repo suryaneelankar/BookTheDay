@@ -23,7 +23,7 @@ import MinusIcon from '../../assets/svgs/minusIcon.svg';
 import AddIcon from '../../assets/svgs/addIcon.svg';
 
 
-const ViewTentHouse = ({ route, navigation }) => {
+const ViewDecors = ({ route, navigation }) => {
 
     const { width } = Dimensions.get('window');
     const [eventsDetails, setEventsDetails] = useState([])
@@ -63,29 +63,29 @@ const ViewTentHouse = ({ route, navigation }) => {
     const rentalItems = [
         {
             id: '1',
-            name: 'Carpet',
-            price: '700',
+            name: 'Marriage',
+            price: '1300',
             description: 'The Critical Minerals Association USA aims to address critical mineral supply chain challenges to favourably...',
             image: 'https://fpimages.withfloats.com/tile/61fb32feb11d6b00017d8f8b.jpg',
         },
         {
             id: '2',
-            name: 'Chair',
-            price: '700',
+            name: 'Birthday',
+            price: '1000',
             description: 'The Critical Minerals Association USA aims to address critical mineral supply chain challenges to favourably...',
             image: 'https://fpimages.withfloats.com/tile/61fb32feb11d6b00017d8f8b.jpg',
         },
         {
             id: '3',
-            name: 'Side Walks',
-            price: '700',
+            name: 'Anniversary',
+            price: '800',
             description: 'The Critical Minerals Association USA aims to address critical mineral supply chain challenges to favourably...',
             image: 'https://fpimages.withfloats.com/tile/61fb32feb11d6b00017d8f8b.jpg',
         },
         {
             id: '4',
-            name: 'Lights',
-            price: '700',
+            name: 'House Warming',
+            price: '1800',
             description: 'The Critical Minerals Association USA aims to address critical mineral supply chain challenges to favourably...',
             image: 'https://fpimages.withfloats.com/tile/61fb32feb11d6b00017d8f8b.jpg',
         },
@@ -257,9 +257,8 @@ const ViewTentHouse = ({ route, navigation }) => {
             <View style={styles.itemDetails}>
             <View style={{flexDirection:"row",justifyContent:"space-between"}} >
                 <View>
-              <Text style={styles.itemName}>{item?.itemName}</Text>
-              <Text style={styles.itemPrice}><Text style={{fontSize:12, fontWeight:"400"}}>Per Hour</Text> ₹{item?.perHourPrice}/-</Text>
-              <Text style={styles.itemPrice}><Text style={{fontSize:12, fontWeight:"400",}}>Per Day </Text>₹{item?.perDayPrice}/-</Text>
+              <Text style={styles.itemName}>{item?.name}</Text>
+              <Text style={styles.itemPrice}><Text style={{fontSize:12, fontWeight:"400"}}></Text> ₹{item?.price}/-</Text>
               </View>
 
               <View style={styles.quantityContainer}>
@@ -329,7 +328,7 @@ const ViewTentHouse = ({ route, navigation }) => {
 
                     <Text style={{color:"#000000", fontSize:13, fontWeight:"700",fontFamily: 'ManropeRegular',marginTop:15}}>Available Rental Items</Text>
                     <FlatList
-                        data={rentalItemsData}
+                        data={rentalItems}
                         keyExtractor={(item) => item?.id}
                         renderItem={({ item }) => <RentalItem item={item} />}
                     />
@@ -625,4 +624,4 @@ const styles = StyleSheet.create({
       },
 });
 
-export default ViewTentHouse;
+export default ViewDecors;

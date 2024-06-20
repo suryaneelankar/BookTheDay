@@ -41,6 +41,7 @@ import ViewMyLendings from "../screens/Profile/ViewMyLendings";
 import ViewHireCartDetails from "../screens/MyBox/ViewHireCartDetails";
 import ViewTentHouse from "../screens/Events/ViewTentHouse";
 import RentOnProducts from "../screens/GiveOnRent/RentOnProducts";
+import ViewDecors from "../screens/Events/ViewDecors";
 
 const MainNavigation = () => {
 
@@ -140,6 +141,14 @@ const MainNavigation = () => {
                 component={ViewTentHouse}  
                 options={{
                          header: () => <NavigationHeader Icon={true} title="Tent Houses" />,
+                         headerShown: true,
+                }}
+                />
+                <Stack.Screen 
+               name="ViewDecors"
+                component={ViewDecors}  
+                options={{
+                         header: () => <NavigationHeader Icon={true} title="Decorations" />,
                          headerShown: true,
                 }}
                 />

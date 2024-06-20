@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Dimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
-const CategoryFilter = () => {
-  const [selectedCategory, setSelectedCategory] = useState(null);
+const CategoryFilter = ({ onCategoryChange }) => {
+  const [selectedCategory, setSelectedCategory] = useState('Tent House');
 
   const newData = [
     { name: 'Tent House', image: require('../assets/categoriesPngs/tenthouse_icon.png') },
@@ -14,6 +14,7 @@ const CategoryFilter = () => {
 
   const handleCategorySelect = (categoryName) => {
     setSelectedCategory(categoryName);
+    onCategoryChange(categoryName)
     // Here, you can implement the logic to show the filtered UI based on the selected category
     // For example, fetch filtered data and update the state to display the filtered content
   };
