@@ -10,11 +10,14 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { launchImageLibrary } from 'react-native-image-picker';
 import BASE_URL from '../../../apiconfig';
 import axios from 'axios';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const GeneralDetails = () => {
-    const [productName, setProductName] = useState('');
-    const [productBrand, setProductBrand] = useState('');
+    const [isCollapsed, setIsCollapsed] = useState(true);
+    const [overTimeCharges, setOverTimeCharges] = useState();
+    const [vehicleName, setVehicleName] = useState('');
     const [mainImageUrl, setMainImageUrl] = useState('');
+    const [tentHouseName, settentHouseName] = useState('');
     const [productDescription, setProductDescription] = useState('');
     const [additionalImages, setAdditionalImages] = useState({
         additionalImageOne: undefined,
@@ -22,43 +25,121 @@ const GeneralDetails = () => {
         additionalImageThree: undefined,
         additionalImageFour: undefined
     });
-    const [productAddress, setProductAddress] = useState('');
-    const [productCity, setProductCity] = useState('');
-    const [productPinCode, setProductPinCode] = useState();
+    const [tentHouseAddress, settentHouseAddress] = useState('');
+    const [tentHouseCity, settentHouseCity] = useState('');
+    const [tentHousePincode, settentHousePincode] = useState();
     const [perDayRentPrice, setPerDayRentPrice] = useState();
-    const [perMonthRentPrice, setPerMonthRentPrice] = useState();
-    const [securityDeposit, setSecurityDeposit] = useState();
-    const [available, setAvailable] = useState();
+    const [perKMPrice, setPerKMPrice] = useState();
     const [advanceAmount, setAdvanceAmount] = useState();
     const [discountPercentage, setDiscountPercentage] = useState();
-    const [isSelected, setSelection] = useState(false);
+    const [selectedRentalItem, setSelectedRentalItem] = useState();
 
-    const inputHandler = (value) => {
-        console.log("general details inputhandler", value)
-    }
+    const [itemPrices, setItemPrices] = useState({});
 
-    const onChangeProductName = (value) => {
-        setProductName(value);
-    }
 
-    const onChangeProductBrand = (value) => {
-        setProductBrand(value);
-    }
+    const [rentalItemPricingDetails, setRentalItemPricingDetails] = useState({
+        "Carpet": [{ "itemName": "Carpet", "perDayPrice": 0 }],
+        "Chairs": [{ "itemName": "Chairs", "perDayPrice": 0 }],
+        "Side Walls": [{ "itemName": "SideWalls", "perDayPrice": 0 }],
+        "Lights": [{ "itemName": "Lights", "perDayPrice": 0 }],
+        "Tables/Furniture": [{ "itemName": "Tables/Furniture", "perDayPrice": 0 }],
+        "Portable stove or campfire cooking equipment": [{ name: 'Portable stove or campfire cooking equipment', icon: 'ios-flame' }],
+        "Cookware": [{ name: 'Cookware', icon: 'ios-restaurant' }],
+        "Coolers / Fans": [{ name: 'Coolers / Fans', icon: 'ios-snow' }],
+        "Reusable plates, cups, and cutlery": [{ name: 'Reusable plates, cups, and cutlery', icon: 'ios-cut' }],
+        "Food storage containers": [{ name: 'Food storage containers', icon: 'ios-basket' }],
+        "Sound Box/ Speakers": [{ name: 'Sound Box/ Speakers', icon: 'ios-volume-high' }]
+    });
+
+    const rentalItems = [
+        { name: 'Carpet', icon: 'ios-carpet' },
+        { name: 'Chairs', icon: 'ios-chair' },
+        { name: 'Side Walls', icon: 'ios-wall' },
+        { name: 'Lights', icon: 'ios-bulb' },
+        { name: 'Tables/Furniture', icon: 'ios-bed' },
+        { name: 'Portable stove or campfire cooking equipment', icon: 'ios-flame' },
+        { name: 'Cookware', icon: 'ios-restaurant' },
+        { name: 'Coolers / Fans', icon: 'ios-snow' },
+        { name: 'Reusable plates, cups, and cutlery', icon: 'ios-cut' },
+        { name: 'Food storage containers', icon: 'ios-basket' },
+        { name: 'Sound Box/ Speakers', icon: 'ios-volume-high' }
+    ];
+
+    const [selectedItemArray, setSelectedItemArray] = useState([]);
+
+    const RentalItemsList = () => {
+
+        const toggleCollapse = () => {
+            setIsCollapsed(!isCollapsed);
+        };
+
+        const addRentalItemOnPress = (itemName) => {
+            setSelectedItemArray((previous) => {
+                if (previous.includes(itemName)) {
+                    // Remove the item if it's already selected
+                    const updatedPrices = { ...itemPrices };
+                    console.log('updated price is::>>', updatedPrices);
+                    delete updatedPrices[itemName];
+                    setItemPrices(updatedPrices);
+                    return previous.filter((item) => item !== itemName);
+                } else {
+                    // Add the item if it's not already selected
+                    const updatedPrices = { ...itemPrices, itemName };
+                    console.log('updated price added is::>>', updatedPrices);
+                    setItemPrices(updatedPrices);
+                    return [...previous, itemName];
+                }
+            });
+        };
+
+        // console.log('selectedItemArray is::>>', selectedItemArray);
+        console.log('rentalItemPricingDetails ::>>', rentalItemPricingDetails);
+
+        const renderItem = ({ item }) => {
+            return (
+                <TouchableOpacity style={styles.item} onPress={() => { addRentalItemOnPress(item.name) }}>
+                    <View style={{ borderColor: 'green', borderWidth: 2, width: 20, height: 20, borderRadius: 5 }}>
+                        <View style={{ backgroundColor: selectedItemArray.includes(item.name) ? 'green' : 'white', width: 10, height: 10, alignSelf: 'center', marginTop: 3 }}>
+
+                        </View>
+                    </View>
+                    <View style={{ flexDirection: 'row', marginHorizontal: 5 }} onPress={() => { }}>
+                        {/* <Icon name={item.icon} size={20} style={styles.icon} /> */}
+                        <Text style={styles.itemText}>{item.name}</Text>
+                    </View>
+                </TouchableOpacity>
+            )
+        }
+
+        return (
+            <View style={styles.container}>
+                <TouchableOpacity onPress={toggleCollapse} style={styles.header}>
+                    <Text style={styles.headerText}>Available Rental Items</Text>
+                    <Icon name={isCollapsed ? 'ios-arrow-down' : 'ios-arrow-up'} size={20} />
+                </TouchableOpacity>
+                {!isCollapsed && (
+                    <View style={styles.itemsContainer}>
+                        <FlatList
+                            data={rentalItems}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={renderItem}
+                        />
+                    </View>
+                )}
+            </View>
+        );
+    };
 
     const onChangeDescription = (value) => {
         setProductDescription(value);
     }
 
+    const onChangetentHouseName = (value) => {
+        settentHouseName(value);
+    }
+
     const onChangePerDayRentPrice = (value) => {
         setPerDayRentPrice(value);
-    }
-
-    const onChangePerMonthRentPrice = (value) => {
-        setPerMonthRentPrice(value);
-    }
-
-    const onChangeSecurityDepositAmount = (value) => {
-        setSecurityDeposit(value);
     }
 
     const onChangeAdvanceAmount = (value) => {
@@ -69,17 +150,33 @@ const GeneralDetails = () => {
         setDiscountPercentage(value);
     }
 
-    const onChangeAddress = (value) => {
-        setProductAddress(value);
+    const onChangetentHouseAddress = (value) => {
+        settentHouseAddress(value);
     }
 
-    const onChangeCity = (value) => {
-        setProductCity(value);
+    const onChangeOverTimeCharges = (value) => {
+        setOverTimeCharges(value);
     }
 
-    const onChangePinCode = (value) => {
-        setProductPinCode(value);
+    const onChangetentHouseCity = (value) => {
+        settentHouseCity(value);
     }
+
+    const onChangetentHousePincode = (value) => {
+        settentHousePincode(value);
+    }
+
+    const onChangeItemPrice = (text, itemName) => {
+        console.log('text text on change is::>>>', text);
+        // setRentalItemPricingDetails?.[itemName][0]?.perDayPrice(text);
+        // setRentalItemPricingDetails({...rentalItemPricingDetails, })
+        const newPrice = parseFloat(text) || 0;
+        setRentalItemPricingDetails((prevDetails) => ({
+            ...prevDetails,
+            [itemName]: [{ ...prevDetails[itemName]?.[0], itemName, perDayPrice: newPrice }],
+        }));
+        console.log('rentalItemPricingDetails is::><><><>', rentalItemPricingDetails);
+    };
 
     const data = [
         {
@@ -191,6 +288,14 @@ const GeneralDetails = () => {
             </TouchableOpacity>
         )
     }
+    const transformInput = (input) => {
+        return Object.entries(input).map(([key, value]) => {
+          return {
+            itemName: value[0].itemName || value[0].name,
+            perDayPrice: value[0].perDayPrice || 0
+          };
+        });
+      };
 
     const onPressSaveAndPost = async () => {
         const vendorMobileNumber = "8297735285"
@@ -225,51 +330,47 @@ const GeneralDetails = () => {
             name: additionalImages?.additionalImageFour?.assets[0]?.fileName,
         });
 
-        formData.append('categoryType', 'clothes');
-        formData.append('description', productDescription);
-        formData.append('rentPricePerMonth', perMonthRentPrice);
-        formData.append('productName', productName);
-        formData.append('brandName', productBrand);
-        formData.append('rentPricePerDay', perDayRentPrice);
-        formData.append('itemAvailableAddress', productAddress);
-        formData.append('available', true);
-        formData.append('itemAvailablePinCode', productPinCode);
-        formData.append('itemAvailableCity', productCity);
-        formData.append('securityDepositAmount', securityDeposit);
-        formData.append('vendorMobileNumber', vendorMobileNumber);
-        formData.append('advanceAmount', advanceAmount);
-        formData.append('discountPercentage', discountPercentage);
+        const tentHousAddessIs = { "address": tentHouseAddress, "city": tentHouseCity, "pinCode": tentHousePincode };
 
-        console.log('formdata is ::>>',formData);
- 
-          try {
-            const response = await axios.post(`${BASE_URL}/AddClothJewels`, formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              },
+        formData.append('description', productDescription);
+        formData.append('rentalItems', transformInput(rentalItemPricingDetails));
+        formData.append('tentHosueAddress', tentHousAddessIs);
+        formData.append('tentHouseName', tentHouseName);
+        formData.append('vendorMobileNumber', vendorMobileNumber);
+        formData.append('available', true);
+        formData.append('advanceAmount', advanceAmount);
+        formData.append('overTimeCharges', overTimeCharges);
+
+        console.log('formdata is ::>>', formData);
+
+        try {
+            const response = await axios.post(`${BASE_URL}/AddTentHouse`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
             if (response.status === 201) {
-             console.log('Success', `uploaded successfully`);
-             Alert.alert(
-                "Confirmation",
-                "Your proudct posted successfully",
-                [
-                    {
-                        text: "No",
-                        onPress: () => console.log("No Pressed"),
-                        style: "cancel"
-                    },
-                    { text: "Yes", onPress: () => console.log("yes pressed") }
-                ],
-                { cancelable: false }
-            );
+                console.log('Success', `uploaded successfully`);
+                Alert.alert(
+                    "Confirmation",
+                    "Your proudct posted successfully",
+                    [
+                        {
+                            text: "No",
+                            onPress: () => console.log("No Pressed"),
+                            style: "cancel"
+                        },
+                        { text: "Yes", onPress: () => console.log("yes pressed") }
+                    ],
+                    { cancelable: false }
+                );
             } else {
-             console.log('Error', 'Failed to upload document');
+                console.log('Error', 'Failed to upload document');
             }
-          } catch (error) {
+        } catch (error) {
             console.error('Error uploading document:', error);
-           console.log('Error', 'Failed to upload document');
-          }
+            console.log('Error', 'Failed to upload document');
+        }
     }
 
 
@@ -277,9 +378,9 @@ const GeneralDetails = () => {
         <View>
             <View style={styles.mainContainer}>
                 <ChooseFileField
-                    label={'Product Image'}
+                    label={'Tent House Image'}
                     isRequired={true}
-                    placeholder={'Main Image'}
+                    placeholder={'Add Tent House Image'}
                     onPressChooseFile={openGalleryOrCamera}
                 />
                 {mainImageUrl ?
@@ -300,26 +401,17 @@ const GeneralDetails = () => {
                     contentContainerStyle={{ width: '100%', justifyContent: 'space-around' }}
                 />
                 <TextField
-                    label='Product Name'
-                    placeholder="Please Enter Product Name"
-                    value={productName}
-                    onChangeHandler={onChangeProductName}
+                    label='Tent House Name'
+                    placeholder="Please Enter Tent House Name"
+                    value={tentHouseName}
+                    onChangeHandler={onChangetentHouseName}
                     keyboardType='default'
                     isRequired={true}
                 />
 
                 <TextField
-                    label='Product`s Brand'
-                    placeholder="Please Enter Brand"
-                    value={productBrand}
-                    onChangeHandler={onChangeProductBrand}
-                    keyboardType='default'
-                    isRequired={false}
-                />
-
-                <TextField
-                    label='Description'
-                    placeholder="Please Enter Description"
+                    label='Tent House Description'
+                    placeholder="Describe about your service"
                     value={productDescription}
                     onChangeHandler={onChangeDescription}
                     keyboardType='default'
@@ -327,42 +419,27 @@ const GeneralDetails = () => {
                     isDescriptionField={true}
                 />
             </View>
-            <Text style={styles.title}>Rent Type</Text>
+            <Text style={styles.title}>Pricing Details</Text>
             <View style={styles.mainContainer}>
+
                 <TextField
-                    label='Day Price (₹ / 1day)*'
-                    placeholder="Please Enter per Day Price"
+                    label='Per Day Charge (₹/ Per Day)*'
+                    placeholder="Please Enter per Day Charge"
                     value={perDayRentPrice}
                     onChangeHandler={onChangePerDayRentPrice}
                     keyboardType='default'
                     isRequired={true}
                 />
                 <TextField
-                    label='Monthly Price (₹ / 30 days)*'
-                    placeholder="Please Enter Monthly Price"
-                    value={perMonthRentPrice}
-                    onChangeHandler={onChangePerMonthRentPrice}
-                    keyboardType='default'
-                    isRequired={false}
-                />
-                <TextField
-                    label='Security Deposit'
-                    placeholder="Please Enter Security Deposit"
-                    value={securityDeposit}
-                    onChangeHandler={onChangeSecurityDepositAmount}
-                    keyboardType='default'
-                    isRequired={true}
-                />
-                <TextField
-                    label='Advance Amount'
-                    placeholder="Please Enter Advance Amount"
+                    label='Advance Booking Amount'
+                    placeholder="Please Enter Advance Booking Amount"
                     value={advanceAmount}
                     onChangeHandler={onChangeAdvanceAmount}
                     keyboardType='default'
                     isRequired={true}
                 />
                 <TextField
-                    label='Discount'
+                    label='Discount if Any'
                     placeholder="Please Enter Discount Percentage"
                     value={discountPercentage}
                     onChangeHandler={onChangeDiscountPercentage}
@@ -370,37 +447,70 @@ const GeneralDetails = () => {
                     isRequired={false}
                 />
             </View>
+
+            <Text style={styles.title}>Available Rental Items</Text>
+            <View style={styles.mainContainer}>
+                {RentalItemsList()}
+                {selectedItemArray.map((itemName) => {
+                    return (
+                        <>
+                            <TextField
+                                label={itemName}
+                                placeholder={`Please Enter Per hr Charge for ${itemName}`}
+                                // value={itemPrices[itemName] || ''}
+                                value={rentalItemPricingDetails?.[itemName][0]?.perDayPrice}
+                                onChangeHandler={(text) => onChangeItemPrice(text, itemName)}
+                                keyboardType='number-pad'
+                                isRequired={true}
+                            />
+                        </>)
+                })}
+
+            </View>
+
+            <Text style={styles.title}>Other Charges</Text>
+            <View style={styles.mainContainer}>
+                <TextField
+                    label='Over Time Charges'
+                    placeholder="Please Enter OverTime Charges"
+                    value={overTimeCharges}
+                    onChangeHandler={onChangeOverTimeCharges}
+                    keyboardType='default'
+                    isRequired={true}
+                />
+            </View>
+
             <Text style={styles.title}>Item Available Address</Text>
             <View style={styles.mainContainer}>
                 <TextField
                     label='Address'
                     placeholder="Please Enter Address"
-                    value={productAddress}
-                    onChangeHandler={onChangeAddress}
+                    value={tentHouseAddress}
+                    onChangeHandler={onChangetentHouseAddress}
                     keyboardType='default'
                     isRequired={true}
                 />
                 <TextField
                     label='City'
                     placeholder="Please Enter City"
-                    value={productCity}
-                    onChangeHandler={onChangeCity}
+                    value={tentHouseCity}
+                    onChangeHandler={onChangetentHouseCity}
                     keyboardType='default'
                     isRequired={true}
                 />
                 <TextField
                     label='Pin code'
                     placeholder="Please Enter Pin code"
-                    value={productPinCode}
-                    onChangeHandler={onChangePinCode}
+                    value={tentHousePincode}
+                    onChangeHandler={onChangetentHousePincode}
                     keyboardType='default'
                     isRequired={true}
                 />
             </View>
 
             {/* <Text style={{ fontFamily: 'InterRegular', color: '#5F6377', fontSize: 15, fontWeight: '600' }}>I Accept Terms and Conditions</Text> */}
-            <TouchableOpacity onPress={() => {onPressSaveAndPost()}} style={{padding:10,backgroundColor:'#FFF5E3',alignSelf:'center',borderRadius:5,borderColor:'#ECA73C',borderWidth:2,marginTop:40,bottom:20}}>
-                <Text style={{color:'#ECA73C'}}> Save & Post </Text>
+            <TouchableOpacity onPress={() => { onPressSaveAndPost() }} style={{ padding: 10, backgroundColor: '#FFF5E3', alignSelf: 'center', borderRadius: 5, borderColor: '#ECA73C', borderWidth: 2, marginTop: 40, bottom: 20 }}>
+                <Text style={{ color: '#ECA73C' }}> Save & Post </Text>
             </TouchableOpacity>
 
 
@@ -482,5 +592,36 @@ const styles = StyleSheet.create({
     inputSearchStyle: {
         height: 40,
         fontSize: 16,
+    },
+    container: {
+        backgroundColor: '#FFF4E1',
+        padding: 10,
+        borderRadius: 5,
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 10,
+        backgroundColor: '#FFD7B5',
+        borderRadius: 5,
+    },
+    headerText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    itemsContainer: {
+        marginTop: 10,
+    },
+    item: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 5,
+    },
+    icon: {
+        marginRight: 10,
+    },
+    itemText: {
+        fontSize: 14,
     },
 })

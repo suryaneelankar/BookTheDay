@@ -1711,11 +1711,6 @@
 "@pkgjs/parseargs@^0.11.0":
   version "0.11.0"
 
-"@react-native-community/checkbox@0.5.13":
-  version "0.5.13"
-  resolved "https://registry.npmjs.org/@react-native-community/checkbox/-/checkbox-0.5.13.tgz"
-  integrity sha512-FMDYudaUbodbDOBgD6wT7s5z2QSzzghq46og8fF1yNXAp56AIrmRHZAtQhvlfyCdzWDu1+lBqgOxgupRmkCAUA==
-
 "@react-native-community/cli-clean@13.6.4":
   version "13.6.4"
   resolved "https://registry.npmjs.org/@react-native-community/cli-clean/-/cli-clean-13.6.4.tgz"
@@ -7329,7 +7324,7 @@ react-native-vector-icons@^10.1.0:
     prop-types "^15.7.2"
     yargs "^16.1.1"
 
-react-native@*, "react-native@>= 0.30.0", "react-native@>= 0.62", "react-native@>= 0.64.3", react-native@>=0.57, react-native@>=0.57.0, react-native@>=0.59.0, react-native@>=0.60, react-native@>=0.65.0, react-native@>=0.69, react-native@>=0.70.0, react-native@0.74.0:
+react-native@*, "react-native@>= 0.30.0", "react-native@>= 0.64.3", react-native@>=0.57, react-native@>=0.57.0, react-native@>=0.59.0, react-native@>=0.60, react-native@>=0.65.0, react-native@>=0.69, react-native@>=0.70.0, react-native@0.74.0:
   version "0.74.0"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.74.0.tgz"
   integrity sha512-Vpp9WPmkCm4TUH5YDxwQhqktGVon/yLpjbTgjgLqup3GglOgWagYCX3MlmK1iksIcqtyMJHMEWa+UEzJ3G9T8w==
