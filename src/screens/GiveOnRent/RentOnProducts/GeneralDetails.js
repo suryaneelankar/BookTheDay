@@ -240,7 +240,7 @@ const GeneralDetails = () => {
         formData.append('advanceAmount', advanceAmount);
         formData.append('discountPercentage', discountPercentage);
 
-        console.log('formdata is ::>>',formData);
+        console.log('formdata is ::>>',JSON.stringify(formData));
  
           try {
             const response = await axios.post(`${BASE_URL}/AddClothJewels`, formData, {

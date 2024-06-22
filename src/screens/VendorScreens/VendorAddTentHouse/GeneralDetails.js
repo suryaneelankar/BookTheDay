@@ -11,6 +11,18 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import BASE_URL from '../../../apiconfig';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/Ionicons';
+import CarpetIcon from '../../../assets/svgs/VendorCatering/Rug.svg';
+import ChairIcon from '../../../assets/svgs/VendorCatering/Chair.svg';
+import ChefHatIcon from '../../../assets/svgs/VendorCatering/ChefHat.svg';
+import CookingPot from '../../../assets/svgs/VendorCatering/CookingPot.svg';
+import DeskIcon from '../../../assets/svgs/VendorCatering/Desk.svg';
+import JarIcon from '../../../assets/svgs/VendorCatering/Jar.svg';
+import LightsIcon from '../../../assets/svgs/VendorCatering/Lightbulb.svg';
+import RecycleIcon from '../../../assets/svgs/VendorCatering/Recycle.svg';
+import SpeakerIcon from '../../../assets/svgs/VendorCatering/SpeakerHifi.svg';
+import FanIcon from '../../../assets/svgs/VendorCatering/vendor_fan.svg';
+import WallIcon from '../../../assets/svgs/VendorCatering/Wall.svg';
+
 
 const GeneralDetails = () => {
     const [isCollapsed, setIsCollapsed] = useState(true);
@@ -52,22 +64,24 @@ const GeneralDetails = () => {
     });
 
     const rentalItems = [
-        { name: 'Carpet', icon: 'ios-carpet' },
-        { name: 'Chairs', icon: 'ios-chair' },
-        { name: 'Side Walls', icon: 'ios-wall' },
-        { name: 'Lights', icon: 'ios-bulb' },
-        { name: 'Tables/Furniture', icon: 'ios-bed' },
-        { name: 'Portable stove or campfire cooking equipment', icon: 'ios-flame' },
-        { name: 'Cookware', icon: 'ios-restaurant' },
-        { name: 'Coolers / Fans', icon: 'ios-snow' },
-        { name: 'Reusable plates, cups, and cutlery', icon: 'ios-cut' },
-        { name: 'Food storage containers', icon: 'ios-basket' },
-        { name: 'Sound Box/ Speakers', icon: 'ios-volume-high' }
+        { name: 'Carpet', icon: CarpetIcon },
+        { name: 'Chairs', icon: ChairIcon},
+        { name: 'Side Walls', icon: WallIcon},
+        { name: 'Lights', icon: LightsIcon },
+        { name: 'Tables/Furniture', icon: DeskIcon },
+        { name: 'Portable stove or campfire cooking equipment', icon: ChairIcon},
+        { name: 'Cookware', icon: ChefHatIcon },
+        { name: 'Coolers / Fans', icon: FanIcon },
+        { name: 'Reusable plates, cups, and cutlery', icon: RecycleIcon},
+        { name: 'Food storage containers', icon: JarIcon },
+        { name: 'Sound Box/ Speakers', icon: SpeakerIcon }
     ];
 
     const [selectedItemArray, setSelectedItemArray] = useState([]);
 
     const RentalItemsList = () => {
+        // const [isCollapsed, setIsCollapsed] = useState(true);
+
 
         const toggleCollapse = () => {
             setIsCollapsed(!isCollapsed);
@@ -93,9 +107,9 @@ const GeneralDetails = () => {
         };
 
         // console.log('selectedItemArray is::>>', selectedItemArray);
-        console.log('rentalItemPricingDetails ::>>', rentalItemPricingDetails);
 
         const renderItem = ({ item }) => {
+            const IconImage = item?.icon;
             return (
                 <TouchableOpacity style={styles.item} onPress={() => { addRentalItemOnPress(item.name) }}>
                     <View style={{ borderColor: 'green', borderWidth: 2, width: 20, height: 20, borderRadius: 5 }}>
@@ -103,8 +117,10 @@ const GeneralDetails = () => {
 
                         </View>
                     </View>
-                    <View style={{ flexDirection: 'row', marginHorizontal: 5 }} onPress={() => { }}>
+                    <View style={{ flexDirection: 'row', marginHorizontal: 5,alignItems:"center" }} onPress={() => { }}>
                         {/* <Icon name={item.icon} size={20} style={styles.icon} /> */}
+                        
+                        <IconImage style={{marginHorizontal:2}}/>
                         <Text style={styles.itemText}>{item.name}</Text>
                     </View>
                 </TouchableOpacity>
@@ -331,17 +347,22 @@ const GeneralDetails = () => {
         });
 
         const tentHousAddessIs = { "address": tentHouseAddress, "city": tentHouseCity, "pinCode": tentHousePincode };
-
+         const RentItems =[ { "itemName": "Tent", "perHourPrice": 80, "perDayPrice": 300 }, { "itemName": "Chairs", "perHourPrice": 400, "perDayPrice": 2000 },{ "itemName": "Carpet", "perHourPrice": 50, "perDayPrice": 200 },{ "itemName": "Side Walls", "perHourPrice": 75, "perDayPrice": 320 },{ "itemName": "Lights", "perHourPrice": 45, "perDayPrice": 960 },{ "itemName": "Tables/Furniture", "perHourPrice": 75, "perDayPrice": 620 },{ "itemName": "Portable Stove", "perHourPrice": 35, "perDayPrice": 420 },{ "itemName": "Cookware", "perHourPrice": 65, "perDayPrice": 270 },{ "itemName": "Coolers/Fans", "perHourPrice": 435, "perDayPrice": 2210 },{ "itemName": "Coolers/Fans", "perHourPrice": 435, "perDayPrice": 2210 } ,{ "itemName": "Reusable Plates andCcontainers", "perHourPrice": 425, "perDayPrice": 1210 } ,{ "itemName": "Food storage containers", "perHourPrice": 435, "perDayPrice": 2210 },{ "itemName": "Sound Box/Speakers", "perHourPrice": 535, "perDayPrice": 3210 }   ]
+        const Address= {  "address":  "Ameerpet",
+            "city": "Hyderabad",
+            "pinCode": 500075
+          }
         formData.append('description', productDescription);
-        formData.append('rentalItems', transformInput(rentalItemPricingDetails));
-        formData.append('tentHosueAddress', tentHousAddessIs);
+        formData.append('rentalItems', JSON.stringify(transformInput(rentalItemPricingDetails)));
+        formData.append('tentHosueAddress', JSON.stringify(tentHousAddessIs));
         formData.append('tentHouseName', tentHouseName);
         formData.append('vendorMobileNumber', vendorMobileNumber);
+        formData.append('discountPercentage', discountPercentage);
         formData.append('available', true);
         formData.append('advanceAmount', advanceAmount);
         formData.append('overTimeCharges', overTimeCharges);
 
-        console.log('formdata is ::>>', formData);
+        console.log('formdata is ::>>', JSON.stringify(formData));
 
         try {
             const response = await axios.post(`${BASE_URL}/AddTentHouse`, formData, {
@@ -452,13 +473,16 @@ const GeneralDetails = () => {
             <View style={styles.mainContainer}>
                 {RentalItemsList()}
                 {selectedItemArray.map((itemName) => {
+                const itemDetails = rentalItemPricingDetails[itemName]?.[0];
+                const price = itemDetails?.perDayPrice?.toString() || '';
+
                     return (
                         <>
                             <TextField
                                 label={itemName}
                                 placeholder={`Please Enter Per hr Charge for ${itemName}`}
                                 // value={itemPrices[itemName] || ''}
-                                value={rentalItemPricingDetails?.[itemName][0]?.perDayPrice}
+                                value={price || ''}
                                 onChangeHandler={(text) => onChangeItemPrice(text, itemName)}
                                 keyboardType='number-pad'
                                 isRequired={true}
