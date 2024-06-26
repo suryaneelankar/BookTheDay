@@ -93,7 +93,7 @@ const GeneralDetails = () => {
         };
 
         // console.log('selectedItemArray is::>>', selectedItemArray);
-        console.log('rentalItemPricingDetails ::>>', rentalItemPricingDetails);
+        // console.log('rentalItemPricingDetails ::>>', rentalItemPricingDetails);
 
         const renderItem = ({ item }) => {
             return (
