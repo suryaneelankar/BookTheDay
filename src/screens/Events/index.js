@@ -54,12 +54,12 @@ const Events = () => {
         setSelectedCategory(newCategory);
         // You can also perform any other actions needed when the category changes
     };
-    console.log("SELECTED FILETRS", selectedCategory)
+    // console.log("SELECTED FILETRS", selectedCategory)
 
     const getAllEvents = async () => {
         try {
             const response = await axios.get(`${BASE_URL}/all-events`);
-            console.log('events response is::::::::', response?.data?.data)
+            // console.log('events response is::::::::', response?.data?.data);
             setEventsData(response?.data?.data)
         } catch (error) {
             console.log("events data error>>::", error);
@@ -81,10 +81,10 @@ const Events = () => {
         const convertLocalhostUrls = (url) => {
             return url.replace("localhost", LocalHostUrl);
         };
-        console.log("insdie render item")
+        // console.log("insdie render item")
         const imageUrls = item?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
 
-        console.log("IMAGE URLS IS:::::::::::::", imageUrls)
+        // console.log("IMAGE URLS IS:::::::::::::", imageUrls)
         return (
             <View style={{ borderRadius: 20, marginHorizontal: 20, marginBottom: 5, elevation: -10 }}>
                 <View style={[styles.container]}>
