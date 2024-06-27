@@ -121,7 +121,7 @@ const CategoriesList = ({ route }) => {
         )
     }
 
-    console.log("cat list render:::::::::", categories)
+    // console.log("cat list render:::::::::", categories)
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>

@@ -107,6 +107,7 @@ const GeneralDetails = () => {
         };
 
         // console.log('selectedItemArray is::>>', selectedItemArray);
+        // console.log('rentalItemPricingDetails ::>>', rentalItemPricingDetails);
 
         const renderItem = ({ item }) => {
             const IconImage = item?.icon;

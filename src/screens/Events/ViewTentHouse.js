@@ -135,7 +135,7 @@ const ViewTentHouse = ({ route, navigation }) => {
         console.log("IAM CALLING API")
         try {
             const response = await axios.get(`${BASE_URL}/getTentHouseDetailsById/${categoryId}`);
-            console.log("tenthouse view details ::::::::::",JSON.stringify( response?.data));
+            // console.log("tenthouse view details ::::::::::",JSON.stringify( response?.data));
             setEventsDetails(response?.data);
 
             const imageUrls = response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));

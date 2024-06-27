@@ -46,6 +46,7 @@ import HireChefOrDriverForm from "../screens/VendorScreens/VendorHireChefOrDrive
 import AddTentHouse from "../screens/VendorScreens/VendorAddTentHouse/AddTentHouse";
 import LocationAdded from "../screens/Location/LocationAdded";
 import AddSelectLocation from "../screens/Location/AddSelectLocation";
+import AddFunctionalHall from "../screens/VendorScreens/VendorAddFunctionHalls/AddFunctionalHall";
 
 const MainNavigation = () => {
 
@@ -226,6 +227,12 @@ const MainNavigation = () => {
                 {/* AddTentHouse */}
 
                 <Stack.Screen name="RentOnProducts" component={RentOnProducts} options={{ headerShown:false }}/>
+
+                {/* AddFunctionalHall */}
+                <Stack.Screen name="AddFunctionalHall" component={AddFunctionalHall} options={{
+                     header: () => <NavigationHeader Icon={true} title="Function Hall" />,
+                     headerShown: true,
+                }}/>
 
             </Stack.Navigator>
         </NavigationContainer>

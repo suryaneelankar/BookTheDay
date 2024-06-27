@@ -457,7 +457,8 @@ const HomeDashboard = () => {
                     {/* HireChefOrDriverForm */}
                     {/* RentOnProducts */}
                     {/* AddTentHouse */}
-                    <TouchableOpacity onPress={() => navigation.navigate('AddTentHouse')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                    {/* AddFunctionalHall */}
+                    <TouchableOpacity onPress={() => navigation.navigate('AddFunctionalHall')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
                         <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
                         <RightArrowIcon width={25} height={25} />
                     </TouchableOpacity>
