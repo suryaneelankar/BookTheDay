@@ -110,7 +110,7 @@ const ProfileMainScreen = () => {
                     </TouchableOpacity>
                 </MenuItem>
                 <MenuItem icon={<TransactionIcon />} title="My Transaction" />
-                <MenuItem icon={<LocationIcon />} title="Manage Location" />
+                <MenuItem onPress={() => navigation.navigate('LocationAdded')} icon={<LocationIcon />} title="Manage Location" />
                 <MenuItem icon={<NotificationIcon />} title="Notification Preferences">
                     {/* <Switch
                         trackColor={{ false: "#767577", true: "#81b0ff" }}

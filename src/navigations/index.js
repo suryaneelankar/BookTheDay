@@ -44,6 +44,8 @@ import RentOnProducts from "../screens/GiveOnRent/RentOnProducts";
 import ViewDecors from "../screens/Events/ViewDecors";
 import HireChefOrDriverForm from "../screens/VendorScreens/VendorHireChefOrDriver/HireChefOrDriverForm";
 import AddTentHouse from "../screens/VendorScreens/VendorAddTentHouse/AddTentHouse";
+import LocationAdded from "../screens/Location/LocationAdded";
+import AddSelectLocation from "../screens/Location/AddSelectLocation";
 
 const MainNavigation = () => {
 
@@ -135,6 +137,22 @@ const MainNavigation = () => {
                 component={ViewHireCartDetails}  
                 options={{
                          header: () => <NavigationHeader Icon={true} title="Cart" />,
+                         headerShown: true,
+                }}
+                />
+                <Stack.Screen 
+               name="LocationAdded"
+                component={LocationAdded}  
+                options={{
+                         header: () => <NavigationHeader Icon={true} title="Location" />,
+                         headerShown: true,
+                }}
+                />
+                <Stack.Screen 
+               name="AddSelectLocation"
+                component={AddSelectLocation}  
+                options={{
+                         header: () => <NavigationHeader Icon={true} title="Select Location" />,
                          headerShown: true,
                 }}
                 />
