@@ -47,6 +47,8 @@ import AddTentHouse from "../screens/VendorScreens/VendorAddTentHouse/AddTentHou
 import LocationAdded from "../screens/Location/LocationAdded";
 import AddSelectLocation from "../screens/Location/AddSelectLocation";
 import AddFunctionalHall from "../screens/VendorScreens/VendorAddFunctionHalls/AddFunctionalHall";
+import HallsBookingOverView from "../screens/Bookings/HallsBokingOverView";
+import AddDecorations from "../screens/VendorScreens/VendorAddDecorations/AddDecorations";
 
 const MainNavigation = () => {
 
@@ -128,6 +130,14 @@ const MainNavigation = () => {
                 <Stack.Screen 
                name="BookingDetailsScreen"
                 component={BookingDetailsScreen}  
+                options={{
+                         header: () => <NavigationHeader Icon={true} title="Cart" />,
+                         headerShown: true,
+                }}
+                />
+                 <Stack.Screen 
+               name="HallsBookingOverView"
+                component={HallsBookingOverView}  
                 options={{
                          header: () => <NavigationHeader Icon={true} title="Cart" />,
                          headerShown: true,
@@ -231,6 +241,10 @@ const MainNavigation = () => {
                 {/* AddFunctionalHall */}
                 <Stack.Screen name="AddFunctionalHall" component={AddFunctionalHall} options={{
                      header: () => <NavigationHeader Icon={true} title="Function Hall" />,
+                     headerShown: true,
+                }}/>
+                <Stack.Screen name="AddDecorations" component={AddDecorations} options={{
+                     header: () => <NavigationHeader Icon={true} title="Decorations" />,
                      headerShown: true,
                 }}/>
 

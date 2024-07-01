@@ -9,25 +9,14 @@ import Modal from 'react-native-modal';
 import themevariable from "../../utils/themevariable";
 import LinearGradient from "react-native-linear-gradient";
 
-const BookingOverView = ({ route, navigation }) => {
+const HallsBookingOverView = ({ route, navigation }) => {
 
-    const { categoryId, rentalItems, timeSlot, bookingDate, totalPrice } = route.params;
+    const { categoryId, timeSlot, bookingDate, totalPrice } = route.params;
     const [bookingDetails, setBookingDetails] = useState([]);
     const [bookingDone, setBookingDone] = useState(false);
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
 
-    const rentalItemsArray = Object.entries(rentalItems).map(([key, value]) => ({
-        name: key,
-        quantity: value
-    }));
-
-    // Render function for FlatList
-    const renderItem = ({ item }) => (
-        <View style={styles.item}>
-            <Text style={styles.itemText}>{item.name} : {item.quantity}</Text>
-        </View>
-    );
-
+  
 
     useEffect(() => {
         getEventsDetails();
@@ -35,15 +24,14 @@ const BookingOverView = ({ route, navigation }) => {
 
     const getEventsDetails = async () => {
         try {
-            const response = await axios.get(`${BASE_URL}/getTentHouseDetailsById/${categoryId}`);
-            console.log("tent house over view ::::::::::", JSON.stringify(response?.data));
+            const response = await axios.get(`${BASE_URL}/getFunctionHallDetailsById/${categoryId}`);
+            console.log("Halls house over view ::::::::::", JSON.stringify(response?.data));
             setBookingDetails(response?.data)
         } catch (error) {
             console.log("categories::::::::::", error);
         }
     }
 
-    console.log("rental items:::::::", rentalItems)
 
     return (
         <View style={{ flex: 1, alignSelf: 'center', width: '100%', alignItems: 'center' }}>
@@ -65,8 +53,8 @@ const BookingOverView = ({ route, navigation }) => {
             <View style={{ backgroundColor: 'white', borderRadius: 15, padding: 10, marginTop: 20, width: '90%', paddingHorizontal: 18, }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <View>
-                        <Text style={{ color: 'grey' }}>{bookingDetails?.tentHouseName}</Text>
-                        <Text style={{ color: 'grey' }}>Address : {bookingDetails?.tentHosueAddress?.address}</Text>
+                        <Text style={{ color: 'grey' }}>{bookingDetails?.functionHallName}</Text>
+                        <Text style={{ color: 'grey' }}>Address : {bookingDetails?.functionHallAddress?.address}</Text>
 
 
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -86,12 +74,6 @@ const BookingOverView = ({ route, navigation }) => {
                     />
                 </View>
 
-                <Text style={{ marginTop: 20, color: "black", fontSize: 16 }}>Selected Rental Items</Text>
-                <FlatList
-                    data={rentalItemsArray}
-                    renderItem={renderItem}
-                    keyExtractor={item => item?.name}
-                />
 
 
                 <View style={{ backgroundColor: '#dcdcdc', width: '100%', height: 2, alignSelf: 'center', marginTop: 10 }} />
@@ -163,7 +145,7 @@ const BookingOverView = ({ route, navigation }) => {
     )
 }
 
-export default BookingOverView;
+export default HallsBookingOverView;
 
 const styles = StyleSheet.create({
     container: {

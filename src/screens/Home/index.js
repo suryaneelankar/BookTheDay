@@ -122,7 +122,7 @@ const HomeDashboard = () => {
         try {
             const response = await axios.get(`${BASE_URL}/getAllFunctionHalls`);
             console.log("HALLS RES::::::", JSON.stringify(response))
-            setEventsData(response?.data?.data)
+            setEventsData(response?.data)
         } catch (error) {
             console.log("events data error>>::", error);
         }
@@ -245,31 +245,32 @@ const HomeDashboard = () => {
 
 
     const renderItem = ({ item }) => {
-
+        
+        const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
         return (
             <View style={{}}>
                 <TouchableOpacity
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
                     style={{ marginBottom: 5, elevation: 5, backgroundColor: "white", width: Dimensions.get('window').width / 1.3, alignSelf: 'center', borderRadius: 8, marginHorizontal: 16, marginTop: 15, height: 'auto' }}>
-                    <Image source={{ uri: item?.mainImageUrl }} style={{ borderRadius: 8, width: '95%', padding: 90, alignSelf: "center", marginTop: 8 }}
+                    <Image source={{ uri: updatedImgUrl }} style={{ borderRadius: 8, width: '95%', padding: 90, alignSelf: "center", marginTop: 8 }}
                         resizeMode="stretch"
 
                     />
                     <View style={{ marginTop: 15, justifyContent: 'space-between', }}>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignSelf: 'center', alignItems: 'center' }}>
-                            <Text style={{ fontWeight: '700', color: '#131313', fontSize: 16, fontFamily: 'InterBold', width: '48%' }}>{item?.name}</Text>
-                            <Text style={{ fontWeight: '700', color: themevariable.Color_B46609, fontSize: 18, fontFamily: 'InterBold' }}>{formatAmount(item?.price)}/day</Text>
+                            <Text style={{ fontWeight: '700', color: '#131313', fontSize: 16, fontFamily: 'InterBold', width: '48%' }}>{item?.functionHallName}</Text>
+                            <Text style={{ fontWeight: '700', color: themevariable.Color_B46609, fontSize: 18, fontFamily: 'InterBold' }}>{formatAmount(item?.rentPricePerDay)}/day</Text>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignSelf: 'center', alignItems: 'center' }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                                 <FontAwesome name={"map-marker"} color={themevariable.Color_777777} size={20} style={{}} />
-                                <Text style={{ fontWeight: '500', marginHorizontal: 5, color: themevariable.Color_777777, fontSize: 13, marginTop: 5, fontFamily: 'InterBold', bottom: 3 }}>Madhapur,Hyderabad</Text>
+                                <Text style={{ fontWeight: '500', marginHorizontal: 5, color: themevariable.Color_777777, fontSize: 13, marginTop: 5, fontFamily: 'InterBold', bottom: 3 }}>{item?.functionHallAddress?.address}</Text>
                             </View>
-                            <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
+                            {/* <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
                                 <Text style={styles.strickedoffer}>{formatAmount(item?.price + 1000)}</Text>
                                 <Text style={styles.off}> 20% off</Text>
-                            </View>
+                            </View> */}
                         </View>
                     </View>
 
@@ -285,7 +286,7 @@ const HomeDashboard = () => {
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: themevariable.Color_FFF8DF }}>
                             <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} />
-                            <Text style={{ marginHorizontal: 2, fontFamily: 'InterRegular', fontWeight: '600' }}> 300-500</Text>
+                            <Text style={{ marginHorizontal: 2, fontFamily: 'InterRegular', fontWeight: '600' }}> {item?.seatingCapacity}</Text>
                         </View>
 
                     </View>
@@ -458,7 +459,7 @@ const HomeDashboard = () => {
                     {/* RentOnProducts */}
                     {/* AddTentHouse */}
                     {/* AddFunctionalHall */}
-                    <TouchableOpacity onPress={() => navigation.navigate('AddFunctionalHall')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                    <TouchableOpacity onPress={() => navigation.navigate('AddDecorations')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
                         <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
                         <RightArrowIcon width={25} height={25} />
                     </TouchableOpacity>

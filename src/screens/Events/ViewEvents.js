@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Text, View, Image, StyleSheet, Dimensions, ScrollView, Button, TouchableOpacity, FlatList } from "react-native";
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import axios from "axios";
-import BASE_URL from "../../apiconfig";
+import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import { verticalScale, moderateScale, horizontalScale } from "../../utils/scalingMetrics";
 import { Calendar } from 'react-native-calendars';
 import moment from 'moment';
@@ -29,12 +29,13 @@ const ViewEvents = ({ route, navigation }) => {
   const [selectedEndDate, setSelectedEndDate] = useState('');
   const [isCalendarVisible, setCalendarVisible] = useState(false);
   const [noOfDays, setNoOfDays] = useState();
+  const [subImages, setSubImages] = useState();
   const [bookingData, setBookingData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isTimeSlotModalVisible, setTimeSlotModalVisible] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-
+  const [amenitiesData, setAmenitiesData] = useState();
 
   const { categoryId } = route.params;
   console.log("CATEID I::::::", categoryId)
@@ -48,12 +49,12 @@ const ViewEvents = ({ route, navigation }) => {
 
   ]
 
-  const amenitiesData = [
-    { id: '1', icon: PeopleAccommodate, label: '500-1200 pax' },
-    { id: '2', icon: FanIcon, label: 'Fan Available' },
-    { id: '3', icon: RoomsAvailable, label: '4 Bedroom' },
-    { id: '4', icon: AcIcon, label: 'Air Condition' },
-  ];
+  // const amenitiesData = [
+  //   { id: '1', icon: PeopleAccommodate, label: '500-1200 pax' },
+  //   { id: '2', icon: FanIcon, label: 'Fan Available' },
+  //   { id: '3', icon: RoomsAvailable, label: '4 Bedroom' },
+  //   { id: '4', icon: AcIcon, label: 'Air Condition' },
+  // ];
 
   const timeSlots = [
     '12:00 AM',
@@ -92,18 +93,28 @@ const ViewEvents = ({ route, navigation }) => {
     getEventsDetails();
   }, []);
 
+  const convertLocalhostUrls = (url) => {
+    return url.replace("localhost", LocalHostUrl);
+  };
+
   const getEventsDetails = async () => {
-    console.log("IAM CALLING API")
     try {
-      const response = await axios.get(`${BASE_URL}/getEvent/${categoryId}`);
-      console.log("events view details ::::::::::", response?.data?.data);
-      setEventsDetails(response?.data?.data)
+      const response = await axios.get(`${BASE_URL}/getFunctionHallDetailsById/${categoryId}`);
+      setEventsDetails(response?.data);
+      const imageUrls = response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
+      setSubImages(imageUrls);
+
+      const amenities = response?.data?.hallAmenities[0].split(',').map((item, index) => ({
+        id: (index + 1).toString(),
+        name: item.trim()
+      }));
+      setAmenitiesData(amenities);
+
     } catch (error) {
       console.log("categories::::::::::", error);
 
     }
   }
-
   const createFunctionHallBooking = async (eventId) => {
 
     const bookingData = {
@@ -193,12 +204,10 @@ const ViewEvents = ({ route, navigation }) => {
     }
   };
 
-  console.log("selected dates:::::::::", selectedStartDate, selectedEndDate);
 
-  const AmenitiesRenderItem = ({ icon: Icon, label }) => (
+  const AmenitiesRenderItem = ({ item }) => (
     <View style={{ alignItems: 'center', marginHorizontal: 15, marginTop: 10 }}>
-      <Icon style={{}} />
-      <Text style={{ fontSize: 9.5, color: "#606060", fontWeight: "400", fontFamily: 'ManropeRegular', marginTop: 5 }}>{label}</Text>
+      <Text style={{ fontSize: 9.5, color: "#606060", fontWeight: "400", fontFamily: 'ManropeRegular', marginTop: 5 }}>{item?.name}</Text>
     </View>
   );
 
@@ -216,7 +225,7 @@ const ViewEvents = ({ route, navigation }) => {
             paginationStyleItem={{ alignSelf: 'center' }}
             paginationStyleItemInactive={{ width: 7, height: 7 }}
             paginationStyleItemActive={{ width: 10, height: 10 }}
-            data={eventsDetails?.subImages}
+            data={subImages}
             style={{ flex: 1, alignSelf: "center", }}
             renderItem={({ item }) => (
               <View style={[{ width: Dimensions.get('window').width, height: 300 }]}>
@@ -229,32 +238,11 @@ const ViewEvents = ({ route, navigation }) => {
           />
         </View>
 
-        {/* <Swiper
-            index={0}
-            dotColor='white'
-            activeDotColor='white'
-            paginationStyle={{ bottom: 5 }}
-            showPagination={true}
-            dotStyle={{ width: 7, height: 7, borderRadius: 3.5 }}
-            activeDotStyle={{ width: 10, height: 10, borderRadius: 5 }}
-            style={{ alignSelf: "center", height: Dimensions.get('window').height / 2.5,}}
-        >
-            {eventsDetails?.subImages.map((item, index) => (
-                <View key={index} style={{ width: Dimensions.get('window').width, justifyContent: 'center', height: Dimensions.get('window').height / 2.5, }}>
-                    <Image
-                        source={{ uri: item }}
-                        style={{width:"100%",height: Dimensions.get('window').height / 2.5,borderBottomLeftRadius:30,borderBottomRightRadius}}
-                        resizeMethod="auto"
-                        resizeMode="cover"
-                    />
-                </View>
-            ))}
-        </Swiper> */}
 
         <View style={{ flex: 1, marginTop: 10, marginHorizontal: 20 }}>
 
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={{ fontSize: 20, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular' }}>{eventsDetails?.name}</Text>
+            <Text style={{ fontSize: 20, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular' }}>{eventsDetails?.functionHallName}</Text>
             {/* <Text style={{ fontSize: 16, color: "#100D25", marginLeft: 5, fontFamily: 'ManropeRegular' }}>{eventsDetails?.title}</Text> */}
 
           </View>
@@ -265,14 +253,14 @@ const ViewEvents = ({ route, navigation }) => {
               color: "#100D25",
               fontWeight: "500"
             }}>MRP</Text> */}
-            <Text style={{ color: "#100D25", fontSize: 18, fontWeight: "bold" }}> {formatAmount(eventsDetails?.price)}/day</Text>
-            <Text style={styles.strickedoffer}>₹1800</Text>
-            <Text style={styles.off}> (20% off) </Text>
+            <Text style={{ color: "#100D25", fontSize: 18, fontWeight: "bold" }}> {formatAmount(eventsDetails?.rentPricePerDay)}/day</Text>
+            {/* <Text style={styles.strickedoffer}>₹1800</Text>
+            <Text style={styles.off}> (20% off) </Text> */}
           </View>
 
           <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center" }}>
             <MapMarkIcon />
-            <Text style={{ color: "#939393", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', marginLeft: 5 }}>Alice Springs NT 0870, Bangalore</Text>
+            <Text style={{ color: "#939393", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', marginLeft: 5 }}>{eventsDetails?.functionHallAddress?.address}</Text>
           </View>
 
           <View style={{ marginTop: 20 }}>
@@ -287,14 +275,16 @@ const ViewEvents = ({ route, navigation }) => {
 
             <FlatList
               data={amenitiesData}
-              renderItem={({ item }) => (
-                <AmenitiesRenderItem icon={item?.icon} label={item?.label} />
-              )}
+              renderItem={AmenitiesRenderItem}
               keyExtractor={item => item?.id}
               horizontal={true}
-              contentContainerStyle={styles.container}
+              showsHorizontalScrollIndicator={false}
+            // contentContainerStyle={styles.container}
             />
-
+            <View style={{marginTop:20,}}>
+              <Text style={{fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular'}}>Food Type Allowed</Text>
+              <Text style={{fontWeight: "700", color: "#8B8B8B", fontSize: 12, fontFamily: 'ManropeRegular', marginTop:10}}>{eventsDetails?.foodType}</Text>
+            </View>
             {/* <ScrollView horizontal>
               {editsData.map((item, index) => (
                 <View key={index} style={{ width: 100, margin: 5, alignItems: "center", paddingVertical: 10 }} >
@@ -349,23 +339,16 @@ const ViewEvents = ({ route, navigation }) => {
           </TouchableOpacity>
 
 
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20}}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
 
             <Text style={[styles.title, { marginTop: 10 }]}>Total Days :</Text>
             <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{noOfDays > 1 ? `${noOfDays} days` : '1 day'}</Text>
           </View>
 
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
-
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, marginBottom: "20%" }}>
             <Text style={[styles.title, { marginTop: 10 }]}>Total Price :</Text>
-            <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{noOfDays ? formatAmount(eventsDetails?.price * noOfDays) : formatAmount(eventsDetails?.price)}</Text>
+            <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{formatAmount(eventsDetails?.rentPricePerDay)}</Text>
           </View>
-
-
-
-
-
-
         </View>
 
         <Modal
@@ -443,13 +426,13 @@ const ViewEvents = ({ route, navigation }) => {
                 <TouchableOpacity
                   style={{
                     padding: 10,
-                    paddingHorizontal:10,
-                    paddingVertical:15,
-                    borderRadius:10,
-                    borderColor:"pink",
-                    borderWidth:1,
-                    marginHorizontal:10,
-                    marginVertical:5
+                    paddingHorizontal: 10,
+                    paddingVertical: 15,
+                    borderRadius: 10,
+                    borderColor: "pink",
+                    borderWidth: 1,
+                    marginHorizontal: 10,
+                    marginVertical: 5
                   }}
                   onPress={() => handleTimeSlotSelection(item)}
                 >
@@ -462,8 +445,17 @@ const ViewEvents = ({ route, navigation }) => {
 
 
       </ScrollView>
+
+      <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
+        <BookDatesButton
+          onPress={() => navigation.navigate('HallsBookingOverView', { categoryId: categoryId, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `${formatAmount(eventsDetails?.rentPricePerDay)}` })}
+          text={`${formatAmount(eventsDetails?.rentPricePerDay)} View Cart`}
+          padding={10}
+        />
+      </View>
+
       {/* <Text style={{ padding: 10, color: 'black', fontWeight: '600' }}>Total for {noOfDays} days</Text> */}
-      <View style={{ backgroundColor: 'white', flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
+      {/* <View style={{ backgroundColor: 'white', flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
         <TouchableOpacity style={{ backgroundColor: 'white', borderRadius: 8, padding: 10, borderColor: '#D2453B', borderWidth: 2, width: '45%' }}
           onPress={() => navigation.navigate('BookingOverView', { categoryId: categoryId })}
         >
@@ -494,7 +486,7 @@ const ViewEvents = ({ route, navigation }) => {
           </View>
         </TouchableOpacity>
 
-      </View>
+      </View> */}
     </View>
   )
 };

@@ -39,57 +39,16 @@ const ViewTentHouse = ({ route, navigation }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isTimeSlotModalVisible, setTimeSlotModalVisible] = useState(false);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+    const [itemQuantities, setItemQuantities] = useState({});
+    const [selectedItems, setSelectedItems] = useState({});
 
 
     const { categoryId } = route.params;
     console.log("CATEID I::::::", categoryId)
-    const editsData = [
-        { image: require('../../assets/chair.png'), name: '300 Seating', status: 'Available' },
-        { image: require('../../assets/foodAvailable.png'), name: 'Food', status: 'Available' },
-        { image: require('../../assets/rooms.png'), name: 'Rooms', status: 'Available' },
-        { image: require('../../assets/foodAvailable.png'), name: 'Area Available', status: 'Available' },
-        { image: require('../../assets/acAvailable.jpeg'), name: 'No A/C', status: 'Available' },
-        { image: require('../../assets/foodAvailable.png'), name: 'Food', status: 'Available' },
+  
+  
 
-    ]
-
-    const amenitiesData = [
-        { id: '1', icon: PeopleAccommodate, label: '500-1200 pax' },
-        { id: '2', icon: FanIcon, label: 'Fan Available' },
-        { id: '3', icon: RoomsAvailable, label: '4 Bedroom' },
-        { id: '4', icon: AcIcon, label: 'Air Condition' },
-    ];
-
-    const rentalItems = [
-        {
-            id: '1',
-            name: 'Carpet',
-            price: '700',
-            description: 'The Critical Minerals Association USA aims to address critical mineral supply chain challenges to favourably...',
-            image: 'https://fpimages.withfloats.com/tile/61fb32feb11d6b00017d8f8b.jpg',
-        },
-        {
-            id: '2',
-            name: 'Chair',
-            price: '700',
-            description: 'The Critical Minerals Association USA aims to address critical mineral supply chain challenges to favourably...',
-            image: 'https://fpimages.withfloats.com/tile/61fb32feb11d6b00017d8f8b.jpg',
-        },
-        {
-            id: '3',
-            name: 'Side Walks',
-            price: '700',
-            description: 'The Critical Minerals Association USA aims to address critical mineral supply chain challenges to favourably...',
-            image: 'https://fpimages.withfloats.com/tile/61fb32feb11d6b00017d8f8b.jpg',
-        },
-        {
-            id: '4',
-            name: 'Lights',
-            price: '700',
-            description: 'The Critical Minerals Association USA aims to address critical mineral supply chain challenges to favourably...',
-            image: 'https://fpimages.withfloats.com/tile/61fb32feb11d6b00017d8f8b.jpg',
-        },
-    ];
+ 
 
     const timeSlots = [
         '12:00 AM',
@@ -122,7 +81,7 @@ const ViewTentHouse = ({ route, navigation }) => {
         setSelectedTimeSlot(timeSlot);
         setTimeSlotModalVisible(false);
     };
-   
+
     const convertLocalhostUrls = (url) => {
         return url.replace("localhost", LocalHostUrl);
     };
@@ -141,6 +100,7 @@ const ViewTentHouse = ({ route, navigation }) => {
             const imageUrls = response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
             setSubImages(imageUrls);
             setRentalItemsData(response?.data?.rentalItems);
+            console.log("rental items::::::", response?.data?.rentalItems)
         } catch (error) {
             console.log("tenthouse details::::::::::", error);
 
@@ -238,47 +198,89 @@ const ViewTentHouse = ({ route, navigation }) => {
 
     console.log("selected dates:::::::::", selectedStartDate, selectedEndDate);
 
-    const AmenitiesRenderItem = ({ icon: Icon, label }) => (
-        <View style={{ alignItems: 'center', marginHorizontal: 15, marginTop: 10 }}>
-            <Icon style={{}} />
-            <Text style={{ fontSize: 9.5, color: "#606060", fontWeight: "400", fontFamily: 'ManropeRegular', marginTop: 5 }}>{label}</Text>
-        </View>
-    );
 
-   
+    const updateQuantity = (item) => {
+        const quantity = itemQuantities[item.itemName] || 0;
+        const newQuantity = quantity + 1;
+        setItemQuantities(prevState => ({
+            ...prevState,
+            [item.itemName]: newQuantity
+        }));
 
+        setSelectedItems(prevState => ({
+            ...prevState,
+            [item.itemName]: {
+                name: item.itemName,
+                quantity: newQuantity,
+                perDayPrice: item.perDayPrice,
+                total: newQuantity * item.perDayPrice
+            }
+        }));
+    };
+
+    const decrementQuantity = (item) => {
+        const quantity = itemQuantities[item.itemName] || 0;
+        const newQuantity = quantity > 0 ? quantity - 1 : 0;
+        setItemQuantities(prevState => ({
+            ...prevState,
+            [item.itemName]: newQuantity
+        }));
+
+        if (newQuantity > 0) {
+            setSelectedItems(prevState => ({
+                ...prevState,
+                [item.itemName]: {
+                    name: item.itemName,
+                    quantity: newQuantity,
+                    perDayPrice: item.perDayPrice,
+                    total: newQuantity * item.perDayPrice
+                }
+            }));
+        } else {
+            const updatedItems = { ...selectedItems };
+            delete updatedItems[item.itemName];
+            setSelectedItems(updatedItems);
+        }
+    };
+
+    const calculateTotalPrice = (rentalItemsData, itemQuantities) => {
+        if (!rentalItemsData) return 0;
+        return rentalItemsData.reduce((total, item) => {
+            const quantity = itemQuantities[item.itemName] || 0;
+            return total + (item.perDayPrice * quantity);
+        }, 0);
+    };
 
     const RentalItem = ({ item }) => {
-        const [quantity, setQuantity] = useState(0);
-      
+        const quantity = itemQuantities[item.itemName] || 0;
         return (
-          <View style={styles.itemContainer}>
-            <Image source={{ uri: item?.image }} style={styles.itemImage} />
-            <View style={styles.itemDetails}>
-            <View style={{flexDirection:"row",justifyContent:"space-between"}} >
-                <View>
-              <Text style={styles.itemName}>{item?.itemName}</Text>
-              <Text style={styles.itemPrice}><Text style={{fontSize:12, fontWeight:"400"}}>Per Hour</Text> ₹{item?.perHourPrice}/-</Text>
-              <Text style={styles.itemPrice}><Text style={{fontSize:12, fontWeight:"400",}}>Per Day </Text>₹{item?.perDayPrice}/-</Text>
-              </View>
+            <View style={styles.itemContainer}>
+                <Image source={{ uri: item?.image }} style={styles.itemImage} />
+                <View style={styles.itemDetails}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between" }} >
+                        <View>
+                            <Text style={styles.itemName}>{item?.itemName}</Text>
+                            {/* <Text style={styles.itemPrice}><Text style={{fontSize:12, fontWeight:"400"}}>Per Hour</Text> ₹{item?.perHourPrice}/-</Text> */}
+                            <Text style={styles.itemPrice}><Text style={{ fontSize: 12, fontWeight: "400", }}>Per Day </Text>₹{item?.perDayPrice}/-</Text>
+                        </View>
 
-              <View style={styles.quantityContainer}>
-              <TouchableOpacity onPress={() => setQuantity(quantity > 0 ? quantity - 1 : 0)}>
-                <MinusIcon  />
-              </TouchableOpacity>
-              <Text style={styles.quantityText}>{quantity}</Text>
-              <TouchableOpacity onPress={() => setQuantity(quantity + 1)}>
-                <AddIcon />
-              </TouchableOpacity>
-            </View>
+                        <View style={styles.quantityContainer}>
+                            <TouchableOpacity onPress={() => decrementQuantity(item)}>
+                                <MinusIcon />
+                            </TouchableOpacity>
+                            <Text style={styles.quantityText}>{quantity}</Text>
+                            <TouchableOpacity onPress={() => updateQuantity(item)}>
+                                <AddIcon />
+                            </TouchableOpacity>
+                        </View>
 
-              </View>
-              <Text style={styles.itemDescription}>{item?.description}</Text>
+                    </View>
+                    <Text style={styles.itemDescription}>{item?.description}</Text>
+                </View>
+
             </View>
-            
-          </View>
         );
-      };
+    };
 
 
 
@@ -327,11 +329,17 @@ const ViewTentHouse = ({ route, navigation }) => {
 
                     <View style={{ borderColor: "#F1F1F1", borderWidth: 1, width: "100%", marginTop: 5 }} />
 
-                    <Text style={{color:"#000000", fontSize:13, fontWeight:"700",fontFamily: 'ManropeRegular',marginTop:15}}>Available Rental Items</Text>
+                    <Text style={{ color: "#000000", fontSize: 13, fontWeight: "700", fontFamily: 'ManropeRegular', marginTop: 15 }}>Available Rental Items</Text>
                     <FlatList
                         data={rentalItemsData}
                         keyExtractor={(item) => item?.id}
-                        renderItem={({ item }) => <RentalItem item={item} />}
+                        renderItem={({ item }) =>
+                            <RentalItem
+                                item={item}
+                                quantity={itemQuantities[item.itemName] || 0}
+                                updateQuantity={updateQuantity}
+                            />
+                        }
                     />
 
                     <Text style={{ marginTop: 20, fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular' }}>Book The Day</Text>
@@ -361,10 +369,10 @@ const ViewTentHouse = ({ route, navigation }) => {
                         <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{noOfDays > 1 ? `${noOfDays} days` : '1 day'}</Text>
                     </View>
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, marginBottom: "25%" }}>
 
                         <Text style={[styles.title, { marginTop: 10 }]}>Total Price :</Text>
-                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{noOfDays ? formatAmount(eventsDetails?.price * noOfDays) : formatAmount(eventsDetails?.price)}</Text>
+                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{`₹${calculateTotalPrice(rentalItemsData, itemQuantities)}`}</Text>
                     </View>
 
                 </View>
@@ -410,13 +418,13 @@ const ViewTentHouse = ({ route, navigation }) => {
                             style={{ marginTop: 20, marginHorizontal: 25, borderRadius: 10 }}
                         />
 
-                        <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
-                            <BookDatesButton
-                                onPress={() => setIsVisible(false)}
-                                text={'Confirm Date'}
-                                padding={10}
-                            />
-                        </View>
+            <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
+                <BookDatesButton
+                    onPress={() => setIsVisible(false)}
+                    text={`Confirm Date`}
+                    padding={10}
+                />
+            </View>
                     </View>
                 </Modal>
 
@@ -463,6 +471,15 @@ const ViewTentHouse = ({ route, navigation }) => {
 
 
             </ScrollView>
+
+            <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
+                <BookDatesButton
+                    onPress={() => navigation.navigate('BookingOverView',{categoryId:categoryId, rentalItems:itemQuantities,timeSlot:selectedTimeSlot , bookingDate:moment(selectedDate).format('DD-MM-YYYY'), totalPrice:`₹${calculateTotalPrice(rentalItemsData, itemQuantities)}`})}
+                    text={`₹${calculateTotalPrice(rentalItemsData, itemQuantities)}   View Cart`}
+                    padding={10}
+                />
+            </View>
+
             {/* <Text style={{ padding: 10, color: 'black', fontWeight: '600' }}>Total for {noOfDays} days</Text> */}
             {/* <View style={{ backgroundColor: 'white', flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
                 <TouchableOpacity style={{ backgroundColor: 'white', borderRadius: 8, padding: 10, borderColor: '#D2453B', borderWidth: 2, width: '45%' }}
@@ -567,62 +584,62 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 16,
-        paddingHorizontal:5,
-        paddingVertical:10,
-        borderBottomColor:"#D6D6D6",
-        borderBottomWidth:1
+        paddingHorizontal: 5,
+        paddingVertical: 10,
+        borderBottomColor: "#D6D6D6",
+        borderBottomWidth: 1
         // padding: 16,
         // borderRadius: 8,
         // backgroundColor: '#f9f9f9',
         // elevation: 1,
-      },
-      itemImage: {
+    },
+    itemImage: {
         width: 80,
         height: 80,
         borderRadius: 8,
-      },
-      itemDetails: {
+    },
+    itemDetails: {
         flex: 1,
-        marginLeft:10
-      },
-      itemName: {
+        marginLeft: 10
+    },
+    itemName: {
         fontSize: 16,
         fontWeight: '400',
-        color:"#000000",
+        color: "#000000",
         fontFamily: 'ManropeRegular',
 
-      },
-      itemPrice: {
+    },
+    itemPrice: {
         fontSize: 13,
         color: '#000000',
         fontFamily: 'ManropeRegular',
-        fontWeight:"700",
-        marginTop:5
-      },
-      itemDescription: {
+        fontWeight: "700",
+        marginTop: 5
+    },
+    itemDescription: {
         fontSize: 10,
         color: '#8B8B8B',
-        fontWeight:"400",
+        fontWeight: "400",
         fontFamily: 'ManropeRegular',
         marginTop: 5,
-      },
-      quantityContainer: {
+    },
+    quantityContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderColor:"#4E7B10",
-        borderWidth:1,
-        borderRadius:10,
-        paddingHorizontal:10,
-        height:"50%"
-      },
-      quantityText: {
+        borderColor: "#4E7B10",
+        borderWidth: 1,
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        height: "50%"
+    },
+    quantityText: {
         fontSize: 13,
         marginHorizontal: 8,
-        color:"#000000",
-        fontWeight:"400",
+        color: "#000000",
+        fontWeight: "400",
         fontFamily: 'ManropeRegular',
 
-      },
+    },
 });
 
 export default ViewTentHouse;

@@ -58,9 +58,9 @@ const Events = () => {
 
     const getAllEvents = async () => {
         try {
-            const response = await axios.get(`${BASE_URL}/all-events`);
+            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls`);
             // console.log('events response is::::::::', response?.data?.data);
-            setEventsData(response?.data?.data)
+            setEventsData(response?.data)
         } catch (error) {
             console.log("events data error>>::", error);
         }
@@ -156,9 +156,16 @@ const Events = () => {
 
     const renderItem = ({ item }) => {
 
+        const convertLocalhostUrls = (url) => {
+            return url.replace("localhost", LocalHostUrl);
+        };
+        // console.log("insdie render item")
+        const imageUrls = item?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
+        console.log("image urls arrya:", imageUrls)
+
         return (
             <View style={{ borderRadius: 20, marginHorizontal: 20, marginBottom: 5, elevation: -10 }}>
-                <View style={[styles.container]}>
+               <View style={[styles.container]}>
                     <Swiper
                         style={styles.wrapper}
                         loop={false}
@@ -168,11 +175,11 @@ const Events = () => {
                         activeDotStyle={{ width: 12, height: 12, borderRadius: 6 }}
                         dot={<View style={{ backgroundColor: '#FFFFFF', width: 8, height: 8, borderRadius: 6, marginHorizontal: 8 }} />}
                     >
-                        {item?.subImages.map((item, index) => (
+                        {imageUrls.map((item, index) => (
                             <TouchableOpacity style={styles.slide} key={index}
-                                onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
+                                onPress={() => navigation.navigate('ViewTentHouse', { categoryId: item?._id })}
                             >
-                                <Image source={{ uri: item }} style={styles.image} />
+                                <Image resizeMode="contain" source={{ uri: item }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
                     </Swiper>
@@ -182,24 +189,21 @@ const Events = () => {
                     style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                         <View style={{ width: '60%', }}>
-                            <Text style={{ color: 'black', fontSize: 17, fontWeight: "700", fontFamily: "ManropeRegular" }} >{item?.name}</Text>
+                            <Text style={{ color: 'black', fontSize: 17, fontWeight: "700", fontFamily: "ManropeRegular" }} >{item?.functionHallName}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', }}>
                                 <LocationMarkIcon style={{ marginTop: 5 }} />
-                                <Text style={{ fontWeight: '500', marginHorizontal: 5, color: '#696969', fontSize: 13, marginTop: 5, fontFamily: "ManropeRegular" }}>Alice Springs NT 0870</Text>
+                                <Text style={{ fontWeight: '500', marginHorizontal: 5, color: '#696969', fontSize: 13, marginTop: 5, fontFamily: "ManropeRegular" }}>{item?.functionHallAddress?.address}</Text>
                             </View>
                         </View>
                         <View>
-                            <Text style={{ fontWeight: '700', color: '#202020', fontSize: 18, fontFamily: "ManropeRegular" }}>{formatAmount(item?.price)}<Text style={{ color: "gray", fontSize: 16 }}> /day</Text></Text>
-                            <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
+                            <Text style={{ fontWeight: '700', color: '#202020', fontSize: 18, fontFamily: "ManropeRegular" }}>{formatAmount(item?.rentPricePerDay)}<Text style={{ color: "gray", fontSize: 16 }}> /day</Text></Text>
+                            {/* <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
                                 <Text style={styles.strickedoffer}>₹20000</Text>
                                 <Text style={styles.off}> 20% off</Text>
-                            </View>
+                            </View> */}
                         </View>
                     </View>
-                    <View style={{ marginTop: 10, flexDirection: 'row' }}>
-
-                        {/* <Text style={{ fontWeight: '600', color: '#696969', fontSize: 12, width: '100%' }}>{item?.description}</Text> */}
-                    </View>
+                    
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "50%" }}>
 
                         <View style={{ backgroundColor: item?.available ? "#FEF7DE" : "#FEF7DE", flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
@@ -212,7 +216,7 @@ const Events = () => {
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
                             <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} />
-                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> 300-500</Text>
+                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> {item?.seatingCapacity}</Text>
                         </View>
                     </View>
                 </TouchableOpacity>
