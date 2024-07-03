@@ -30,7 +30,7 @@ const GeneralDetails = () => {
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [eventProviderName, setEventProviderName] = useState('');
     const [eventDescription, setEventDescription] = useState('');
-    const [isCollapsed, setIsCollapsed] = useState(true);
+    const [isCollapsed, setIsCollapsed] = useState(false);
     const [isFoodDropDownCollapsed, setIsFoodDropDownCollapsed] = useState(true);
     const [selectedFoodType, setSelectedFoodType] = useState('');
     const [additionalImages, setAdditionalImages] = useState({
@@ -39,9 +39,9 @@ const GeneralDetails = () => {
         additionalImageThree: undefined,
         additionalImageFour: undefined
     });
-    const [functionHallAddress, setfunctionHallAddress] = useState('');
-    const [functionHallCity, setfunctionHallCity] = useState('');
-    const [functionHallPinCode, setfunctionHallPinCode] = useState();
+    const [eventOrgAddress, seteventOrgAddress] = useState('');
+    const [eventOrgCity, seteventOrgCity] = useState('');
+    const [eventOrgPinCode, seteventOrgPinCode] = useState();
     const [perDayRentPrice, setPerDayRentPrice] = useState();
     const [perKMPrice, setPerKMPrice] = useState();
     const [perMonthRentPrice, setPerMonthRentPrice] = useState();
@@ -80,43 +80,20 @@ const GeneralDetails = () => {
 
     const seatingCapacity = ['0-100', '100-200','200-30', '300+']
 
-    const rentalItems = [
+    const decorTypes = [
         { name: 'Marriage' },
         { name: 'Birthday' },
         { name: 'Anniversary' },
-        { name: 'House Warming' },
+        { name: 'Festival' },
+        { name: 'Other' }
     ];
-
-    const onChangePerKMChargePrice = (value) => {
-        setPerKMPrice(value);
-    }
-
-    const onChangeBedRooms = (value) => {
-        setBedRooms(value);
-    }
-
-    const onChangeFoodType = (value) => {
-        setFoodType(value);
-    }
 
     const onChangeDescription = (value) => {
         setEventDescription(value);
     }
 
-    const onChangefunctionHallName = (value) => {
+    const onChangeEventProviderName = (value) => {
         setEventProviderName(value);
-    }
-
-    const onChangePerDayRentPrice = (value) => {
-        setPerDayRentPrice(value);
-    }
-
-    const onChangePerMonthRentPrice = (value) => {
-        setPerMonthRentPrice(value);
-    }
-
-    const onChangeSecurityDepositAmount = (value) => {
-        setSecurityDeposit(value);
     }
 
     const onChangeAdvanceAmount = (value) => {
@@ -131,16 +108,16 @@ const GeneralDetails = () => {
         setOverTimeCharges(value);
     }
 
-    const onChangefunctionHallAddress = (value) => {
-        setfunctionHallAddress(value);
+    const onChangeEventOrganizerAddress = (value) => {
+        seteventOrgAddress(value);
     }
 
-    const onChangefunctionHallCity = (value) => {
-        setfunctionHallCity(value);
+    const onChangeeventOrgCity = (value) => {
+        seteventOrgCity(value);
     }
 
-    const onChangefunctionHallPinCode = (value) => {
-        setfunctionHallPinCode(value);
+    const onChangeeventOrgPinCode = (value) => {
+        seteventOrgPinCode(value);
     }
 
     const data = [
@@ -312,7 +289,7 @@ const GeneralDetails = () => {
             name: additionalImages?.additionalImageFour?.assets[0]?.fileName,
         });
 
-        const functionHallAddessIs = { "address": functionHallAddress, "city": functionHallCity, "pinCode": functionHallPinCode };
+        const functionHallAddessIs = { "address": eventOrgAddress, "city": eventOrgCity, "pinCode": eventOrgPinCode };
         console.log('selectedItemArray is ::>>>',selectedItemArray)
         formData.append('serviceType', 'driver');
         formData.append('description', eventDescription);
@@ -322,7 +299,7 @@ const GeneralDetails = () => {
         formData.append('rentPricePerDay', perDayRentPrice);
         formData.append('bedRooms', BedRooms);
         formData.append('available', true);
-        formData.append('functionHallAddress', JSON.stringify(functionHallAddessIs));
+        formData.append('eventOrgAddress', JSON.stringify(functionHallAddessIs));
         formData.append('vendorMobileNumber', vendorMobileNumber);
         formData.append('advanceAmount', advanceAmount);
         formData.append('discountPercentage', discountPercentage);
@@ -444,7 +421,7 @@ const GeneralDetails = () => {
         });
     };
 
-    const RentalItemsList = () => {
+    const decorTypesList = () => {
 
         const toggleCollapse = () => {
             setIsCollapsed(!isCollapsed);
@@ -472,13 +449,13 @@ const GeneralDetails = () => {
         return (
             <View style={styles.container}>
                 <TouchableOpacity onPress={toggleCollapse} style={styles.header}>
-                    <Text style={styles.headerText}>Available Amenities</Text>
+                    <Text style={styles.headerText}>Decoration Types</Text>
                     <Icon name={isCollapsed ? 'arrow-down' : 'arrow-up'} size={20} />
                 </TouchableOpacity>
                 {!isCollapsed && (
                     <View style={styles.itemsContainer}>
                         <FlatList
-                            data={rentalItems}
+                            data={decorTypes}
                             keyExtractor={(item, index) => index.toString()}
                             renderItem={renderItem}
                         />
@@ -487,71 +464,29 @@ const GeneralDetails = () => {
             </View>
         );
     };
-
-
-
-
-
-    const RentalFoodTypeList = () => {
-
-        const toggleCollapse = () => {
-            setIsFoodDropDownCollapsed(!isFoodDropDownCollapsed);
-            // setSelectedFoodType(name);
-        };
-
-        const onSelectFoodType = (name) => {
-            setSelectedFoodType(name);
-        }
-
-
-        const renderItem = ({ item }) => {
-            const IconImage = item?.icon;
-            return (
-                <TouchableOpacity style={styles.item} onPress={() => { onSelectFoodType(item?.name) }}>
-                    <View style={{ borderColor: 'green', borderWidth: 2, width: 20, height: 20, borderRadius: 5 }}>
-                        <View style={{ backgroundColor: selectedFoodType === item.name ? 'green' : 'white', width: 10, height: 10, alignSelf: 'center', marginTop: 3 }}>
-
-                        </View>
-                    </View>
-                    <View style={{ flexDirection: 'row', marginHorizontal: 5, alignItems: "center" }} onPress={() => { }}>
-                        {/* <Icon name={item.icon} size={20} style={styles.icon} /> */}
-
-                        <IconImage style={{ marginHorizontal: 2 }} />
-                        <Text style={styles.itemText}>{item.name}</Text>
-                    </View>
-                </TouchableOpacity>
-            )
-        }
-
-        return (
-            <View style={styles.container}>
-                <TouchableOpacity onPress={toggleCollapse} style={styles.header}>
-                    <Text style={styles.headerText}>Food Type</Text>
-                    <Icon name={isFoodDropDownCollapsed ? 'arrow-down' : 'arrow-up'} size={20} />
-                </TouchableOpacity>
-                {!isFoodDropDownCollapsed && (
-                    <View style={styles.itemsContainer}>
-                        <FlatList
-                            data={foodTypes}
-                            keyExtractor={(item, index) => index.toString()}
-                            renderItem={renderItem}
-                        />
-                    </View>
-                )}
-            </View>
-        );
-    };
-
 
     return (
         <View>
             <View style={styles.mainContainer}>
+            <ChooseFileField
+                    label={'Event Origanizing Image'}
+                    isRequired={true}
+                    placeholder={'Hall Image'}
+                    onPressChooseFile={openGalleryOrCamera}
+                />
+                {mainImageUrl ?
+                    <Image
+                        source={{ uri: mainImageUrl?.assets[0].uri }}
+                        width={Dimensions.get('window').width}
+                        height={300}
+                        resizeMode='cover'
+                    /> : null}
                 
                 <TextField
                     label='Event Organize Name'
                     placeholder="Please Enter Event Organize Name"
                     value={eventProviderName}
-                    onChangeHandler={onChangefunctionHallName}
+                    onChangeHandler={onChangeEventProviderName}
                     keyboardType='default'
                     isRequired={true}
                 />
@@ -570,7 +505,7 @@ const GeneralDetails = () => {
 
             <Text style={styles.title}>Packages Available</Text>
             <View style={styles.mainContainer}>
-                {RentalItemsList()}
+                {decorTypesList()}
                  {selectedItemArray.map((itemName) => (
                 <Accordion
                     key={itemName}
@@ -617,24 +552,24 @@ const GeneralDetails = () => {
                 <TextField
                     label='Address'
                     placeholder="Please Enter Address"
-                    value={functionHallAddress}
-                    onChangeHandler={onChangefunctionHallAddress}
+                    value={eventOrgAddress}
+                    onChangeHandler={onChangeEventOrganizerAddress}
                     keyboardType='default'
                     isRequired={true}
                 />
                 <TextField
                     label='City'
                     placeholder="Please Enter City"
-                    value={functionHallCity}
-                    onChangeHandler={onChangefunctionHallCity}
+                    value={eventOrgCity}
+                    onChangeHandler={onChangeeventOrgCity}
                     keyboardType='default'
                     isRequired={true}
                 />
                 <TextField
                     label='Pin code'
                     placeholder="Please Enter Pin code"
-                    value={functionHallPinCode}
-                    onChangeHandler={onChangefunctionHallPinCode}
+                    value={eventOrgPinCode}
+                    onChangeHandler={onChangeeventOrgPinCode}
                     keyboardType='default'
                     isRequired={true}
                 />

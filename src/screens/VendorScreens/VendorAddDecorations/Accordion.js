@@ -120,7 +120,7 @@ export const Accordion = ({ itemName, onChangeDescription, onUploadImage, onChan
                 <Text style={styles.accordionHeaderText}>{itemName}</Text>
                 <Icon name={isCollapsed ? 'arrow-down' : 'arrow-up'} size={20} />
                 </TouchableOpacity>
-            {!isCollapsed && (
+            {isCollapsed && (
                 <View style={styles.accordionContent}>
                      <Text style={styles.subTitle}>Please add up to 2 images*</Text>
                 <FlatList
