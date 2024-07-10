@@ -39,6 +39,8 @@ const ViewDecors = ({ route, navigation }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isTimeSlotModalVisible, setTimeSlotModalVisible] = useState(false);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+    const [addedItems, setAddedItems] = useState([]);
+    const [totalPrice, setTotalPrice] = useState(0);
 
 
     const { categoryId } = route.params;
@@ -122,30 +124,55 @@ const ViewDecors = ({ route, navigation }) => {
         setSelectedTimeSlot(timeSlot);
         setTimeSlotModalVisible(false);
     };
-   
+
     const convertLocalhostUrls = (url) => {
         return url.replace("localhost", LocalHostUrl);
     };
 
     useEffect(() => {
-        getTentHouseDetails();
+        getDecorDetails();
     }, []);
 
-    const getTentHouseDetails = async () => {
+    const getDecorDetails = async () => {
         console.log("IAM CALLING API")
         try {
-            const response = await axios.get(`${BASE_URL}/getTentHouseDetailsById/${categoryId}`);
-            // console.log("tenthouse view details ::::::::::",JSON.stringify( response?.data));
+            const response = await axios.get(`${BASE_URL}/getDecorationDetailsById/${categoryId}`);
+            console.log("decorations view details ::::::::::", JSON.stringify(response?.data));
             setEventsDetails(response?.data);
 
-            const imageUrls = response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
-            setSubImages(imageUrls);
-            setRentalItemsData(response?.data?.rentalItems);
+            const imageUrl = response?.data?.professionalImage?.url.replace('localhost', LocalHostUrl);
+            setSubImages([imageUrl]);
+
+            setRentalItemsData(response?.data?.packages);
         } catch (error) {
             console.log("tenthouse details::::::::::", error);
 
         }
     }
+
+
+    console.log("profe image:", JSON.stringify(rentalItemsData));
+
+    const addItem = (item) => {
+        setAddedItems((prevAddedItems) => {
+            if (prevAddedItems.some(addedItem => addedItem._id === item._id)) {
+                return prevAddedItems.filter(addedItem => addedItem._id !== item._id);
+            } else {
+                return [...prevAddedItems, item];
+            }
+        });
+    };
+
+    const isItemAdded = (item) => {
+        return addedItems.some(addedItem => addedItem._id === item._id);
+    };
+
+    useEffect(() => {
+        const total = addedItems.reduce((sum, item) => sum + item.packagePrice, 0);
+        setTotalPrice(total);
+      }, [addedItems]);
+
+    console.log("added to cart is:::::::", JSON.stringify(addedItems))
 
     const createFunctionHallBooking = async (eventId) => {
 
@@ -245,39 +272,55 @@ const ViewDecors = ({ route, navigation }) => {
         </View>
     );
 
-   
 
 
-    const RentalItem = ({ item }) => {
-        const [quantity, setQuantity] = useState(0);
-      
+
+    const RentalItem = ({ item , addItem, isAdded}) => {
+
         return (
-          <View style={styles.itemContainer}>
-            <Image source={{ uri: item?.image }} style={styles.itemImage} />
-            <View style={styles.itemDetails}>
-            <View style={{flexDirection:"row",justifyContent:"space-between"}} >
-                <View>
-              <Text style={styles.itemName}>{item?.name}</Text>
-              <Text style={styles.itemPrice}><Text style={{fontSize:12, fontWeight:"400"}}></Text> ₹{item?.price}/-</Text>
-              </View>
+            <View style={styles.itemContainer}>
+                <View style={{ width: Dimensions.get('window').width / 4, height: 100 }}>
+                    <Swiper
+                        showsPagination
+                        autoplay={true}
+                        paginationStyle={{ bottom: 15 }}
+                        dotStyle={{ width: 7, height: 7 }}
+                        activeDotStyle={{ width: 10, height: 10 }}
+                    >
+                        {item.packageImages.map((image, index) => (
+                            <Image
+                                key={index}
+                                source={{ uri: image.url.replace('localhost', LocalHostUrl) }}
+                                style={{
+                                    width: '100%',
+                                    height: "95%",
+                                    resizeMode: 'cover'
+                                }}
+                                resizeMode="cover"
+                            />
+                        ))}
+                    </Swiper>
+                </View>
+                <View style={styles.itemDetails}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between" }} >
+                        <View>
+                            <Text style={styles.itemName}>{item?.packageName}</Text>
+                            <Text style={styles.itemPrice}><Text style={{ fontSize: 12, fontWeight: "400" }}></Text> ₹{item?.packagePrice}/-</Text>
+                        </View>
 
-              <View style={styles.quantityContainer}>
-              <TouchableOpacity onPress={() => setQuantity(quantity > 0 ? quantity - 1 : 0)}>
-                <MinusIcon  />
-              </TouchableOpacity>
-              <Text style={styles.quantityText}>{quantity}</Text>
-              <TouchableOpacity onPress={() => setQuantity(quantity + 1)}>
-                <AddIcon />
-              </TouchableOpacity>
-            </View>
+                        <View style={styles.quantityContainer}> 
+                            <TouchableOpacity onPress={() => addItem(item)}>
+                            <Text style={styles.addText}>{isAdded ? 'Added -' : 'ADD'}</Text>
+                            </TouchableOpacity>
+                        </View>
 
-              </View>
-              <Text style={styles.itemDescription}>{item?.description}</Text>
+                    </View>
+                    <Text style={styles.itemDescription}>{item?.packageDescription}</Text>
+                </View>
+
             </View>
-            
-          </View>
         );
-      };
+    };
 
 
 
@@ -311,12 +354,12 @@ const ViewDecors = ({ route, navigation }) => {
                 <View style={{ flex: 1, marginTop: 10, marginHorizontal: 20 }}>
 
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                        <Text style={{ fontSize: 20, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular' }}>{eventsDetails?.tentHouseName}</Text>
+                        <Text style={{ fontSize: 20, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular' }}>{eventsDetails?.eventOrganiserName}</Text>
                     </View>
 
                     <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center" }}>
                         <MapMarkIcon />
-                        <Text style={{ color: "#939393", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', marginLeft: 5 }}>{eventsDetails?.tentHosueAddress?.address}</Text>
+                        <Text style={{ color: "#939393", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', marginLeft: 5 }}>{eventsDetails?.eventOrganizerAddress?.address}</Text>
                     </View>
 
                     <View style={{ marginTop: 20 }}>
@@ -326,11 +369,12 @@ const ViewDecors = ({ route, navigation }) => {
 
                     <View style={{ borderColor: "#F1F1F1", borderWidth: 1, width: "100%", marginTop: 5 }} />
 
-                    <Text style={{color:"#000000", fontSize:13, fontWeight:"700",fontFamily: 'ManropeRegular',marginTop:15}}>Available Rental Items</Text>
+                    <Text style={{ color: "#000000", fontSize: 13, fontWeight: "700", fontFamily: 'ManropeRegular', marginTop: 15 }}>Available Rental Items</Text>
                     <FlatList
-                        data={rentalItems}
+                        data={rentalItemsData}
                         keyExtractor={(item) => item?.id}
-                        renderItem={({ item }) => <RentalItem item={item} />}
+                        renderItem={({ item }) => <RentalItem item={item} addItem={addItem}
+                            isAdded={isItemAdded(item)} />}
                     />
 
                     <Text style={{ marginTop: 20, fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular' }}>Book The Day</Text>
@@ -360,10 +404,10 @@ const ViewDecors = ({ route, navigation }) => {
                         <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{noOfDays > 1 ? `${noOfDays} days` : '1 day'}</Text>
                     </View>
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20,marginBottom:"20%" }}>
 
                         <Text style={[styles.title, { marginTop: 10 }]}>Total Price :</Text>
-                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{noOfDays ? formatAmount(eventsDetails?.price * noOfDays) : formatAmount(eventsDetails?.price)}</Text>
+                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{formatAmount(totalPrice)}</Text>
                     </View>
 
                 </View>
@@ -400,12 +444,14 @@ const ViewDecors = ({ route, navigation }) => {
                             headerStyle={{ backgroundColor: '#FDEEBC' }}
                             markedDates={{ [selectedDate]: { selected: true, marked: true, selectedColor: '#ED5065' } }}
                             markingType="single"
-                            minDate={moment().format('DD-MM-YYYY')} // Disable past dates
+                            minDate={moment().format('YYYY-MM-DD')} // Disable past dates
                             theme={{
                                 arrowColor: 'black',
                                 todayTextColor: '#ED5065',
                                 selectedDayBackgroundColor: '#ED5065',
+                                textDisabledColor: '#d9e1e8' // Make disabled dates less prominent
                             }}
+                            disableAllTouchEventsForDisabledDays={true} // Disable touch events for past dates
                             style={{ marginTop: 20, marginHorizontal: 25, borderRadius: 10 }}
                         />
 
@@ -462,6 +508,14 @@ const ViewDecors = ({ route, navigation }) => {
 
 
             </ScrollView>
+
+            <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
+        <BookDatesButton
+          onPress={() => navigation.navigate('DecorsBookingOverView', { categoryId: categoryId, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `${formatAmount(totalPrice)}`, addedItems: addedItems})}
+          text={` View Cart`}
+          padding={10}
+        />
+      </View>
             {/* <Text style={{ padding: 10, color: 'black', fontWeight: '600' }}>Total for {noOfDays} days</Text> */}
             {/* <View style={{ backgroundColor: 'white', flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
                 <TouchableOpacity style={{ backgroundColor: 'white', borderRadius: 8, padding: 10, borderColor: '#D2453B', borderWidth: 2, width: '45%' }}
@@ -566,62 +620,69 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 16,
-        paddingHorizontal:5,
-        paddingVertical:10,
-        borderBottomColor:"#D6D6D6",
-        borderBottomWidth:1
+        paddingHorizontal: 5,
+        paddingVertical: 10,
+        borderBottomColor: "#D6D6D6",
+        borderBottomWidth: 1
         // padding: 16,
         // borderRadius: 8,
         // backgroundColor: '#f9f9f9',
         // elevation: 1,
-      },
-      itemImage: {
+    },
+    itemImage: {
         width: 80,
         height: 80,
         borderRadius: 8,
-      },
-      itemDetails: {
+    },
+    itemDetails: {
         flex: 1,
-        marginLeft:10
-      },
-      itemName: {
+        marginLeft: 10
+    },
+    itemName: {
         fontSize: 16,
         fontWeight: '400',
-        color:"#000000",
+        color: "#000000",
         fontFamily: 'ManropeRegular',
 
-      },
-      itemPrice: {
+    },
+    itemPrice: {
         fontSize: 13,
         color: '#000000',
         fontFamily: 'ManropeRegular',
-        fontWeight:"700",
-        marginTop:5
-      },
-      itemDescription: {
+        fontWeight: "700",
+        marginTop: 5
+    },
+    itemDescription: {
         fontSize: 10,
         color: '#8B8B8B',
-        fontWeight:"400",
+        fontWeight: "400",
         fontFamily: 'ManropeRegular',
         marginTop: 5,
-      },
-      quantityContainer: {
+    },
+    quantityContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderColor:"#4E7B10",
-        borderWidth:1,
-        borderRadius:10,
-        paddingHorizontal:10,
-        height:"50%"
-      },
-      quantityText: {
-        fontSize: 13,
-        marginHorizontal: 8,
-        color:"#000000",
-        fontWeight:"400",
+        borderColor: "#4E7B10",
+        borderWidth: 1,
+        borderRadius: 8,
+        paddingHorizontal: 10,
+        height: "50%"
+    },
+    addText: {
+        color: "#4E7B10",
+        fontSize: 12,
+        fontWeight: "700",
         fontFamily: 'ManropeRegular',
 
-      },
+    },
+    quantityText: {
+        fontSize: 13,
+        marginHorizontal: 8,
+        color: "#000000",
+        fontWeight: "400",
+        fontFamily: 'ManropeRegular',
+
+    },
 });
 
 export default ViewDecors;

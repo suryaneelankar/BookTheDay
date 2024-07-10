@@ -29,7 +29,7 @@ const ViewEvents = ({ route, navigation }) => {
   const [selectedEndDate, setSelectedEndDate] = useState('');
   const [isCalendarVisible, setCalendarVisible] = useState(false);
   const [noOfDays, setNoOfDays] = useState();
-  const [subImages, setSubImages] = useState();
+  const [subImages, setSubImages] = useState([]);
   const [bookingData, setBookingData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -103,7 +103,7 @@ const ViewEvents = ({ route, navigation }) => {
       setEventsDetails(response?.data);
       const imageUrls = response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
       setSubImages(imageUrls);
-
+      console.log("hall amenities", JSON.stringify(response?.data))
       const amenities = response?.data?.hallAmenities[0].split(',').map((item, index) => ({
         id: (index + 1).toString(),
         name: item.trim()
@@ -115,6 +115,8 @@ const ViewEvents = ({ route, navigation }) => {
 
     }
   }
+
+  console.log("sub images::::::", subImages);
   const createFunctionHallBooking = async (eventId) => {
 
     const bookingData = {

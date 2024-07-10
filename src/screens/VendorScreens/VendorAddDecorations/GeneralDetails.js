@@ -265,29 +265,48 @@ const GeneralDetails = () => {
             name: mainImageUrl?.assets[0]?.fileName,
         });
 
-        formData.append('additionalImages', {
-            uri: additionalImages?.additionalImageOne?.assets[0]?.uri,
-            type: additionalImages?.additionalImageOne?.assets[0]?.type,
-            name: additionalImages?.additionalImageOne?.assets[0]?.fileName,
-        });
+        // formData.append('additionalImages', {
+        //     uri: additionalImages?.additionalImageOne?.assets[0]?.uri,
+        //     type: additionalImages?.additionalImageOne?.assets[0]?.type,
+        //     name: additionalImages?.additionalImageOne?.assets[0]?.fileName,
+        // });
 
-        formData.append('additionalImages', {
-            uri: additionalImages?.additionalImageTwo?.assets[0]?.uri,
-            type: additionalImages?.additionalImageTwo?.assets[0]?.type,
-            name: additionalImages?.additionalImageTwo?.assets[0]?.fileName,
-        });
+        // formData.append('additionalImages', {
+        //     uri: additionalImages?.additionalImageTwo?.assets[0]?.uri,
+        //     type: additionalImages?.additionalImageTwo?.assets[0]?.type,
+        //     name: additionalImages?.additionalImageTwo?.assets[0]?.fileName,
+        // });
 
-        formData.append('additionalImages', {
-            uri: additionalImages?.additionalImageThree?.assets[0]?.uri,
-            type: additionalImages?.additionalImageThree?.assets[0]?.type,
-            name: additionalImages?.additionalImageThree?.assets[0]?.fileName,
-        });
+        if (itemDetails?.Marriage) {
+            itemDetails.Marriage.images.forEach((image, index) => {
+                formData.append('marriageImages', {
+                    uri: image.assets[0].uri,
+                    type: image.assets[0].type,
+                    name: image.assets[0].fileName,
+                });
+            });
+            formData.append('marriagePackage', JSON.stringify({
+                packageName: "Marriage",
+                packagePrice: itemDetails.Marriage.price,
+                packageDescription: itemDetails.Marriage.description,
+            }));
+        }
 
-        formData.append('additionalImages', {
-            uri: additionalImages?.additionalImageFour?.assets[0]?.uri,
-            type: additionalImages?.additionalImageFour?.assets[0]?.type,
-            name: additionalImages?.additionalImageFour?.assets[0]?.fileName,
-        });
+        if (itemDetails?.Birthday) {
+            itemDetails.Birthday.images.forEach((image, index) => {
+                formData.append('birthdayImages', {
+                    uri: image.assets[0].uri,
+                    type: image.assets[0].type,
+                    name: image.assets[0].fileName,
+                });
+            });
+            formData.append('birthdayPackage', JSON.stringify({
+                packageName: "Birthday",
+                packagePrice: itemDetails.Birthday.price,
+                packageDescription: itemDetails.Birthday.description,
+            }));
+        }
+
 
         const functionHallAddessIs = { "address": eventOrgAddress, "city": eventOrgCity, "pinCode": eventOrgPinCode };
         console.log('selectedItemArray is ::>>>',selectedItemArray)
@@ -295,11 +314,11 @@ const GeneralDetails = () => {
         formData.append('description', eventDescription);
         // formData.append('subscriptionChargesPerMonth', perMonthRentPrice);
         formData.append('hallAmenities', selectedItemArray);
-        formData.append('eventProviderName', eventProviderName);
+        formData.append('eventOrganiserName', eventProviderName);
         formData.append('rentPricePerDay', perDayRentPrice);
         formData.append('bedRooms', BedRooms);
         formData.append('available', true);
-        formData.append('eventOrgAddress', JSON.stringify(functionHallAddessIs));
+        formData.append('eventOrganizerAddress', JSON.stringify(functionHallAddessIs));
         formData.append('vendorMobileNumber', vendorMobileNumber);
         formData.append('advanceAmount', advanceAmount);
         formData.append('discountPercentage', discountPercentage);
@@ -310,7 +329,7 @@ const GeneralDetails = () => {
         console.log('formdata is ::>>', formData);
 
         try {
-            const response = await axios.post(`${BASE_URL}/AddFunctionHall`, formData, {
+            const response = await axios.post(`${BASE_URL}/AddDecorations`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

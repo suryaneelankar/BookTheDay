@@ -49,6 +49,8 @@ import AddSelectLocation from "../screens/Location/AddSelectLocation";
 import AddFunctionalHall from "../screens/VendorScreens/VendorAddFunctionHalls/AddFunctionalHall";
 import HallsBookingOverView from "../screens/Bookings/HallsBokingOverView";
 import AddDecorations from "../screens/VendorScreens/VendorAddDecorations/AddDecorations";
+import DecorsBookingOverView from "../screens/Bookings/DecorsBookingOverView";
+import ViewCaterings from "../screens/Events/ViewCaterings";
 
 const MainNavigation = () => {
 
@@ -172,6 +174,22 @@ const MainNavigation = () => {
                 component={ViewTentHouse}  
                 options={{
                          header: () => <NavigationHeader Icon={true} title="Tent Houses" />,
+                         headerShown: true,
+                }}
+                />
+                <Stack.Screen 
+               name="ViewCaterings"
+                component={ViewCaterings}  
+                options={{
+                         header: () => <NavigationHeader Icon={true} title="Caterings" />,
+                         headerShown: true,
+                }}
+                />
+                 <Stack.Screen 
+               name="DecorsBookingOverView"
+                component={DecorsBookingOverView}  
+                options={{
+                         header: () => <NavigationHeader Icon={true} title="Cart" />,
                          headerShown: true,
                 }}
                 />
