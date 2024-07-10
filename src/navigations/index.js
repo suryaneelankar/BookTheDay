@@ -49,6 +49,7 @@ import AddSelectLocation from "../screens/Location/AddSelectLocation";
 import AddFunctionalHall from "../screens/VendorScreens/VendorAddFunctionHalls/AddFunctionalHall";
 import HallsBookingOverView from "../screens/Bookings/HallsBokingOverView";
 import AddDecorations from "../screens/VendorScreens/VendorAddDecorations/AddDecorations";
+import AddFoodCatering from "../screens/VendorScreens/VendorAddFoodCatering/AddFoodCatering";
 
 const MainNavigation = () => {
 
@@ -73,180 +74,187 @@ const MainNavigation = () => {
             <Stack.Navigator>
                 <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="ViewTrendingDetails" component={ViewTrendingDetails} options={{ headerShown: true }} />
-                <Stack.Screen name="CategoriesList" component={CategoriesList}  options={{
-                         header: () => <NavigationHeader Icon={true} title="View Products" />,
-                         headerShown: true,
+                <Stack.Screen name="CategoriesList" component={CategoriesList} options={{
+                    header: () => <NavigationHeader Icon={true} title="View Products" />,
+                    headerShown: true,
                 }} />
                 <Stack.Screen name="ViewEvents" component={ViewEvents} options={{ headerShown: true }} />
-               
-               <Stack.Screen 
-               name="ViewHireDetails"
-                component={ViewHireDetails}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="Hire Professionals" />,
-                         headerShown: true,
-                }}
+
+                <Stack.Screen
+                    name="ViewHireDetails"
+                    component={ViewHireDetails}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Hire Professionals" />,
+                        headerShown: true,
+                    }}
                 />
-                <Stack.Screen 
-               name="ViewProfile"
-                component={ViewProfile}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="View Profile" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="ViewProfile"
+                    component={ViewProfile}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="View Profile" />,
+                        headerShown: true,
+                    }}
                 />
-                <Stack.Screen 
-               name="EditProfile"
-                component={EditProfile}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="Edit Profile" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="EditProfile"
+                    component={EditProfile}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Edit Profile" />,
+                        headerShown: true,
+                    }}
                 />
-                 <Stack.Screen 
-               name="ViewMyBookings"
-                component={ViewMyBookings}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="My Bookings" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="ViewMyBookings"
+                    component={ViewMyBookings}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="My Bookings" />,
+                        headerShown: true,
+                    }}
                 />
-                  <Stack.Screen 
-               name="ViewMyLendings"
-                component={ViewMyLendings}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="My Lendings" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="ViewMyLendings"
+                    component={ViewMyLendings}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="My Lendings" />,
+                        headerShown: true,
+                    }}
                 />
-                <Stack.Screen 
-               name="ViewCatDetails"
-                component={ViewCatDetails}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="Hire Professionals" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="ViewCatDetails"
+                    component={ViewCatDetails}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Hire Professionals" />,
+                        headerShown: true,
+                    }}
                 />
-                <Stack.Screen 
-               name="BookingDetailsScreen"
-                component={BookingDetailsScreen}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="Cart" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="BookingDetailsScreen"
+                    component={BookingDetailsScreen}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Cart" />,
+                        headerShown: true,
+                    }}
                 />
-                 <Stack.Screen 
-               name="HallsBookingOverView"
-                component={HallsBookingOverView}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="Cart" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="HallsBookingOverView"
+                    component={HallsBookingOverView}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Cart" />,
+                        headerShown: true,
+                    }}
                 />
-                <Stack.Screen 
-               name="ViewHireCartDetails"
-                component={ViewHireCartDetails}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="Cart" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="ViewHireCartDetails"
+                    component={ViewHireCartDetails}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Cart" />,
+                        headerShown: true,
+                    }}
                 />
-                <Stack.Screen 
-               name="LocationAdded"
-                component={LocationAdded}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="Location" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="LocationAdded"
+                    component={LocationAdded}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Location" />,
+                        headerShown: true,
+                    }}
                 />
-                <Stack.Screen 
-               name="AddSelectLocation"
-                component={AddSelectLocation}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="Select Location" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="AddSelectLocation"
+                    component={AddSelectLocation}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Select Location" />,
+                        headerShown: true,
+                    }}
                 />
-                <Stack.Screen 
-               name="ViewTentHouse"
-                component={ViewTentHouse}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="Tent Houses" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="ViewTentHouse"
+                    component={ViewTentHouse}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Tent Houses" />,
+                        headerShown: true,
+                    }}
                 />
-                <Stack.Screen 
-               name="ViewDecors"
-                component={ViewDecors}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="Decorations" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="ViewDecors"
+                    component={ViewDecors}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Decorations" />,
+                        headerShown: true,
+                    }}
                 />
-                <Stack.Screen 
-               name="SelectDateTime"
-                component={SelectDateTimeScreen}  
-                options={{
-                         header: () => (''),
-                         headerShown: false,
-                }}
+                <Stack.Screen
+                    name="SelectDateTime"
+                    component={SelectDateTimeScreen}
+                    options={{
+                        header: () => (''),
+                        headerShown: false,
+                    }}
                 />
-               
-               
-                 {/* ############### profile Screens ################# */}
-                <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{headerShown: true}} />
-                <Stack.Screen name="AboutUs" component={AboutUs} options={{headerShown: true}}/>
-                <Stack.Screen name="ContactUs"component={ContactUs}options={{headerShown: false,}}/>
-                <Stack.Screen name="DeleteMyAccount" component={DeleteMyAccount} options={{headerShown: true,}}/>
-                <Stack.Screen name="EditProfileInfo" component={EditProfileInfo} options={{headerShown: true,}}/>
-                <Stack.Screen name="LogOut" component={LogOut} options={{headerShown: true,}}/>
-                <Stack.Screen name="MyBookings" component={MyBookings} options={{headerShown: true,}} />
-                <Stack.Screen name="MyEvents" component={MyEvents} options={{headerShown: true,}} />
-                <Stack.Screen name="MyLocations" component={MyLocations} options={{headerShown: true,}} />
-                <Stack.Screen name="Notifications" component={Notifications} options={{headerShown: true,}} />
-                <Stack.Screen name="PrivacyPolicy" component={ProfilePolicy} options={{headerShown: true,}} />
-                <Stack.Screen name="ReferAndEarn" component={ReferAndEarn} options={{headerShown: true,}} />
-                <Stack.Screen name="RefundPolicy" component={RefundPolicy} options={{headerShown: true,}} />
-                <Stack.Screen name="TermsAndConditions" component={TermsAndCondition} options={{headerShown: true,}} />
+
+
+                {/* ############### profile Screens ################# */}
+                <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: true }} />
+                <Stack.Screen name="AboutUs" component={AboutUs} options={{ headerShown: true }} />
+                <Stack.Screen name="ContactUs" component={ContactUs} options={{ headerShown: false, }} />
+                <Stack.Screen name="DeleteMyAccount" component={DeleteMyAccount} options={{ headerShown: true, }} />
+                <Stack.Screen name="EditProfileInfo" component={EditProfileInfo} options={{ headerShown: true, }} />
+                <Stack.Screen name="LogOut" component={LogOut} options={{ headerShown: true, }} />
+                <Stack.Screen name="MyBookings" component={MyBookings} options={{ headerShown: true, }} />
+                <Stack.Screen name="MyEvents" component={MyEvents} options={{ headerShown: true, }} />
+                <Stack.Screen name="MyLocations" component={MyLocations} options={{ headerShown: true, }} />
+                <Stack.Screen name="Notifications" component={Notifications} options={{ headerShown: true, }} />
+                <Stack.Screen name="PrivacyPolicy" component={ProfilePolicy} options={{ headerShown: true, }} />
+                <Stack.Screen name="ReferAndEarn" component={ReferAndEarn} options={{ headerShown: true, }} />
+                <Stack.Screen name="RefundPolicy" component={RefundPolicy} options={{ headerShown: true, }} />
+                <Stack.Screen name="TermsAndConditions" component={TermsAndCondition} options={{ headerShown: true, }} />
                 {/* ############################################################ */}
 
-                <Stack.Screen name="ProductScreen" component={ProductScreen} options={{headerShown: true,}} />
+                <Stack.Screen name="ProductScreen" component={ProductScreen} options={{ headerShown: true, }} />
 
                 <Stack.Screen name="Login" component={Login} options={{ headerShown: true }} />
                 <Stack.Screen name="Register" component={Register} options={{ headerShown: true }} />
                 <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ headerShown: true }} />
                 <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: true }} />
                 <Stack.Screen name="BookingOverView" component={BookingOverView} options={{ headerShown: true }} />
-                <Stack.Screen name="BookingConfirm" component={BookingConfirm} options={{ headerShown:false }}/>
+                <Stack.Screen name="BookingConfirm" component={BookingConfirm} options={{ headerShown: false }} />
 
                 {/* //////////////////////      VENDOR SCREENS     ///////////////////////////////////////////// */}
 
-                <Stack.Screen name="RequestConfirmation" component={RequestConfirmation}  options={{
-                         header: () => <NavigationHeader Icon={true} title="Request Details" />,
-                         headerShown: true,
-                }}/>
+                <Stack.Screen name="RequestConfirmation" component={RequestConfirmation} options={{
+                    header: () => <NavigationHeader Icon={true} title="Request Details" />,
+                    headerShown: true,
+                }} />
                 <Stack.Screen name="HireChefOrDriverForm" component={HireChefOrDriverForm} options={{
-                     header: () => <NavigationHeader Icon={true} title="Hire Driver" />,
-                     headerShown: true,
-                }}/>
+                    header: () => <NavigationHeader Icon={true} title="Hire Driver" />,
+                    headerShown: true,
+                }} />
 
                 <Stack.Screen name="AddTentHouse" component={AddTentHouse} options={{
-                     header: () => <NavigationHeader Icon={true} title="Tent House" />,
-                     headerShown: true,
-                }}/>
+                    header: () => <NavigationHeader Icon={true} title="Tent House" />,
+                    headerShown: true,
+                }} />
                 {/* AddTentHouse */}
 
-                <Stack.Screen name="RentOnProducts" component={RentOnProducts} options={{ headerShown:false }}/>
+                <Stack.Screen name="RentOnProducts" component={RentOnProducts} options={{ headerShown: false }} />
 
                 {/* AddFunctionalHall */}
                 <Stack.Screen name="AddFunctionalHall" component={AddFunctionalHall} options={{
-                     header: () => <NavigationHeader Icon={true} title="Function Hall" />,
-                     headerShown: true,
-                }}/>
+                    header: () => <NavigationHeader Icon={true} title="Function Hall" />,
+                    headerShown: true,
+                }} />
                 <Stack.Screen name="AddDecorations" component={AddDecorations} options={{
-                     header: () => <NavigationHeader Icon={true} title="Decorations" />,
-                     headerShown: true,
-                }}/>
+                    header: () => <NavigationHeader Icon={true} title="Decorations" />,
+                    headerShown: true,
+                }} />
+
+                <Stack.Screen name="AddFoodCatering" component={AddFoodCatering} options={{
+                    header: () => <NavigationHeader Icon={true} title="Food Catering" />,
+                    headerShown: true,
+                }} />
+
+                {/*  */}
 
             </Stack.Navigator>
         </NavigationContainer>
