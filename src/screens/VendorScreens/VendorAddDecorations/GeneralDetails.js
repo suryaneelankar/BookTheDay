@@ -496,7 +496,7 @@ const GeneralDetails = () => {
                 {mainImageUrl ?
                     <Image
                         source={{ uri: mainImageUrl?.assets[0].uri }}
-                        width={Dimensions.get('window').width}
+                        width={'100%'}
                         height={300}
                         resizeMode='cover'
                     /> : null}

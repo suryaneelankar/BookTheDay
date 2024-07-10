@@ -458,7 +458,9 @@ const HomeDashboard = () => {
                     {/* RentOnProducts */}
                     {/* AddTentHouse */}
                     {/* AddFunctionalHall */}
-                    <TouchableOpacity onPress={() => navigation.navigate('AddDecorations')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                    {/* AddFoodCatering */}
+                    {/* AddDecorations */}
+                    <TouchableOpacity onPress={() => navigation.navigate('AddFoodCatering')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
                         <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
                         <RightArrowIcon width={25} height={25} />
                     </TouchableOpacity>

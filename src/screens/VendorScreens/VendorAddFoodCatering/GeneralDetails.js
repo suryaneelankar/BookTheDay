@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, TextInput, alert } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
@@ -22,10 +22,12 @@ import RecycleIcon from '../../../assets/svgs/VendorCatering/Recycle.svg';
 import SpeakerIcon from '../../../assets/svgs/VendorCatering/SpeakerHifi.svg';
 import FanIcon from '../../../assets/svgs/VendorCatering/vendor_fan.svg';
 import WallIcon from '../../../assets/svgs/VendorCatering/Wall.svg';
-
+import CrossIconRed from '../../../assets/vendorIcons/crossIconRed.svg';
+import CheckIconGreen from '../../../assets/vendorIcons/checkIconGreen.svg';
+import CrossIcon from '../../../assets/vendorIcons/crossIcon.svg';
 
 const GeneralDetails = () => {
-    const [isCollapsed, setIsCollapsed] = useState(true);
+    const [isCollapsed, setIsCollapsed] = useState(false);
     const [overTimeCharges, setOverTimeCharges] = useState();
     const [vehicleName, setVehicleName] = useState('');
     const [mainImageUrl, setMainImageUrl] = useState('');
@@ -65,84 +67,254 @@ const GeneralDetails = () => {
 
     const rentalItems = [
         { name: 'Carpet', icon: CarpetIcon },
-        { name: 'Chairs', icon: ChairIcon},
-        { name: 'Side Walls', icon: WallIcon},
+        { name: 'Chairs', icon: ChairIcon },
+        { name: 'Side Walls', icon: WallIcon },
         { name: 'Lights', icon: LightsIcon },
         { name: 'Tables/Furniture', icon: DeskIcon },
-        { name: 'Portable stove or campfire cooking equipment', icon: ChairIcon},
+        { name: 'Portable stove or campfire cooking equipment', icon: ChairIcon },
         { name: 'Cookware', icon: ChefHatIcon },
         { name: 'Coolers / Fans', icon: FanIcon },
-        { name: 'Reusable plates, cups, and cutlery', icon: RecycleIcon},
+        { name: 'Reusable plates, cups, and cutlery', icon: RecycleIcon },
         { name: 'Food storage containers', icon: JarIcon },
         { name: 'Sound Box/ Speakers', icon: SpeakerIcon }
     ];
 
+    const foodMenu = [{
+        title: "Non Veg Standard Menu",
+        id: 1,
+        subItems: [
+            "Sweet",
+            "Roti",
+            "Paneer",
+            "Veg Biryani",
+            "Veg Curry",
+            "Raitha",
+            "White Rice",
+            "Dal",
+            "Fry",
+            "Sambar",
+            "Pickel",
+            "Chutney",
+            "Papad",
+            "Salad",
+            "Veg Snack",
+            "Curd",
+            "Mouth Freshener"
+        ],
+    },
+    {
+        title: "Vegetarian Standard Menu",
+        id: 2,
+        subItems: [
+            "Sweet",
+            "Roti",
+            "Paneer",
+            "Veg Biryani",
+            "Veg Curry",
+            "Raitha",
+            "White Rice",
+            "Dal",
+            "Fry",
+            "Sambar",
+            "Pickel",
+            "Chutney",
+            "Papad",
+            "Salad",
+            "Veg Snack",
+            "Curd",
+            "Mouth Freshener"
+        ],
+    }
+    ];
+
     const [selectedItemArray, setSelectedItemArray] = useState([]);
+    const [selectedId, setSelectedId] = useState(true);
+    const [customItemVal, setCustomItemVal] = useState();
+    const [customisedItems, setCustomisedItems] = useState([]);
+    const [showCustomTextInput, setShowCustomTextInput] = useState(false);
+
+    const onPressAddCustomizedItem = () => {
+        setShowCustomTextInput(true);
+    };
+
+    const handleInputChange = (text, index) => {
+        setCustomItemVal(text);
+    };
+
+    const handleRemoveInput = (index) => {
+        setShowCustomTextInput(false);
+    };
+
+    const onAddItemsFinish = () => {
+        setCustomisedItems(oldArray => [...oldArray, customItemVal]);
+        setCustomItemVal('');
+    }
+
+    const addRentalItemOnPress = (itemName) => {
+        setSelectedItemArray((previous) => {
+            if (previous.includes(itemName)) {
+                // Remove the item if it's already selected
+                const updatedPrices = { ...itemPrices };
+                console.log('updated price is::>>', updatedPrices);
+                delete updatedPrices[itemName];
+                setItemPrices(updatedPrices);
+                return previous.filter((item) => item !== itemName);
+            } else {
+                // Add the item if it's not already selected
+                const updatedPrices = { ...itemPrices, itemName };
+                console.log('updated price added is::>>', updatedPrices);
+                setItemPrices(updatedPrices);
+                return [...previous, itemName];
+            }
+        });
+    };
+
+    const ItemList = () => {
+        const screenWidth = Dimensions.get('window').width;
+
+        // Function to render items in rows
+        const renderItemsInRows = () => {
+            const itemsPerRow = [];
+            let currentRow = [];
+            let currentRowWidth = 0;
+
+            customisedItems.forEach((itemName) => {
+                const itemWidth = measureTextWidth(itemName) + 20; // Add padding and margin
+
+                if (currentRowWidth + itemWidth > screenWidth) {
+                    itemsPerRow.push(currentRow);
+                    currentRow = [itemName];
+                    currentRowWidth = itemWidth;
+                } else {
+                    currentRow.push(itemName);
+                    currentRowWidth += itemWidth;
+                }
+            });
+
+            // Push the last row
+            if (currentRow.length > 0) {
+                itemsPerRow.push(currentRow);
+            }
+
+            return itemsPerRow;
+        };
+
+        // Function to measure text width (simplified, should be improved for real scenarios)
+        const measureTextWidth = (text) => {
+            // Adjust the base width as needed
+            return text.length * 10;
+        };
+
+        const itemsPerRow = renderItemsInRows();
+
+        return (
+            <View style={styles.amenitiesContainer}>
+                {itemsPerRow.map((row, rowIndex) => (
+                    <View key={rowIndex} style={styles.row}>
+                        {row.map((itemName, itemIndex) => {
+                            // const itemDetails = rentalItemPricingDetails[itemName]?.[0];
+                            // const price = itemDetails?.perDayPrice?.toString() || '';
+
+                            return (
+                                <View key={itemIndex} style={styles.itemContainer}>
+                                    <TouchableOpacity style={styles.itemButton}>
+                                        <Text style={styles.itemText}>{itemName}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => addRentalItemOnPress(itemName)}>
+                                        <CrossIcon />
+                                    </TouchableOpacity>
+                                </View>
+                            );
+                        })}
+                    </View>
+                ))}
+            </View>
+        );
+    };
 
     const RentalItemsList = () => {
         // const [isCollapsed, setIsCollapsed] = useState(true);
 
-
-        const toggleCollapse = () => {
+        const toggleCollapse = (id) => {
+            setSelectedId(id);
             setIsCollapsed(!isCollapsed);
         };
 
-        const addRentalItemOnPress = (itemName) => {
-            setSelectedItemArray((previous) => {
-                if (previous.includes(itemName)) {
-                    // Remove the item if it's already selected
-                    const updatedPrices = { ...itemPrices };
-                    console.log('updated price is::>>', updatedPrices);
-                    delete updatedPrices[itemName];
-                    setItemPrices(updatedPrices);
-                    return previous.filter((item) => item !== itemName);
-                } else {
-                    // Add the item if it's not already selected
-                    const updatedPrices = { ...itemPrices, itemName };
-                    console.log('updated price added is::>>', updatedPrices);
-                    setItemPrices(updatedPrices);
-                    return [...previous, itemName];
-                }
-            });
-        };
-
-        // console.log('selectedItemArray is::>>', selectedItemArray);
-        // console.log('rentalItemPricingDetails ::>>', rentalItemPricingDetails);
-
-        const renderItem = ({ item }) => {
-            const IconImage = item?.icon;
+        const renderItem = ({ item, index }) => {
+            const currentSelected = item.id === selectedId ? true : false;
             return (
-                <TouchableOpacity style={styles.item} onPress={() => { addRentalItemOnPress(item.name) }}>
-                    <View style={{ borderColor: 'green', borderWidth: 2, width: 20, height: 20, borderRadius: 5 }}>
-                        <View style={{ backgroundColor: selectedItemArray.includes(item.name) ? 'green' : 'white', width: 10, height: 10, alignSelf: 'center', marginTop: 3 }}>
+                <TouchableOpacity onPress={() => {toggleCollapse(item.id), addRentalItemOnPress(item)}} style={{ backgroundColor: '#FFF4E1', width: '100%', padding: 10, borderRadius: 10, marginTop: 20 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={styles.headerText}>{item.title}</Text>
+                        <Icon name={isCollapsed ? 'arrow-down' : 'arrow-up'} size={20} />
+                    </View>
+                    {currentSelected ?
+                        <View style={{}}>
+                            {item?.subItems?.map((itemData, index) => {
+                                return (
+                                    <TouchableOpacity style={styles.item} onPress={() => { }}>
+                                        <View style={{ borderColor: 'green', borderWidth: 2, width: 20, height: 20, borderRadius: 5 }}>
+                                            <View style={{ backgroundColor: selectedItemArray.includes(item.name) ? 'green' : 'white', width: 10, height: 10, alignSelf: 'center', marginTop: 3 }}>
 
+                                            </View>
+                                        </View>
+                                        <Text style={styles.itemText}>{itemData}</Text>
+                                    </TouchableOpacity>
+                                )
+                            })}
+
+                            {customisedItems?.length>0 ?
+                                <>
+                                <Text style={{ textAlign: 'left', fontWeight: 'bold', color: 'black', fontSize: 16 }}>Your customized items</Text>
+                                    {customisedItems.map((item) => {
+                                        return (
+                                            <Text>{item}</Text>
+                                        )
+                                    })}
+                                </> : null}
+                            {showCustomTextInput ?
+                                <View key={index} style={styles.inputContainer}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <TextInput
+                                            style={styles.input}
+                                            value={customItemVal}
+                                            onChangeText={(text) => handleInputChange(text, index)}
+                                            placeholder={`Add Item ${index + 1}`}
+                                        />
+                                        <TouchableOpacity
+                                            style={{ marginHorizontal: 5, marginTop: 10 }}
+                                            onPress={() => onAddItemsFinish()}
+                                        >
+                                            <CheckIconGreen />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            style={{ marginHorizontal: 5, marginTop: 10 }}
+                                            onPress={() => handleRemoveInput(index)}
+                                        >
+                                            <CrossIconRed />
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                                : null}
+
+                            <TouchableOpacity style={{ backgroundColor: '#D2453B', padding: 10, borderRadius: 10, alignItems: 'center', marginTop: 10 }}
+                                onPress={() => { onPressAddCustomizedItem() }}
+                            >
+                                <Text style={{ color: 'white', fontFamily: 'ManropeRegular', fontWeight: 'bold', }}>Add Your Customized item in this combo</Text>
+                            </TouchableOpacity>
                         </View>
-                    </View>
-                    <View style={{ flexDirection: 'row', marginHorizontal: 5,alignItems:"center" }} onPress={() => { }}>
-                        {/* <Icon name={item.icon} size={20} style={styles.icon} /> */}
-                        
-                        <IconImage style={{marginHorizontal:2}}/>
-                        <Text style={styles.itemText}>{item.name}</Text>
-                    </View>
+                        : null}
                 </TouchableOpacity>
             )
         }
 
         return (
             <View style={styles.container}>
-                <TouchableOpacity onPress={toggleCollapse} style={styles.header}>
-                    <Text style={styles.headerText}>Available Rental Items</Text>
-                    <Icon name={isCollapsed ? 'ios-arrow-down' : 'ios-arrow-up'} size={20} />
-                </TouchableOpacity>
-                {!isCollapsed && (
-                    <View style={styles.itemsContainer}>
-                        <FlatList
-                            data={rentalItems}
-                            keyExtractor={(item, index) => index.toString()}
-                            renderItem={renderItem}
-                        />
-                    </View>
-                )}
+                <FlatList
+                    data={foodMenu}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={renderItem}
+                />
             </View>
         );
     };
@@ -307,12 +479,12 @@ const GeneralDetails = () => {
     }
     const transformInput = (input) => {
         return Object.entries(input).map(([key, value]) => {
-          return {
-            itemName: value[0].itemName || value[0].name,
-            perDayPrice: value[0].perDayPrice || 0
-          };
+            return {
+                itemName: value[0].itemName || value[0].name,
+                perDayPrice: value[0].perDayPrice || 0
+            };
         });
-      };
+    };
 
     const onPressSaveAndPost = async () => {
         const vendorMobileNumber = "8297735285"
@@ -348,11 +520,12 @@ const GeneralDetails = () => {
         });
 
         const tentHousAddessIs = { "address": tentHouseAddress, "city": tentHouseCity, "pinCode": tentHousePincode };
-         const RentItems =[ { "itemName": "Tent", "perHourPrice": 80, "perDayPrice": 300 }, { "itemName": "Chairs", "perHourPrice": 400, "perDayPrice": 2000 },{ "itemName": "Carpet", "perHourPrice": 50, "perDayPrice": 200 },{ "itemName": "Side Walls", "perHourPrice": 75, "perDayPrice": 320 },{ "itemName": "Lights", "perHourPrice": 45, "perDayPrice": 960 },{ "itemName": "Tables/Furniture", "perHourPrice": 75, "perDayPrice": 620 },{ "itemName": "Portable Stove", "perHourPrice": 35, "perDayPrice": 420 },{ "itemName": "Cookware", "perHourPrice": 65, "perDayPrice": 270 },{ "itemName": "Coolers/Fans", "perHourPrice": 435, "perDayPrice": 2210 },{ "itemName": "Coolers/Fans", "perHourPrice": 435, "perDayPrice": 2210 } ,{ "itemName": "Reusable Plates andCcontainers", "perHourPrice": 425, "perDayPrice": 1210 } ,{ "itemName": "Food storage containers", "perHourPrice": 435, "perDayPrice": 2210 },{ "itemName": "Sound Box/Speakers", "perHourPrice": 535, "perDayPrice": 3210 }   ]
-        const Address= {  "address":  "Ameerpet",
+        const RentItems = [{ "itemName": "Tent", "perHourPrice": 80, "perDayPrice": 300 }, { "itemName": "Chairs", "perHourPrice": 400, "perDayPrice": 2000 }, { "itemName": "Carpet", "perHourPrice": 50, "perDayPrice": 200 }, { "itemName": "Side Walls", "perHourPrice": 75, "perDayPrice": 320 }, { "itemName": "Lights", "perHourPrice": 45, "perDayPrice": 960 }, { "itemName": "Tables/Furniture", "perHourPrice": 75, "perDayPrice": 620 }, { "itemName": "Portable Stove", "perHourPrice": 35, "perDayPrice": 420 }, { "itemName": "Cookware", "perHourPrice": 65, "perDayPrice": 270 }, { "itemName": "Coolers/Fans", "perHourPrice": 435, "perDayPrice": 2210 }, { "itemName": "Coolers/Fans", "perHourPrice": 435, "perDayPrice": 2210 }, { "itemName": "Reusable Plates andCcontainers", "perHourPrice": 425, "perDayPrice": 1210 }, { "itemName": "Food storage containers", "perHourPrice": 435, "perDayPrice": 2210 }, { "itemName": "Sound Box/Speakers", "perHourPrice": 535, "perDayPrice": 3210 }]
+        const Address = {
+            "address": "Ameerpet",
             "city": "Hyderabad",
             "pinCode": 500075
-          }
+        }
         formData.append('description', productDescription);
         formData.append('rentalItems', JSON.stringify(transformInput(rentalItemPricingDetails)));
         formData.append('tentHosueAddress', JSON.stringify(tentHousAddessIs));
@@ -407,7 +580,7 @@ const GeneralDetails = () => {
                 />
                 {mainImageUrl ?
                     <Image
-                        source={{ uri: mainImageUrl?.assets[0].uri }}
+                        source={{ uri: mainImageUrl?.assets[0]?.uri }}
                         width={'100%'}
                         height={300}
                         resizeMode='cover'
@@ -470,27 +643,10 @@ const GeneralDetails = () => {
                 />
             </View>
 
-            <Text style={styles.title}>Available Rental Items</Text>
+            <Text style={styles.title}>Add Menu Items</Text>
             <View style={styles.mainContainer}>
                 {RentalItemsList()}
-                {selectedItemArray.map((itemName) => {
-                const itemDetails = rentalItemPricingDetails[itemName]?.[0];
-                const price = itemDetails?.perDayPrice?.toString() || '';
-
-                    return (
-                        <>
-                            <TextField
-                                label={`Enter Per hr Charge for \n${itemName}`}
-                                placeholder={`Please Enter Per hr Charge for ${itemName}`}
-                                // value={itemPrices[itemName] || ''}
-                                value={price || ''}
-                                onChangeHandler={(text) => onChangeItemPrice(text, itemName)}
-                                keyboardType='number-pad'
-                                isRequired={true}
-                            />
-                        </>)
-                })}
-
+                {ItemList()}
             </View>
 
             <Text style={styles.title}>Other Charges</Text>
@@ -505,7 +661,7 @@ const GeneralDetails = () => {
                 />
             </View>
 
-            <Text style={styles.title}>Item Available Address</Text>
+            <Text style={styles.title}>Catering Address</Text>
             <View style={styles.mainContainer}>
                 <TextField
                     label='Address'
@@ -619,8 +775,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     container: {
-        backgroundColor: '#FFF4E1',
-        padding: 10,
+        // backgroundColor: '#FFF4E1',
+        // padding: 10,
         borderRadius: 5,
     },
     header: {
@@ -635,6 +791,38 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+    amenitiesContainer: {
+        flex: 1,
+        padding: 10,
+    },
+    itemContainer: {
+        flexDirection: 'row',
+        margin: 5,
+        alignItems: 'center',
+        backgroundColor: '#FFF5E3',
+        padding: 10,
+        borderRadius: 5
+    },
+    itemButton: {
+        // padding: 10,
+        borderRadius: 10,
+    },
+    itemText: {
+        marginHorizontal: 5,
+    },
+    input: {
+        borderWidth: 1,
+        marginTop: 10,
+        borderColor: themevariable.Color_C8C8C6,
+        paddingHorizontal: 12,
+        borderRadius: 5,
+        flex: 1,
+    },
+    inputContainer: {
+        // flexDirection: 'row',
+        // alignItems: 'center',
+        marginBottom: 10,
+    },
     itemsContainer: {
         marginTop: 10,
     },
@@ -648,5 +836,6 @@ const styles = StyleSheet.create({
     },
     itemText: {
         fontSize: 14,
+        marginHorizontal: 10
     },
 })
