@@ -31,7 +31,7 @@ const ViewMyBookings = () => {
 
   const getMyBookings = async () => {
     try {
-        const response = await axios.get(`${BASE_URL}/getUserBookings`);
+        const response = await axios.get(`${BASE_URL}/getUserClothJewelBookings`);
         console.log("BOOKINGS RES:::::::::", JSON.stringify(response?.data))
         setMyBookings(response?.data?.data)
     } catch (error) {

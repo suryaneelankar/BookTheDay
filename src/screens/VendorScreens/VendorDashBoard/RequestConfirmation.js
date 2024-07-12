@@ -121,7 +121,7 @@ const RequestConfirmation = ({ navigation, route }) => {
         }
         console.log('updatedParams is::>>',updatedParams);
         try {
-            const response = await axios.patch(`${BASE_URL}/bookingConfirmationFromVendor`,updatedParams);
+            const response = await axios.patch(`${BASE_URL}/clothJewelsbookingConfirmationFromVendor`,updatedParams);
             console.log("accept confirm response::::::::::", response?.data);
         } catch (error) {
             console.log("accept::::::::::", error);
