@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, TextInput, alert } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
@@ -29,27 +29,27 @@ import CrossIcon from '../../../assets/vendorIcons/crossIcon.svg';
 const GeneralDetails = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [overTimeCharges, setOverTimeCharges] = useState();
-    const [vehicleName, setVehicleName] = useState('');
     const [mainImageUrl, setMainImageUrl] = useState('');
-    const [tentHouseName, settentHouseName] = useState('');
-    const [productDescription, setProductDescription] = useState('');
+    const [foodCateringName, setFoodCateringName] = useState('');
+    const [cateringDescription, setCateringDescription] = useState('');
     const [additionalImages, setAdditionalImages] = useState({
         additionalImageOne: undefined,
         additionalImageTwo: undefined,
         additionalImageThree: undefined,
         additionalImageFour: undefined
     });
-    const [tentHouseAddress, settentHouseAddress] = useState('');
-    const [tentHouseCity, settentHouseCity] = useState('');
-    const [tentHousePincode, settentHousePincode] = useState();
+    const [cateringAddress, setCateringAddress] = useState('');
+    const [cateringCity, setCateringCity] = useState('');
+    const [cateringPincode, setCateringPincode] = useState();
     const [perDayRentPrice, setPerDayRentPrice] = useState();
-    const [perKMPrice, setPerKMPrice] = useState();
     const [advanceAmount, setAdvanceAmount] = useState();
     const [discountPercentage, setDiscountPercentage] = useState();
-    const [selectedRentalItem, setSelectedRentalItem] = useState();
 
     const [itemPrices, setItemPrices] = useState({});
-
+    const [selectedItems, setSelectedItems] = useState({});
+    const [foodMenuItems, setFoodMenuItems] = useState();
+    const [comboPrice, setComboPrice] = useState({});
+    const [minOrderMembers, setMinOrderMembers] = useState({});
 
     const [rentalItemPricingDetails, setRentalItemPricingDetails] = useState({
         "Carpet": [{ "itemName": "Carpet", "perDayPrice": 0 }],
@@ -65,19 +65,20 @@ const GeneralDetails = () => {
         "Sound Box/ Speakers": [{ name: 'Sound Box/ Speakers', icon: 'ios-volume-high' }]
     });
 
-    const rentalItems = [
-        { name: 'Carpet', icon: CarpetIcon },
-        { name: 'Chairs', icon: ChairIcon },
-        { name: 'Side Walls', icon: WallIcon },
-        { name: 'Lights', icon: LightsIcon },
-        { name: 'Tables/Furniture', icon: DeskIcon },
-        { name: 'Portable stove or campfire cooking equipment', icon: ChairIcon },
-        { name: 'Cookware', icon: ChefHatIcon },
-        { name: 'Coolers / Fans', icon: FanIcon },
-        { name: 'Reusable plates, cups, and cutlery', icon: RecycleIcon },
-        { name: 'Food storage containers', icon: JarIcon },
-        { name: 'Sound Box/ Speakers', icon: SpeakerIcon }
-    ];
+    // /getAllFoodItems
+    useEffect(() =>{
+        getFoodMenuItems();
+    },[]);
+
+    const getFoodMenuItems = async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}/getAllFoodItems`);
+            console.log("foodmenu items::::::::", JSON.stringify(response?.data?.data[0]?.foodMenuItems));
+            setFoodMenuItems(response?.data?.data[0]?.foodMenuItems);
+        }catch (error) {
+            console.log("events data error>>::", error);
+        }
+    };
 
     const foodMenu = [{
         title: "Non Veg Standard Menu",
@@ -169,162 +170,276 @@ const GeneralDetails = () => {
         });
     };
 
-    const ItemList = () => {
-        const screenWidth = Dimensions.get('window').width;
-
-        // Function to render items in rows
-        const renderItemsInRows = () => {
-            const itemsPerRow = [];
-            let currentRow = [];
-            let currentRowWidth = 0;
-
-            customisedItems.forEach((itemName) => {
-                const itemWidth = measureTextWidth(itemName) + 20; // Add padding and margin
-
-                if (currentRowWidth + itemWidth > screenWidth) {
-                    itemsPerRow.push(currentRow);
-                    currentRow = [itemName];
-                    currentRowWidth = itemWidth;
-                } else {
-                    currentRow.push(itemName);
-                    currentRowWidth += itemWidth;
-                }
-            });
-
-            // Push the last row
-            if (currentRow.length > 0) {
-                itemsPerRow.push(currentRow);
-            }
-
-            return itemsPerRow;
-        };
-
-        // Function to measure text width (simplified, should be improved for real scenarios)
-        const measureTextWidth = (text) => {
-            // Adjust the base width as needed
-            return text.length * 10;
-        };
-
-        const itemsPerRow = renderItemsInRows();
-
-        return (
-            <View style={styles.amenitiesContainer}>
-                {itemsPerRow.map((row, rowIndex) => (
-                    <View key={rowIndex} style={styles.row}>
-                        {row.map((itemName, itemIndex) => {
-                            // const itemDetails = rentalItemPricingDetails[itemName]?.[0];
-                            // const price = itemDetails?.perDayPrice?.toString() || '';
-
-                            return (
-                                <View key={itemIndex} style={styles.itemContainer}>
-                                    <TouchableOpacity style={styles.itemButton}>
-                                        <Text style={styles.itemText}>{itemName}</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={() => addRentalItemOnPress(itemName)}>
-                                        <CrossIcon />
-                                    </TouchableOpacity>
-                                </View>
-                            );
-                        })}
-                    </View>
-                ))}
-            </View>
-        );
-    };
 
     const RentalItemsList = () => {
+        // const [selectedId, setSelectedId] = useState(null);
         // const [isCollapsed, setIsCollapsed] = useState(true);
+        // const [selectedItems, setSelectedItems] = useState({});
 
         const toggleCollapse = (id) => {
             setSelectedId(id);
-            setIsCollapsed(!isCollapsed);
+            setIsCollapsed(id === selectedId ? !isCollapsed : true);
         };
 
-        const renderItem = ({ item, index }) => {
-            const currentSelected = item.id === selectedId ? true : false;
+        const handleComboPriceChange = (id, price) => {
+            setComboPrice(prevPrices => ({
+                ...prevPrices,
+                [id]: price
+            }));
+        };
+    
+        const handleMinOrderMembersChange = (id, members) => {
+            setMinOrderMembers(prevMembers => ({
+                ...prevMembers,
+                [id]: members
+            }));
+        };
+
+        const handleItemSelect = (menuId, itemName) => {
+            setSelectedItems((prevState) => {
+                const updatedItems = { ...prevState };
+                if (!updatedItems[menuId]) {
+                    updatedItems[menuId] = [];
+                }
+
+                if (updatedItems[menuId].includes(itemName)) {
+                    updatedItems[menuId] = updatedItems[menuId].filter(item => item !== itemName);
+                } else {
+                    updatedItems[menuId].push(itemName);
+                }
+
+                return updatedItems;
+            });
+        };
+
+        const handleAddCustomItem = (id) => {
+            console.log("id i::::::::::::,", id)
+            // if (customItemVal.trim() !== '') {
+            //     setCustomisedItems([...customisedItems, customItemVal.trim(), id]);
+            //     setCustomItemVal('');
+            //     setShowCustomTextInput(false);
+            // }
+
+            if (customItemVal.trim() !== '') {
+                setCustomisedItems(prevItems => {
+                    const itemIndex = prevItems.findIndex(item => item.id === id);
+                    if (itemIndex > -1) {
+                        // Update existing entry
+                        const updatedItems = [...prevItems];
+                        updatedItems[itemIndex].items.push(customItemVal.trim());
+                        return updatedItems;
+                    } else {
+                        // Add new entry
+                        return [...prevItems, {
+                            id: id,
+                            items: [customItemVal.trim()],
+                        }];
+                    }
+                });
+                setCustomItemVal('');
+                setShowCustomTextInput(false);
+            }
+        };
+
+        const handleRemoveCustomItem = (id, itemIndex) => {
+            // const updatedItems = customisedItems.filter((_, i) => i !== index);
+            // setCustomisedItems(updatedItems);
+            setCustomisedItems(prevItems => {
+                const updatedItems = prevItems.map(custom => {
+                    if (custom.id === id) {
+                        return {
+                            ...custom,
+                            items: custom.items.filter((_, index) => index !== itemIndex),
+                        };
+                    }
+                    return custom;
+                }).filter(custom => custom.items.length > 0); // Remove any entries with no items
+                return updatedItems;
+            });
+        };
+
+        const renderCustomizedItems = (id) => {
+            const customItem = customisedItems.find(custom => custom.id === id);
+    
+            if (!customItem) return null;
             return (
-                <TouchableOpacity onPress={() => {toggleCollapse(item.id), addRentalItemOnPress(item)}} style={{ backgroundColor: '#FFF4E1', width: '100%', padding: 10, borderRadius: 10, marginTop: 20 }}>
+                <View>
+                    <Text style={{ textAlign: 'left', fontWeight: 'bold', color: 'black', fontSize: 16 }}>Your customized items</Text>
+                    {customItem.items.map((item, index) => (
+                        <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Text>{item}</Text>
+                            <TouchableOpacity onPress={() => handleRemoveCustomItem(id, index)}>
+                                <Icon name="trash" size={20} color="red" style={{ marginHorizontal: 5 }} />
+                            </TouchableOpacity>
+                        </View>
+                    ))}
+                </View>
+            );
+        };
+
+
+        const renderItem = ({ item, index }) => {
+            const currentSelected = item._id === selectedId;
+            console.log("curenntsle", currentSelected);
+            const customItem = customisedItems.find(custom => custom.id === item._id);
+           console.log("custom item :::::::::", customItem)
+            return (
+                <TouchableOpacity
+                    onPress={() => toggleCollapse(item?._id)}
+                    style={{ backgroundColor: '#FFF4E1', width: '100%', padding: 10, borderRadius: 10, marginTop: 20 }}
+                >
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text style={styles.headerText}>{item.title}</Text>
                         <Icon name={isCollapsed ? 'arrow-down' : 'arrow-up'} size={20} />
                     </View>
-                    {currentSelected ?
-                        <View style={{}}>
-                            {item?.subItems?.map((itemData, index) => {
-                                return (
-                                    <TouchableOpacity style={styles.item} onPress={() => { }}>
+                    {isCollapsed &&
+                        <View>
+                            <FlatList
+                                data={item?.subItems}
+                                keyExtractor={(subItem, index) => index.toString()}
+                                numColumns={2}
+                                renderItem={({ item: subItem }) => (
+                                    <TouchableOpacity
+                                        style={styles.item}
+                                        onPress={() => handleItemSelect(item._id, subItem)}
+                                    >
                                         <View style={{ borderColor: 'green', borderWidth: 2, width: 20, height: 20, borderRadius: 5 }}>
-                                            <View style={{ backgroundColor: selectedItemArray.includes(item.name) ? 'green' : 'white', width: 10, height: 10, alignSelf: 'center', marginTop: 3 }}>
-
-                                            </View>
+                                            <View style={{
+                                                backgroundColor: selectedItems[item._id]?.includes(subItem) ? 'green' : 'white',
+                                                width: 10,
+                                                height: 10,
+                                                alignSelf: 'center',
+                                                marginTop: 3
+                                            }} />
                                         </View>
-                                        <Text style={styles.itemText}>{itemData}</Text>
+                                        <Text style={styles.itemText}>{subItem}</Text>
                                     </TouchableOpacity>
+                                )}
+                            />
+                        </View>
+                    }
+
+                    {selectedItems[item._id]?.length > 0 &&
+                        <View>
+                            <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Selected Items:</Text>
+                            {selectedItems[item._id].map((selectedItem, index) => (
+                                <Text key={index} style={{ marginLeft: 5 }}>{selectedItem}</Text>
+                            ))}
+                        </View>
+                    }
+
+                    {/* {customisedItems?.length > 0 ?
+                        <>
+                            <Text style={{ textAlign: 'left', fontWeight: 'bold', color: 'black', fontSize: 16 }}>Your customized items</Text>
+                            {customisedItems.map((item) => {
+                                return (
+                                    <Text>{item}</Text>
                                 )
                             })}
+                        </> : null} */}
+                                        {renderCustomizedItems(item._id)}
 
-                            {customisedItems?.length>0 ?
-                                <>
-                                <Text style={{ textAlign: 'left', fontWeight: 'bold', color: 'black', fontSize: 16 }}>Your customized items</Text>
-                                    {customisedItems.map((item) => {
-                                        return (
-                                            <Text>{item}</Text>
-                                        )
-                                    })}
-                                </> : null}
-                            {showCustomTextInput ?
-                                <View key={index} style={styles.inputContainer}>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <TextInput
-                                            style={styles.input}
-                                            value={customItemVal}
-                                            onChangeText={(text) => handleInputChange(text, index)}
-                                            placeholder={`Add Item ${index + 1}`}
-                                        />
-                                        <TouchableOpacity
-                                            style={{ marginHorizontal: 5, marginTop: 10 }}
-                                            onPress={() => onAddItemsFinish()}
-                                        >
-                                            <CheckIconGreen />
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            style={{ marginHorizontal: 5, marginTop: 10 }}
-                                            onPress={() => handleRemoveInput(index)}
-                                        >
-                                            <CrossIconRed />
-                                        </TouchableOpacity>
-                                    </View>
+                    {/* {customItem > 0 &&
+                        <>
+                            <Text style={{ textAlign: 'left', fontWeight: 'bold', color: 'black', fontSize: 16 }}>Your customized items</Text>
+                            {customItem.items.map.map((customItem, index) => (
+                                <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text>{customItem}</Text>
+                                    <TouchableOpacity onPress={() => handleRemoveCustomItem(index)}>
+                                        <Icon name="trash" size={20} color="red" style={{marginHorizontal:5}} />
+                                    </TouchableOpacity>
                                 </View>
-                                : null}
+                            ))}
+                        </>
+                    } */}
+                    {showCustomTextInput ?
+                        <View style={styles.inputContainer}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <TextInput
+                                    style={styles.input}
+                                    value={customItemVal}
+                                    onChangeText={(text) => setCustomItemVal(text)}
+                                    // onChangeText={(text) => handleInputChange(text, index)}
+                                    placeholder={`Add Item`}
+                                />
+                                <TouchableOpacity
+                                    style={{ marginHorizontal: 5, marginTop: 10 }}
+                                    // onPress={() => onAddItemsFinish()}
+                                    onPress={() =>handleAddCustomItem(item._id)}
 
-                            <TouchableOpacity style={{ backgroundColor: '#D2453B', padding: 10, borderRadius: 10, alignItems: 'center', marginTop: 10 }}
-                                onPress={() => { onPressAddCustomizedItem() }}
-                            >
-                                <Text style={{ color: 'white', fontFamily: 'ManropeRegular', fontWeight: 'bold', }}>Add Your Customized item in this combo</Text>
-                            </TouchableOpacity>
+                                >
+                                    <CheckIconGreen />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={{ marginHorizontal: 5, marginTop: 10 }}
+                                    onPress={() => handleRemoveInput(index)}
+                                >
+                                    <CrossIconRed />
+                                </TouchableOpacity>
+                            </View>
                         </View>
                         : null}
-                </TouchableOpacity>
-            )
-        }
 
+                    {isCollapsed ?
+                        <TouchableOpacity style={{ backgroundColor: '#D2453B', padding: 10, borderRadius: 10, alignItems: 'center', marginTop: 10 }}
+                            onPress={() => { onPressAddCustomizedItem() }}
+                        >
+                            <Text style={{ color: 'white', fontFamily: 'ManropeRegular', fontWeight: 'bold', }}>Add Your Customized item in this combo</Text>
+                        </TouchableOpacity>
+                        : null}
+
+                       {isCollapsed &&
+                    <>
+                        <TextInput
+                            style={{ borderColor: "lightgray", borderWidth: 1, marginTop: 5, padding: 5 }}
+                            placeholder='Enter per plate Combo price'
+                            value={comboPrice[item._id] || ''}
+                            onChangeText={(text) => handleComboPriceChange(item._id, text)}
+                        />
+                        <TextInput
+                            style={{ borderColor: "lightgray", borderWidth: 1, marginTop: 5, padding: 5 }}
+                            placeholder='Enter min Order members'
+                            value={minOrderMembers[item._id] || ''}
+                            onChangeText={(text) => handleMinOrderMembersChange(item._id, text)}
+                        />
+                    </>
+                }
+
+                </TouchableOpacity>
+            );
+        };
+
+       
         return (
             <View style={styles.container}>
                 <FlatList
-                    data={foodMenu}
-                    keyExtractor={(item, index) => index.toString()}
+                    data={foodMenuItems}
+                    keyExtractor={(item) => item._id.toString()}
                     renderItem={renderItem}
                 />
             </View>
         );
     };
 
+    const processItems = () => {
+        return Object.keys(selectedItems).map(id => ({
+            title: foodMenuItems.find(item => item._id === id).title,
+            items: selectedItems[id].concat(customisedItems.find(custom => custom.id === id)?.items || []),
+            perPlateCost: comboPrice[id] || 0,
+            minOrder: minOrderMembers[id] || 0,
+        }));
+    };
+
+    const finalCombomenu = processItems();
+
+    console.log("Processed items:", finalCombomenu);
+
     const onChangeDescription = (value) => {
-        setProductDescription(value);
+        setCateringDescription(value);
     }
 
     const onChangetentHouseName = (value) => {
-        settentHouseName(value);
+        setFoodCateringName(value);
     }
 
     const onChangePerDayRentPrice = (value) => {
@@ -340,7 +455,7 @@ const GeneralDetails = () => {
     }
 
     const onChangetentHouseAddress = (value) => {
-        settentHouseAddress(value);
+        setCateringAddress(value);
     }
 
     const onChangeOverTimeCharges = (value) => {
@@ -348,24 +463,12 @@ const GeneralDetails = () => {
     }
 
     const onChangetentHouseCity = (value) => {
-        settentHouseCity(value);
+        setCateringCity(value);
     }
 
     const onChangetentHousePincode = (value) => {
-        settentHousePincode(value);
+        setCateringPincode(value);
     }
-
-    const onChangeItemPrice = (text, itemName) => {
-        console.log('text text on change is::>>>', text);
-        // setRentalItemPricingDetails?.[itemName][0]?.perDayPrice(text);
-        // setRentalItemPricingDetails({...rentalItemPricingDetails, })
-        const newPrice = parseFloat(text) || 0;
-        setRentalItemPricingDetails((prevDetails) => ({
-            ...prevDetails,
-            [itemName]: [{ ...prevDetails[itemName]?.[0], itemName, perDayPrice: newPrice }],
-        }));
-        console.log('rentalItemPricingDetails is::><><><>', rentalItemPricingDetails);
-    };
 
     const data = [
         {
@@ -519,27 +622,24 @@ const GeneralDetails = () => {
             name: additionalImages?.additionalImageFour?.assets[0]?.fileName,
         });
 
-        const tentHousAddessIs = { "address": tentHouseAddress, "city": tentHouseCity, "pinCode": tentHousePincode };
-        const RentItems = [{ "itemName": "Tent", "perHourPrice": 80, "perDayPrice": 300 }, { "itemName": "Chairs", "perHourPrice": 400, "perDayPrice": 2000 }, { "itemName": "Carpet", "perHourPrice": 50, "perDayPrice": 200 }, { "itemName": "Side Walls", "perHourPrice": 75, "perDayPrice": 320 }, { "itemName": "Lights", "perHourPrice": 45, "perDayPrice": 960 }, { "itemName": "Tables/Furniture", "perHourPrice": 75, "perDayPrice": 620 }, { "itemName": "Portable Stove", "perHourPrice": 35, "perDayPrice": 420 }, { "itemName": "Cookware", "perHourPrice": 65, "perDayPrice": 270 }, { "itemName": "Coolers/Fans", "perHourPrice": 435, "perDayPrice": 2210 }, { "itemName": "Coolers/Fans", "perHourPrice": 435, "perDayPrice": 2210 }, { "itemName": "Reusable Plates andCcontainers", "perHourPrice": 425, "perDayPrice": 1210 }, { "itemName": "Food storage containers", "perHourPrice": 435, "perDayPrice": 2210 }, { "itemName": "Sound Box/Speakers", "perHourPrice": 535, "perDayPrice": 3210 }]
-        const Address = {
-            "address": "Ameerpet",
-            "city": "Hyderabad",
-            "pinCode": 500075
-        }
-        formData.append('description', productDescription);
-        formData.append('rentalItems', JSON.stringify(transformInput(rentalItemPricingDetails)));
-        formData.append('tentHosueAddress', JSON.stringify(tentHousAddessIs));
-        formData.append('tentHouseName', tentHouseName);
+        const foodCateringAddressIs = { "address": cateringAddress, "city": cateringCity, "pinCode": cateringPincode };
+        formData.append('description', cateringDescription);
+        formData.append('foodCateringAddress', JSON.stringify(foodCateringAddressIs));
+        formData.append('foodCateringName', foodCateringName);
+        formData.append('foodItems', JSON.stringify(finalCombomenu));
+
         formData.append('vendorMobileNumber', vendorMobileNumber);
         formData.append('discountPercentage', discountPercentage);
         formData.append('available', true);
         formData.append('advanceAmount', advanceAmount);
         formData.append('overTimeCharges', overTimeCharges);
+        formData.append('accepted', false);
+
 
         console.log('formdata is ::>>', JSON.stringify(formData));
 
         try {
-            const response = await axios.post(`${BASE_URL}/AddTentHouse`, formData, {
+            const response = await axios.post(`${BASE_URL}/AddFoodCatering`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -568,6 +668,18 @@ const GeneralDetails = () => {
         }
     }
 
+    const renderMenuItem = ({ item }) => (
+        <View style={{marginHorizontal:5,backgroundColor:"white",borderWidth:1,borderColor:"lightgray", borderRadius:10,paddingVertical:10,paddingHorizontal:10}}>
+          <Text style={{color:"black", fontSize:14, fontWeight:"700", fontFamily: 'ManropeRegular'}}>{item.title}</Text>
+          <Text style={{marginTop:5,color:"black", fontSize:10, fontWeight:"200", fontFamily: 'ManropeRegular'}}>Combo Includes</Text>
+          <Text style={{marginTop:2,color:"black", fontSize:12, fontWeight:"400", fontFamily: 'ManropeRegular', width:"60%"}}>{item.items.join(', ')}</Text>
+          <Text style={{marginTop:5,color:"#FE8235", fontSize:12, fontWeight:"400", fontFamily: 'ManropeRegular'}}>Per Plate Price: {item.perPlateCost}</Text>
+          <Text style={{marginTop:5,color:"#FE8235", fontSize:12, fontWeight:"400", fontFamily: 'ManropeRegular'}}>Min Order: {item.minOrder}</Text>
+
+        </View>
+      );
+
+      
 
     return (
         <View>
@@ -596,35 +708,48 @@ const GeneralDetails = () => {
                     contentContainerStyle={{ width: '100%', justifyContent: 'space-around' }}
                 />
                 <TextField
-                    label='Tent House Name'
-                    placeholder="Please Enter Tent House Name"
-                    value={tentHouseName}
+                    label='Catering Name'
+                    placeholder="Please Enter Catering Name"
+                    value={foodCateringName}
                     onChangeHandler={onChangetentHouseName}
                     keyboardType='default'
                     isRequired={true}
                 />
 
                 <TextField
-                    label='Tent House Description'
+                    label='Catering Description'
                     placeholder="Describe about your service"
-                    value={productDescription}
+                    value={cateringDescription}
                     onChangeHandler={onChangeDescription}
                     keyboardType='default'
                     isRequired={true}
                     isDescriptionField={true}
                 />
             </View>
+           
+
+            <Text style={styles.title}>Add Menu Items</Text>
+            <View style={styles.mainContainer}>
+                {RentalItemsList()}
+                {/* {ItemList()} */}
+            </View>
+
+            {finalCombomenu?.length > 0 ?
+            <View style={styles.mainContainer}>
+            <Text style={{color:"black", fontSize:14, fontWeight:"500", marginBottom:5,marginHorizontal:8}}>Added Combos</Text>
+             <FlatList
+             data={finalCombomenu}
+             renderItem={renderMenuItem}
+             keyExtractor={(item, index) => index.toString()}
+             horizontal
+             showsHorizontalScrollIndicator={false}
+           />
+           </View>: 
+           null}
+
             <Text style={styles.title}>Pricing Details</Text>
             <View style={styles.mainContainer}>
 
-                <TextField
-                    label='Per Day Charge (₹/ Per Day)*'
-                    placeholder="Please Enter per Day Charge"
-                    value={perDayRentPrice}
-                    onChangeHandler={onChangePerDayRentPrice}
-                    keyboardType='default'
-                    isRequired={true}
-                />
                 <TextField
                     label='Advance Booking Amount'
                     placeholder="Please Enter Advance Booking Amount"
@@ -641,17 +766,7 @@ const GeneralDetails = () => {
                     keyboardType='default'
                     isRequired={false}
                 />
-            </View>
-
-            <Text style={styles.title}>Add Menu Items</Text>
-            <View style={styles.mainContainer}>
-                {RentalItemsList()}
-                {ItemList()}
-            </View>
-
-            <Text style={styles.title}>Other Charges</Text>
-            <View style={styles.mainContainer}>
-                <TextField
+                 <TextField
                     label='Over Time Charges'
                     placeholder="Please Enter OverTime Charges"
                     value={overTimeCharges}
@@ -666,7 +781,7 @@ const GeneralDetails = () => {
                 <TextField
                     label='Address'
                     placeholder="Please Enter Address"
-                    value={tentHouseAddress}
+                    value={cateringAddress}
                     onChangeHandler={onChangetentHouseAddress}
                     keyboardType='default'
                     isRequired={true}
@@ -674,7 +789,7 @@ const GeneralDetails = () => {
                 <TextField
                     label='City'
                     placeholder="Please Enter City"
-                    value={tentHouseCity}
+                    value={cateringCity}
                     onChangeHandler={onChangetentHouseCity}
                     keyboardType='default'
                     isRequired={true}
@@ -682,7 +797,7 @@ const GeneralDetails = () => {
                 <TextField
                     label='Pin code'
                     placeholder="Please Enter Pin code"
-                    value={tentHousePincode}
+                    value={cateringPincode}
                     onChangeHandler={onChangetentHousePincode}
                     keyboardType='default'
                     isRequired={true}
@@ -830,6 +945,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 5,
+        width: "50%"
     },
     icon: {
         marginRight: 10,
