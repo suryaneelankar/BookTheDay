@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, Dimensions } from 'react-native';
 import axios from 'axios';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -8,32 +8,16 @@ import BookDatesButton from "../../components/GradientButton";
 import Modal from 'react-native-modal';
 import themevariable from "../../utils/themevariable";
 import LinearGradient from "react-native-linear-gradient";
-import moment from "moment";
+import Swiper from "react-native-swiper";
 
-const BookingOverView = ({ route, navigation }) => {
+const DecorsBookingOverView = ({ route, navigation }) => {
 
-    const { categoryId,numberOfDays, selectedRentalItems,  rentalItems, timeSlot, startDate,endDate, totalPrice } = route.params;
+    const { categoryId, timeSlot, bookingDate, totalPrice, addedItems } = route.params;
     const [bookingDetails, setBookingDetails] = useState([]);
     const [bookingDone, setBookingDone] = useState(false);
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
 
-    const rentalItemsArray = Object.entries(rentalItems).map(([key, value]) => ({
-        name: key,
-        quantity: value
-    }));
-    const  bookingItems=  Object.keys(selectedRentalItems).map(key => ({
-        itemName: selectedRentalItems[key]?.name,
-        itemPerDayPrice: selectedRentalItems[key]?.perDayPrice,
-        quantity: selectedRentalItems[key]?.quantity
-    }))
-
-    // Render function for FlatList
-    const renderItem = ({ item }) => (
-        <View style={styles.item}>
-            <Text style={styles.itemText}>{item.name} : {item.quantity}</Text>
-        </View>
-    );
-
+  
 
     useEffect(() => {
         getEventsDetails();
@@ -41,41 +25,55 @@ const BookingOverView = ({ route, navigation }) => {
 
     const getEventsDetails = async () => {
         try {
-            const response = await axios.get(`${BASE_URL}/getTentHouseDetailsById/${categoryId}`);
-            console.log("tent house over view ::::::::::", JSON.stringify(response?.data));
+            const response = await axios.get(`${BASE_URL}/getDecorationDetailsById/${categoryId}`);
+            console.log(" decors over view ::::::::::", JSON.stringify(response?.data));
             setBookingDetails(response?.data)
         } catch (error) {
-            console.log("categories::::::::::", error);
+            console.log("decors::::::::::", error);
         }
-    }
+    };
 
-    console.log("rental items:::::::", selectedRentalItems, numberOfDays);
-   
-    console.log("bookings items", bookingItems)
+    const RentalItem = ({ item , addItem, isAdded}) => {
 
-    const ConfirmBooking = async () => {
-      
-        const payload = {
-          productId: categoryId,
-          startDate: moment(startDate).format('DD MMMM YYYY'),
-          endDate: moment(endDate).format('DD MMMM YYYY'),
-          numOfDays: numberOfDays,
-          totalAmount: totalPrice.replace(/[^\d]/g, ''),
-          bookingItems: bookingItems
-        }
-        console.log("payload is:::::::", payload);
-        try {
-          const bookingResponse = await axios.post(`${BASE_URL}/create-tent-house-booking`, payload);
-           console.log("booking res:::::::::", bookingResponse);
-          if (bookingResponse?.status === 201) {
-            setThankYouCardVisible(true);
+        return (
+            <View style={styles.itemContainer}>
+                <View style={{ width: Dimensions.get('window').width / 4, height: 100 }}>
+                    <Swiper
+                        showsPagination
+                        autoplay={true}
+                        paginationStyle={{ bottom: 15 }}
+                        dotStyle={{ width: 7, height: 7 }}
+                        activeDotStyle={{ width: 10, height: 10 }}
+                    >
+                        {item.packageImages.map((image, index) => (
+                            <Image
+                                key={index}
+                                source={{ uri: image.url.replace('localhost', LocalHostUrl) }}
+                                style={{
+                                    width: '100%',
+                                    height: "95%",
+                                    resizeMode: 'cover'
+                                }}
+                                resizeMode="cover"
+                            />
+                        ))}
+                    </Swiper>
+                </View>
+                <View style={styles.itemDetails}>
+                        <View>
+                            <Text style={styles.itemName}>{item?.packageName}</Text>
+                            <Text style={styles.itemPrice}><Text style={{ fontSize: 12, fontWeight: "400" }}></Text> ₹{item?.packagePrice}/-</Text>
+                        </View>
 
-          }
-        } catch (error) {
-          console.error("Error during booking:", error);
-        }
-      }
 
+                    <Text style={styles.itemDescription}>{item?.packageDescription}</Text>
+                </View>
+
+            </View>
+        );
+    };
+
+console.log("addeiets:::::", addedItems)
     return (
         <View style={{ flex: 1, alignSelf: 'center', width: '100%', alignItems: 'center' }}>
 
@@ -96,19 +94,19 @@ const BookingOverView = ({ route, navigation }) => {
             <View style={{ backgroundColor: 'white', borderRadius: 15, padding: 10, marginTop: 20, width: '90%', paddingHorizontal: 18, }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <View style={{width:"80%"}}>
-                        <Text style={{ color: 'grey' }}>{bookingDetails?.tentHouseName}</Text>
-                        <Text style={{ color: 'grey' }}>Address : {bookingDetails?.tentHosueAddress?.address}</Text>
+                        <Text style={{ color: 'black',fontSize:14, fontWeight:"600",fontFamily: 'ManropeRegular',  }}>{bookingDetails?.eventOrganiserName}</Text>
+                        <Text style={{ color: 'black',fontSize:14, fontWeight:"600",fontFamily: 'ManropeRegular', }}>Address : {bookingDetails?.eventOrganizerAddress?.address}</Text>
 
 
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
-                            <Text style={{ fontWeight: '600', fontSize: 12 }}>Booking Date : </Text>
-                            <Text style={{ fontWeight: '600', fontSize: 13 }}>{startDate} to {endDate}</Text>
+                            <Text style={{ fontWeight: '600', fontSize: 12 , fontFamily: 'ManropeRegular',}}>Booking Date : </Text>
+                            <Text style={{ fontWeight: '600', fontSize: 13 , fontFamily: 'ManropeRegular',}}>{bookingDate}</Text>
                         </View>
                         <View style={{ flexDirection: "row", alignItems: "center" }}>
-                            <Text style={{ fontWeight: '600', fontSize: 12 }}>Booking Time : </Text>
-                            <Text style={{ fontWeight: '600', fontSize: 13 }}>{timeSlot}</Text>
+                            <Text style={{ fontWeight: '600', fontSize: 12 , fontFamily: 'ManropeRegular', }}>Booking Time : </Text>
+                            <Text style={{ fontWeight: '600', fontSize: 13,  fontFamily: 'ManropeRegular', }}>{timeSlot}</Text>
                         </View>
-                        <Text style={{ color: 'black' }}>Booked for - Rakesh Pandit</Text>
+                        <Text style={{ color: 'black', fontSize:12, fontWeight:"500" ,fontFamily: 'ManropeRegular',}}>Booked for - Rakesh Pandit</Text>
                     </View>
                     <Image source={{ uri: bookingDetails?.professionalImage?.url.replace('localhost', LocalHostUrl) }}
                         style={{ width: 70, height: 70, borderRadius: 35 }}
@@ -117,17 +115,20 @@ const BookingOverView = ({ route, navigation }) => {
                     />
                 </View>
 
-                <Text style={{ marginTop: 20, color: "black", fontSize: 16 }}>Selected Rental Items</Text>
-                <FlatList
-                    data={rentalItemsArray}
-                    renderItem={renderItem}
-                    keyExtractor={item => item?.name}
-                />
 
 
                 <View style={{ backgroundColor: '#dcdcdc', width: '100%', height: 2, alignSelf: 'center', marginTop: 10 }} />
-                <Text style={{ fontWeight: '600', marginTop: 10, fontSize: 18 }}>Total Price : {totalPrice}</Text>
-                <Text style={{ fontWeight: '600', marginTop: 10 }}> Advacnce Amount : {bookingDetails?.advanceAmount}</Text>
+                
+                <Text style={{ color: 'black',fontSize:14, fontWeight:"600",fontFamily: 'ManropeRegular', }}>Package selected</Text>
+
+                <FlatList
+                        data={addedItems}
+                        keyExtractor={(item) => item?.id}
+                        renderItem={({ item }) => <RentalItem item={item}  />}
+                    />
+                
+                <Text style={{  color: 'black',fontSize:18, fontWeight:"700",fontFamily: 'ManropeRegular',  }}>Total Price : {totalPrice}</Text>
+                <Text style={{  color: 'black',fontSize:14, fontWeight:"600",fontFamily: 'ManropeRegular',  }}> Advacnce Amount : {bookingDetails?.advanceAmount}</Text>
             </View>
 
             <Modal
@@ -185,7 +186,7 @@ const BookingOverView = ({ route, navigation }) => {
             <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
                 {!bookingDone ?
                 <BookDatesButton
-                    onPress={() => ConfirmBooking()}
+                    onPress={() => setThankYouCardVisible(true)}
                     text={'Confirm Booking'}
                     padding={10}
                 /> : null}
@@ -194,7 +195,7 @@ const BookingOverView = ({ route, navigation }) => {
     )
 }
 
-export default BookingOverView;
+export default DecorsBookingOverView;
 
 const styles = StyleSheet.create({
     container: {
@@ -233,6 +234,49 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         position: 'relative',
+    },
+    itemContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+        paddingHorizontal: 5,
+        paddingVertical: 10,
+        borderBottomColor: "#D6D6D6",
+        borderBottomWidth: 1
+        // padding: 16,
+        // borderRadius: 8,
+        // backgroundColor: '#f9f9f9',
+        // elevation: 1,
+    },
+    itemImage: {
+        width: 80,
+        height: 80,
+        borderRadius: 8,
+    },
+    itemDetails: {
+        flex: 1,
+        marginLeft: 10
+    },
+    itemName: {
+        fontSize: 16,
+        fontWeight: '400',
+        color: "#000000",
+        fontFamily: 'ManropeRegular',
+
+    },
+    itemPrice: {
+        fontSize: 13,
+        color: '#000000',
+        fontFamily: 'ManropeRegular',
+        fontWeight: "700",
+        marginTop: 5
+    },
+    itemDescription: {
+        fontSize: 10,
+        color: '#8B8B8B',
+        fontWeight: "400",
+        fontFamily: 'ManropeRegular',
+        marginTop: 5,
     },
     icon: {
         width: 40,

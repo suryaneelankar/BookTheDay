@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, Image, StyleSheet, Dimensions, ScrollView, Button, TouchableOpacity, FlatList } from "react-native";
+import { Text, View, Image, StyleSheet, Dimensions, ScrollView, Button, TouchableOpacity, FlatList, TextInput } from "react-native";
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import axios from "axios";
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
@@ -23,12 +23,12 @@ import MinusIcon from '../../assets/svgs/minusIcon.svg';
 import AddIcon from '../../assets/svgs/addIcon.svg';
 
 
-const ViewTentHouse = ({ route, navigation }) => {
+const ViewCaterings = ({ route, navigation }) => {
 
     const { width } = Dimensions.get('window');
     const [eventsDetails, setEventsDetails] = useState([])
     const [subImages, setSubImages] = useState();
-    const [rentalItemsData, setRentalItemsData] = useState();
+    const [foodItemsData, setFoodItemsData] = useState();
 
     const [selectedStartDate, setSelectedStartDate] = useState('');
     const [selectedEndDate, setSelectedEndDate] = useState('');
@@ -41,19 +41,65 @@ const ViewTentHouse = ({ route, navigation }) => {
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
     const [itemQuantities, setItemQuantities] = useState({});
     const [selectedItems, setSelectedItems] = useState({});
-    const [selectedRange, setSelectedRange] = useState({
-        startDate: '',
-        endDate: '',
-    });
-    const [numberOfDays, setNumberOfDays] = useState(0);
-
+    const [addedItems, setAddedItems] = useState([]);
+    const [numPlates, setNumPlates] = useState({});
+    // const [selectedIndex, SetSelectedIndex] = useState();
+    const [selectedIndex, setSelectedIndex] = useState(null);
 
     const { categoryId } = route.params;
     console.log("CATEID I::::::", categoryId)
-  
-  
 
- 
+    const foodMenu = [{
+        title: "Non Veg Standard Menu",
+        items: [
+            "Sweet",
+            "Roti",
+            "Paneer",
+            "Veg Biryani",
+            "Veg Curry",
+            "Raitha",
+            "White Rice",
+            "Dal",
+            "Fry",
+            "Sambar",
+            "Pickel",
+            "Chutney",
+            "Papad",
+            "Salad",
+            "Veg Snack",
+            "Curd",
+            "Mouth Freshener"
+        ],
+        perPlateCost: 200,
+        minOrder: 50
+    },
+    {
+        title: "Vegetarian Standard Menu",
+        items: [
+            "Sweet",
+            "Roti",
+            "Paneer",
+            "Veg Biryani",
+            "Veg Curry",
+            "Raitha",
+            "White Rice",
+            "Dal",
+            "Fry",
+            "Sambar",
+            "Pickel",
+            "Chutney",
+            "Papad",
+            "Salad",
+            "Veg Snack",
+            "Curd",
+            "Mouth Freshener"
+        ],
+        perPlateCost: 200,
+        minOrder: 50
+    }
+    ];
+
+
 
     const timeSlots = [
         '12:00 AM',
@@ -92,22 +138,22 @@ const ViewTentHouse = ({ route, navigation }) => {
     };
 
     useEffect(() => {
-        getTentHouseDetails();
+        getCateringDetails();
     }, []);
 
-    const getTentHouseDetails = async () => {
+    const getCateringDetails = async () => {
         console.log("IAM CALLING API")
         try {
-            const response = await axios.get(`${BASE_URL}/getTentHouseDetailsById/${categoryId}`);
-            // console.log("tenthouse view details ::::::::::",JSON.stringify( response?.data));
+            const response = await axios.get(`${BASE_URL}/getCateringDetailsById/${categoryId}`);
+            console.log("catering view details ::::::::::",JSON.stringify( response?.data));
             setEventsDetails(response?.data);
 
             const imageUrls = response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
             setSubImages(imageUrls);
-            setRentalItemsData(response?.data?.rentalItems);
-            console.log("rental items::::::", response?.data?.rentalItems)
+            setFoodItemsData(response?.data?.foodItems);
+            console.log("rental items::::::", response?.data?.foodItems)
         } catch (error) {
-            console.log("tenthouse details::::::::::", error);
+            console.log("catering details::::::::::", error);
 
         }
     }
@@ -148,8 +194,63 @@ const ViewTentHouse = ({ route, navigation }) => {
         const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         const formattedAmount = decimalPart ? `${formattedIntegerPart}.${decimalPart}` : formattedIntegerPart;
         return `₹${formattedAmount}`;
-    }
+    };
 
+  const FoodItem = ({ item, onAdd, onDelete, addedItems, numPlates, setNumPlates, selectedIndex, setSelectedIndex, index }) => {
+        const isAdded = addedItems.some(addedItem => addedItem?._id === item?._id);
+
+        return (
+            <View style={{ paddingHorizontal: 10, paddingVertical: 10, borderRadius:10,borderColor:"lightgray", borderWidth:1,marginVertical:10 }}>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <View style={{ width: "70%" }}>
+                        <Text style={{ color: "#100D25", fontSize: 16, fontWeight: "400", fontFamily: 'ManropeRegular' }}>{item?.title}</Text>
+                        <Text style={{ fontSize: 10, color: "#FD813B", marginTop: 5 }}>{formatAmount(item?.perPlateCost)}</Text>
+                        <Text style={{ fontSize: 10, color: "#FD813B", marginTop: 5 }}>Min order: {item?.minOrder}</Text>
+                        <Text style={{ marginTop: 5, color: "#100D25", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular' }}>{item?.items.join(', ')}</Text>
+                    </View>
+
+                    <View>
+                        <Image style={{ width: 100, height: 120, borderRadius: 5 }} source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/9/96/Lunch_Meals.jpg' }} />
+                        <TouchableOpacity
+                            onPress={() => {
+                                if (isAdded) {
+                                    onDelete(item, index);
+                                    setSelectedIndex(null);
+                                } else {
+                                    onAdd(item, index);
+                                    setSelectedIndex(index);
+                                }
+                            }}
+                            style={{ position: "relative", bottom: 10, borderRadius: 8, backgroundColor: "#F1F1F1", alignSelf: "center" }}
+                        >
+                            <Text style={styles.addText}>{isAdded ? 'DELETE' : 'ADD'}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+                {isAdded && (
+                    <>
+                    <TextInput
+                        style={{ backgroundColor: "#F1F1F1", borderRadius:5 ,elevation:2,}}
+                        placeholder="Enter number of plates"
+                        keyboardType="numeric"
+                        value={numPlates[item.title]}
+                        onChangeText={(text) => setNumPlates({ ...numPlates, [item.title]: text })}
+                    />
+                    </>
+                )}
+            </View>
+        );
+    };
+
+    const handleAdd = (item) => {
+        setAddedItems([...addedItems, item]);
+    };
+
+    const handleDelete = (item) => {
+        setAddedItems(addedItems.filter(addedItem => addedItem.title !== item.title));
+        setNumPlates({ ...numPlates, [item.title]: '' });
+    };
 
     const renderCalendar = () => {
         return (
@@ -174,73 +275,34 @@ const ViewTentHouse = ({ route, navigation }) => {
     }
 
     const onDayPress = (day) => {
-        const { startDate, endDate } = selectedRange;
-    
-        // if (selectedOption === 'monthly') {
-        //   // Set start date and end date to 30 days after start date for monthly option
-        //   const endDate = moment(day.dateString).add(29, 'days').format('YYYY-MM-DD');
-        //   setSelectedRange({ startDate: day.dateString, endDate });
-        // //   setNumberOfDays(31); // 30 days + 1 to include both start and end date
-        // } else {
-          // If start date is not set or both dates are set, set the start date
-          if (!startDate || (startDate && endDate)) {
-            setSelectedRange({ startDate: day.dateString, endDate: '' });
-            setNumberOfDays(0); // Reset number of days when selecting a new start date
-          } else if (startDate && !endDate) {
-            // Ensure the end date is after the start date
-            if (moment(day.dateString).isAfter(moment(startDate))) {
-              setSelectedRange({ startDate, endDate: day.dateString });
-              const days = moment(day.dateString).diff(moment(startDate), 'days') + 1; // Include both start and end dates
-              setNumberOfDays(days);
-            } else {
-              Alert.alert('Invalid date selection', 'End date must be after start date.');
-            }
-          }
-        // }
-      };
-
-
-      const getMarkedDates = () => {
-        const { startDate, endDate } = selectedRange;
-        if (!startDate) {
-            return {};
-        }
-
-        let markedDates = {
-            [startDate]: {
-                startingDay: true,
-                color: '#FFC107',
-                textColor: 'white',
-            },
-        };
-
-        if (endDate) {
-            markedDates[endDate] = {
-                endingDay: true,
-                color: '#FFC107',
-                textColor: 'white',
-            };
-
-            // Add dates between startDate and endDate
-            let currentDate = new Date(startDate);
-            while (currentDate < new Date(endDate)) {
-                currentDate.setDate(currentDate.getDate() + 1);
-                const dateString = currentDate.toISOString().split('T')[0];
-                if (dateString !== endDate) {
-                    markedDates[dateString] = {
-                        color: '#FFE082',
-                        textColor: 'white',
-                    };
-                }
-            }
+        console.log('day is::>>', day)
+        let startedDate;
+        if (!selectedStartDate || selectedEndDate) {
+            startedDate = day?.dateString;
+            const formattedDate = formattedDates(day?.dateString);
+            setSelectedStartDate(day?.dateString);
+            setSelectedEndDate('');
+        } else if (day.dateString < selectedStartDate) {
+            startedDate = day?.dateString;
+            const formattedDate = formattedDates(day?.dateString);
+            setSelectedStartDate(day?.dateString);
         } else {
-            markedDates[startDate].endingDay = true;
+            const formattedDate = formattedDates(day?.dateString);
+            setSelectedEndDate(formattedDate);
+            const endedDate = day?.dateString;
+            const startDate = new Date(selectedStartDate);
+            const endDate = new Date(endedDate);
+            console.log(selectedStartDate, endedDate, 'started and ednded dates::>>>')
+            const diffInTime = endDate.getTime() - startDate.getTime();
+            const diffInDays = diffInTime / (1000 * 3600 * 24);
+            setNoOfDays(diffInDays);
+            const formattedStartDate = formattedDates(selectedStartDate);
+            setSelectedStartDate(formattedStartDate);
+            console.log('Number of days:', diffInDays);
         }
-
-        return markedDates;
     };
 
-    console.log("selected dates:::::::::", selectedRange.startDate,selectedRange.endDate);
+    console.log("selected dates:::::::::", selectedStartDate, selectedEndDate);
 
 
     const updateQuantity = (item) => {
@@ -286,46 +348,16 @@ const ViewTentHouse = ({ route, navigation }) => {
             setSelectedItems(updatedItems);
         }
     };
-    console.log("selected rental irems",selectedItems);
 
-    const calculateTotalPrice = (rentalItemsData, itemQuantities) => {
-        if (!rentalItemsData) return 0;
-        return rentalItemsData.reduce((total, item) => {
+    const calculateTotalPrice = (foodItemsData, itemQuantities) => {
+        if (!foodItemsData) return 0;
+        return foodItemsData.reduce((total, item) => {
             const quantity = itemQuantities[item.itemName] || 0;
             return total + (item.perDayPrice * quantity);
         }, 0);
     };
 
-    const RentalItem = ({ item }) => {
-        const quantity = itemQuantities[item.itemName] || 0;
-        return (
-            <View style={styles.itemContainer}>
-                <Image source={{ uri: item?.image }} style={styles.itemImage} />
-                <View style={styles.itemDetails}>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between" }} >
-                        <View>
-                            <Text style={styles.itemName}>{item?.itemName}</Text>
-                            {/* <Text style={styles.itemPrice}><Text style={{fontSize:12, fontWeight:"400"}}>Per Hour</Text> ₹{item?.perHourPrice}/-</Text> */}
-                            <Text style={styles.itemPrice}><Text style={{ fontSize: 12, fontWeight: "400", }}>Per Day </Text>₹{item?.perDayPrice}/-</Text>
-                        </View>
-
-                        <View style={styles.quantityContainer}>
-                            <TouchableOpacity onPress={() => decrementQuantity(item)}>
-                                <MinusIcon />
-                            </TouchableOpacity>
-                            <Text style={styles.quantityText}>{quantity}</Text>
-                            <TouchableOpacity onPress={() => updateQuantity(item)}>
-                                <AddIcon />
-                            </TouchableOpacity>
-                        </View>
-
-                    </View>
-                    <Text style={styles.itemDescription}>{item?.description}</Text>
-                </View>
-
-            </View>
-        );
-    };
+console.log("food items is:::::,", foodItemsData);
 
 
 
@@ -359,12 +391,12 @@ const ViewTentHouse = ({ route, navigation }) => {
                 <View style={{ flex: 1, marginTop: 10, marginHorizontal: 20 }}>
 
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-                        <Text style={{ fontSize: 20, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular' }}>{eventsDetails?.tentHouseName}</Text>
+                        <Text style={{ fontSize: 20, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular' }}>{eventsDetails?.foodCateringName}</Text>
                     </View>
 
                     <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center" }}>
                         <MapMarkIcon />
-                        <Text style={{ color: "#939393", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', marginLeft: 5 }}>{eventsDetails?.tentHosueAddress?.address}</Text>
+                        <Text style={{ color: "#939393", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', marginLeft: 5 }}>{eventsDetails?.foodCateringAddress?.address}</Text>
                     </View>
 
                     <View style={{ marginTop: 20 }}>
@@ -374,17 +406,33 @@ const ViewTentHouse = ({ route, navigation }) => {
 
                     <View style={{ borderColor: "#F1F1F1", borderWidth: 1, width: "100%", marginTop: 5 }} />
 
-                    <Text style={{ color: "#000000", fontSize: 13, fontWeight: "700", fontFamily: 'ManropeRegular', marginTop: 15 }}>Available Rental Items</Text>
+                    <Text style={{ color: "#000000", fontSize: 13, fontWeight: "700", fontFamily: 'ManropeRegular', marginTop: 15 }}>Available Food Menu</Text>
+                    {/* <FlatList
+                        data={foodMenu}
+                        keyExtractor={(item) => item}
+                        renderItem={({ item , index}) => <FoodItem item={item} index={index} onAdd={handleAdd}
+                        onDelete={handleDelete}
+                        addedItems={addedItems}
+                        numPlates={numPlates}
+                        setNumPlates={setNumPlates} />}
+                    /> */}
+
                     <FlatList
-                        data={rentalItemsData}
-                        keyExtractor={(item) => item?.id}
-                        renderItem={({ item }) =>
-                            <RentalItem
+                        data={foodItemsData}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({ item, index }) => (
+                            <FoodItem
                                 item={item}
-                                quantity={itemQuantities[item.itemName] || 0}
-                                updateQuantity={updateQuantity}
+                                index={index}
+                                onAdd={handleAdd}
+                                onDelete={handleDelete}
+                                addedItems={addedItems}
+                                numPlates={numPlates}
+                                setNumPlates={setNumPlates}
+                                selectedIndex={selectedIndex}
+                                setSelectedIndex={setSelectedIndex}
                             />
-                        }
+                        )}
                     />
 
                     <Text style={{ marginTop: 20, fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular' }}>Book The Day</Text>
@@ -394,10 +442,8 @@ const ViewTentHouse = ({ route, navigation }) => {
                             <CalendarIcon />
                             <Text style={{ fontSize: 12, fontFamily: 'ManropeRegular', fontWeight: "400" }}>{selectedDate ? 'Booking Date' : 'Select The Date'}</Text>
                         </View>
-                        <View>
-                        <Text style={[styles.title, { marginTop: 2 }]}>{selectedRange ? `${selectedRange?.startDate} to ${selectedRange?.endDate}`: null}</Text>
-                        <Text style={[styles.title, { marginTop: 2 }]}>No of Days: {selectedRange ? `${numberOfDays}`: null}</Text>
-                        </View>
+                        <Text style={[styles.title, { marginTop: 2 }]}>{selectedDate ? moment(selectedDate).format('DD-MM-YYYY') : null}</Text>
+
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={() => setTimeSlotModalVisible(true)} style={{ marginTop: 25, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
@@ -413,13 +459,13 @@ const ViewTentHouse = ({ route, navigation }) => {
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
 
                         <Text style={[styles.title, { marginTop: 10 }]}>Total Days :</Text>
-                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{numberOfDays} Days</Text>
+                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{noOfDays > 1 ? `${noOfDays} days` : '1 day'}</Text>
                     </View>
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, marginBottom: "25%" }}>
 
                         <Text style={[styles.title, { marginTop: 10 }]}>Total Price :</Text>
-                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{`₹${ numberOfDays > 0 ? numberOfDays * calculateTotalPrice(rentalItemsData, itemQuantities) : calculateTotalPrice(rentalItemsData, itemQuantities)}`}</Text>
+                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{`₹${calculateTotalPrice(foodItemsData, itemQuantities)}`}</Text>
                     </View>
 
                 </View>
@@ -452,19 +498,6 @@ const ViewTentHouse = ({ route, navigation }) => {
                             <Text style={{ color: "#FFFFFF", fontSize: 20, fontWeight: "800", fontFamily: "ManropeRegular", }}>Select Date & Time</Text>
                         </View>
                         <Calendar
-                        onDayPress={onDayPress}
-                        headerStyle={{ backgroundColor: '#FDEEBC' }}
-                        markedDates={getMarkedDates()}
-                        markingType="period"
-                        minDate={moment().format('YYYY-MM-DD')} // Disable past dates
-                        theme={{
-                            arrowColor: 'black',
-                            todayTextColor: '#ED5065',
-                            selectedDayBackgroundColor: '#FFC107',
-                        }}
-                        style={{ marginTop: 20, marginHorizontal: 25, borderRadius: 10 }}
-                    />
-                        {/* <Calendar
                             onDayPress={(day) => setSelectedDate(day.dateString)}
                             headerStyle={{ backgroundColor: '#FDEEBC' }}
                             markedDates={{ [selectedDate]: { selected: true, marked: true, selectedColor: '#ED5065' } }}
@@ -476,15 +509,15 @@ const ViewTentHouse = ({ route, navigation }) => {
                                 selectedDayBackgroundColor: '#ED5065',
                             }}
                             style={{ marginTop: 20, marginHorizontal: 25, borderRadius: 10 }}
-                        /> */}
+                        />
 
-            <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
-                <BookDatesButton
-                    onPress={() => setIsVisible(false)}
-                    text={`Confirm Date`}
-                    padding={10}
-                />
-            </View>
+                        <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
+                            <BookDatesButton
+                                onPress={() => setIsVisible(false)}
+                                text={`Confirm Date`}
+                                padding={10}
+                            />
+                        </View>
                     </View>
                 </Modal>
 
@@ -534,8 +567,8 @@ const ViewTentHouse = ({ route, navigation }) => {
 
             <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
                 <BookDatesButton
-                    onPress={() => navigation.navigate('BookingOverView',{categoryId:categoryId, numberOfDays: numberOfDays,selectedRentalItems: selectedItems,rentalItems:itemQuantities,timeSlot:selectedTimeSlot , startDate: selectedRange?.startDate, endDate: selectedRange?.endDate,totalPrice:`₹${numberOfDays * calculateTotalPrice(rentalItemsData, itemQuantities)}`})}
-                    text={`₹${numberOfDays > 0 ? numberOfDays * calculateTotalPrice(rentalItemsData, itemQuantities) : calculateTotalPrice(rentalItemsData, itemQuantities)}   View Cart`}
+                    onPress={() => navigation.navigate('BookingOverView', { categoryId: categoryId, rentalItems: itemQuantities, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `₹${calculateTotalPrice(foodItemsData, itemQuantities)}` })}
+                    text={`₹${calculateTotalPrice(foodItemsData, itemQuantities)}   View Cart`}
                     padding={10}
                 />
             </View>
@@ -626,6 +659,21 @@ const styles = StyleSheet.create({
         marginTop: 10,
         alignItems: 'center',
     },
+    addText: {
+        color: "#4E7B10",
+        fontSize: 12,
+        fontWeight: "700",
+        fontFamily: 'ManropeRegular',
+        paddingVertical: 5,
+        paddingHorizontal: 15,
+        borderRadius: 8,
+        borderColor: "#4E7B10",
+        borderWidth: 1,
+        alignSelf: "center",
+        textAlign: "center",
+
+
+    },
     listcard: {
         marginTop: 10,
         width: "90%",
@@ -702,4 +750,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default ViewTentHouse;
+export default ViewCaterings;
