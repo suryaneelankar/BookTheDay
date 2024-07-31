@@ -410,7 +410,7 @@ const HomeDashboard = () => {
                                 return (
                                     <TouchableOpacity  onPress={() => handlePress(item?.name)}    style={{ alignItems: "center", alignSelf: "center", justifyContent: "center", width: Dimensions.get('window').width / 4 }} >
                                         <SvgComponent width={65} height={65} />
-                                        <Text style={{ marginTop: 5, fontSize: 13, fontWeight: "500", color: '#202020', fontFamily: "ManropeRegular" }}>
+                                        <Text style={{ marginTop: 2, fontSize: 13, fontWeight: "500", color: '#202020', fontFamily: "ManropeRegular" }}>
                                             {item?.name}
                                         </Text>
                                     </TouchableOpacity>

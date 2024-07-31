@@ -113,7 +113,7 @@ const Tab4Screen = ({ navigation }) => {
 />
 <Tab.Screen
   name="Events"
-  component={Tab2Screen}
+  component={VendorDashBoardTab}
   options={({ focused }) => ({
     tabBarIcon: ({focused}) => (
       

@@ -26,7 +26,7 @@ const DecorsBookingOverView = ({ route, navigation }) => {
     const getEventsDetails = async () => {
         try {
             const response = await axios.get(`${BASE_URL}/getDecorationDetailsById/${categoryId}`);
-            console.log(" decors over view ::::::::::", JSON.stringify(response?.data));
+            // console.log(" decors over view ::::::::::", JSON.stringify(response?.data));
             setBookingDetails(response?.data)
         } catch (error) {
             console.log("decors::::::::::", error);
@@ -73,7 +73,7 @@ const DecorsBookingOverView = ({ route, navigation }) => {
         );
     };
 
-console.log("addeiets:::::", addedItems)
+// console.log("addeiets:::::", addedItems)
     return (
         <View style={{ flex: 1, alignSelf: 'center', width: '100%', alignItems: 'center' }}>
 

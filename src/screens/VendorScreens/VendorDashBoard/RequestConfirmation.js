@@ -13,11 +13,13 @@ import LinearGradient from 'react-native-linear-gradient';
 import { formatAmount } from "../../../utils/GlobalFunctions";
 
 const RequestConfirmation = ({ navigation, route }) => {
-    const { productId } = route?.params;
+    const { productId, catEndPoint } = route?.params;
     const [productDetails, setProductDetails] = useState([]);
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [wholeBookingData, setWholeBookingData] = useState([]);
+
+    console.log('catEndPoint is ::>>',catEndPoint);
 
     useEffect(() => {
         getProductDetails();
@@ -25,15 +27,17 @@ const RequestConfirmation = ({ navigation, route }) => {
     }, [])
 
     const getVendorClothJewelBookings = async () => {
-        const vendorMobileNumber = "8297735285"
+        const vendorMobileNumber = "8297735286"
         try {
-            const response = await axios.get(`${BASE_URL}/clothJewelBookingsGotForVendor/${vendorMobileNumber}`);
+            const response = await axios.get(`${BASE_URL}/${catEndPoint?.bookingDetailsEndpoint}/${vendorMobileNumber}`);
+            console.log('before resp::><>', response?.data?.data);
             groupByFilterData(response?.data?.data);
         } catch (error) {
             console.log("categories::::::::::", error);
         }
     }
 
+    // filter the data based on product ID, if same product got multiple req then filter those from whole data.
     const groupByFilterData = (data) => {
         var result = data.reduce((x, y) => {
             (x[y.productId] = x[y.productId] || []).push(y);
@@ -47,7 +51,7 @@ const RequestConfirmation = ({ navigation, route }) => {
     const getProductDetails = async () => {
         console.log('productId is ::>>', productId)
         try {
-            const response = await axios.get(`${BASE_URL}/getClothJewelsById/${productId}`);
+            const response = await axios.get(`${BASE_URL}/${catEndPoint?.productDetailsEndpoint}/${productId}`);
             // console.log("getClothJewelsById::::::::::", response?.data);
             setProductDetails(response?.data)
         } catch (error) {
@@ -117,11 +121,12 @@ const RequestConfirmation = ({ navigation, route }) => {
     const RequestConfirmationAcceptOrReject = async (bookingStatus) => {
         const updatedParams = {
             productId: productId,
-            accepted: bookingStatus
+            accepted: true,
+            bookingStatus: bookingStatus
         }
-        console.log('updatedParams is::>>',updatedParams);
+        console.log('updatedParams is::>>', updatedParams);
         try {
-            const response = await axios.patch(`${BASE_URL}/clothJewelsbookingConfirmationFromVendor`,updatedParams);
+            const response = await axios.patch(`${BASE_URL}/${catEndPoint?.confirmationEndpoint}`, updatedParams);
             console.log("accept confirm response::::::::::", response?.data);
         } catch (error) {
             console.log("accept::::::::::", error);
@@ -130,9 +135,9 @@ const RequestConfirmation = ({ navigation, route }) => {
 
     const callConfirmationWithStatus = (alertText) => {
         if (alertText.includes('accept')) {
-            RequestConfirmationAcceptOrReject(true)
+            RequestConfirmationAcceptOrReject('approved')
         } else {
-            RequestConfirmationAcceptOrReject(false);
+            RequestConfirmationAcceptOrReject('rejected');
         }
     }
 
