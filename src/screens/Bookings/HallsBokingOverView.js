@@ -8,6 +8,7 @@ import BookDatesButton from "../../components/GradientButton";
 import Modal from 'react-native-modal';
 import themevariable from "../../utils/themevariable";
 import LinearGradient from "react-native-linear-gradient";
+import moment from "moment";
 
 const HallsBookingOverView = ({ route, navigation }) => {
 
@@ -17,7 +18,6 @@ const HallsBookingOverView = ({ route, navigation }) => {
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
 
   
-
     useEffect(() => {
         getEventsDetails();
     }, []);
@@ -31,6 +31,29 @@ const HallsBookingOverView = ({ route, navigation }) => {
             console.log("categories::::::::::", error);
         }
     }
+
+    const ConfirmBooking = async () => {  
+        const payload = {
+          productId: categoryId,
+          startDate: moment(bookingDate, "DD-MM-YYYY").format("DD MMMM YYYY"),
+          endDate: moment(bookingDate, "DD-MM-YYYY").format("DD MMMM YYYY"),
+          numOfDays: 1,
+          totalAmount: totalPrice.replace(/[^\d]/g, ''),
+          
+        }
+        console.log("payload is:::::::", payload);
+        try {
+          const bookingResponse = await axios.post(`${BASE_URL}/create-function-hall-booking`, payload);
+           console.log("booking res:::::::::", bookingResponse);
+          if (bookingResponse?.status === 201) {
+            setThankYouCardVisible(true);
+
+          }
+        } catch (error) {
+          console.error("Error during booking:", error);
+        }
+      }
+    
 
 
     return (
@@ -136,7 +159,7 @@ const HallsBookingOverView = ({ route, navigation }) => {
             <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
                 {!bookingDone ?
                 <BookDatesButton
-                    onPress={() => setThankYouCardVisible(true)}
+                    onPress={() => ConfirmBooking()}
                     text={'Confirm Booking'}
                     padding={10}
                 /> : null}

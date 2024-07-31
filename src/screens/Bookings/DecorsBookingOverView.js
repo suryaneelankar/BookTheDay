@@ -22,6 +22,7 @@ const DecorsBookingOverView = ({ route, navigation }) => {
     useEffect(() => {
         getEventsDetails();
     }, []);
+    console.log("added package is:::::", addedItems);
 
     const getEventsDetails = async () => {
         try {
@@ -32,6 +33,29 @@ const DecorsBookingOverView = ({ route, navigation }) => {
             console.log("decors::::::::::", error);
         }
     };
+
+    const ConfirmBooking = async () => {  
+        const payload = {
+          productId: categoryId,
+          startDate: bookingDate,
+          endDate: bookingDate,
+          numOfDays: 1,
+          totalAmount: totalPrice.replace(/[^\d]/g, ''),
+          packageId: addedItems[0]?._id
+        }
+        console.log("payload is:::::::", payload);
+        try {
+          const bookingResponse = await axios.post(`${BASE_URL}/create-decorations-booking`, payload);
+           console.log("booking res:::::::::", bookingResponse);
+          if (bookingResponse?.status === 201) {
+            setThankYouCardVisible(true);
+
+          }
+        } catch (error) {
+          console.error("Error during booking:", error);
+        }
+      }
+    
 
     const RentalItem = ({ item , addItem, isAdded}) => {
 
@@ -186,7 +210,7 @@ console.log("addeiets:::::", addedItems)
             <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
                 {!bookingDone ?
                 <BookDatesButton
-                    onPress={() => setThankYouCardVisible(true)}
+                    onPress={() => ConfirmBooking()}
                     text={'Confirm Booking'}
                     padding={10}
                 /> : null}
