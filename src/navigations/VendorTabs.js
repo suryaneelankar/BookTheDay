@@ -5,6 +5,7 @@ import {Image, Platform,View, TouchableOpacity, Text, Button} from 'react-native
 import { useDispatch } from 'react-redux';
 import { getLoginUserId } from '../../redux/actions';
 import VendorDashBoardTab from '../screens/VendorScreens/VendorDashBoard/DashBoard';
+import VendorCategoryScreen from '../screens/VendorScreens/VendorCatergoryScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -90,10 +91,11 @@ const Tab4Screen = ({ navigation }) => {
           },
         };
       }}>
-
+{/* VendorCategoryScreen */}
+{/* VendorDashBoardTab */}
      <Tab.Screen
      name="Home"
-     component={VendorDashBoardTab}
+     component={VendorCategoryScreen}
      options={({ focused }) => ({
      tabBarIcon: ({focused}) => (
         <Image
@@ -111,7 +113,7 @@ const Tab4Screen = ({ navigation }) => {
 />
 <Tab.Screen
   name="Events"
-  component={Tab2Screen}
+  component={VendorDashBoardTab}
   options={({ focused }) => ({
     tabBarIcon: ({focused}) => (
       

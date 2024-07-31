@@ -18,17 +18,55 @@ import Avatar from "../../../components/NameAvatar";
 
 const VendorDashBoardTab = ({ navigation }) => {
 
-    const [allBookings, setAllBookings] = useState([]);
-    const [wholeBookingData, setWholeBookingData] = useState([]);
+    const [clothJewelBookingsData, setclothJewelBookingsData] = useState([]);
     const [vendorListing, setVendorListings] = useState([]);
-    const [driverChefBookingsData, setDriverChefBookingsData] = useState([]);
+    const [decorationsBookingsData, setDecorationsBookingsData] = useState([]);
+    const [functionHallBookingsData, setFunctionHallBookingsData] = useState([]);
+    const [tentHouseBookingsData, setTentHouseBookingsData] = useState([]);
+    const [cateringsBookingsData, setCateringBookingsData] = useState([]);
 
     useEffect(() => {
         getVendorClothJewelBookings();
-        getVendorDriverChefBookings();
-        getVendorChefDriverBookings();
+        getVendorDecorationBookings();
+        getVendorFunctionHallBookings();
+        getVendorTentHouseBookings();
+        getVendorFoodCateringBookings()
+
         getVendorListings();
     }, [])
+
+    const allCatProductDetailEndpoints = {
+        decorations : {
+            productDetailsEndpoint: 'getDecorationDetailsById',
+            bookingDetailsEndpoint: 'decorationBookingsGotForVendor',
+            catType: 'decorations',
+            confirmationEndpoint: 'decorationsBookingConfirmationFromVendor'
+        },
+        clothjewels : {
+            productDetailsEndpoint: 'getClothJewelsById',
+            bookingDetailsEndpoint: 'clothJewelBookingsGotForVendor',
+            catType: 'clothjewels',
+            confirmationEndpoint: 'clothJewelsbookingConfirmationFromVendor'
+        },
+        foodcatering : {
+            productDetailsEndpoint: 'getCateringDetailsById',
+            bookingDetailsEndpoint: 'foodCateringBookingsGotForVendor',
+            catType: 'foodcatering',
+            confirmationEndpoint: 'foodCateringBookingConfirmationFromVendor'
+        },
+        tenthouse : {
+            productDetailsEndpoint: 'getTentHouseDetailsById',
+            bookingDetailsEndpoint: 'tentHouseBookingsGotForVendor',
+            catType: 'tenthouse',
+            confirmationEndpoint: 'tentHouseBookingConfirmationFromVendor'
+        },
+        functionhalls : {
+            productDetailsEndpoint: 'getFunctionHallDetailsById',
+            bookingDetailsEndpoint: 'functionHallBookingsGotForVendor',
+            catType: 'functionhalls',
+            confirmationEndpoint: 'functionHallsBookingConfirmationFromVendor'
+        },
+    }
 
 
     const getVendorListings = async () => {
@@ -42,41 +80,65 @@ const VendorDashBoardTab = ({ navigation }) => {
         }
     }
 
-    const getVendorDriverChefBookings = async () => {
-        const vendorMobileNumber = "8297735285"
-        try {
-            const response = await axios.get(`${BASE_URL}/driverChefBookingsGotForVendor/${vendorMobileNumber}`);
-            // console.log("setAllBookings::::::::::", response?.data?.data);
-            setWholeBookingData(response?.data?.data);
-            // const output = consolidateByProductId(response?.data?.data);
-            // console.log('output is ::>>', output);
-            // setAllBookings(output)
-        } catch (error) {
-            console.log("categories::::::::::", error);
-        }
-    }
-
     const getVendorClothJewelBookings = async () => {
-        const vendorMobileNumber = "8297735285"
+        const vendorMobileNumber = "8297735286"
         try {
             const response = await axios.get(`${BASE_URL}/clothJewelBookingsGotForVendor/${vendorMobileNumber}`);
-            // console.log("setAllBookings::::::::::", response?.data?.data);
-            setWholeBookingData(response?.data?.data)
             const output = consolidateByProductId(response?.data?.data);
             // console.log('output is ::>>', output);
-            setAllBookings(output)
+            setclothJewelBookingsData(output)
         } catch (error) {
             console.log("categories::::::::::", error);
         }
     }
 
-    const getVendorChefDriverBookings = async () => {
+    const getVendorDecorationBookings = async () => {
         console.log("getVendorChefDriverBookings::::::::::");
-        const vendorMobileNumber = "8297735285"
+        const vendorMobileNumber = "8297735286"
         try {
-            const response = await axios.get(`${BASE_URL}/driverChefBookingsGotForVendor/${vendorMobileNumber}`);
-            console.log('resp driver ::>>', response?.data?.data);
-            setDriverChefBookingsData(response?.data?.data);
+            const response = await axios.get(`${BASE_URL}/decorationBookingsGotForVendor/${vendorMobileNumber}`);
+            // console.log('resp decorationsBookingsData ::>>', response?.data?.data);
+            const outputData = consolidateDecorationDataByProductId(response?.data?.data);
+            setDecorationsBookingsData(outputData);
+
+        } catch (error) {
+            console.log("categories::::::::::", error);
+        }
+    }
+
+    const getVendorFunctionHallBookings = async () => {
+        const vendorMobileNumber = "8297735286"
+        try {
+            const response = await axios.get(`${BASE_URL}/functionHallBookingsGotForVendor/${vendorMobileNumber}`);
+            // console.log('resp getVendorFunctionHallBookings ::>>', response?.data?.data);
+            const outputData = consolidateFunctionHallsDataByProductId(response?.data?.data);
+            setFunctionHallBookingsData(outputData);
+
+        } catch (error) {
+            console.log("categories::::::::::", error);
+        }
+    }
+
+    const getVendorTentHouseBookings = async () => {
+        const vendorMobileNumber = "8297735286"
+        try {
+            const response = await axios.get(`${BASE_URL}/tentHouseBookingsGotForVendor/${vendorMobileNumber}`);
+            // console.log('resp getVendorTentHouseBookings ::>>', response?.data?.data);
+            const outputData = consolidateTentHouseDataByProductId(response?.data?.data);
+            setTentHouseBookingsData(outputData);
+
+        } catch (error) {
+            console.log("categories::::::::::", error);
+        }
+    }
+
+    const getVendorFoodCateringBookings = async () => {
+        const vendorMobileNumber = "8297735286"
+        try {
+            const response = await axios.get(`${BASE_URL}/foodCateringBookingsGotForVendor/${vendorMobileNumber}`);
+            console.log('resp foodcateringBookings ::>>', response?.data?.data);
+            const outputData = consolidateFoodCateringDataByProductId(response?.data?.data);
+            setCateringBookingsData(outputData);
 
         } catch (error) {
             console.log("categories::::::::::", error);
@@ -103,18 +165,108 @@ const VendorDashBoardTab = ({ navigation }) => {
         )
     }
 
-    const renderChefDriverItem = ({ item }) => {
+    const renderDecorationItem = ({ item }) => {
         const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
 
         return (
             <TouchableOpacity
-                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId })}
+                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId,catEndPoint: allCatProductDetailEndpoints?.decorations })}
                 style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" />
                     <View style={{ margin: 10 }}>
-                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 4 }}>Test </Text>
-                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.perDayPrice)}</Text>
+                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{item?.productName} </Text>
+                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.totalAmount)}</Text>
+                    </View>
+                </View>
+                <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', height: 35, borderRadius: 5, position: 'absolute', right: 10 }}>
+                    <Text style={{ color: '#FD813B', marginHorizontal: 5 }}>{item?.count == 1 ? '1 Request ' : `${item?.count} Requests `}</Text>
+                    {item?.count == 1 ? <PersonOne /> :
+                        <>
+                            <PersonOne style={{ marginRight: -10 }} />
+                            <PersonTwo style={{ marginRight: -10 }} />
+                            <PersonThree />
+                        </>}
+                    <ArrowRight style={{ marginTop: 3, marginHorizontal: 10 }} />
+                </View>
+
+
+            </TouchableOpacity>
+        )
+    }
+
+    const renderFunctionHallItem = ({ item }) => {
+        const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+
+        return (
+            <TouchableOpacity
+                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId,catEndPoint: allCatProductDetailEndpoints?.functionhalls })}
+                style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" />
+                    <View style={{ margin: 10 }}>
+                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{item?.productName} </Text>
+                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.totalAmount)}</Text>
+                    </View>
+                </View>
+                <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', height: 35, borderRadius: 5, position: 'absolute', right: 10 }}>
+                    <Text style={{ color: '#FD813B', marginHorizontal: 5 }}>{item?.count == 1 ? '1 Request ' : `${item?.count} Requests `}</Text>
+                    {item?.count == 1 ? <PersonOne /> :
+                        <>
+                            <PersonOne style={{ marginRight: -10 }} />
+                            <PersonTwo style={{ marginRight: -10 }} />
+                            <PersonThree />
+                        </>}
+                    <ArrowRight style={{ marginTop: 3, marginHorizontal: 10 }} />
+                </View>
+
+
+            </TouchableOpacity>
+        )
+    }
+
+    const renderTentHouseItem = ({ item }) => {
+        const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+
+        return (
+            <TouchableOpacity
+                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId,catEndPoint: allCatProductDetailEndpoints?.tenthouse })}
+                style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" />
+                    <View style={{ margin: 10 }}>
+                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{item?.productName} </Text>
+                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.totalAmount)}</Text>
+                    </View>
+                </View>
+                <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', height: 35, borderRadius: 5, position: 'absolute', right: 10 }}>
+                    <Text style={{ color: '#FD813B', marginHorizontal: 5 }}>{item?.count == 1 ? '1 Request ' : `${item?.count} Requests `}</Text>
+                    {item?.count == 1 ? <PersonOne /> :
+                        <>
+                            <PersonOne style={{ marginRight: -10 }} />
+                            <PersonTwo style={{ marginRight: -10 }} />
+                            <PersonThree />
+                        </>}
+                    <ArrowRight style={{ marginTop: 3, marginHorizontal: 10 }} />
+                </View>
+
+
+            </TouchableOpacity>
+        )
+    }
+
+    const renderFoodCateringItem = ({ item }) => {
+        const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+
+        return (
+            <TouchableOpacity
+                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId,catEndPoint: allCatProductDetailEndpoints?.foodcatering })}
+                style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" />
+                    <View style={{ margin: 10 }}>
+                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{item?.productName} </Text>
+                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.totalAmount)}</Text>
                     </View>
                 </View>
                 <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', height: 35, borderRadius: 5, position: 'absolute', right: 10 }}>
@@ -142,13 +294,13 @@ const VendorDashBoardTab = ({ navigation }) => {
 
         return (
             <TouchableOpacity
-                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId })}
+                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId,catEndPoint: allCatProductDetailEndpoints?.clothjewels })}
                 style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" />
                     <View style={{ margin: 10 }}>
-                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 4 }}>{capitalizeFirstLetters(item?.productName)} </Text>
-                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.perDayPrice)}</Text>
+                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{capitalizeFirstLetters(item?.productName)} </Text>
+                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.perDayPrice)} / day</Text>
                     </View>
                 </View>
                 <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', height: 35, borderRadius: 5, position: 'absolute', right: 10 }}>
@@ -174,6 +326,78 @@ const VendorDashBoardTab = ({ navigation }) => {
                     productId: item?.productId,
                     productName: item?.productName,
                     perDayPrice: item?.perDayPrice,
+                    professionalImage: item?.professionalImage,
+                    count: 0
+                };
+            }
+            acc[item?.productId].count += 1;
+            return acc;
+        }, {});
+
+        return Object.values(grouped);
+    };
+
+    const consolidateDecorationDataByProductId = (data) => {
+        const grouped = data.reduce((acc, item) => {
+            if (!acc[item?.productId]) {
+                acc[item?.productId] = {
+                    productId: item?.productId,
+                    productName: item?.eventOrganiserName,
+                    totalAmount: item?.totalAmount,
+                    professionalImage: item?.professionalImage,
+                    count: 0
+                };
+            }
+            acc[item?.productId].count += 1;
+            return acc;
+        }, {});
+
+        return Object.values(grouped);
+    };
+
+    const consolidateFunctionHallsDataByProductId = (data) => {
+        const grouped = data.reduce((acc, item) => {
+            if (!acc[item?.productId]) {
+                acc[item?.productId] = {
+                    productId: item?.productId,
+                    productName: item?.functionHallName,
+                    totalAmount: item?.totalAmount,
+                    professionalImage: item?.professionalImage,
+                    count: 0
+                };
+            }
+            acc[item?.productId].count += 1;
+            return acc;
+        }, {});
+
+        return Object.values(grouped);
+    };
+
+    const consolidateTentHouseDataByProductId = (data) => {
+        const grouped = data.reduce((acc, item) => {
+            if (!acc[item?.productId]) {
+                acc[item?.productId] = {
+                    productId: item?.productId,
+                    productName: item?.tentHouseName,
+                    totalAmount: item?.totalAmount,
+                    professionalImage: item?.professionalImage,
+                    count: 0
+                };
+            }
+            acc[item?.productId].count += 1;
+            return acc;
+        }, {});
+
+        return Object.values(grouped);
+    };
+
+    const consolidateFoodCateringDataByProductId = (data) => {
+        const grouped = data.reduce((acc, item) => {
+            if (!acc[item?.productId]) {
+                acc[item?.productId] = {
+                    productId: item?.productId,
+                    productName: item?.foodCateringName,
+                    totalAmount: item?.totalAmount,
                     professionalImage: item?.professionalImage,
                     count: 0
                 };
@@ -218,20 +442,64 @@ const VendorDashBoardTab = ({ navigation }) => {
             <ScrollView>
                 <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Recent Request</Text>
                 <View >
-                    <FlatList
-                        data={allBookings}
-                        renderItem={renderItem}
-                        contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
-                        ItemSeparatorComponent={ItemSeparator}
-                    />
-                      <FlatList
-                        data={driverChefBookingsData}
-                        renderItem={renderChefDriverItem}
-                        contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
-                        ItemSeparatorComponent={ItemSeparator}
-                    />
+                    {clothJewelBookingsData?.length ?
+                        <>
+                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Cloth/Jewel Bookings</Text>
+                            <FlatList
+                                data={clothJewelBookingsData}
+                                renderItem={renderItem}
+                                contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
+                                ItemSeparatorComponent={ItemSeparator}
+                            />
+                        </>
+                        : null}
+                    {decorationsBookingsData?.length ?
+                        <>
+                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Decoration Bookings</Text>
+                            <FlatList
+                                data={decorationsBookingsData}
+                                renderItem={renderDecorationItem}
+                                contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
+                                ItemSeparatorComponent={ItemSeparator}
+                            />
+                        </>
+                        : null}
+
+                    {functionHallBookingsData?.length ?
+                        <>
+                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Function Hall Bookings</Text>
+                            <FlatList
+                                data={functionHallBookingsData}
+                                renderItem={renderFunctionHallItem}
+                                contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
+                                ItemSeparatorComponent={ItemSeparator}
+                            />
+                        </>
+                        : null}
+                    {tentHouseBookingsData?.length ?
+                        <>
+                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Tent House Bookings</Text>
+                            <FlatList
+                                data={tentHouseBookingsData}
+                                renderItem={renderTentHouseItem}
+                                contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
+                                ItemSeparatorComponent={ItemSeparator}
+                            />
+                        </>
+                        : null}
+
+                    {cateringsBookingsData?.length ?
+                        <>
+                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Food Catering Bookings</Text>
+                            <FlatList
+                                data={cateringsBookingsData}
+                                renderItem={renderFoodCateringItem}
+                                contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
+                                ItemSeparatorComponent={ItemSeparator}
+                            />
+                        </>
+                        : null}
                 </View>
-                <View style={{}}>
                     <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%' }}>All Listed Products</Text>
                     <FlatList
                         data={vendorListing}
@@ -239,7 +507,6 @@ const VendorDashBoardTab = ({ navigation }) => {
                         contentContainerStyle={{ borderRadius: 15, margin: 15, bottom: 20 }}
                         numColumns={2}
                     />
-                </View>
             </ScrollView>
         </SafeAreaView>
     );
