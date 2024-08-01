@@ -349,18 +349,25 @@ const ViewCaterings = ({ route, navigation }) => {
         }
     };
 
-    const calculateTotalPrice = (foodItemsData, itemQuantities) => {
-        if (!foodItemsData) return 0;
-        return foodItemsData.reduce((total, item) => {
-            const quantity = itemQuantities[item.itemName] || 0;
-            return total + (item.perDayPrice * quantity);
-        }, 0);
-    };
+    const calculateTotalPrice = (numOfPlates, addedItems) => {
+        return addedItems.map(item => {
+          const numPlates = numOfPlates[item.title];
+          if (numPlates) {
+            return {
+              ...item,
+              totalPrice: numPlates * item.perPlateCost,
+            };
+          }
+          return item;
+        });
+      };
+      const calculateGrandTotal = itemsWithTotalPrice => {
+        return itemsWithTotalPrice.reduce((sum, item) => sum + item.totalPrice, 0);
+      };
+      const itemsWithTotalPrice = calculateTotalPrice(numPlates, addedItems);
+  const grandTotal = calculateGrandTotal(itemsWithTotalPrice);
 
-console.log("food items is:::::,", foodItemsData);
-
-
-
+console.log("total price is:::::::::::::,",grandTotal)
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
             <ScrollView style={{ backgroundColor: "white", marginBottom: 30 }}>
@@ -465,7 +472,7 @@ console.log("food items is:::::,", foodItemsData);
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, marginBottom: "25%" }}>
 
                         <Text style={[styles.title, { marginTop: 10 }]}>Total Price :</Text>
-                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{`₹${calculateTotalPrice(foodItemsData, itemQuantities)}`}</Text>
+                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{`₹${grandTotal}`}</Text>
                     </View>
 
                 </View>
@@ -567,8 +574,8 @@ console.log("food items is:::::,", foodItemsData);
 
             <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
                 <BookDatesButton
-                    onPress={() => navigation.navigate('BookingOverView', { categoryId: categoryId, rentalItems: itemQuantities, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `₹${calculateTotalPrice(foodItemsData, itemQuantities)}` })}
-                    text={`₹${calculateTotalPrice(foodItemsData, itemQuantities)}   View Cart`}
+                    onPress={() => navigation.navigate('CateringsOverView', { categoryId: categoryId, cateringItems: itemsWithTotalPrice, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `₹${grandTotal}` })}
+                    text={`₹${grandTotal}   View Cart`}
                     padding={10}
                 />
             </View>

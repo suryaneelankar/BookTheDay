@@ -52,6 +52,8 @@ import AddDecorations from "../screens/VendorScreens/VendorAddDecorations/AddDec
 import DecorsBookingOverView from "../screens/Bookings/DecorsBookingOverView";
 import ViewCaterings from "../screens/Events/ViewCaterings";
 import AddFoodCatering from "../screens/VendorScreens/VendorAddFoodCatering/AddFoodCatering";
+import LandingScreen from "../screens/LandingScreen";
+import CateringsOverView from "../screens/Bookings/CateringsOverView";
 
 const MainNavigation = () => {
 
@@ -194,6 +196,14 @@ const MainNavigation = () => {
                          headerShown: true,
                 }}
                 />
+                 <Stack.Screen 
+               name="CateringsOverView"
+                component={CateringsOverView}  
+                options={{
+                         header: () => <NavigationHeader Icon={true} title="Cart" />,
+                         headerShown: true,
+                }}
+                />
                 <Stack.Screen 
                name="ViewDecors"
                 component={ViewDecors}  
@@ -205,6 +215,14 @@ const MainNavigation = () => {
                 <Stack.Screen
                     name="SelectDateTime"
                     component={SelectDateTimeScreen}
+                    options={{
+                        header: () => (''),
+                        headerShown: false,
+                    }}
+                />
+                <Stack.Screen
+                    name="LandingScreen"
+                    component={LandingScreen}
                     options={{
                         header: () => (''),
                         headerShown: false,
