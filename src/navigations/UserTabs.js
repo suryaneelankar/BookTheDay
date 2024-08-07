@@ -19,6 +19,8 @@ import FocusedHire from '../assets/svgs/tabIcons/focusedHire.svg';
 import SwitchIcon from '../assets/svgs/tabIcons/profile.svg';
 import Hire from '../screens/MyBox';
 import NavigationHeader from '../components/NavigationHeader';
+import ViewProfile from '../screens/Profile/ViewProfile';
+import ProfileMainScreen from '../screens/Profile/ProfileScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -63,7 +65,7 @@ const Tab4Screen = ({ navigation }) => {
   return (
    
     <Tab.Navigator
-    initialRouteName='Homie'
+    initialRouteName='UserHome'
       screenOptions={props => {
         return {
           tabBarShowLabel: false,
@@ -81,7 +83,7 @@ const Tab4Screen = ({ navigation }) => {
       }}>
 
         <Tab.Screen
-        name="Homie"
+        name="UserHome"
         component={HomeDashboard}
         options={{
           tabBarIcon: ({ focused }) => (
@@ -121,7 +123,7 @@ const Tab4Screen = ({ navigation }) => {
   }}
 />
 
-<Tab.Screen
+{/* <Tab.Screen
   name="My Box"
   component={Hire}
   options={{
@@ -133,21 +135,26 @@ const Tab4Screen = ({ navigation }) => {
     header: () => <NavigationHeader Icon={false} title="Hire Professionals" />,
     headerShown: true,
   }}
-/>
+/> */}
 
 <Tab.Screen
   name="My Profile"
-  component={StackProfileNavigation}
-  listeners={{
-    tabPress: (e) => {
-      // Prevent default action
-      e.preventDefault();
-    },
-  }}
+  // component={StackProfileNavigation}
+  component={ProfileMainScreen}
   options={{
-    tabBarIcon: ({ focused }) => <TabProfile focused={focused} />,
-    headerShown: false,
-  }}
+    tabBarIcon: ({ focused }) => (
+      focused ? <HireIcon /> : <SwitchIcon />
+    ),}}
+  // listeners={{
+  //   tabPress: (e) => {
+  //     // Prevent default action
+  //     e.preventDefault();
+  //   },
+  // }}
+  // options={{
+  //   tabBarIcon: ({ focused }) => <TabProfile focused={focused} />,
+  //   headerShown: false,
+  // }}
 />
 
     </Tab.Navigator>

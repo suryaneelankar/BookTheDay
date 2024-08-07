@@ -20,13 +20,13 @@ const VendorCategoryScreen = ({ navigation }) => {
     const categoriesData = [
         {
             id: 1,
-            CatImg: FunctionHallVendorImg,
-            navScreen: 'AddFunctionalHall'
+            CatImg: ClothVendorImg,
+            navScreen: 'RentOnProducts'
         },
         {
             id: 1,
-            CatImg: TentHouseVendorImg,
-            navScreen: 'AddTentHouse'
+            CatImg: FunctionHallVendorImg,
+            navScreen: 'AddFunctionalHall'
         },
         {
             id: 1,
@@ -35,13 +35,14 @@ const VendorCategoryScreen = ({ navigation }) => {
         },
         {
             id: 1,
-            CatImg: DecorVendorImg,
-            navScreen: 'AddDecorations'
+            CatImg: TentHouseVendorImg,
+            navScreen: 'AddTentHouse'
         },
+      
         {
             id: 1,
-            CatImg: ClothVendorImg,
-            navScreen: 'RentOnProducts'
+            CatImg: DecorVendorImg,
+            navScreen: 'AddDecorations'
         },
         {
             id: 1,
@@ -66,7 +67,7 @@ const VendorCategoryScreen = ({ navigation }) => {
 
     return (
         <View style={styles.root}>
-            <Text style={styles.mainHeading}>Select Your Service</Text>
+            {/* <Text style={styles.mainHeading}>Select Your Service</Text> */}
             <FlatList
                 data={categoriesData}
                 renderItem={renderItem}
@@ -80,10 +81,11 @@ export default VendorCategoryScreen
 
 const styles = StyleSheet.create({
     root: {
-        backgroundColor: themevariable.Color_E1E1E2,
+        // backgroundColor: themevariable.Color_E1E1E2,
         alignSelf: 'center',
         // alignItems:'center',
         flex: 1,
+        marginBottom:"15%",
     },
     mainHeading: {
         // marginTop:20,

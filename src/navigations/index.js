@@ -2,7 +2,7 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import UserTabs from "./UserTabs";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import VendorTabs from "./VendorTabs";
 import ViewTrendingDetails from "../screens/Home/ViewTrendingDetails";
 import CategoriesList from "../screens/Categories/categoriesList";
@@ -54,11 +54,15 @@ import ViewCaterings from "../screens/Events/ViewCaterings";
 import AddFoodCatering from "../screens/VendorScreens/VendorAddFoodCatering/AddFoodCatering";
 import LandingScreen from "../screens/LandingScreen";
 import CateringsOverView from "../screens/Bookings/CateringsOverView";
+import LoginScreen from "../screens/LandingScreen/LoginScreen";
+import OtpValidation from "../screens/LandingScreen/OtpValidation";
+
 
 const MainNavigation = () => {
 
     const Stack = createNativeStackNavigator();
     const switchtab = useSelector((state) => state.userId);
+     console.log("switch tab id:::::::::::", switchtab)
 
     const HomeScreen = () => {
         return (
@@ -76,6 +80,30 @@ const MainNavigation = () => {
         <NavigationContainer>
 
             <Stack.Navigator>
+            <Stack.Screen
+                    name="LandingScreen"
+                    component={LandingScreen}
+                    options={{
+                        header: () => (''),
+                        headerShown: false,
+                    }}
+                />
+                <Stack.Screen
+                    name="LoginScreen"
+                    component={LoginScreen}
+                    options={{
+                        // header: () => <NavigationHeader Icon={true} title="" />,
+                        headerShown: false,
+                    }}
+                />
+                 <Stack.Screen
+                    name="OtpValidation"
+                    component={OtpValidation}
+                    options={{
+                        // header: () => <NavigationHeader Icon={true} title="" />,
+                        headerShown: false,
+                    }}
+                />
                 <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
                 <Stack.Screen name="ViewTrendingDetails" component={ViewTrendingDetails} options={{ headerShown: true }} />
                 <Stack.Screen name="CategoriesList" component={CategoriesList} options={{
@@ -220,14 +248,7 @@ const MainNavigation = () => {
                         headerShown: false,
                     }}
                 />
-                <Stack.Screen
-                    name="LandingScreen"
-                    component={LandingScreen}
-                    options={{
-                        header: () => (''),
-                        headerShown: false,
-                    }}
-                />
+               
 
 
                 {/* ############### profile Screens ################# */}

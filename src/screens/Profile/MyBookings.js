@@ -23,10 +23,18 @@ const ongoingRental = {
 
 const ViewMyBookings = () => {
   const [myBookings, setMyBookings] = useState();
-
+  const [decorsBookings, setDecorsBookings] = useState();
+  const [cateringBookings, setCateringBookings] = useState();
+  const [hallsBookings, setHallsBookings] = useState();
+  const [tentHouseBookings, settentHouseBookings] = useState();
 
   useEffect(() => {
     getMyBookings();
+    getDecorationsBookings();
+    getCateringsBookings();
+    getHallsBookings();
+    getTentHouseBookings();
+
   }, []);
 
   const getMyBookings = async () => {
@@ -37,6 +45,46 @@ const ViewMyBookings = () => {
     } catch (error) {
         console.log("My Bookings data error>>::", error);
     }
+};
+
+const getDecorationsBookings = async () => {
+  try {
+      const response = await axios.get(`${BASE_URL}/getUserDecorationBookings`);
+      console.log("Decors BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+      setDecorsBookings(response?.data?.data)
+  } catch (error) {
+      console.log("My Bookings data error>>::", error);
+  }
+};
+
+const getCateringsBookings = async () => {
+  try {
+      const response = await axios.get(`${BASE_URL}/getUserFoodCateringBookings`);
+      console.log("Decors BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+      setCateringBookings(response?.data?.data)
+  } catch (error) {
+      console.log("My Bookings data error>>::", error);
+  }
+};
+
+const getHallsBookings = async () => {
+  try {
+      const response = await axios.get(`${BASE_URL}/getUserFunctionHallBookings`);
+      console.log("Decors BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+      setHallsBookings(response?.data?.data)
+  } catch (error) {
+      console.log("My Bookings data error>>::", error);
+  }
+};
+
+const getTentHouseBookings = async () => {
+  try {
+      const response = await axios.get(`${BASE_URL}/getUserTentHouseBookings`);
+      console.log("Decors BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+      settentHouseBookings(response?.data?.data)
+  } catch (error) {
+      console.log("My Bookings data error>>::", error);
+  }
 };
 
 
@@ -78,29 +126,50 @@ const ViewMyBookings = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={{color:"black", fontSize:14,marginVertical:10}}>
+        Clothes jewellery bookings
+      </Text>
       <FlatList
         data={myBookings}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         numColumns={2}
-        // ListHeaderComponent={() => <Text style={styles.sectionHeader}>Ongoing Rentals</Text>}
-        // ListFooterComponent={() => (
-        //   <View style={styles.ongoingRentalCard}>
-        //     <Image source={{ uri: ongoingRental.image }} style={styles.ongoingRentalImage} />
-        //     <View style={styles.ongoingRentalContent}>
-        //       <Text style={styles.ongoingRentalTitle}>{ongoingRental.productName}</Text>
-        //       <Text style={styles.ongoingRentalDetails}>Rent Days: {ongoingRental.rentDays}</Text>
-        //       <Text style={styles.ongoingRentalDetails}>Return date: {ongoingRental.returnDate}</Text>
-        //       <Text style={styles.ongoingRentalDetails}>Balance Due: ₹{ongoingRental.balanceDue}</Text>
-        //       <View style={styles.ongoingRentalFooter}>
-        //         <Text style={styles.ongoingRentalStatus}>{ongoingRental.status}</Text>
-        //         <TouchableOpacity style={styles.payNowButton}>
-        //           <Text style={styles.payNowButtonText}>Pay Now</Text>
-        //         </TouchableOpacity>
-        //       </View>
-        //     </View>
-        //   </View>
-        // )}
+      />
+      <Text style={{color:"black", fontSize:14,marginVertical:10}}>
+        Decoartions Bokkings
+      </Text>
+      <FlatList
+        data={decorsBookings}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+      />
+      <Text style={{color:"black", fontSize:14,marginVertical:10}}>
+        Food Catering bookings
+      </Text>
+      <FlatList
+        data={cateringBookings}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+      />
+      <Text style={{color:"black", fontSize:14,marginVertical:10}}>
+        Halls bookings
+      </Text>
+      <FlatList
+        data={hallsBookings}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+      />
+      <Text style={{color:"black", fontSize:14,marginVertical:10}}>
+        Tent House bookings
+      </Text>
+      <FlatList
+        data={tentHouseBookings}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
       />
     </View>
   );
@@ -109,10 +178,11 @@ const ViewMyBookings = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    // padding: 16,
     backgroundColor: '#F3F5FB',
 },
   card: {
+    flex:1,
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
     overflow: 'hidden',

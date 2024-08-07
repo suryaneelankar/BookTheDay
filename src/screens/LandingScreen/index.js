@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
 import SvgUri from 'react-native-svg-uri'; // Use this for handling SVG files
 import CateringIcon from '../../assets/svgs/LandingScreen/cateringDash.svg';
@@ -10,7 +10,7 @@ import JewelleryIcon from '../../assets/svgs/LandingScreen/jewellryDash.svg';
 import LinearGradient from 'react-native-linear-gradient';
 import GiveOnRentSub from '../../assets/SelectUserOrVendor/GiveOnRentSub.svg';
 import TakeOnRentSubImage from '../../assets/SelectUserOrVendor/takeOnRentSub.svg';
-import Svg, { Image } from 'react-native-svg';
+import { useNavigation } from '@react-navigation/native';
 
 
 const LandingScreen = () => {
@@ -24,18 +24,10 @@ const LandingScreen = () => {
         { id: '6', component: <JewelleryIcon width="100%" height="100%" />, title: 'Jewellery' },
     ];
 
-    const categories = [
-        { id: '1', source: require('../../assets/svgs/LandingScreen/marriageDecoration.png') },
-        { id: '2', source: require('../../assets/svgs/LandingScreen/jewelleryLandScreen.png') },
-        { id: '3', source: require('../../assets/svgs/LandingScreen/dressesLandscreen.png') },
-        { id: '4', source: require('../../assets/svgs/LandingScreen/decorationLandScreen.png') },
-        { id: '5', source: require('../../assets/svgs/LandingScreen/clothesLandingscreen.png') },
-        { id: '6', source: require('../../assets/svgs/LandingScreen/cateringLandScreen.png') },
+    const [selectedId, setSelectedId] = useState(null);
+    const navigation = useNavigation();
 
-    ]
-
-    const { width } = Dimensions.get('window');
-
+  
     const data = [
         {
             id: '1',
@@ -43,6 +35,7 @@ const LandingScreen = () => {
             description: 'Rent the items and make it more easy',
             buttonText: 'Start Lending',
             SvgImage: TakeOnRentSubImage,
+            type:'user'
         },
         {
             id: '2',
@@ -50,11 +43,12 @@ const LandingScreen = () => {
             description: 'Rent the items and make it more Profitable',
             buttonText: 'Start Renting',
             SvgImage: GiveOnRentSub,
+            type:'vendor'
         },
     ];
 
-    const Item = ({ title, description, buttonText, SvgImage }) => (
-        <View style={styles.card}>
+    const Item = ({ title, description, buttonText, SvgImage,onPress, borderColor }) => (
+        <TouchableOpacity onPress={onPress} style={[styles.card, { borderColor }]}>
             <View style={styles.textContainer}>
                 <Text style={styles.title}>{title}</Text>
                 <Text style={styles.description}>{description}</Text>
@@ -65,8 +59,17 @@ const LandingScreen = () => {
             <View style={styles.imageContainer}>
                 <SvgImage width={100} height={100} />
             </View>
-        </View>
+        </TouchableOpacity>
     );
+
+    const handlePress = (id, typeIs) => {
+        setSelectedId(id);
+        if (id === '1') {
+            navigation.navigate('LoginScreen',{type:typeIs}); 
+        } else if (id === '2') {
+            navigation.navigate('LoginScreen',{type: typeIs});
+        }
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -97,6 +100,8 @@ const LandingScreen = () => {
                         description={item.description}
                         buttonText={item.buttonText}
                         SvgImage={item.SvgImage}
+                        onPress={() => handlePress(item.id, item?.type)}
+                        borderColor={selectedId === item.id ? '#FD8236' : 'lightgray'}
                     />
                 )}
                 contentContainerStyle={{flex:1,marginTop:15}}
@@ -183,7 +188,9 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 10,
-        elevation: 3,
+        elevation: 5,
+        borderWidth:1,
+        // borderColor:"lightgray"
       },
       textContainer: {
         flex: 1,
