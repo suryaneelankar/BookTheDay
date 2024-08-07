@@ -32,12 +32,6 @@ const LoginScreen = ({ route }) => {
             // role: type
         }
         console.log("payload is:::::::", payload, type);
-        if (type === 'vendor') {
-            dispatch(getLoginUserId(true));
-            navigation.navigate('Home')
-        } else {
-            navigation.navigate('Home')
-        }
         try {
             const logineRes = await axios.post(`${BASE_URL}/user/login`, payload);
             console.log("login  res:::::::::", logineRes);
