@@ -1,6 +1,7 @@
 
 const initialState = {
     userId: '',
+    deviceFCMToken: ''
 }
 export const ApiResponse = (state = initialState, action) => {
     switch (action.type) {
@@ -10,7 +11,11 @@ export const ApiResponse = (state = initialState, action) => {
                 userId: action.payload,
                
             };
-
+            case 'STORE_DEVICE_FCM_TOKEN':
+                return {
+                    ...state,
+                    deviceFCMToken: action.payload,
+                }
         default:
             return state;
     }

@@ -13,7 +13,7 @@ import messaging from '@react-native-firebase/messaging';
 import { store } from "./redux/store";
 import { Provider } from "react-redux";
 import MainNavigation from './src/navigations';
-import SplashScreen from 'react-native-splash-screen'
+import SplashScreen from 'react-native-splash-screen';
 
 const App = () => {
 
@@ -38,8 +38,8 @@ const App = () => {
   }
 
   const getToken = async () => {
-    const token = await messaging().getToken();
-    console.log('token is ::>>',token);
+    const fcmToken = await messaging().getToken();
+    console.log('token is ::>>',fcmToken);
   }
 
   return (

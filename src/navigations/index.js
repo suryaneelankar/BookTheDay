@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import UserTabs from "./UserTabs";
@@ -56,13 +56,26 @@ import LandingScreen from "../screens/LandingScreen";
 import CateringsOverView from "../screens/Bookings/CateringsOverView";
 import LoginScreen from "../screens/LandingScreen/LoginScreen";
 import OtpValidation from "../screens/LandingScreen/OtpValidation";
-
+import { getDeviceFCMToken } from "../../redux/actions";
+import messaging from '@react-native-firebase/messaging';
 
 const MainNavigation = () => {
 
     const Stack = createNativeStackNavigator();
     const switchtab = useSelector((state) => state.userId);
-     console.log("switch tab id:::::::::::", switchtab)
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        getToken();
+    },[])
+
+    const getToken = async () => {
+        const fcmToken = await messaging().getToken();
+        console.log('device fcm test token is ::>>',fcmToken);
+        dispatch(getDeviceFCMToken(fcmToken));
+    }
+    
+    console.log("switch tab id:::::::::::", switchtab)
 
     const HomeScreen = () => {
         return (

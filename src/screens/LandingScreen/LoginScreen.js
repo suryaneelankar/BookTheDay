@@ -20,8 +20,43 @@ const LoginScreen = ({ route }) => {
     const [authToken, setAuthToken] = useState('');
     const dispatch = useDispatch();
     const selectedMode = useSelector((state) => state.userId);
+    const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
     console.log("selected mode::::::::;;", selectedMode);
+    console.log('deviceFCMToken is::>>',deviceFCMToken)
 
+    const storeUserDeviceToken = async () => {
+        const payload = {
+            mobileNumber: String(phoneNumber),
+            fcmToken: deviceFCMToken
+        }
+        console.log("payload is:::::::", payload, type);
+        try {
+            const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload);
+            console.log("userTokenRes  res:::::::::", userTokenRes);
+            if (userTokenRes?.status === 200) {
+
+            }
+        } catch (error) {
+            console.error("Error during booking:", error);
+        }
+    }
+
+    const storeVendorDeviceToken = async () => {
+        const payload = {
+            mobileNumber: String(phoneNumber),
+            fcmToken: deviceFCMToken
+        }
+        console.log("payload is:::::::", payload, type);
+        try {
+            const vendorTokenRes = await axios.post(`${BASE_URL}/addVendorFCMToken`, payload);
+            console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
+            if (vendorTokenRes?.status === 200) {
+               
+            }
+        } catch (error) {
+            console.error("Error during booking:", error);
+        }
+    }
 
     const getCheckUserValidation = async () => {
 
@@ -39,8 +74,10 @@ const LoginScreen = ({ route }) => {
                 setAuthToken(logineRes?.data?.token);
                 if (type === 'vendor') {
                     dispatch(getLoginUserId(true));
+                    storeVendorDeviceToken();
                     navigation.navigate('Home')
                 } else {
+                    storeUserDeviceToken();
                     navigation.navigate('Home')
                 }
             }
