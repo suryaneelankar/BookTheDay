@@ -244,7 +244,7 @@ const HomeDashboard = () => {
 
 
     const renderItem = ({ item }) => {
-        
+
         const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
         return (
             <View style={{}}>
@@ -408,7 +408,7 @@ const HomeDashboard = () => {
                             renderItem={({ item }) => {
                                 const SvgComponent = item.image;
                                 return (
-                                    <TouchableOpacity  onPress={() => handlePress(item?.name)}    style={{ alignItems: "center", alignSelf: "center", justifyContent: "center", width: Dimensions.get('window').width / 4 }} >
+                                    <TouchableOpacity onPress={() => handlePress(item?.name)} style={{ alignItems: "center", alignSelf: "center", justifyContent: "center", width: Dimensions.get('window').width / 4 }} >
                                         <SvgComponent width={65} height={65} />
                                         <Text style={{ marginTop: 2, fontSize: 13, fontWeight: "500", color: '#202020', fontFamily: "ManropeRegular" }}>
                                             {item?.name}
@@ -436,21 +436,23 @@ const HomeDashboard = () => {
                     />
 
                 </View>
-
-                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: 20 }}>
-                    <Text style={styles.onDemandTextStyle}>Newly Added</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('CategoriesList', { componentType: 'new' })} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
-                        <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
-                        <RightArrowIcon width={25} height={25} />
-                    </TouchableOpacity>
-                </View>
-                <FlatList
-                    horizontal
-                    data={newlyAddedProducts}
-                    contentContainerStyle={{ paddingVertical: verticalScale(20), marginLeft: horizontalScale(5) }}
-                    renderItem={renderNewlyAddedDetails}
-                    showsHorizontalScrollIndicator={false}
-                />
+                {newlyAddedProducts?.length ?
+                    <>
+                        <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: 20 }}>
+                            <Text style={styles.onDemandTextStyle}>Newly Added</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('CategoriesList', { componentType: 'new' })} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                                <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
+                                <RightArrowIcon width={25} height={25} />
+                            </TouchableOpacity>
+                        </View>
+                        <FlatList
+                            horizontal
+                            data={newlyAddedProducts}
+                            contentContainerStyle={{ paddingVertical: verticalScale(20), marginLeft: horizontalScale(5) }}
+                            renderItem={renderNewlyAddedDetails}
+                            showsHorizontalScrollIndicator={false}
+                        />
+                    </> : null}
 
                 <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
                     <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
@@ -482,12 +484,12 @@ const HomeDashboard = () => {
                         const SvgComponent = item?.image;
                         return (
                             <TouchableOpacity onPress={() => navigation.navigate('My Box')}>
-                            <SvgComponent
-                                key={index}
-                                width="90%"
-                                height="100%"
-                                style={{ alignSelf: "center" }}
-                            />
+                                <SvgComponent
+                                    key={index}
+                                    width="90%"
+                                    height="100%"
+                                    style={{ alignSelf: "center" }}
+                                />
                             </TouchableOpacity>
                         );
                     })}

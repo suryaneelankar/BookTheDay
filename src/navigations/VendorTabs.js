@@ -6,6 +6,8 @@ import { useDispatch } from 'react-redux';
 import { getLoginUserId } from '../../redux/actions';
 import VendorDashBoardTab from '../screens/VendorScreens/VendorDashBoard/DashBoard';
 import VendorCategoryScreen from '../screens/VendorScreens/VendorCatergoryScreen';
+import SwitchIcon from '../assets/svgs/tabIcons/profile.svg';
+import NavigationHeader from '../components/NavigationHeader';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -74,12 +76,12 @@ const Tab4Screen = ({ navigation }) => {
   return (
    
     <Tab.Navigator
-    initialRouteName='HomeDashboard'
+    initialRouteName='VendorHome'
       screenOptions={props => {
         return {
-          tabBarShowLabel: false,
+          tabBarShowLabel: true,
           tabBarActiveTintColor: 'blue', // Change the active tab color
-          tabBarInactiveTintColor: 'white', // Change the inactive tab color
+          tabBarInactiveTintColor: 'gray', // Change the inactive tab color
           tabBarStyle: {
             backgroundColor: 'white',
             height: 40,
@@ -94,7 +96,7 @@ const Tab4Screen = ({ navigation }) => {
 {/* VendorCategoryScreen */}
 {/* VendorDashBoardTab */}
      <Tab.Screen
-     name="Home"
+     name="VendorHome"
      component={VendorCategoryScreen}
      options={({ focused }) => ({
      tabBarIcon: ({focused}) => (
@@ -108,7 +110,11 @@ const Tab4Screen = ({ navigation }) => {
         }}
       />
     ),
-    headerShown: false,
+    headerShown: true,
+    tabBarLabel:'Services',
+    tabBarShowLabel: true,
+    header: () => <NavigationHeader Icon={false} title="Services" />,
+
   })}
 />
 <Tab.Screen
@@ -128,28 +134,38 @@ const Tab4Screen = ({ navigation }) => {
       />
     ),
     headerShown: false,
+    tabBarLabel:'Home',
+    tabBarShowLabel: true
   })}
 />
+
+{/* <Tab.Screen
+  name="Category"
+  component={Categories}
+  options={{
+    tabBarIcon: ({ focused }) => (
+      focused ? <FocusedCollection /> : <CollectionIcon />
+    ),
+    tabBarLabel: 'Collections',
+    tabBarShowLabel:true,
+    header: () => <NavigationHeader Icon={false} title="Products" />,
+    headerShown: true,
+  }}
+/> */}
       <Tab.Screen
   name="Category"
   component={Tab3Screen}
   options={({ focused }) => ({
     tabBarIcon: ({focused}) => (
-      
-        <Image
-        source={require('../assets/eventsicon.png')}
-        style={{
-          width: 20,
-          height: 20,
-          marginTop: os === 'ios' ? 30 : 0,
-          tintColor: focused ? 'black' : 'gray',
-        }}
-      />
+      focused ? <SwitchIcon/> : <SwitchIcon/>
     ),
-    headerShown: false,
+    headerShown: true,
+    tabBarLabel:'Profile',
+    tabBarShowLabel: true,
+
   })}
 />
-<Tab.Screen
+{/* <Tab.Screen
   name="My Profile"
   component={Tab4Screen}
   listeners={{
@@ -162,7 +178,7 @@ const Tab4Screen = ({ navigation }) => {
     tabBarIcon: ({ focused }) => <TabProfile focused={focused} />,
     headerShown: false,
   }}
-/>
+/> */}
 
     </Tab.Navigator>
   );
