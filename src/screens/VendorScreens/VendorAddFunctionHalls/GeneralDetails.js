@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal, Button, TextInput } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
@@ -14,6 +14,9 @@ import CrossIcon from '../../../assets/vendorIcons/crossIcon.svg';
 import VegNonVegIcon from '../../../assets/svgs/foodtype/vegNonveg.svg';
 import VegIcon from '../../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../../assets/svgs/foodtype/NonVeg.svg';
+import LocationPicker from '../../../components/LocationPicker';
+import DetectLocation from '../../../assets/svgs/detectLocation.svg';
+
 
 const GeneralDetails = () => {
     const [BedRooms, setBedRooms] = useState();
@@ -44,7 +47,7 @@ const GeneralDetails = () => {
     const [selectedItemArray, setSelectedItemArray] = useState([]);
     const [selectedFoodTypeItem, setSelectedFoodTypeItem] = useState('');
     const [itemPrices, setItemPrices] = useState({});
-    const [selectedSeatingCapacity,setSelectedSeatingCapacity] = useState('');
+    const [selectedSeatingCapacity, setSelectedSeatingCapacity] = useState('');
 
     const [rentalItemPricingDetails, setRentalItemPricingDetails] = useState({
         "Tables with basic covers": [{ "itemName": "Tables with basic covers", "perDayPrice": 0 }],
@@ -69,7 +72,8 @@ const GeneralDetails = () => {
         { name: 'Both', icon: VegNonVegIcon }
     ]
 
-    const seatingCapacity = ['0-100', '100-200','200-30', '300+']
+    const seatingCapacity = ['0-100', '100-200', '200-30', '300+']
+    const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
 
     const rentalItems = [
         { name: 'Tables with basic covers' },
@@ -288,7 +292,7 @@ const GeneralDetails = () => {
         });
 
         const functionHallAddessIs = { "address": functionHallAddress, "city": functionHallCity, "pinCode": functionHallPinCode };
-        console.log('selectedItemArray is ::>>>',selectedItemArray)
+        console.log('selectedItemArray is ::>>>', selectedItemArray)
         formData.append('serviceType', 'driver');
         formData.append('description', productDescription);
         // formData.append('subscriptionChargesPerMonth', perMonthRentPrice);
@@ -473,8 +477,8 @@ const GeneralDetails = () => {
         return (
             <View style={{ flexDirection: 'row' }}>
                 {seatingCapacity.map((item) =>
-                    <TouchableOpacity style={{ backgroundColor:'#FFF5E3',marginHorizontal:10,borderRadius:5,padding:10}}
-                     onPress={() => onPressSeatingCapacity(item)}
+                    <TouchableOpacity style={{ backgroundColor: '#FFF5E3', marginHorizontal: 10, borderRadius: 5, padding: 10 }}
+                        onPress={() => onPressSeatingCapacity(item)}
                     >
                         <Text>{item}</Text>
                     </TouchableOpacity>
@@ -518,7 +522,7 @@ const GeneralDetails = () => {
         return (
             <View style={styles.container}>
                 <TouchableOpacity onPress={toggleCollapse} style={styles.header}>
-                    <Text style={styles.headerText}>Food Type</Text>
+                    <Text style={styles.headerText}>Select Food Type</Text>
                     <Icon name={isFoodDropDownCollapsed ? 'arrow-down' : 'arrow-up'} size={20} />
                 </TouchableOpacity>
                 {!isFoodDropDownCollapsed && (
@@ -535,8 +539,35 @@ const GeneralDetails = () => {
     };
 
 
+    const handleOpenLocationPicker = () => {
+        setLocationPickerVisible(true);
+    };
+
+    const handleLocationSelected = (location, address) => {
+        console.log('Selected Location:', location, address);
+        setfunctionHallAddress(address);
+        setfunctionHallCity(location?.address?.city);
+        setfunctionHallPinCode(location.pinCode);
+        setLocationPickerVisible(false); // Hide the LocationPicker after selection
+    };
+
+    const handleCloseLocationPicker = () => {
+        setLocationPickerVisible(false);
+    };
+
+
+
     return (
-        <View>
+        <View style={{ flex: 1, backgroundColor: "#EBEDF3", paddingHorizontal: 10 }}>
+
+            <Modal visible={isLocationPickerVisible} animationType="slide">
+                <LocationPicker onLocationSelected={handleLocationSelected} />
+                <Button title="Close" onPress={handleCloseLocationPicker} />
+            </Modal>
+
+
+
+            <Text style={styles.mainHeading}>General Details</Text>
             <View style={styles.mainContainer}>
                 <ChooseFileField
                     label={'Hall Image'}
@@ -627,7 +658,7 @@ const GeneralDetails = () => {
                     keyboardType='default'
                     isRequired={true}
                 />
-                 <TextField
+                <TextField
                     label='Over Time Charges'
                     placeholder="Please Enter OverTime Charges"
                     value={overTimeCharges}
@@ -635,7 +666,7 @@ const GeneralDetails = () => {
                     keyboardType='default'
                     isRequired={true}
                 />
-                
+
                 <TextField
                     label='Discount if Any'
                     placeholder="Please Enter Discount Percentage"
@@ -647,14 +678,36 @@ const GeneralDetails = () => {
             </View>
             <Text style={styles.title}>Item Available Address</Text>
             <View style={styles.mainContainer}>
-                <TextField
+
+                <Text style={styles.textInputlabel}>
+                    Address<Text style={{ color: "red" }}>*</Text>
+                </Text>
+                <TouchableOpacity onPress={handleOpenLocationPicker} style={[styles.textTnputView, { height: 100, flexDirection: "row",}]}>
+                    <View style={{height: '100%',width:"85%" }}>
+                        <TextInput
+                            onChangeText={onChangefunctionHallAddress}
+                            value={functionHallAddress}
+                            placeholder="Please Enter Address"
+                            keyboardType={'default'}
+                            style={{ height: '100%', textAlignVertical: 'top', padding: 10 }}
+                            multiline={true}
+                            numberOfLines={4}
+                        />
+                    </View>
+                    <View style={{justifyContent: 'center', alignItems: 'center' }}>
+                        <DetectLocation />
+                    </View>
+                </TouchableOpacity>
+
+
+                {/* <TextField
                     label='Address'
                     placeholder="Please Enter Address"
                     value={functionHallAddress}
                     onChangeHandler={onChangefunctionHallAddress}
                     keyboardType='default'
                     isRequired={true}
-                />
+                /> */}
                 <TextField
                     label='City'
                     placeholder="Please Enter City"
@@ -691,7 +744,7 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
         paddingHorizontal: 10,
         borderRadius: 6,
-        marginTop: 15,
+        marginTop: 10,
         flex: 1
     },
     detailsContainer: {
@@ -699,6 +752,12 @@ const styles = StyleSheet.create({
         backgroundColor: 'red',
         borderRadius: 10,
 
+    },
+    mainHeading: {
+        marginTop: 20,
+        fontWeight: 'bold',
+        fontSize: 20,
+        color: themevariable.Color_000000
     },
     title: {
         fontFamily: 'ManropeRegular',
@@ -767,9 +826,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     container: {
-        backgroundColor: '#FFF4E1',
+        // backgroundColor: '#FFE9DA',
         padding: 5,
         borderRadius: 5,
+        borderColor: themevariable.Color_C8C8C6,
+        borderWidth: 1
     },
     header: {
         flexDirection: 'row',
@@ -780,8 +841,10 @@ const styles = StyleSheet.create({
         borderRadius: 5,
     },
     headerText: {
-        fontSize: 16,
-        fontWeight: 'bold',
+        fontSize: 14,
+        fontWeight: '600',
+        fontFamily: 'ManropeRegular',
+
     },
     itemsContainer: {
         marginTop: 10,
@@ -815,4 +878,18 @@ const styles = StyleSheet.create({
     itemText: {
         marginHorizontal: 5,
     },
+    textInputlabel: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: 'bold',
+        color: themevariable.Color_000000,
+        fontSize: 15,
+        marginTop: 15
+    },
+    textTnputView: {
+        borderWidth: 1,
+        marginTop: 10,
+        borderColor: themevariable.Color_C8C8C6,
+        // paddingHorizontal:12,
+        borderRadius: 5,
+    }
 })

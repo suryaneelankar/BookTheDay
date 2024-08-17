@@ -68,7 +68,7 @@ const LoginScreen = ({ route }) => {
         }
         console.log("payload is:::::::", payload, type);
         try {
-            const logineRes = await axios.post(`${BASE_URL}/user/login`, payload);
+            const logineRes = await axios.post(`${BASE_URL}/${type}/login`, payload);
             console.log("login  res:::::::::", logineRes);
             if (logineRes?.status === 200) {
                 setAuthToken(logineRes?.data?.token);

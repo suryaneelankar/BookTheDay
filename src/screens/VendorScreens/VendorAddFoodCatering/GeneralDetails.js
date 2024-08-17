@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, TextInput, alert } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, TextInput, alert, Modal, Button } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
@@ -25,6 +25,10 @@ import WallIcon from '../../../assets/svgs/VendorCatering/Wall.svg';
 import CrossIconRed from '../../../assets/vendorIcons/crossIconRed.svg';
 import CheckIconGreen from '../../../assets/vendorIcons/checkIconGreen.svg';
 import CrossIcon from '../../../assets/vendorIcons/crossIcon.svg';
+import LocationPicker from '../../../components/LocationPicker';
+import DetectLocation from '../../../assets/svgs/detectLocation.svg';
+
+
 
 const GeneralDetails = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -50,6 +54,8 @@ const GeneralDetails = () => {
     const [foodMenuItems, setFoodMenuItems] = useState();
     const [comboPrice, setComboPrice] = useState({});
     const [minOrderMembers, setMinOrderMembers] = useState({});
+    const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
+
 
     const [rentalItemPricingDetails, setRentalItemPricingDetails] = useState({
         "Carpet": [{ "itemName": "Carpet", "perDayPrice": 0 }],
@@ -66,16 +72,16 @@ const GeneralDetails = () => {
     });
 
     // /getAllFoodItems
-    useEffect(() =>{
+    useEffect(() => {
         getFoodMenuItems();
-    },[]);
+    }, []);
 
     const getFoodMenuItems = async () => {
         try {
             const response = await axios.get(`${BASE_URL}/getAllFoodItems`);
             console.log("foodmenu items::::::::", JSON.stringify(response?.data?.data[0]?.foodMenuItems));
             setFoodMenuItems(response?.data?.data[0]?.foodMenuItems);
-        }catch (error) {
+        } catch (error) {
             console.log("events data error>>::", error);
         }
     };
@@ -187,7 +193,7 @@ const GeneralDetails = () => {
                 [id]: price
             }));
         };
-    
+
         const handleMinOrderMembersChange = (id, members) => {
             setMinOrderMembers(prevMembers => ({
                 ...prevMembers,
@@ -260,7 +266,7 @@ const GeneralDetails = () => {
 
         const renderCustomizedItems = (id) => {
             const customItem = customisedItems.find(custom => custom.id === id);
-    
+
             if (!customItem) return null;
             return (
                 <View>
@@ -282,7 +288,7 @@ const GeneralDetails = () => {
             const currentSelected = item._id === selectedId;
             console.log("curenntsle", currentSelected);
             const customItem = customisedItems.find(custom => custom.id === item._id);
-           console.log("custom item :::::::::", customItem)
+            console.log("custom item :::::::::", customItem)
             return (
                 <TouchableOpacity
                     onPress={() => toggleCollapse(item?._id)}
@@ -337,7 +343,7 @@ const GeneralDetails = () => {
                                 )
                             })}
                         </> : null} */}
-                                        {renderCustomizedItems(item._id)}
+                    {renderCustomizedItems(item._id)}
 
                     {/* {customItem > 0 &&
                         <>
@@ -365,7 +371,7 @@ const GeneralDetails = () => {
                                 <TouchableOpacity
                                     style={{ marginHorizontal: 5, marginTop: 10 }}
                                     // onPress={() => onAddItemsFinish()}
-                                    onPress={() =>handleAddCustomItem(item._id)}
+                                    onPress={() => handleAddCustomItem(item._id)}
 
                                 >
                                     <CheckIconGreen />
@@ -388,28 +394,28 @@ const GeneralDetails = () => {
                         </TouchableOpacity>
                         : null}
 
-                       {isCollapsed &&
-                    <>
-                        <TextInput
-                            style={{ borderColor: "lightgray", borderWidth: 1, marginTop: 5, padding: 5 }}
-                            placeholder='Enter per plate Combo price'
-                            value={comboPrice[item._id] || ''}
-                            onChangeText={(text) => handleComboPriceChange(item._id, text)}
-                        />
-                        <TextInput
-                            style={{ borderColor: "lightgray", borderWidth: 1, marginTop: 5, padding: 5 }}
-                            placeholder='Enter min Order members'
-                            value={minOrderMembers[item._id] || ''}
-                            onChangeText={(text) => handleMinOrderMembersChange(item._id, text)}
-                        />
-                    </>
-                }
+                    {isCollapsed &&
+                        <>
+                            <TextInput
+                                style={{ borderColor: "lightgray", borderWidth: 1, marginTop: 5, padding: 5 }}
+                                placeholder='Enter per plate Combo price'
+                                value={comboPrice[item._id] || ''}
+                                onChangeText={(text) => handleComboPriceChange(item._id, text)}
+                            />
+                            <TextInput
+                                style={{ borderColor: "lightgray", borderWidth: 1, marginTop: 5, padding: 5 }}
+                                placeholder='Enter min Order members'
+                                value={minOrderMembers[item._id] || ''}
+                                onChangeText={(text) => handleMinOrderMembersChange(item._id, text)}
+                            />
+                        </>
+                    }
 
                 </TouchableOpacity>
             );
         };
 
-       
+
         return (
             <View style={styles.container}>
                 <FlatList
@@ -454,7 +460,7 @@ const GeneralDetails = () => {
         setDiscountPercentage(value);
     }
 
-    const onChangetentHouseAddress = (value) => {
+    const onChangeCateringAddress = (value) => {
         setCateringAddress(value);
     }
 
@@ -669,20 +675,43 @@ const GeneralDetails = () => {
     }
 
     const renderMenuItem = ({ item }) => (
-        <View style={{marginHorizontal:5,backgroundColor:"white",borderWidth:1,borderColor:"lightgray", borderRadius:10,paddingVertical:10,paddingHorizontal:10}}>
-          <Text style={{color:"black", fontSize:14, fontWeight:"700", fontFamily: 'ManropeRegular'}}>{item.title}</Text>
-          <Text style={{marginTop:5,color:"black", fontSize:10, fontWeight:"200", fontFamily: 'ManropeRegular'}}>Combo Includes</Text>
-          <Text style={{marginTop:2,color:"black", fontSize:12, fontWeight:"400", fontFamily: 'ManropeRegular', width:"60%"}}>{item.items.join(', ')}</Text>
-          <Text style={{marginTop:5,color:"#FE8235", fontSize:12, fontWeight:"400", fontFamily: 'ManropeRegular'}}>Per Plate Price: {item.perPlateCost}</Text>
-          <Text style={{marginTop:5,color:"#FE8235", fontSize:12, fontWeight:"400", fontFamily: 'ManropeRegular'}}>Min Order: {item.minOrder}</Text>
+        <View style={{ marginHorizontal: 5, backgroundColor: "white", borderWidth: 1, borderColor: "lightgray", borderRadius: 10, paddingVertical: 10, paddingHorizontal: 10 }}>
+            <Text style={{ color: "black", fontSize: 14, fontWeight: "700", fontFamily: 'ManropeRegular' }}>{item.title}</Text>
+            <Text style={{ marginTop: 5, color: "black", fontSize: 10, fontWeight: "200", fontFamily: 'ManropeRegular' }}>Combo Includes</Text>
+            <Text style={{ marginTop: 2, color: "black", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', width: "60%" }}>{item.items.join(', ')}</Text>
+            <Text style={{ marginTop: 5, color: "#FE8235", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular' }}>Per Plate Price: {item.perPlateCost}</Text>
+            <Text style={{ marginTop: 5, color: "#FE8235", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular' }}>Min Order: {item.minOrder}</Text>
 
         </View>
-      );
+    );
 
-      
+
+    const handleOpenLocationPicker = () => {
+        setLocationPickerVisible(true);
+    };
+
+    const handleLocationSelected = (location, address) => {
+        console.log('Selected Location:', location, address);
+        setCateringAddress(address);
+        setCateringCity(location?.address?.city);
+        setCateringPincode(location.pinCode);
+        setLocationPickerVisible(false); // Hide the LocationPicker after selection
+    };
+
+    const handleCloseLocationPicker = () => {
+        setLocationPickerVisible(false);
+    };
+
+
+
 
     return (
-        <View>
+        <View style={{}}>
+
+         <Modal visible={isLocationPickerVisible} animationType="slide">
+                <LocationPicker onLocationSelected={handleLocationSelected} />
+                <Button title="Close" onPress={handleCloseLocationPicker} />
+            </Modal>
             <View style={styles.mainContainer}>
                 <ChooseFileField
                     label={'Tent House Image'}
@@ -726,7 +755,7 @@ const GeneralDetails = () => {
                     isDescriptionField={true}
                 />
             </View>
-           
+
 
             <Text style={styles.title}>Add Menu Items</Text>
             <View style={styles.mainContainer}>
@@ -735,17 +764,17 @@ const GeneralDetails = () => {
             </View>
 
             {finalCombomenu?.length > 0 ?
-            <View style={styles.mainContainer}>
-            <Text style={{color:"black", fontSize:14, fontWeight:"500", marginBottom:5,marginHorizontal:8}}>Added Combos</Text>
-             <FlatList
-             data={finalCombomenu}
-             renderItem={renderMenuItem}
-             keyExtractor={(item, index) => index.toString()}
-             horizontal
-             showsHorizontalScrollIndicator={false}
-           />
-           </View>: 
-           null}
+                <View style={styles.mainContainer}>
+                    <Text style={{ color: "black", fontSize: 14, fontWeight: "500", marginBottom: 5, marginHorizontal: 8 }}>Added Combos</Text>
+                    <FlatList
+                        data={finalCombomenu}
+                        renderItem={renderMenuItem}
+                        keyExtractor={(item, index) => index.toString()}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                    />
+                </View> :
+                null}
 
             <Text style={styles.title}>Pricing Details</Text>
             <View style={styles.mainContainer}>
@@ -766,7 +795,7 @@ const GeneralDetails = () => {
                     keyboardType='default'
                     isRequired={false}
                 />
-                 <TextField
+                <TextField
                     label='Over Time Charges'
                     placeholder="Please Enter OverTime Charges"
                     value={overTimeCharges}
@@ -778,14 +807,35 @@ const GeneralDetails = () => {
 
             <Text style={styles.title}>Catering Address</Text>
             <View style={styles.mainContainer}>
-                <TextField
+
+            <Text style={styles.textInputlabel}>
+                    Address<Text style={{ color: "red" }}>*</Text>
+                </Text>
+                <TouchableOpacity onPress={handleOpenLocationPicker} style={[styles.textTnputView, { height: 100, flexDirection: "row",}]}>
+                    <View style={{height: '100%',width:"85%" }}>
+                        <TextInput
+                            onChangeText={onChangeCateringAddress}
+                            value={cateringAddress}
+                            placeholder="Please Enter Address"
+                            keyboardType={'default'}
+                            style={{ height: '100%', textAlignVertical: 'top', padding: 10 }}
+                            multiline={true}
+                            numberOfLines={4}
+                        />
+                    </View>
+                    <View style={{justifyContent: 'center', alignItems: 'center' }}>
+                        <DetectLocation />
+                    </View>
+                </TouchableOpacity>
+
+                {/* <TextField
                     label='Address'
                     placeholder="Please Enter Address"
                     value={cateringAddress}
-                    onChangeHandler={onChangetentHouseAddress}
+                    onChangeHandler={onChangeCateringAddress}
                     keyboardType='default'
                     isRequired={true}
-                />
+                /> */}
                 <TextField
                     label='City'
                     placeholder="Please Enter City"
@@ -954,4 +1004,18 @@ const styles = StyleSheet.create({
         fontSize: 14,
         marginHorizontal: 10
     },
+    textInputlabel: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: 'bold',
+        color: themevariable.Color_000000,
+        fontSize: 15,
+        marginTop: 15
+    },
+    textTnputView: {
+        borderWidth: 1,
+        marginTop: 10,
+        borderColor: themevariable.Color_C8C8C6,
+        // paddingHorizontal:12,
+        borderRadius: 5,
+    }
 })

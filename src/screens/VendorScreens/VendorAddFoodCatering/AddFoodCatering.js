@@ -17,9 +17,11 @@ export default AddFoodCatering;
 
 const styles=StyleSheet.create({
   root:{
-    backgroundColor:themevariable.Color_E1E1E2,
+    backgroundColor: "#EBEDF3", 
+    // paddingHorizontal: 10
+    // backgroundColor:themevariable.Color_E1E1E2,
     // backgroundColor:'green',
-    flex:1,
+    // flex:1,
   },
   subContainer:{
     marginHorizontal:10,
@@ -28,6 +30,7 @@ const styles=StyleSheet.create({
     marginTop:20,
     fontWeight:'bold',
     fontSize:20,
-    color:themevariable.Color_000000
+    color:themevariable.Color_000000,
+    marginHorizontal:20
 },
 })

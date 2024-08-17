@@ -6,7 +6,7 @@ const AddFunctionalHall =()=>{
   return(
     <ScrollView style={styles.root}>
        <View style={styles.subContainer}>
-       <Text style={styles.mainHeading}>General Details</Text>
+       {/* <Text style={styles.mainHeading}>General Details</Text> */}
         <GeneralDetails />
        </View>
     </ScrollView>
@@ -22,7 +22,7 @@ const styles=StyleSheet.create({
     flex:1,
   },
   subContainer:{
-    marginHorizontal:10,
+    // marginHorizontal:10,
   },
   mainHeading:{
     marginTop:20,

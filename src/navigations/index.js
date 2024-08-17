@@ -311,7 +311,7 @@ const MainNavigation = () => {
 
                 {/* AddFunctionalHall */}
                 <Stack.Screen name="AddFunctionalHall" component={AddFunctionalHall} options={{
-                    header: () => <NavigationHeader Icon={true} title="Function Hall" />,
+                    header: () => <NavigationHeader Icon={true} title="Give on Rent" />,
                     headerShown: true,
                 }} />
                 <Stack.Screen name="AddDecorations" component={AddDecorations} options={{
