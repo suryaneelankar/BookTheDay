@@ -7,6 +7,7 @@ import TentHouseVendorImg from '../../assets/vendorIcons/TentHouseVendorImgs.svg
 import ClothVendorImg from '../../assets/vendorIcons/clothVendorImg.svg';
 import DecorVendorImg from '../../assets/vendorIcons/decorVendorImg.svg';
 import CateringVendorImg from '../../assets/vendorIcons/cateringVendorImg.svg';
+import { getVendorAuthToken } from '../../utils/StoreAuthToken';
 
 const VendorCategoryScreen = ({ navigation }) => {
 
@@ -16,6 +17,18 @@ const VendorCategoryScreen = ({ navigation }) => {
     {/* AddFunctionalHall */ }
     {/* AddFoodCatering */ }
     {/* AddDecorations */ }
+
+    const vendorToken = async () => {
+        const token = await getVendorAuthToken();
+        if (token) {
+          // Use the token, e.g., include it in API requests
+          console.log('Using vendor token:', token);
+        } else {
+          console.log('No vendor token found');
+        }
+      };
+      
+    // vendorToken();
 
     const categoriesData = [
         {

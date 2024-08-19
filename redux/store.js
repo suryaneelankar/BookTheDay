@@ -1,5 +1,5 @@
 import {createStore} from 'redux';
-import { ApiResponse } from './reducer';
+import { commonReducer } from './reducer';
 
 
-export const store = createStore(ApiResponse);
+export const store = createStore(commonReducer);

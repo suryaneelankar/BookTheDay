@@ -2,6 +2,7 @@ import React,{useEffect, useState} from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import BASE_URL, { LocalHostUrl } from '../../apiconfig';
 import axios from 'axios';
+import { getUserAuthToken } from '../../utils/StoreAuthToken';
 
 const data = [
   { id: '1', name: 'Mr. Riya Trivedi', role: 'Chef - Accord', rating: 4.5, status: 'Requested', image: 'chef-image-url' },
@@ -38,8 +39,13 @@ const ViewMyBookings = () => {
   }, []);
 
   const getMyBookings = async () => {
+    const token = await getUserAuthToken();
     try {
-        const response = await axios.get(`${BASE_URL}/getUserClothJewelBookings`);
+        const response = await axios.get(`${BASE_URL}/getUserClothJewelBookings`,{
+          headers: {
+              Authorization: `Bearer ${token}`,
+            },
+      });
         console.log("BOOKINGS RES:::::::::", JSON.stringify(response?.data))
         setMyBookings(response?.data?.data)
     } catch (error) {
@@ -48,8 +54,13 @@ const ViewMyBookings = () => {
 };
 
 const getDecorationsBookings = async () => {
+  const token = await getUserAuthToken();
   try {
-      const response = await axios.get(`${BASE_URL}/getUserDecorationBookings`);
+      const response = await axios.get(`${BASE_URL}/getUserDecorationBookings`,{
+        headers: {
+            Authorization: `Bearer ${token}`,
+          },
+    });
       console.log("Decors BOOKINGS RES:::::::::", JSON.stringify(response?.data))
       setDecorsBookings(response?.data?.data)
   } catch (error) {
@@ -58,8 +69,13 @@ const getDecorationsBookings = async () => {
 };
 
 const getCateringsBookings = async () => {
+  const token = await getUserAuthToken();
   try {
-      const response = await axios.get(`${BASE_URL}/getUserFoodCateringBookings`);
+      const response = await axios.get(`${BASE_URL}/getUserFoodCateringBookings`,{
+        headers: {
+            Authorization: `Bearer ${token}`,
+          },
+    });
       console.log("Decors BOOKINGS RES:::::::::", JSON.stringify(response?.data))
       setCateringBookings(response?.data?.data)
   } catch (error) {
@@ -68,8 +84,13 @@ const getCateringsBookings = async () => {
 };
 
 const getHallsBookings = async () => {
+  const token = await getUserAuthToken();
   try {
-      const response = await axios.get(`${BASE_URL}/getUserFunctionHallBookings`);
+      const response = await axios.get(`${BASE_URL}/getUserFunctionHallBookings`,{
+        headers: {
+            Authorization: `Bearer ${token}`,
+          },
+    });
       console.log("Decors BOOKINGS RES:::::::::", JSON.stringify(response?.data))
       setHallsBookings(response?.data?.data)
   } catch (error) {
@@ -78,8 +99,13 @@ const getHallsBookings = async () => {
 };
 
 const getTentHouseBookings = async () => {
+  const token = await getUserAuthToken();
   try {
-      const response = await axios.get(`${BASE_URL}/getUserTentHouseBookings`);
+      const response = await axios.get(`${BASE_URL}/getUserTentHouseBookings`,{
+        headers: {
+            Authorization: `Bearer ${token}`,
+          },
+    });
       console.log("Decors BOOKINGS RES:::::::::", JSON.stringify(response?.data))
       settentHouseBookings(response?.data?.data)
   } catch (error) {
@@ -100,7 +126,7 @@ const getTentHouseBookings = async () => {
 
         <Text style={styles.cardTitle}> Start Date: {item?.startDate}</Text>
         <Text style={styles.cardTitle}> End Date: {item?.endDate}</Text>
-        <Text style={styles.cardTitle}>{item?.accepted ? 'Booking Confirmed' : 'Rejected'}</Text>
+        <Text style={styles.cardTitle}>{item?.bookingStatus}</Text>
 
         <Text style={styles.cardSubtitle}>{item.role}</Text>
         <View style={styles.cardFooter}>

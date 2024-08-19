@@ -19,7 +19,7 @@ import themevariable from "../../utils/themevariable";
 import LeftArrow from '../../assets/svgs/leftarrowWhite.svg';
 import BookDatesButton from "../../components/GradientButton";
 import ServiceTime from '../../assets/svgs/serviceTime.svg';
-
+import { getUserAuthToken } from "../../utils/StoreAuthToken";
 
 const ViewEvents = ({ route, navigation }) => {
 
@@ -98,8 +98,13 @@ const ViewEvents = ({ route, navigation }) => {
   };
 
   const getEventsDetails = async () => {
+    const token = await getUserAuthToken();
     try {
-      const response = await axios.get(`${BASE_URL}/getFunctionHallDetailsById/${categoryId}`);
+      const response = await axios.get(`${BASE_URL}/getFunctionHallDetailsById/${categoryId}`,{
+        headers: {
+            Authorization: `Bearer ${token}`,
+          },
+    });
       setEventsDetails(response?.data);
       const imageUrls = response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
       setSubImages(imageUrls);
@@ -128,12 +133,13 @@ const ViewEvents = ({ route, navigation }) => {
     };
 
     console.log('params data is::>>', bookingData);
-
+    const token = await getUserAuthToken();
     try {
       const response = await axios.post(`${BASE_URL}/create-event-booking`, bookingData, {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`,
         }
       });
       console.log("event booking resp ::::::::::", response?.data?.data);

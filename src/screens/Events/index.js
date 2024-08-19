@@ -13,7 +13,7 @@ import LocationMarkIcon from '../../assets/svgs/location.svg';
 import { verticalScale } from "../../utils/scalingMetrics";
 import TentHouseIcon from '../../assets/svgs/categories/home_tenthouseimage.svg';
 import CategoryFilter from "../../components/CategoryFilter";
-
+import { getUserAuthToken } from "../../utils/StoreAuthToken";
 
 const Events = () => {
     const navigation = useNavigation();
@@ -62,8 +62,13 @@ const Events = () => {
     // console.log("SELECTED FILETRS", selectedCategory)
 
     const getAllEvents = async () => {
+        const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls`);
+            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
             // console.log('events response is::::::::', response?.data?.data);
             setEventsData(response?.data)
         } catch (error) {
@@ -72,8 +77,13 @@ const Events = () => {
     };
 
     const getAllCaterings = async () => {
+        const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFoodCaterings`);
+            const response = await axios.get(`${BASE_URL}/getAllFoodCaterings`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
             console.log('catering response is::::::::', JSON.stringify(response?.data));
             setCateringsData(response?.data)
         } catch (error) {
@@ -82,8 +92,13 @@ const Events = () => {
     };
 
     const getTentHouse = async () => {
+        const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllTentHouses`);
+            const response = await axios.get(`${BASE_URL}/getAllTentHouses`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
             // console.log('Tent house response is::::::::', JSON.stringify(response?.data))
             setTentHouseData(response?.data)
         } catch (error) {
@@ -92,8 +107,13 @@ const Events = () => {
     };
 
     const getDecorations = async () => {
+        const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllDecorations`);
+            const response = await axios.get(`${BASE_URL}/getAllDecorations`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
             // console.log('decorations response is::::::::', JSON.stringify(response?.data))
             setDecorationsData(response?.data)
         } catch (error) {

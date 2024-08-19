@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"; { }
+import React, { useEffect, useState, useCallback } from "react"; { }
 import { View, Text, SafeAreaView, Image, ScrollView, TouchableOpacity, Dimensions, StyleSheet, Animated, FlatList } from "react-native";
 import ProfileIcon from '../../../assets/vendorIcons/profileIcon.svg'
 import LinearGradient from "react-native-linear-gradient";
@@ -15,6 +15,9 @@ import themevariable from "../../../utils/themevariable";
 import ListedTimeIcon from '../../../assets/vendorIcons/listedTimeIcon.svg';
 import EditButton from '../../../assets/vendorIcons/editButton.svg';
 import Avatar from "../../../components/NameAvatar";
+import { useSelector } from "react-redux";
+import { getVendorAuthToken } from "../../../utils/StoreAuthToken";
+import { useFocusEffect } from "@react-navigation/native";
 
 const VendorDashBoardTab = ({ navigation }) => {
 
@@ -25,7 +28,24 @@ const VendorDashBoardTab = ({ navigation }) => {
     const [tentHouseBookingsData, setTentHouseBookingsData] = useState([]);
     const [cateringsBookingsData, setCateringBookingsData] = useState([]);
 
-    useEffect(() => {
+    const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
+
+    console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
+
+    // useEffect(() => {
+    //     getVendorClothJewelBookings();
+    //     getVendorDecorationBookings();
+    //     getVendorFunctionHallBookings();
+    //     getVendorTentHouseBookings();
+    //     getVendorFoodCateringBookings()
+
+    //     getVendorListings();
+    // }, [])
+
+
+    useFocusEffect(
+        useCallback(() => {
+          // Code to run when the screen is focused
         getVendorClothJewelBookings();
         getVendorDecorationBookings();
         getVendorFunctionHallBookings();
@@ -33,7 +53,13 @@ const VendorDashBoardTab = ({ navigation }) => {
         getVendorFoodCateringBookings()
 
         getVendorListings();
-    }, [])
+          
+          // Cleanup function to run when the screen loses focus
+          return () => {
+            console.log('Screen is unfocused');
+          };
+        }, [])
+      );
 
     const allCatProductDetailEndpoints = {
         decorations : {
@@ -70,10 +96,15 @@ const VendorDashBoardTab = ({ navigation }) => {
 
 
     const getVendorListings = async () => {
-        const vendorMobileNumber = "8297735285"
+        const vendorMobileNumber = vendorLoggedInMobileNum;
+        const token = await getVendorAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllVendorProductsAdded/${vendorMobileNumber}`);
-            // console.log("postsposts::::::::::", response?.data?.posts);
+            const response = await axios.get(`${BASE_URL}/getAllVendorProductsAdded/${vendorMobileNumber}`,{
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            console.log("postsposts::::::::::", response?.data);
             setVendorListings(response?.data?.posts)
         } catch (error) {
             console.log("categories::::::::::", error);
@@ -81,11 +112,16 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     const getVendorClothJewelBookings = async () => {
-        const vendorMobileNumber = "8297735286"
+        const vendorMobileNumber = vendorLoggedInMobileNum;
+        const token = await getVendorAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/clothJewelBookingsGotForVendor/${vendorMobileNumber}`);
+            const response = await axios.get(`${BASE_URL}/clothJewelBookingsGotForVendor/${vendorMobileNumber}`,{
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
             const output = consolidateByProductId(response?.data?.data);
-            // console.log('output is ::>>', output);
+            console.log('output is ::>>', output);
             setclothJewelBookingsData(output)
         } catch (error) {
             console.log("categories::::::::::", error);
@@ -94,9 +130,14 @@ const VendorDashBoardTab = ({ navigation }) => {
 
     const getVendorDecorationBookings = async () => {
         console.log("getVendorChefDriverBookings::::::::::");
-        const vendorMobileNumber = "8297735286"
+        const vendorMobileNumber = vendorLoggedInMobileNum;
+        const token = await getVendorAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/decorationBookingsGotForVendor/${vendorMobileNumber}`);
+            const response = await axios.get(`${BASE_URL}/decorationBookingsGotForVendor/${vendorMobileNumber}`,{
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
             // console.log('resp decorationsBookingsData ::>>', response?.data?.data);
             const outputData = consolidateDecorationDataByProductId(response?.data?.data);
             setDecorationsBookingsData(outputData);
@@ -107,9 +148,14 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     const getVendorFunctionHallBookings = async () => {
-        const vendorMobileNumber = "8297735286"
+        const vendorMobileNumber = vendorLoggedInMobileNum;
+        const token = await getVendorAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/functionHallBookingsGotForVendor/${vendorMobileNumber}`);
+            const response = await axios.get(`${BASE_URL}/functionHallBookingsGotForVendor/${vendorMobileNumber}`,{
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
             // console.log('resp getVendorFunctionHallBookings ::>>', response?.data?.data);
             const outputData = consolidateFunctionHallsDataByProductId(response?.data?.data);
             setFunctionHallBookingsData(outputData);
@@ -120,9 +166,14 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     const getVendorTentHouseBookings = async () => {
-        const vendorMobileNumber = "8297735286"
+        const vendorMobileNumber = vendorLoggedInMobileNum;
+        const token = await getVendorAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/tentHouseBookingsGotForVendor/${vendorMobileNumber}`);
+            const response = await axios.get(`${BASE_URL}/tentHouseBookingsGotForVendor/${vendorMobileNumber}`,{
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
             // console.log('resp getVendorTentHouseBookings ::>>', response?.data?.data);
             const outputData = consolidateTentHouseDataByProductId(response?.data?.data);
             setTentHouseBookingsData(outputData);
@@ -133,9 +184,14 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     const getVendorFoodCateringBookings = async () => {
-        const vendorMobileNumber = "8297735286"
+        const vendorMobileNumber = vendorLoggedInMobileNum;
+        const token = await getVendorAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/foodCateringBookingsGotForVendor/${vendorMobileNumber}`);
+            const response = await axios.get(`${BASE_URL}/foodCateringBookingsGotForVendor/${vendorMobileNumber}`,{
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
             console.log('resp foodcateringBookings ::>>', response?.data?.data);
             const outputData = consolidateFoodCateringDataByProductId(response?.data?.data);
             setCateringBookingsData(outputData);
@@ -147,7 +203,7 @@ const VendorDashBoardTab = ({ navigation }) => {
 
     const renderVendorList = ({ item }) => {
         const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
-
+        console.log('item?.professionalImage?.url is::>>>',item)
         return (
             <TouchableOpacity style={{ backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10 }}>
                 <View style={{ marginTop: 5, width: '100%', marginHorizontal: 5 }}>
@@ -286,7 +342,10 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     function capitalizeFirstLetters(str) {
-        return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+        console.log('str is::>>',str)
+        if(str){
+         return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+        }
     }
 
     const renderItem = ({ item }) => {

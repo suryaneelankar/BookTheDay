@@ -14,6 +14,7 @@ import { store } from "./redux/store";
 import { Provider } from "react-redux";
 import MainNavigation from './src/navigations';
 import SplashScreen from 'react-native-splash-screen';
+import RazorpayCheckout from 'react-native-razorpay';
 
 const App = () => {
 

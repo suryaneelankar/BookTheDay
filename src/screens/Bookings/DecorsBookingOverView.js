@@ -9,6 +9,7 @@ import Modal from 'react-native-modal';
 import themevariable from "../../utils/themevariable";
 import LinearGradient from "react-native-linear-gradient";
 import Swiper from "react-native-swiper";
+import { getUserAuthToken } from "../../utils/StoreAuthToken";
 
 const DecorsBookingOverView = ({ route, navigation }) => {
 
@@ -25,8 +26,13 @@ const DecorsBookingOverView = ({ route, navigation }) => {
     console.log("added package is:::::", addedItems);
 
     const getEventsDetails = async () => {
+        const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getDecorationDetailsById/${categoryId}`);
+            const response = await axios.get(`${BASE_URL}/getDecorationDetailsById/${categoryId}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
             // console.log(" decors over view ::::::::::", JSON.stringify(response?.data));
             setBookingDetails(response?.data)
         } catch (error) {
@@ -35,6 +41,7 @@ const DecorsBookingOverView = ({ route, navigation }) => {
     };
 
     const ConfirmBooking = async () => {  
+        const token = await getUserAuthToken();
         const payload = {
           productId: categoryId,
           startDate: bookingDate,
@@ -45,7 +52,11 @@ const DecorsBookingOverView = ({ route, navigation }) => {
         }
         console.log("payload is:::::::", payload);
         try {
-          const bookingResponse = await axios.post(`${BASE_URL}/create-decorations-booking`, payload);
+          const bookingResponse = await axios.post(`${BASE_URL}/create-decorations-booking`, payload,{
+            headers: {
+                Authorization: `Bearer ${token}`,
+              },
+        });
            console.log("booking res:::::::::", bookingResponse);
           if (bookingResponse?.status === 201) {
             setThankYouCardVisible(true);

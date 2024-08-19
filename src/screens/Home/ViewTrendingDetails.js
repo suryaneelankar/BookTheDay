@@ -5,6 +5,7 @@ import axios from "axios";
 import BASE_URL from "../../apiconfig";
 import { verticalScale, moderateScale, horizontalScale } from "../../utils/scalingMetrics";
 import { Calendar } from 'react-native-calendars';
+import { getUserAuthToken } from "../../utils/StoreAuthToken";
 
 const ViewTrendingDetails = ({ route }) => {
   const { width } = Dimensions.get('window');
@@ -24,8 +25,13 @@ const ViewTrendingDetails = ({ route }) => {
 
   const getCategoriesDetails = async () => {
     console.log("IAM CALLING API")
+    const token = await getUserAuthToken();
     try {
-      const response = await axios.get(`${BASE_URL}/getCategory/${categoryId}`);
+      const response = await axios.get(`${BASE_URL}/getCategory/${categoryId}`,{
+        headers: {
+            Authorization: `Bearer ${token}`,
+          },
+    });
       // console.log("categories details ::::::::::", response?.data?.data);
       setCategoriesDetails(response?.data?.data)
     } catch (error) {

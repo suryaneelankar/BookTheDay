@@ -22,7 +22,7 @@ import axios from "axios";
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import LeftArrow from '../../assets/svgs/leftarrowWhite.svg';
 import moment from "moment";
-
+import { getUserAuthToken } from "../../utils/StoreAuthToken";
 
 const ViewCatDetails = ({ route }) => {
 
@@ -52,8 +52,13 @@ const ViewCatDetails = ({ route }) => {
     }, []);
 
     const getCategoriesDetails = async () => {
+        const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getClothJewelsById/${catId}`);
+            const response = await axios.get(`${BASE_URL}/getClothJewelsById/${catId}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
             console.log("categories each ::::::::::", JSON.stringify(response?.data));
             setJewelleryDetails(response?.data)
 

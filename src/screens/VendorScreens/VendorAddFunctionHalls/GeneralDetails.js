@@ -14,6 +14,8 @@ import CrossIcon from '../../../assets/vendorIcons/crossIcon.svg';
 import VegNonVegIcon from '../../../assets/svgs/foodtype/vegNonveg.svg';
 import VegIcon from '../../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../../assets/svgs/foodtype/NonVeg.svg';
+import { useSelector } from 'react-redux';
+import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 
 const GeneralDetails = () => {
     const [BedRooms, setBedRooms] = useState();
@@ -45,6 +47,10 @@ const GeneralDetails = () => {
     const [selectedFoodTypeItem, setSelectedFoodTypeItem] = useState('');
     const [itemPrices, setItemPrices] = useState({});
     const [selectedSeatingCapacity,setSelectedSeatingCapacity] = useState('');
+
+    const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
+
+    console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
 
     const [rentalItemPricingDetails, setRentalItemPricingDetails] = useState({
         "Tables with basic covers": [{ "itemName": "Tables with basic covers", "perDayPrice": 0 }],
@@ -255,7 +261,7 @@ const GeneralDetails = () => {
     }
 
     const onPressSaveAndPost = async () => {
-        const vendorMobileNumber = "8297735285"
+        const vendorMobileNumber = vendorLoggedInMobileNum
         const formData = new FormData();
         formData.append('professionalImage', {
             uri: mainImageUrl?.assets[0]?.uri,
@@ -306,11 +312,12 @@ const GeneralDetails = () => {
         formData.append('overTimeCharges', overTimeCharges);
 
         console.log('formdata is ::>>', formData);
-
+        const token = await getVendorAuthToken();
         try {
             const response = await axios.post(`${BASE_URL}/AddFunctionHall`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`,
                 },
             });
             if (response.status === 201) {

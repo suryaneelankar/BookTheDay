@@ -21,7 +21,7 @@ import BookDatesButton from "../../components/GradientButton";
 import ServiceTime from '../../assets/svgs/serviceTime.svg';
 import MinusIcon from '../../assets/svgs/minusIcon.svg';
 import AddIcon from '../../assets/svgs/addIcon.svg';
-
+import { getUserAuthToken } from "../../utils/StoreAuthToken";
 
 const ViewCaterings = ({ route, navigation }) => {
 
@@ -143,8 +143,13 @@ const ViewCaterings = ({ route, navigation }) => {
 
     const getCateringDetails = async () => {
         console.log("IAM CALLING API")
+        const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getCateringDetailsById/${categoryId}`);
+            const response = await axios.get(`${BASE_URL}/getCateringDetailsById/${categoryId}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
             console.log("catering view details ::::::::::",JSON.stringify( response?.data));
             setEventsDetails(response?.data);
 
@@ -167,7 +172,7 @@ const ViewCaterings = ({ route, navigation }) => {
             totalAmount: noOfDays ? formatAmount(eventsDetails?.price * noOfDays) : formatAmount(eventsDetails?.price),
             numOfDays: noOfDays
         };
-
+        const token = await getUserAuthToken();
         console.log('params data is::>>', bookingData);
 
         try {
@@ -175,6 +180,7 @@ const ViewCaterings = ({ route, navigation }) => {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
+                    "Authorization": `Bearer ${token}`,
                 }
             });
             console.log("event booking resp ::::::::::", response?.data?.data);

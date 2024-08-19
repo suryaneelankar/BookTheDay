@@ -5,8 +5,9 @@ import BookDatesButton from '../../components/GradientButton';
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL from '../../apiconfig';
 import axios from 'axios';
-import { getLoginUserId } from '../../../redux/actions';
+import { getCurrentLoggedInVendorMobileNum, getLoginUserId } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
+import { storeUserAuthToken,getVendorAuthToken, getUserAuthToken,storeVendorAuthToken } from '../../utils/StoreAuthToken';
 
 const LoginScreen = ({ route }) => {
     const { type } = route.params;
@@ -21,8 +22,10 @@ const LoginScreen = ({ route }) => {
     const dispatch = useDispatch();
     const selectedMode = useSelector((state) => state.userId);
     const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
-    console.log("selected mode::::::::;;", selectedMode);
+    console.log("selected mode::::::::;;", selectedMode,type);
     console.log('deviceFCMToken is::>>',deviceFCMToken)
+
+    // console.log('user auth token is::>>',getVendorAuthToken());
 
     const storeUserDeviceToken = async () => {
         const payload = {
@@ -30,9 +33,14 @@ const LoginScreen = ({ route }) => {
             fcmToken: deviceFCMToken
         }
         console.log("payload is:::::::", payload, type);
+        const token = await getUserAuthToken();
         try {
-            const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload);
-            console.log("userTokenRes  res:::::::::", userTokenRes);
+            const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
+            // console.log("userTokenRes  res:::::::::", userTokenRes);
             if (userTokenRes?.status === 200) {
 
             }
@@ -47,8 +55,13 @@ const LoginScreen = ({ route }) => {
             fcmToken: deviceFCMToken
         }
         console.log("payload is:::::::", payload, type);
+        const token = await getVendorAuthToken();
         try {
-            const vendorTokenRes = await axios.post(`${BASE_URL}/addVendorFCMToken`, payload);
+            const vendorTokenRes = await axios.post(`${BASE_URL}/addVendorFCMToken`, payload,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
             console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
             if (vendorTokenRes?.status === 200) {
                
@@ -68,21 +81,27 @@ const LoginScreen = ({ route }) => {
         }
         console.log("payload is:::::::", payload, type);
         try {
-            const logineRes = await axios.post(`${BASE_URL}/user/login`, payload);
-            console.log("login  res:::::::::", logineRes);
+            const logineRes = await axios.post(`${BASE_URL}/${type}/login`, payload);
+            console.log("login  res:::::::::", logineRes?.data);
             if (logineRes?.status === 200) {
                 setAuthToken(logineRes?.data?.token);
                 if (type === 'vendor') {
+                    console.log('into vendor LOGG');
                     dispatch(getLoginUserId(true));
+                    dispatch(getCurrentLoggedInVendorMobileNum(phoneNumber));
                     storeVendorDeviceToken();
-                    navigation.navigate('Home')
+                    storeVendorAuthToken(logineRes?.data?.token)
+                    navigation.navigate('Home');
                 } else {
+                    console.log('into USER LOGG');
                     storeUserDeviceToken();
-                    navigation.navigate('Home')
+                    dispatch(getLoginUserId(false));
+                    storeUserAuthToken(logineRes?.data?.token);
+                    navigation.navigate('Home');
                 }
             }
         } catch (error) {
-            console.error("Error during booking:", error);
+            console.error("Error during login:", error);
         }
 
     }

@@ -7,6 +7,7 @@ import { moderateScale, verticalScale, horizontalScale } from "../../utils/scali
 import themevariable from "../../utils/themevariable";
 import { formatAmount } from "../../utils/GlobalFunctions";
 import OfferStikcer from '../../assets/svgs/offerSticker.svg';
+import { getUserAuthToken } from "../../utils/StoreAuthToken";
 
 const CategoriesList = ({ route }) => {
     const { catType,componentType } = route.params;
@@ -23,8 +24,13 @@ const CategoriesList = ({ route }) => {
     }, []);
 
     const getCategories = async () => {
+        const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllClothesJewels`);
+            const response = await axios.get(`${BASE_URL}/getAllClothesJewels`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
             if(componentType === 'discount' || componentType === 'new'){
                 const filteredDiscountItems = response?.data.filter(category => category?.componentType === componentType);
                 setCategories(filteredDiscountItems);

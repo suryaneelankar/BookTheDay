@@ -69,7 +69,8 @@ import DriverCard from '../../assets/svgs/chefDriver/home_drivercardnew.svg';
 import ChefCard from '../../assets/svgs/chefDriver/home_chefcard.svg';
 import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.svg';
 import ClothesCard from '../../assets/svgs/homeSwippers/home_shirtcard.svg';
-
+import RazorpayCheckout from 'react-native-razorpay';
+import { getUserAuthToken, getVendorAuthToken } from "../../utils/StoreAuthToken";
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
@@ -87,6 +88,20 @@ const HomeDashboard = () => {
         { image: DriverCard },
         { image: ChefCard },
     ];
+
+    const someFunction = async () => {
+        const token = await getUserAuthToken();
+        if (token) {
+          // Use the token, e.g., include it in API requests
+          console.log('Using stored token:', token);
+        } else {
+          console.log('No User token found');
+        }
+      };
+      
+      
+    someFunction();
+    // vendorToken();
 
 
     const CategoriesData = [
@@ -118,9 +133,71 @@ const HomeDashboard = () => {
         getAllEvents();
     }, []);
 
-    const getAllEvents = async () => {
+    const handlePayment = async () => {
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls`);
+          // Fetch the order details from your backend
+          const response = await fetch(`${BASE_URL}/create-order`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              amount: 1, // Amount in INR
+              currency: 'INR',
+              receipt: 'receipt#1'
+            })
+          });
+          
+          const data = await response.json();
+          console.log('razor pay data is ::>>',data);
+          // Start the Razorpay payment process
+          var options = {
+            description: 'Test Transaction',
+            image: 'https://your-logo-url.com/logo.png',
+            currency: data.currency,
+            key: 'rzp_test_SFQjGVsyEZ2P05', // Your Razorpay Key ID
+            amount: data.amount, // Amount in smallest currency unit
+            order_id: data.orderId, // Order ID returned from backend
+            name: 'Book the day',
+            prefill: {
+              email: 'bookthedaytechnologies@gmail.com',
+              contact: '8297735285',
+              name: 'Surya Neelankar',
+              method: 'upi',  // Pre-select UPI as the payment method
+              vpa: ''
+            },
+            theme: { color: '#FFDB7E' }
+          };
+
+          console.log('options is::>>',options)
+    
+          RazorpayCheckout.open(options)
+            .then((paymentData) => {
+              // Success callback
+              Alert.alert(`Success: ${paymentData.razorpay_payment_id}`);
+              // Verify the payment on the server-side
+              console.log('success resp::>>',paymentData);
+            //   verifyPayment(paymentData);
+            })
+            .catch((error) => {
+              // Failure callback
+              Alert.alert(`Error: ${error.code} | ${error.description}`);
+              console.error(error);
+            });
+        } catch (error) {
+          console.error(error);
+          Alert.alert('Error', 'Something went wrong');
+        }
+      };
+
+    const getAllEvents = async () => {
+        const token = await getUserAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
             setEventsData(response?.data)
         } catch (error) {
             console.log("events data error>>::", error);
@@ -128,8 +205,13 @@ const HomeDashboard = () => {
     };
 
     const getCategories = async () => {
+        const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllClothesJewels`);
+            const response = await axios.get(`${BASE_URL}/getAllClothesJewels`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
             // console.log("Products res:::::::", JSON.stringify(response?.data))
             setCategories(response?.data)
             const filteredDiscountItems = response?.data.filter(category => category?.componentType === 'discount');
@@ -347,6 +429,9 @@ const HomeDashboard = () => {
                             <FilterIcon />
                         </View>
                     </View>
+                    <TouchableOpacity onPress={() => {handlePayment()}}>
+                        <Text>Initiate Razopr Pay Payment</Text>
+                    </TouchableOpacity>
                     {/* <View style={{ width: "100%" }}> */}
                     <Swiper
                         autoplay

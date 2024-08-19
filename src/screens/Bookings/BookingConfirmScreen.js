@@ -4,6 +4,7 @@ import axios from 'axios';
 import BASE_URL from "../../apiconfig";
 import Icon from 'react-native-vector-icons/AntDesign';
 import IonIcon  from 'react-native-vector-icons/Ionicons';
+import { getUserAuthToken } from "../../utils/StoreAuthToken";
 
 const BookingConfirm = ({ route, navigation }) => {
 
@@ -14,12 +15,17 @@ const BookingConfirm = ({ route, navigation }) => {
     }, []);
 
     const getBookingDetails = async () => {
+        const token = await getUserAuthToken();
         const bookingIdData = {
             "bookingId":"BOOK-1714477859168-7696",
             "eventId":"661d6a6ba8da8199cf381c2a"
         }
         try {
-            const response = await axios.get(`${BASE_URL}/get-event-by-bookingid`,bookingIdData,);
+            const response = await axios.get(`${BASE_URL}/get-event-by-bookingid`,bookingIdData,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
             // console.log("events over view ::::::::::", response?.data?.data);
             setEventsDetails(response?.data?.data)
         } catch (error) {

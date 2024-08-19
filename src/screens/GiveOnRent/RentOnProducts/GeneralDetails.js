@@ -10,6 +10,8 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { launchImageLibrary } from 'react-native-image-picker';
 import BASE_URL from '../../../apiconfig';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 
 const GeneralDetails = () => {
     const [productName, setProductName] = useState('');
@@ -32,6 +34,10 @@ const GeneralDetails = () => {
     const [advanceAmount, setAdvanceAmount] = useState();
     const [discountPercentage, setDiscountPercentage] = useState();
     const [isSelected, setSelection] = useState(false);
+
+    const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
+
+    console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
 
     const inputHandler = (value) => {
         console.log("general details inputhandler", value)
@@ -193,7 +199,7 @@ const GeneralDetails = () => {
     }
 
     const onPressSaveAndPost = async () => {
-        const vendorMobileNumber = "8297735285"
+        const vendorMobileNumber = vendorLoggedInMobileNum
         const formData = new FormData();
         formData.append('professionalImage', {
             uri: mainImageUrl?.assets[0]?.uri,
@@ -241,11 +247,13 @@ const GeneralDetails = () => {
         formData.append('discountPercentage', discountPercentage);
 
         console.log('formdata is ::>>',JSON.stringify(formData));
+        const token = await getVendorAuthToken();
  
           try {
             const response = await axios.post(`${BASE_URL}/AddClothJewels`, formData, {
               headers: {
                 'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}`,
               },
             });
             if (response.status === 201) {

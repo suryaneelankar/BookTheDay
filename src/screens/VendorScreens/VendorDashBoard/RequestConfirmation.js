@@ -11,6 +11,8 @@ import AcceptIcon from "../../../assets/vendorIcons/AcceptIcon.svg";
 import themevariable from "../../../utils/themevariable";
 import LinearGradient from 'react-native-linear-gradient';
 import { formatAmount } from "../../../utils/GlobalFunctions";
+import { useSelector } from "react-redux";
+import { getUserAuthToken, getVendorAuthToken } from "../../../utils/StoreAuthToken";
 
 const RequestConfirmation = ({ navigation, route }) => {
     const { productId, catEndPoint } = route?.params;
@@ -19,7 +21,9 @@ const RequestConfirmation = ({ navigation, route }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [wholeBookingData, setWholeBookingData] = useState([]);
 
-    console.log('catEndPoint is ::>>',catEndPoint);
+    const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
+
+    console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
 
     useEffect(() => {
         getProductDetails();
@@ -27,9 +31,14 @@ const RequestConfirmation = ({ navigation, route }) => {
     }, [])
 
     const getVendorClothJewelBookings = async () => {
-        const vendorMobileNumber = "8297735286"
+        const vendorMobileNumber = vendorLoggedInMobileNum;
+        const token = await getVendorAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/${catEndPoint?.bookingDetailsEndpoint}/${vendorMobileNumber}`);
+            const response = await axios.get(`${BASE_URL}/${catEndPoint?.bookingDetailsEndpoint}/${vendorMobileNumber}`,{
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
             console.log('before resp::><>', response?.data?.data);
             groupByFilterData(response?.data?.data);
         } catch (error) {
@@ -49,9 +58,14 @@ const RequestConfirmation = ({ navigation, route }) => {
 
 
     const getProductDetails = async () => {
-        console.log('productId is ::>>', productId)
+        console.log('productId is ::>>', productId);
+        const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/${catEndPoint?.productDetailsEndpoint}/${productId}`);
+            const response = await axios.get(`${BASE_URL}/${catEndPoint?.productDetailsEndpoint}/${productId}`,{
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
             // console.log("getClothJewelsById::::::::::", response?.data);
             setProductDetails(response?.data)
         } catch (error) {
@@ -125,8 +139,13 @@ const RequestConfirmation = ({ navigation, route }) => {
             bookingStatus: bookingStatus
         }
         console.log('updatedParams is::>>', updatedParams);
+        const token = await getVendorAuthToken();
         try {
-            const response = await axios.patch(`${BASE_URL}/${catEndPoint?.confirmationEndpoint}`, updatedParams);
+            const response = await axios.patch(`${BASE_URL}/${catEndPoint?.confirmationEndpoint}`, updatedParams,{
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
             console.log("accept confirm response::::::::::", response?.data);
         } catch (error) {
             console.log("accept::::::::::", error);

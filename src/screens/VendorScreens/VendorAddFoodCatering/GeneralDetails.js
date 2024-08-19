@@ -25,6 +25,8 @@ import WallIcon from '../../../assets/svgs/VendorCatering/Wall.svg';
 import CrossIconRed from '../../../assets/vendorIcons/crossIconRed.svg';
 import CheckIconGreen from '../../../assets/vendorIcons/checkIconGreen.svg';
 import CrossIcon from '../../../assets/vendorIcons/crossIcon.svg';
+import { useSelector } from 'react-redux';
+import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 
 const GeneralDetails = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -51,6 +53,10 @@ const GeneralDetails = () => {
     const [comboPrice, setComboPrice] = useState({});
     const [minOrderMembers, setMinOrderMembers] = useState({});
 
+    const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
+
+    console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
+
     const [rentalItemPricingDetails, setRentalItemPricingDetails] = useState({
         "Carpet": [{ "itemName": "Carpet", "perDayPrice": 0 }],
         "Chairs": [{ "itemName": "Chairs", "perDayPrice": 0 }],
@@ -71,8 +77,13 @@ const GeneralDetails = () => {
     },[]);
 
     const getFoodMenuItems = async () => {
+        const token = await getVendorAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFoodItems`);
+            const response = await axios.get(`${BASE_URL}/getAllFoodItems`,{
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
             console.log("foodmenu items::::::::", JSON.stringify(response?.data?.data[0]?.foodMenuItems));
             setFoodMenuItems(response?.data?.data[0]?.foodMenuItems);
         }catch (error) {
@@ -590,7 +601,7 @@ const GeneralDetails = () => {
     };
 
     const onPressSaveAndPost = async () => {
-        const vendorMobileNumber = "8297735285"
+        const vendorMobileNumber = vendorLoggedInMobileNum
         const formData = new FormData();
         formData.append('professionalImage', {
             uri: mainImageUrl?.assets[0]?.uri,
@@ -637,11 +648,12 @@ const GeneralDetails = () => {
 
 
         console.log('formdata is ::>>', JSON.stringify(formData));
-
+        const token = await getVendorAuthToken();
         try {
             const response = await axios.post(`${BASE_URL}/AddFoodCatering`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`,
                 },
             });
             if (response.status === 201) {

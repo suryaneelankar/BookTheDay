@@ -22,7 +22,8 @@ import RecycleIcon from '../../../assets/svgs/VendorCatering/Recycle.svg';
 import SpeakerIcon from '../../../assets/svgs/VendorCatering/SpeakerHifi.svg';
 import FanIcon from '../../../assets/svgs/VendorCatering/vendor_fan.svg';
 import WallIcon from '../../../assets/svgs/VendorCatering/Wall.svg';
-
+import { useSelector } from 'react-redux';
+import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 
 const GeneralDetails = () => {
     const [isCollapsed, setIsCollapsed] = useState(true);
@@ -47,7 +48,9 @@ const GeneralDetails = () => {
     const [selectedRentalItem, setSelectedRentalItem] = useState();
 
     const [itemPrices, setItemPrices] = useState({});
+    const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
+    console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
 
     const [rentalItemPricingDetails, setRentalItemPricingDetails] = useState({
         "Carpet": [{ "itemName": "Carpet", "perDayPrice": 0 }],
@@ -315,7 +318,7 @@ const GeneralDetails = () => {
       };
 
     const onPressSaveAndPost = async () => {
-        const vendorMobileNumber = "8297735285"
+        const vendorMobileNumber = vendorLoggedInMobileNum
         const formData = new FormData();
         formData.append('professionalImage', {
             uri: mainImageUrl?.assets[0]?.uri,
@@ -364,11 +367,12 @@ const GeneralDetails = () => {
         formData.append('overTimeCharges', overTimeCharges);
 
         console.log('formdata is ::>>', JSON.stringify(formData));
-
+        const token = await getVendorAuthToken();
         try {
             const response = await axios.post(`${BASE_URL}/AddTentHouse`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`,
                 },
             });
             if (response.status === 201) {

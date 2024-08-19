@@ -13,6 +13,7 @@ import BASE_URL, { LocalHostUrl } from '../../apiconfig';
 import axios from 'axios';
 import { formatAmount } from '../../utils/GlobalFunctions';
 import moment from 'moment';
+import { getUserAuthToken } from '../../utils/StoreAuthToken';
 
 const BookingDetailsScreen = ({ navigation, route }) => {
 
@@ -33,8 +34,13 @@ const BookingDetailsScreen = ({ navigation, route }) => {
 
   const getSelectedProductDetails = async () => {
     console.log("IAM CALLING INSIDE CART")
+    const token = await getUserAuthToken();
     try {
-      const response = await axios.get(`${BASE_URL}/getClothJewelsById/${catId}`);
+      const response = await axios.get(`${BASE_URL}/getClothJewelsById/${catId}`,{
+        headers: {
+            Authorization: `Bearer ${token}`,
+          },
+    });
       console.log(" selected product::::::::::", JSON.stringify(response?.data));
       setProductDetails(response?.data);
       const updatedImgUrl = response?.data?.professionalImage?.url !== undefined ? response?.data?.professionalImage?.url.replace('localhost', LocalHostUrl) : response?.data?.professionalImage?.url;
@@ -75,6 +81,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
   };
 
   const ConfirmBooking = async () => {
+    const token = await getUserAuthToken();
     const payload = {
       productId: catId,
       startDate: moment(startDate).format('DD MMMM YYYY'),
@@ -83,7 +90,11 @@ const BookingDetailsScreen = ({ navigation, route }) => {
       totalAmount: calculateTotalPrice()
     }
     try {
-      const bookingResponse = await axios.post(`${BASE_URL}/create-cloth-jewel-booking`, payload);
+      const bookingResponse = await axios.post(`${BASE_URL}/create-cloth-jewel-booking`, payload,{
+        headers: {
+            Authorization: `Bearer ${token}`,
+          },
+    });
       if (bookingResponse?.status === 201) {
         setThankYouCardVisible(true)
       }

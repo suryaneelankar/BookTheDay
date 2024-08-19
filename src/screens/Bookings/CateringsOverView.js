@@ -10,6 +10,7 @@ import themevariable from "../../utils/themevariable";
 import LinearGradient from "react-native-linear-gradient";
 import Swiper from "react-native-swiper";
 import moment from "moment";
+import { getUserAuthToken } from "../../utils/StoreAuthToken";
 
 const CateringsOverView = ({ route, navigation }) => {
 
@@ -26,8 +27,13 @@ const CateringsOverView = ({ route, navigation }) => {
     console.log("received item::::::::", cateringItems)
 
     const getEventsDetails = async () => {
+        const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getCateringDetailsById/${categoryId}`);
+            const response = await axios.get(`${BASE_URL}/getCateringDetailsById/${categoryId}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
             console.log(" caterings over view ::::::::::", JSON.stringify(response?.data));
             setBookingDetails(response?.data)
         } catch (error) {
@@ -36,7 +42,7 @@ const CateringsOverView = ({ route, navigation }) => {
     };
 
     const ConfirmBooking = async () => {
-      
+        const token = await getUserAuthToken();
         const transformedData = cateringItems.map(item => ({
             subMenuId: item?._id,
             numOfPlatesOrdered: item?.totalPrice / item?.perPlateCost,
@@ -51,7 +57,11 @@ const CateringsOverView = ({ route, navigation }) => {
         }
         console.log("payload is:::::::", payload);
         try {
-          const bookingResponse = await axios.post(`${BASE_URL}/create-food-catering-booking`, payload);
+          const bookingResponse = await axios.post(`${BASE_URL}/create-food-catering-booking`, payload,{
+            headers: {
+                Authorization: `Bearer ${token}`,
+              },
+        });
            console.log("booking res:::::::::", bookingResponse);
           if (bookingResponse?.status === 201) {
             setThankYouCardVisible(true);

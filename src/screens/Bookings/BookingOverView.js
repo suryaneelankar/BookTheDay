@@ -9,10 +9,11 @@ import Modal from 'react-native-modal';
 import themevariable from "../../utils/themevariable";
 import LinearGradient from "react-native-linear-gradient";
 import moment from "moment";
+import { getUserAuthToken } from "../../utils/StoreAuthToken";
 
 const BookingOverView = ({ route, navigation }) => {
 
-    const { categoryId,numberOfDays, selectedRentalItems,  rentalItems, timeSlot, startDate,endDate, totalPrice } = route.params;
+    const { categoryId, numberOfDays, selectedRentalItems, rentalItems, timeSlot, startDate, endDate, totalPrice } = route.params;
     const [bookingDetails, setBookingDetails] = useState([]);
     const [bookingDone, setBookingDone] = useState(false);
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
@@ -21,7 +22,7 @@ const BookingOverView = ({ route, navigation }) => {
         name: key,
         quantity: value
     }));
-    const  bookingItems=  Object.keys(selectedRentalItems).map(key => ({
+    const bookingItems = Object.keys(selectedRentalItems).map(key => ({
         itemName: selectedRentalItems[key]?.name,
         itemPerDayPrice: selectedRentalItems[key]?.perDayPrice,
         quantity: selectedRentalItems[key]?.quantity
@@ -40,8 +41,13 @@ const BookingOverView = ({ route, navigation }) => {
     }, []);
 
     const getEventsDetails = async () => {
+        const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getTentHouseDetailsById/${categoryId}`);
+            const response = await axios.get(`${BASE_URL}/getTentHouseDetailsById/${categoryId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             console.log("tent house over view ::::::::::", JSON.stringify(response?.data));
             setBookingDetails(response?.data)
         } catch (error) {
@@ -50,31 +56,36 @@ const BookingOverView = ({ route, navigation }) => {
     }
 
     console.log("rental items:::::::", selectedRentalItems, numberOfDays);
-   
+
     console.log("bookings items", bookingItems)
 
     const ConfirmBooking = async () => {
-      
+        const token = await getUserAuthToken();
+
         const payload = {
-          productId: categoryId,
-          startDate: moment(startDate).format('DD MMMM YYYY'),
-          endDate: moment(endDate).format('DD MMMM YYYY'),
-          numOfDays: numberOfDays,
-          totalAmount: totalPrice.replace(/[^\d]/g, ''),
-          bookingItems: bookingItems
+            productId: categoryId,
+            startDate: moment(startDate).format('DD MMMM YYYY'),
+            endDate: moment(endDate).format('DD MMMM YYYY'),
+            numOfDays: numberOfDays,
+            totalAmount: totalPrice.replace(/[^\d]/g, ''),
+            bookingItems: bookingItems
         }
         console.log("payload is:::::::", payload);
         try {
-          const bookingResponse = await axios.post(`${BASE_URL}/create-tent-house-booking`, payload);
-           console.log("booking res:::::::::", bookingResponse);
-          if (bookingResponse?.status === 201) {
-            setThankYouCardVisible(true);
+            const bookingResponse = await axios.post(`${BASE_URL}/create-tent-house-booking`, payload,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
+            console.log("booking res:::::::::", bookingResponse);
+            if (bookingResponse?.status === 201) {
+                setThankYouCardVisible(true);
 
-          }
+            }
         } catch (error) {
-          console.error("Error during booking:", error);
+            console.error("Error during booking:", error);
         }
-      }
+    }
 
     return (
         <View style={{ flex: 1, alignSelf: 'center', width: '100%', alignItems: 'center' }}>
@@ -95,7 +106,7 @@ const BookingOverView = ({ route, navigation }) => {
 
             <View style={{ backgroundColor: 'white', borderRadius: 15, padding: 10, marginTop: 20, width: '90%', paddingHorizontal: 18, }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <View style={{width:"80%"}}>
+                    <View style={{ width: "80%" }}>
                         <Text style={{ color: 'grey' }}>{bookingDetails?.tentHouseName}</Text>
                         <Text style={{ color: 'grey' }}>Address : {bookingDetails?.tentHosueAddress?.address}</Text>
 
@@ -184,11 +195,11 @@ const BookingOverView = ({ route, navigation }) => {
 
             <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
                 {!bookingDone ?
-                <BookDatesButton
-                    onPress={() => ConfirmBooking()}
-                    text={'Confirm Booking'}
-                    padding={10}
-                /> : null}
+                    <BookDatesButton
+                        onPress={() => ConfirmBooking()}
+                        text={'Confirm Booking'}
+                        padding={10}
+                    /> : null}
             </View>
         </View>
     )

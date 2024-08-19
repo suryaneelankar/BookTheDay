@@ -1,9 +1,10 @@
 
 const initialState = {
     userId: '',
-    deviceFCMToken: ''
+    deviceFCMToken: '',
+    vendorLoggedInMobileNum: ''
 }
-export const ApiResponse = (state = initialState, action) => {
+export const commonReducer = (state = initialState, action) => {
     switch (action.type) {
             case 'GET_LOGINUSERID':
             return {
@@ -15,6 +16,11 @@ export const ApiResponse = (state = initialState, action) => {
                 return {
                     ...state,
                     deviceFCMToken: action.payload,
+                }
+            case 'GET_LOGGED_IN_VENDOR_MOBILE_NUM':
+                return {
+                    ...state,
+                    vendorLoggedInMobileNum: action.payload,
                 }
         default:
             return state;

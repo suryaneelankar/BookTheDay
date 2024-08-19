@@ -9,6 +9,7 @@ import Modal from 'react-native-modal';
 import themevariable from "../../utils/themevariable";
 import LinearGradient from "react-native-linear-gradient";
 import moment from "moment";
+import { getUserAuthToken } from "../../utils/StoreAuthToken";
 
 const HallsBookingOverView = ({ route, navigation }) => {
 
@@ -23,8 +24,13 @@ const HallsBookingOverView = ({ route, navigation }) => {
     }, []);
 
     const getEventsDetails = async () => {
+        const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getFunctionHallDetailsById/${categoryId}`);
+            const response = await axios.get(`${BASE_URL}/getFunctionHallDetailsById/${categoryId}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
             console.log("Halls house over view ::::::::::", JSON.stringify(response?.data));
             setBookingDetails(response?.data)
         } catch (error) {
@@ -33,6 +39,7 @@ const HallsBookingOverView = ({ route, navigation }) => {
     }
 
     const ConfirmBooking = async () => {  
+        const token = await getUserAuthToken();
         const payload = {
           productId: categoryId,
           startDate: moment(bookingDate, "DD-MM-YYYY").format("DD MMMM YYYY"),
@@ -43,7 +50,11 @@ const HallsBookingOverView = ({ route, navigation }) => {
         }
         console.log("payload is:::::::", payload);
         try {
-          const bookingResponse = await axios.post(`${BASE_URL}/create-function-hall-booking`, payload);
+          const bookingResponse = await axios.post(`${BASE_URL}/create-function-hall-booking`, payload,{
+            headers: {
+                Authorization: `Bearer ${token}`,
+              },
+        });
            console.log("booking res:::::::::", bookingResponse);
           if (bookingResponse?.status === 201) {
             setThankYouCardVisible(true);

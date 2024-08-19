@@ -18,6 +18,7 @@ import HowItWorks from "../Products/HowItWorks";
 import Swiper from 'react-native-swiper';
 import EarRingsIcon from '../../assets/svgs/jewelleryCategories/earrings.svg';
 import ChainIcon from '../../assets/svgs/jewelleryCategories/chains.svg';
+import { getUserAuthToken } from "../../utils/StoreAuthToken";
 
 const Categories = () => {
 
@@ -68,8 +69,13 @@ const Categories = () => {
     }, [filteredJewellery]);
 
     const getCategories = async () => {
+        const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllClothesJewels`);
+            const response = await axios.get(`${BASE_URL}/getAllClothesJewels`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
             setCategories(response?.data)
             const filteredClothesCategories = response?.data.filter(category => category?.categoryType === 'clothes');
             const filteredJewelleryCategories = response?.data.filter(category => category?.categoryType === 'jewels');
