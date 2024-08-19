@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal, Button, TextInput } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
@@ -17,6 +17,9 @@ import NonVegIcon from '../../../assets/svgs/foodtype/NonVeg.svg';
 import { Accordion } from './Accordion';
 import { useSelector } from 'react-redux';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
+import LocationPicker from '../../../components/LocationPicker';
+import DetectLocation from '../../../assets/svgs/detectLocation.svg';
+
 
 const GeneralDetails = () => {
     const [BedRooms, setBedRooms] = useState();
@@ -28,7 +31,7 @@ const GeneralDetails = () => {
     const [itemDetails, setItemDetails] = useState({});
 
 
-
+    const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [eventProviderName, setEventProviderName] = useState('');
     const [eventDescription, setEventDescription] = useState('');
@@ -492,8 +495,32 @@ const GeneralDetails = () => {
         );
     };
 
+    const handleOpenLocationPicker = () => {
+        setLocationPickerVisible(true);
+    };
+
+    const handleLocationSelected = (location, address) => {
+        console.log('Selected Location:', location, address);
+        seteventOrgAddress(address);
+        seteventOrgCity(location?.address?.city);
+        seteventOrgPinCode(location.pinCode);
+        setLocationPickerVisible(false); // Hide the LocationPicker after selection
+    };
+
+    const handleCloseLocationPicker = () => {
+        setLocationPickerVisible(false);
+    };
+
+
+    
+
     return (
         <View>
+
+            <Modal visible={isLocationPickerVisible} animationType="slide">
+                <LocationPicker onLocationSelected={handleLocationSelected} />
+                <Button title="Close" onPress={handleCloseLocationPicker} />
+            </Modal>
             <View style={styles.mainContainer}>
             <ChooseFileField
                     label={'Event Origanizing Image'}
@@ -576,14 +603,34 @@ const GeneralDetails = () => {
             </View>
             <Text style={styles.title}>Item Available Address</Text>
             <View style={styles.mainContainer}>
-                <TextField
+            <Text style={styles.textInputlabel}>
+                    Address<Text style={{ color: "red" }}>*</Text>
+                </Text>
+                <TouchableOpacity onPress={handleOpenLocationPicker} style={[styles.textTnputView, { height: 100, flexDirection: "row",}]}>
+                    <View style={{height: '100%',width:"85%" }}>
+                        <TextInput
+                            onChangeText={onChangeEventOrganizerAddress}
+                            value={eventOrgAddress}
+                            placeholder="Please Enter Address"
+                            keyboardType={'default'}
+                            style={{ height: '100%', textAlignVertical: 'top', padding: 10 }}
+                            multiline={true}
+                            numberOfLines={4}
+                        />
+                    </View>
+                    <View style={{justifyContent: 'center', alignItems: 'center' }}>
+                        <DetectLocation />
+                    </View>
+                </TouchableOpacity>
+
+                {/* <TextField
                     label='Address'
                     placeholder="Please Enter Address"
                     value={eventOrgAddress}
                     onChangeHandler={onChangeEventOrganizerAddress}
                     keyboardType='default'
                     isRequired={true}
-                />
+                /> */}
                 <TextField
                     label='City'
                     placeholder="Please Enter City"
@@ -744,4 +791,19 @@ const styles = StyleSheet.create({
     itemText: {
         marginHorizontal: 5,
     },
+textInputlabel: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: 'bold',
+    color: themevariable.Color_000000,
+    fontSize: 15,
+    marginTop: 15
+},
+textTnputView: {
+    borderWidth: 1,
+    marginTop: 10,
+    borderColor: themevariable.Color_C8C8C6,
+    // paddingHorizontal:12,
+    borderRadius: 5,
+}
+
 })

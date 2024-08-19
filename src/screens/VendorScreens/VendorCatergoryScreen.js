@@ -57,16 +57,16 @@ const VendorCategoryScreen = ({ navigation }) => {
             CatImg: DecorVendorImg,
             navScreen: 'AddDecorations'
         },
-        {
-            id: 1,
-            CatImg: DriverVendorImg,
-            navScreen: 'HireChefOrDriverForm'
-        },
-        {
-            id: 1,
-            CatImg: ChefVendorImg,
-            navScreen: 'HireChefOrDriverForm'
-        }
+        // {
+        //     id: 1,
+        //     CatImg: DriverVendorImg,
+        //     navScreen: 'HireChefOrDriverForm'
+        // },
+        // {
+        //     id: 1,
+        //     CatImg: ChefVendorImg,
+        //     navScreen: 'HireChefOrDriverForm'
+        // }
     ]
 
     const renderItem = ({ item }) => {
@@ -94,7 +94,7 @@ export default VendorCategoryScreen
 
 const styles = StyleSheet.create({
     root: {
-        // backgroundColor: themevariable.Color_E1E1E2,
+        backgroundColor: "#EBEDF3", 
         alignSelf: 'center',
         // alignItems:'center',
         flex: 1,

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal, Button, TextInput } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
@@ -9,6 +9,10 @@ import SelectedUploadIcon from '../../../assets/svgs/selectedUploadIcon.svg';
 import { Dropdown } from 'react-native-element-dropdown';
 import { launchImageLibrary } from 'react-native-image-picker';
 import BASE_URL from '../../../apiconfig';
+import LocationPicker from '../../../components/LocationPicker';
+import DetectLocation from '../../../assets/svgs/detectLocation.svg';
+
+
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
@@ -34,6 +38,7 @@ const GeneralDetails = () => {
     const [advanceAmount, setAdvanceAmount] = useState();
     const [discountPercentage, setDiscountPercentage] = useState();
     const [isSelected, setSelection] = useState(false);
+    const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
@@ -257,32 +262,55 @@ const GeneralDetails = () => {
               },
             });
             if (response.status === 201) {
-             console.log('Success', `uploaded successfully`);
-             Alert.alert(
-                "Confirmation",
-                "Your proudct posted successfully",
-                [
-                    {
-                        text: "No",
-                        onPress: () => console.log("No Pressed"),
-                        style: "cancel"
-                    },
-                    { text: "Yes", onPress: () => console.log("yes pressed") }
-                ],
-                { cancelable: false }
-            );
+                console.log('Success', `uploaded successfully`);
+                Alert.alert(
+                    "Confirmation",
+                    "Your proudct posted successfully",
+                    [
+                        {
+                            text: "No",
+                            onPress: () => console.log("No Pressed"),
+                            style: "cancel"
+                        },
+                        { text: "Yes", onPress: () => console.log("yes pressed") }
+                    ],
+                    { cancelable: false }
+                );
             } else {
-             console.log('Error', 'Failed to upload document');
+                console.log('Error', 'Failed to upload document');
             }
-          } catch (error) {
+        } catch (error) {
             console.error('Error uploading document:', error);
-           console.log('Error', 'Failed to upload document');
-          }
+            console.log('Error', 'Failed to upload document');
+        }
     }
+
+    const handleOpenLocationPicker = () => {
+        setLocationPickerVisible(true);
+    };
+
+    const handleLocationSelected = (location, address) => {
+        console.log('Selected Location:', location, address);
+        setProductAddress(address);
+        setProductCity(location?.address?.city);
+        setProductPinCode(location.pinCode);
+        setLocationPickerVisible(false); // Hide the LocationPicker after selection
+    };
+
+    const handleCloseLocationPicker = () => {
+        setLocationPickerVisible(false);
+    };
 
 
     return (
         <View>
+
+            <Modal visible={isLocationPickerVisible} animationType="slide">
+                <LocationPicker onLocationSelected={handleLocationSelected} />
+                <Button title="Close" onPress={handleCloseLocationPicker} />
+            </Modal>
+
+
             <View style={styles.mainContainer}>
                 <ChooseFileField
                     label={'Product Image'}
@@ -380,14 +408,34 @@ const GeneralDetails = () => {
             </View>
             <Text style={styles.title}>Item Available Address</Text>
             <View style={styles.mainContainer}>
-                <TextField
+            <Text style={styles.textInputlabel}>
+                    Address<Text style={{ color: "red" }}>*</Text>
+                </Text>
+                <TouchableOpacity onPress={handleOpenLocationPicker} style={[styles.textTnputView, { height: 100, flexDirection: "row",}]}>
+                    <View style={{height: '100%',width:"85%" }}>
+                        <TextInput
+                            onChangeText={onChangeAddress}
+                            value={productAddress}
+                            placeholder="Please Enter Address"
+                            keyboardType={'default'}
+                            style={{ height: '100%', textAlignVertical: 'top', padding: 10 }}
+                            multiline={true}
+                            numberOfLines={4}
+                        />
+                    </View>
+                    <View style={{justifyContent: 'center', alignItems: 'center' }}>
+                        <DetectLocation />
+                    </View>
+                </TouchableOpacity>
+
+                {/* <TextField
                     label='Address'
                     placeholder="Please Enter Address"
                     value={productAddress}
                     onChangeHandler={onChangeAddress}
                     keyboardType='default'
                     isRequired={true}
-                />
+                /> */}
                 <TextField
                     label='City'
                     placeholder="Please Enter City"
@@ -407,8 +455,8 @@ const GeneralDetails = () => {
             </View>
 
             {/* <Text style={{ fontFamily: 'InterRegular', color: '#5F6377', fontSize: 15, fontWeight: '600' }}>I Accept Terms and Conditions</Text> */}
-            <TouchableOpacity onPress={() => {onPressSaveAndPost()}} style={{padding:10,backgroundColor:'#FFF5E3',alignSelf:'center',borderRadius:5,borderColor:'#ECA73C',borderWidth:2,marginTop:40,bottom:20}}>
-                <Text style={{color:'#ECA73C'}}> Save & Post </Text>
+            <TouchableOpacity onPress={() => { onPressSaveAndPost() }} style={{ padding: 10, backgroundColor: '#FFF5E3', alignSelf: 'center', borderRadius: 5, borderColor: '#ECA73C', borderWidth: 2, marginTop: 40, bottom: 20 }}>
+                <Text style={{ color: '#ECA73C' }}> Save & Post </Text>
             </TouchableOpacity>
 
 
@@ -491,4 +539,19 @@ const styles = StyleSheet.create({
         height: 40,
         fontSize: 16,
     },
+    textInputlabel: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: 'bold',
+        color: themevariable.Color_000000,
+        fontSize: 15,
+        marginTop: 15
+    },
+    textTnputView: {
+        borderWidth: 1,
+        marginTop: 10,
+        borderColor: themevariable.Color_C8C8C6,
+        // paddingHorizontal:12,
+        borderRadius: 5,
+    }
+
 })
