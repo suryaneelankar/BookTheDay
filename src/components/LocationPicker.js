@@ -236,6 +236,7 @@ const LocationPicker = ({ onLocationSelected }) => {
             setPinCode(details.address_components.find(ac => ac.types.includes('postal_code')).long_name);
             setStreet(details.address_components.find(ac => ac.types.includes('route')).long_name);
           }}
+          onFail={(err) => {console.log('failed err is :>>',err)}}
           query={{
             key: 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo',
             language: 'en', // language of the results
@@ -244,6 +245,7 @@ const LocationPicker = ({ onLocationSelected }) => {
             textInput: styles.input,
           }}
         />
+        
 
         <Text style={{ color: "black", marginVertical: 5, paddingHorizontal: 5, marginTop: 0 }}>Land Mark</Text>
 
