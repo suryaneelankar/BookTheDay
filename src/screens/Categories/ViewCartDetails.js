@@ -102,7 +102,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
         setThankYouCardVisible(true)
       }
     } catch (error) {
-      console.error("Error during booking:", error);
+      console.error("Error during cloth jewel booking:", error);
     }
   }
 

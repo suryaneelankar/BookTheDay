@@ -62,7 +62,7 @@ const HallsBookingOverView = ({ route, navigation }) => {
 
           }
         } catch (error) {
-          console.error("Error during booking:", error);
+          console.error("Error during function hall booking:", error);
         }
       }
     

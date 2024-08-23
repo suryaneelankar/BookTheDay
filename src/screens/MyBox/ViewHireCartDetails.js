@@ -99,7 +99,7 @@ const ViewHireCartDetails = ({ navigation, route }) => {
         setThankYouCardVisible(true)
       }
     } catch (error) {
-      console.error("Error during booking:", error);
+      console.error("Error during cart booking:", error);
     }
   }
 

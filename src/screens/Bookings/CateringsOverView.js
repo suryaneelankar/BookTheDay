@@ -21,7 +21,7 @@ const CateringsOverView = ({ route, navigation }) => {
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
 
     const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
-    
+
   console.log("date is::::", bookingDate);
     useEffect(() => {
         getEventsDetails();
@@ -71,7 +71,7 @@ const CateringsOverView = ({ route, navigation }) => {
 
           }
         } catch (error) {
-          console.error("Error during booking:", error);
+          console.error("Error during food catering booking:", error);
         }
       }
     

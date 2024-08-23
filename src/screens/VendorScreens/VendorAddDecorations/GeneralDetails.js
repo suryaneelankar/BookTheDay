@@ -56,34 +56,8 @@ const GeneralDetails = () => {
     const [discountPercentage, setDiscountPercentage] = useState();
     const [overTimeCharges, setOverTimeCharges] = useState();
     const [selectedItemArray, setSelectedItemArray] = useState([]);
-    const [selectedFoodTypeItem, setSelectedFoodTypeItem] = useState('');
     const [itemPrices, setItemPrices] = useState({});
     const [selectedSeatingCapacity,setSelectedSeatingCapacity] = useState('');
-
-    const [rentalItemPricingDetails, setRentalItemPricingDetails] = useState({
-        "Tables with basic covers": [{ "itemName": "Tables with basic covers", "perDayPrice": 0 }],
-        "Chairs": [{ "itemName": "Chairs", "perDayPrice": 0 }],
-        "Restrooms/Toilets": [{ "itemName": "Restrooms/Toilets", "perDayPrice": 0 }],
-        "Parking": [{ "itemName": "Parking", "perDayPrice": 0 }],
-        "Wheelchair access": [{ "itemName": "Wheelchair access", "perDayPrice": 0 }],
-        "Coolers / Fans": [{ name: 'Coolers / Fans', icon: 'ios-flame' }],
-        "Air Conditioners": [{ name: 'Air Conditioners', icon: 'ios-restaurant' }],
-        "Power Backup/Generator": [{ name: 'Power Backup/Generator', icon: 'ios-snow' }],
-        "Bedrooms": [{ name: 'Bedrooms', icon: 'ios-cut' }],
-        "Lighting": [{ name: 'Lighting', icon: 'ios-basket' }],
-        "Kitchen Space": [{ name: 'Kitchen Space', icon: 'ios-cut' }],
-        "Bridal Room": [{ name: 'Bridal Room', icon: 'ios-basket' }],
-        "Sound/music license": [{ name: 'Sound/music license', icon: 'ios-volume-high' }]
-    });
-    const rows = [];
-
-    const foodTypes = [
-        { name: 'veg', icon: VegIcon },
-        { name: 'non-veg', icon: NonVegIcon },
-        { name: 'Both', icon: VegNonVegIcon }
-    ]
-
-    const seatingCapacity = ['0-100', '100-200','200-30', '300+']
 
     const decorTypes = [
         { name: 'Marriage' },
@@ -129,25 +103,6 @@ const GeneralDetails = () => {
         seteventOrgPinCode(value);
     }
 
-    const data = [
-        {
-            id: 0,
-            imageUrl: SelectedUploadIcon,
-        },
-        {
-            id: 1,
-            imageUrl: SelectedUploadIcon,
-        },
-        {
-            id: 2,
-            imageUrl: SelectedUploadIcon,
-        },
-        {
-            id: 3,
-            imageUrl: SelectedUploadIcon,
-        }
-    ]
-
     const openGalleryOrCamera = async () => {
         const options = {
             mediaType: 'photo',
@@ -167,78 +122,6 @@ const GeneralDetails = () => {
             }
         });
     };
-
-    const openGalleryOrCameraForAdditonalImages = async (index) => {
-        const options = {
-            mediaType: 'photo',
-            maxWidth: 1920,
-            maxHeight: 1920,
-            quality: 1,
-        };
-        launchImageLibrary(options, (response) => {
-            // console.log('Response = ', response);
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.errorCode) {
-                console.log('ImagePicker Error: ', response.errorMessage);
-            } else {
-                if (index == 0) {
-                    setAdditionalImages({ ...additionalImages, additionalImageOne: response });
-                } else if (index == 1) {
-                    setAdditionalImages({ ...additionalImages, additionalImageTwo: response });
-                } else if (index == 2) {
-                    setAdditionalImages({ ...additionalImages, additionalImageThree: response });
-                } else {
-                    setAdditionalImages({ ...additionalImages, additionalImageFour: response });
-                }
-            }
-        });
-    };
-
-    const ListItem = ({ item, index }) => {
-
-        return (
-            <TouchableOpacity style={styles.imageContainer} onPress={() => { openGalleryOrCameraForAdditonalImages(index) }}>
-                {additionalImages &&
-                    additionalImages?.additionalImageOne && index == 0 ?
-                    <Image
-                        source={{ uri: additionalImages?.additionalImageOne?.assets[0]?.uri }}
-                        width={Dimensions.get('window').width / 4.8}
-                        height={100}
-                        style={{ borderRadius: 5 }}
-                        resizeMode='cover'
-                    /> :
-                    additionalImages?.additionalImageTwo && index == 1 ?
-                        <Image
-                            source={{ uri: additionalImages?.additionalImageTwo?.assets[0]?.uri }}
-                            width={Dimensions.get('window').width / 4.8}
-                            height={100}
-                            style={{ borderRadius: 5 }}
-                            resizeMode='cover'
-                        />
-                        : additionalImages?.additionalImageThree && index == 2 ?
-                            <Image
-                                source={{ uri: additionalImages?.additionalImageThree?.assets[0]?.uri }}
-                                width={Dimensions.get('window').width / 4.8}
-                                height={100}
-                                style={{ borderRadius: 5 }}
-                                resizeMode='cover'
-                            />
-                            : additionalImages?.additionalImageFour && index == 3 ?
-                                <Image
-                                    source={{ uri: additionalImages?.additionalImageFour?.assets[0]?.uri }}
-                                    width={Dimensions.get('window').width / 4.8}
-                                    height={100}
-                                    style={{ borderRadius: 5 }}
-                                    resizeMode='cover'
-                                />
-                                :
-                                <item.imageUrl style={{}} width={Dimensions.get('window').width / 4.8} height={100} />
-                }
-
-            </TouchableOpacity>
-        )
-    }
 
     const handleDescriptionChange = (itemName, description) => {
         setItemDetails((prevState) => ({
@@ -261,10 +144,6 @@ const GeneralDetails = () => {
         }));
     };
 
-    console.log("items selected and entered:::::::", JSON.stringify(itemDetails))
-
-
-
     const onPressSaveAndPost = async () => {
         const vendorMobileNumber = vendorLoggedInMobileNum
         const formData = new FormData();
@@ -273,18 +152,6 @@ const GeneralDetails = () => {
             type: mainImageUrl?.assets[0]?.type,
             name: mainImageUrl?.assets[0]?.fileName,
         });
-
-        // formData.append('additionalImages', {
-        //     uri: additionalImages?.additionalImageOne?.assets[0]?.uri,
-        //     type: additionalImages?.additionalImageOne?.assets[0]?.type,
-        //     name: additionalImages?.additionalImageOne?.assets[0]?.fileName,
-        // });
-
-        // formData.append('additionalImages', {
-        //     uri: additionalImages?.additionalImageTwo?.assets[0]?.uri,
-        //     type: additionalImages?.additionalImageTwo?.assets[0]?.type,
-        //     name: additionalImages?.additionalImageTwo?.assets[0]?.fileName,
-        // });
 
         if (itemDetails?.Marriage) {
             itemDetails.Marriage.images.forEach((image, index) => {
@@ -368,69 +235,6 @@ const GeneralDetails = () => {
             console.log('Error', 'Failed to upload document');
         }
     }
-
-    const ItemList = () => {
-        const screenWidth = Dimensions.get('window').width;
-
-        // Function to render items in rows
-        const renderItemsInRows = () => {
-            const itemsPerRow = [];
-            let currentRow = [];
-            let currentRowWidth = 0;
-
-            selectedItemArray.forEach((itemName) => {
-                const itemWidth = measureTextWidth(itemName) + 20; // Add padding and margin
-
-                if (currentRowWidth + itemWidth > screenWidth) {
-                    itemsPerRow.push(currentRow);
-                    currentRow = [itemName];
-                    currentRowWidth = itemWidth;
-                } else {
-                    currentRow.push(itemName);
-                    currentRowWidth += itemWidth;
-                }
-            });
-
-            // Push the last row
-            if (currentRow.length > 0) {
-                itemsPerRow.push(currentRow);
-            }
-
-            return itemsPerRow;
-        };
-
-        // Function to measure text width (simplified, should be improved for real scenarios)
-        const measureTextWidth = (text) => {
-            // Adjust the base width as needed
-            return text.length * 10;
-        };
-
-        const itemsPerRow = renderItemsInRows();
-
-        return (
-            <View style={styles.amenitiesContainer}>
-                {itemsPerRow.map((row, rowIndex) => (
-                    <View key={rowIndex} style={styles.row}>
-                        {row.map((itemName, itemIndex) => {
-                            const itemDetails = rentalItemPricingDetails[itemName]?.[0];
-                            const price = itemDetails?.perDayPrice?.toString() || '';
-
-                            return (
-                                <View key={itemIndex} style={styles.itemContainer}>
-                                    <TouchableOpacity style={styles.itemButton}>
-                                        <Text style={styles.itemText}>{itemName}</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={() => addRentalItemOnPress(itemName)}>
-                                        <CrossIcon />
-                                    </TouchableOpacity>
-                                </View>
-                            );
-                        })}
-                    </View>
-                ))}
-            </View>
-        );
-    };
 
     const addRentalItemOnPress = (itemName) => {
         setSelectedItemArray((previous) => {
@@ -622,15 +426,7 @@ const GeneralDetails = () => {
                         <DetectLocation />
                     </View>
                 </TouchableOpacity>
-
-                {/* <TextField
-                    label='Address'
-                    placeholder="Please Enter Address"
-                    value={eventOrgAddress}
-                    onChangeHandler={onChangeEventOrganizerAddress}
-                    keyboardType='default'
-                    isRequired={true}
-                /> */}
+                
                 <TextField
                     label='City'
                     placeholder="Please Enter City"

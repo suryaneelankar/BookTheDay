@@ -86,7 +86,7 @@ const BookingOverView = ({ route, navigation }) => {
 
             }
         } catch (error) {
-            console.error("Error during booking:", error);
+            console.error("Error during tent hous booking:", error);
         }
     }
 

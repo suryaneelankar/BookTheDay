@@ -45,7 +45,7 @@ const LoginScreen = ({ route }) => {
 
             }
         } catch (error) {
-            console.error("Error during booking:", error);
+            console.error("Error during add user token :", error);
         }
     }
 
@@ -67,7 +67,7 @@ const LoginScreen = ({ route }) => {
                
             }
         } catch (error) {
-            console.error("Error during booking:", error);
+            console.error("Error during add vendor token:", error);
         }
     }
 

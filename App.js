@@ -48,7 +48,7 @@ const App = () => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       // Alert.alert('A new FCM message arrived in foreground mode', JSON.stringify(remoteMessage));
       console.log("remoted message is:::::::::", JSON.stringify(remoteMessage))
-      Alert.alert(remoteMessage);
+      Alert.alert(remoteMessage?.notification?.body);
       // setNotificationMessage(remoteMessage?.data?.user_relations_id)
       // setModalVisible(true);
     });

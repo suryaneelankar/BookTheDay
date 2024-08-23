@@ -65,7 +65,7 @@ const DecorsBookingOverView = ({ route, navigation }) => {
 
           }
         } catch (error) {
-          console.error("Error during booking:", error);
+          console.error("Error during decor booking:", error);
         }
       }
     
