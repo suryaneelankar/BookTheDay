@@ -115,13 +115,22 @@ const VendorDashBoardTab = ({ navigation }) => {
             // setVendorListings(response?.data?.posts);
 
             const result = response?.data?.posts.map(item => {
-                const catType = item.postId.catType;
+                const catType = item?.postId?.catType;
                 let productName = '';
 
                 if (catType === 'functionhall') {
                     productName = item.postId.functionHallName;
                 } else if (catType === 'tenthouse') {
                     productName = item.postId.tentHouseName;
+                }
+                else if (catType === 'clothjewels') {
+                    productName = item.postId.productName;
+                }
+                else if (catType === 'decoration') {
+                    productName = item.postId.eventOrganiserName;
+                }
+                else if (catType === 'catering') {
+                    productName = item.postId.foodCateringName;
                 }
 
                 return {

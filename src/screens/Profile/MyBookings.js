@@ -76,7 +76,7 @@ const getCateringsBookings = async () => {
             Authorization: `Bearer ${token}`,
           },
     });
-      console.log("Decors BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+      console.log("catering BOOKINGS RES:::::::::", JSON.stringify(response?.data))
       setCateringBookings(response?.data?.data)
   } catch (error) {
       console.log("My Bookings data error>>::", error);
@@ -91,7 +91,7 @@ const getHallsBookings = async () => {
             Authorization: `Bearer ${token}`,
           },
     });
-      console.log("Decors BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+      console.log("Funtional halls BOOKINGS RES:::::::::", JSON.stringify(response?.data))
       setHallsBookings(response?.data?.data)
   } catch (error) {
       console.log("My Bookings data error>>::", error);
@@ -106,7 +106,7 @@ const getTentHouseBookings = async () => {
             Authorization: `Bearer ${token}`,
           },
     });
-      console.log("Decors BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+      console.log("Tent house BOOKINGS RES:::::::::", JSON.stringify(response?.data))
       settentHouseBookings(response?.data?.data)
   } catch (error) {
       console.log("My Bookings data error>>::", error);
@@ -168,7 +168,7 @@ const getTentHouseBookings = async () => {
         data={decorsBookings}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        numColumns={2}
+        // numColumns={2}
       />
       <Text style={{color:"black", fontSize:14,marginVertical:10}}>
         Food Catering bookings
@@ -177,7 +177,7 @@ const getTentHouseBookings = async () => {
         data={cateringBookings}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        numColumns={2}
+        // numColumns={2}
       />
       <Text style={{color:"black", fontSize:14,marginVertical:10}}>
         Halls bookings
@@ -186,7 +186,7 @@ const getTentHouseBookings = async () => {
         data={hallsBookings}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        numColumns={2}
+        // numColumns={2}
       />
       <Text style={{color:"black", fontSize:14,marginVertical:10}}>
         Tent House bookings
@@ -195,7 +195,7 @@ const getTentHouseBookings = async () => {
         data={tentHouseBookings}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        numColumns={2}
+        // numColumns={2}
       />
     </View>
   );

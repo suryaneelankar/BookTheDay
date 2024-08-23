@@ -175,7 +175,7 @@ const UserLocationPicker = ({ onLocationSelected }) => {
   return (
     <View style={styles.container}>
 
-      
+
          <GooglePlacesAutocomplete
           placeholder="Search for an address"
           fetchDetails={true}
@@ -211,7 +211,7 @@ const UserLocationPicker = ({ onLocationSelected }) => {
             textInput: styles.input,
           }}
         />
-        
+
 
       {region ?
         <MapView
@@ -261,10 +261,9 @@ const UserLocationPicker = ({ onLocationSelected }) => {
           placeholder="Apartment"
         /> */}
 
-      
+
 
         {/* <Text style={{ color: "black", marginVertical: 5, paddingHorizontal: 5, marginTop: 0 }}>Land Mark</Text>
-
         <TextInput
           style={[styles.input, { marginTop: 0 }]}
           value={street}
