@@ -10,6 +10,7 @@ import themevariable from "../../utils/themevariable";
 import LinearGradient from "react-native-linear-gradient";
 import moment from "moment";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
+import { useSelector } from "react-redux";
 
 const BookingOverView = ({ route, navigation }) => {
 
@@ -17,6 +18,7 @@ const BookingOverView = ({ route, navigation }) => {
     const [bookingDetails, setBookingDetails] = useState([]);
     const [bookingDone, setBookingDone] = useState(false);
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
+    const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
 
     const rentalItemsArray = Object.entries(rentalItems).map(([key, value]) => ({
         name: key,
@@ -68,7 +70,8 @@ const BookingOverView = ({ route, navigation }) => {
             endDate: moment(endDate).format('DD MMMM YYYY'),
             numOfDays: numberOfDays,
             totalAmount: totalPrice.replace(/[^\d]/g, ''),
-            bookingItems: bookingItems
+            bookingItems: bookingItems,
+            userMobileNumber: userLoggedInMobileNum
         }
         console.log("payload is:::::::", payload);
         try {

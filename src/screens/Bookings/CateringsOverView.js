@@ -11,6 +11,7 @@ import LinearGradient from "react-native-linear-gradient";
 import Swiper from "react-native-swiper";
 import moment from "moment";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
+import { useSelector } from "react-redux";
 
 const CateringsOverView = ({ route, navigation }) => {
 
@@ -19,7 +20,8 @@ const CateringsOverView = ({ route, navigation }) => {
     const [bookingDone, setBookingDone] = useState(false);
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
 
-
+    const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
+    
   console.log("date is::::", bookingDate);
     useEffect(() => {
         getEventsDetails();
@@ -53,7 +55,8 @@ const CateringsOverView = ({ route, navigation }) => {
           endDate: bookingDate,
           numOfDays: 1,
           totalAmount: totalPrice.replace(/[^\d]/g, ''),
-          bookingMenuIds: transformedData
+          bookingMenuIds: transformedData,
+          userMobileNumber: userLoggedInMobileNum
         }
         console.log("payload is:::::::", payload);
         try {

@@ -14,6 +14,7 @@ import axios from 'axios';
 import { formatAmount } from '../../utils/GlobalFunctions';
 import moment from 'moment';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
+import { useSelector } from 'react-redux';
 
 const BookingDetailsScreen = ({ navigation, route }) => {
 
@@ -22,6 +23,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
   const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
   const [productDetails, setProductDetails] = useState();
   const [productImage, setProductImage] = useState();
+  const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
 
 
   const { catId, NumOfDays, isDayOrMonthly, startDate, endDate, monthlyPrice } = route.params;
@@ -87,7 +89,8 @@ const BookingDetailsScreen = ({ navigation, route }) => {
       startDate: moment(startDate).format('DD MMMM YYYY'),
       endDate: moment(endDate).format('DD MMMM YYYY'),
       numOfDays: NumOfDays,
-      totalAmount: calculateTotalPrice()
+      totalAmount: calculateTotalPrice(),
+      userMobileNumber: userLoggedInMobileNum
     }
     try {
       const bookingResponse = await axios.post(`${BASE_URL}/create-cloth-jewel-booking`, payload,{

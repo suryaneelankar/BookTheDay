@@ -7,6 +7,7 @@
 
 import React, { useEffect } from 'react';
 import {
+  Alert,
   StyleSheet,
 } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
@@ -42,6 +43,18 @@ const App = () => {
     const fcmToken = await messaging().getToken();
     console.log('token is ::>>',fcmToken);
   }
+
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      // Alert.alert('A new FCM message arrived in foreground mode', JSON.stringify(remoteMessage));
+      console.log("remoted message is:::::::::", JSON.stringify(remoteMessage))
+      Alert.alert(remoteMessage);
+      // setNotificationMessage(remoteMessage?.data?.user_relations_id)
+      // setModalVisible(true);
+    });
+
+    return unsubscribe;
+  }, []);
 
   return (
     <Provider store={store}>

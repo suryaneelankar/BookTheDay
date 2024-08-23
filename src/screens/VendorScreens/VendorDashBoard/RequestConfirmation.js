@@ -20,6 +20,7 @@ const RequestConfirmation = ({ navigation, route }) => {
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [wholeBookingData, setWholeBookingData] = useState([]);
+    const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
@@ -132,11 +133,12 @@ const RequestConfirmation = ({ navigation, route }) => {
         )
     }
 
-    const RequestConfirmationAcceptOrReject = async (bookingStatus) => {
+    const RequestConfirmationAcceptOrReject = async (bookingStatus, userMobileNumber) => {
         const updatedParams = {
             productId: productId,
             accepted: true,
-            bookingStatus: bookingStatus
+            bookingStatus: bookingStatus,
+            userMobileNumber: userMobileNumber
         }
         console.log('updatedParams is::>>', updatedParams);
         const token = await getVendorAuthToken();
@@ -152,15 +154,15 @@ const RequestConfirmation = ({ navigation, route }) => {
         }
     }
 
-    const callConfirmationWithStatus = (alertText) => {
+    const callConfirmationWithStatus = (alertText, userMobileNumber) => {
         if (alertText.includes('accept')) {
-            RequestConfirmationAcceptOrReject('approved')
+            RequestConfirmationAcceptOrReject('approved', userMobileNumber)
         } else {
-            RequestConfirmationAcceptOrReject('rejected');
+            RequestConfirmationAcceptOrReject('rejected', userMobileNumber);
         }
     }
 
-    const showAlert = (alertText) => {
+    const showAlert = (alertText, userMobileNumber) => {
         Alert.alert(
             "Confirmation",
             alertText,
@@ -170,7 +172,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                     onPress: () => console.log("No Pressed"),
                     style: "cancel"
                 },
-                { text: "Yes", onPress: () => callConfirmationWithStatus(alertText) }
+                { text: "Yes", onPress: () => callConfirmationWithStatus(alertText, userMobileNumber) }
             ],
             { cancelable: false }
         );
@@ -196,14 +198,15 @@ const RequestConfirmation = ({ navigation, route }) => {
                     </View>
                     <View style={{ alignItems: 'center', alignSelf: 'center' }}>
                         <TouchableOpacity style={{ alignItems: 'center', borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
-                            onPress={() => { showAlert("Are you sure you want to accept the order?") }}
+                            onPress={() => { showAlert("Are you sure you want to accept the order?", item?.userMobileNumber) }}
                         >
                             <AcceptIcon />
                             <Text style={{ color: "#57A64F", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Accept</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={{ alignItems: 'center', marginTop: 10, borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
-                            onPress={() => { showAlert("Are you sure you want to reject/cancel the order?") }}
+                            onPress={() => { showAlert("Are you sure you want to reject/cancel the order?", item?.userMobileNumber) }}
                         >
+                            
                             <RejectIcon />
                             <Text style={{ color: "#EF0000", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Reject</Text>
                         </TouchableOpacity>

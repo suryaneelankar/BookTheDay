@@ -179,37 +179,6 @@ const ViewDecors = ({ route, navigation }) => {
 
     console.log("added to cart is:::::::", JSON.stringify(addedItems))
 
-    const createFunctionHallBooking = async (eventId) => {
-
-        const bookingData = {
-            eventId: eventId,
-            startDate: selectedStartDate,
-            endDate: selectedEndDate,
-            totalAmount: noOfDays ? formatAmount(eventsDetails?.price * noOfDays) : formatAmount(eventsDetails?.price),
-            numOfDays: noOfDays
-        };
-
-        console.log('params data is::>>', bookingData);
-        const token = await getUserAuthToken();
-        try {
-            const response = await axios.post(`${BASE_URL}/create-event-booking`, bookingData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    "Authorization": `Bearer ${token}`,
-                }
-            });
-            console.log("event booking resp ::::::::::", response?.data?.data);
-
-            setBookingData(response?.data?.data);
-            if (response?.data?.status == 200) {
-                navigation.navigate('BookingOverView', { categoryId: categoryId })
-            }
-        } catch (error) {
-            console.log("event bookings api error::::::::::", error);
-        }
-    }
-
     function formatAmount(amount) {
         const amountStr = `${amount}`;
         const [integerPart, decimalPart] = amountStr.split('.');

@@ -166,7 +166,7 @@ const HomeDashboard = () => {
               email: 'bookthedaytechnologies@gmail.com',
               contact: '8297735285',
               name: 'Surya Neelankar',
-              method: 'upi',  // Pre-select UPI as the payment method
+            //   method: 'upi',  // Pre-select UPI as the payment method
               vpa: ''
             },
             theme: { color: '#FFDB7E' }
