@@ -71,10 +71,13 @@ import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.svg
 import ClothesCard from '../../assets/svgs/homeSwippers/home_shirtcard.svg';
 import RazorpayCheckout from 'react-native-razorpay';
 import { getUserAuthToken, getVendorAuthToken } from "../../utils/StoreAuthToken";
+import { getUserLocation } from "../../../redux/actions";
+import { useDispatch } from "react-redux";
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
     const [address, setAddress] = useState('');
+    const dispatch = useDispatch();
     const [eventsData, setEventsData] = useState([]);
     const [discountProducts, setDiscountProducts] = useState([]);
     const [newlyAddedProducts, setNewlyAddedProducts] = useState([]);
@@ -243,8 +246,10 @@ const HomeDashboard = () => {
                     )
                         .then(response => response.json())
                         .then(data => {
-                            // console.log("address is::::::", data)
+                            console.log("address is::::::", data)
                             setAddress(data?.address);
+                        dispatch(getUserLocation(data?.display_name));
+
                         })
                         .catch(error => {
                             console.error(error);

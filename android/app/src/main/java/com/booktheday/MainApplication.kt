@@ -10,6 +10,7 @@ import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
 import com.razorpay.rn.RazorpayPackage
+import com.dylanvann.fastimage.FastImageViewPackage;
 
 class MainApplication : Application(), ReactApplication {
 

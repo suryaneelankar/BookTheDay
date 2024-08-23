@@ -2,7 +2,8 @@
 const initialState = {
     userId: '',
     deviceFCMToken: '',
-    vendorLoggedInMobileNum: ''
+    vendorLoggedInMobileNum: '',
+    userLocation:'',
 }
 export const commonReducer = (state = initialState, action) => {
     switch (action.type) {
@@ -10,6 +11,12 @@ export const commonReducer = (state = initialState, action) => {
             return {
                 ...state,
                 userId: action.payload,
+               
+            };
+            case 'GET_USERLOCATION':
+            return {
+                ...state,
+                userLocation: action.payload,
                
             };
             case 'STORE_DEVICE_FCM_TOKEN':

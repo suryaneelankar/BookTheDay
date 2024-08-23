@@ -5,7 +5,7 @@ import MapView, { Marker } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import GetLocation from 'react-native-get-location'
 
-const LocationPicker = ({ onLocationSelected }) => {
+const UserLocationPicker = ({ onLocationSelected }) => {
   const [region, setRegion] = useState(null);
   const [address, setAddress] = useState('');
   const [apartment, setApartment] = useState('');
@@ -169,7 +169,7 @@ const LocationPicker = ({ onLocationSelected }) => {
       label,
       region,
     };
-    onLocationSelected(locationData, completeAddress);
+    onLocationSelected(locationData, completeAddress, label);
   };
 
   return (
@@ -253,24 +253,24 @@ const LocationPicker = ({ onLocationSelected }) => {
           multiline={true}
         />
 
-        <Text style={{ color: "black", marginVertical: 5, paddingHorizontal: 5 }}>Appartment</Text>
+        {/* <Text style={{ color: "black", marginVertical: 5, paddingHorizontal: 5 }}>Appartment</Text>
         <TextInput
           style={styles.input}
           value={apartment}
           onChangeText={setApartment}
           placeholder="Apartment"
-        />
+        /> */}
 
       
 
-        <Text style={{ color: "black", marginVertical: 5, paddingHorizontal: 5, marginTop: 0 }}>Land Mark</Text>
+        {/* <Text style={{ color: "black", marginVertical: 5, paddingHorizontal: 5, marginTop: 0 }}>Land Mark</Text>
 
         <TextInput
           style={[styles.input, { marginTop: 0 }]}
           value={street}
           onChangeText={setStreet}
           placeholder="LandMark"
-        />
+        /> */}
 
         <Text style={{ color: "black", marginVertical: 5, paddingHorizontal: 5 }}>Pincode</Text>
 
@@ -280,7 +280,7 @@ const LocationPicker = ({ onLocationSelected }) => {
           onChangeText={setPinCode}
           placeholder="Pin Code"
         />
-        {/* <View style={styles.labels}>
+        <View style={styles.labels}>
           <TouchableOpacity
             style={[styles.label, label === 'Home' && styles.selectedLabel]}
             onPress={() => setLabel('Home')}>
@@ -296,7 +296,7 @@ const LocationPicker = ({ onLocationSelected }) => {
             onPress={() => setLabel('Other')}>
             <Text>Other</Text>
           </TouchableOpacity>
-        </View> */}
+        </View>
         <TouchableOpacity style={styles.saveButton} onPress={saveLocation}>
           <Text style={styles.saveButtonText}>Save Location</Text>
         </TouchableOpacity>
@@ -354,4 +354,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LocationPicker;
+export default UserLocationPicker;
