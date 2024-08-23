@@ -2,7 +2,8 @@
 const initialState = {
     userId: '',
     deviceFCMToken: '',
-    vendorLoggedInMobileNum: ''
+    vendorLoggedInMobileNum: '',
+    userLoggedInMobileNum: ''
 }
 export const commonReducer = (state = initialState, action) => {
     switch (action.type) {
@@ -21,6 +22,11 @@ export const commonReducer = (state = initialState, action) => {
                 return {
                     ...state,
                     vendorLoggedInMobileNum: action.payload,
+                }
+            case 'GET_LOGGED_IN_USER_MOBILE_NUM':
+                return {
+                    ...state,
+                    userLoggedInMobileNum: action.payload
                 }
         default:
             return state;

@@ -10,6 +10,7 @@ import themevariable from "../../utils/themevariable";
 import LinearGradient from "react-native-linear-gradient";
 import Swiper from "react-native-swiper";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
+import { useSelector } from "react-redux";
 
 const DecorsBookingOverView = ({ route, navigation }) => {
 
@@ -17,7 +18,7 @@ const DecorsBookingOverView = ({ route, navigation }) => {
     const [bookingDetails, setBookingDetails] = useState([]);
     const [bookingDone, setBookingDone] = useState(false);
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
-
+    const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
   
 
     useEffect(() => {
@@ -48,7 +49,8 @@ const DecorsBookingOverView = ({ route, navigation }) => {
           endDate: bookingDate,
           numOfDays: 1,
           totalAmount: totalPrice.replace(/[^\d]/g, ''),
-          packageId: addedItems[0]?._id
+          packageId: addedItems[0]?._id,
+          userMobileNumber: userLoggedInMobileNum
         }
         console.log("payload is:::::::", payload);
         try {

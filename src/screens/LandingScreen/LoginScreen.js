@@ -5,7 +5,7 @@ import BookDatesButton from '../../components/GradientButton';
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL from '../../apiconfig';
 import axios from 'axios';
-import { getCurrentLoggedInVendorMobileNum, getLoginUserId } from '../../../redux/actions';
+import { getCurrentLoggedInVendorMobileNum,getCurrentLoggedInUserMobileNum, getLoginUserId } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { storeUserAuthToken,getVendorAuthToken, getUserAuthToken,storeVendorAuthToken } from '../../utils/StoreAuthToken';
 
@@ -96,6 +96,7 @@ const LoginScreen = ({ route }) => {
                     console.log('into USER LOGG');
                     storeUserDeviceToken();
                     dispatch(getLoginUserId(false));
+                    dispatch(getCurrentLoggedInUserMobileNum(phoneNumber));
                     storeUserAuthToken(logineRes?.data?.token);
                     navigation.navigate('Home');
                 }

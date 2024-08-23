@@ -225,7 +225,7 @@ const LocationPicker = ({ onLocationSelected }) => {
           onPress={(data, details = null) => {
             // 'details' is provided when fetchDetails = true
             const { lat, lng } = details.geometry.location;
-            console.log("details is:::::::::", details)
+            console.log("details is:::::::::",data, details)
             setSelectedLocation({ latitude: lat, longitude: lng });
             setRegion({
               latitude: lat,
