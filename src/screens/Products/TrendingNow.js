@@ -7,8 +7,9 @@ import Svg, { Path } from 'react-native-svg';
 import { horizontalScale, verticalScale } from "../../utils/scalingMetrics"
 import { LocalHostUrl } from "../../apiconfig";
 import { useNavigation } from "@react-navigation/native"
+import FastImage from "react-native-fast-image"
 
-const TrendingNow = ({ data, textHeader }) => {
+const TrendingNow = ({ data, textHeader , token}) => {
     const navigation = useNavigation();
     const [selectedDiscount, setSelectedDiscount] = useState('All')
 
@@ -52,7 +53,11 @@ const TrendingNow = ({ data, textHeader }) => {
             <View style={{}}>
                 <TouchableOpacity
                     style={{ width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginLeft: 16 }}>
-                    <Image resizeMode="contain" source={{ uri: updatedImgUrl }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '90%', alignSelf: "center", marginTop: 5, height: Dimensions.get('window').height / 5 }}
+                    <FastImage  source={{ uri: updatedImgUrl ,
+                        headers:{Authorization : `Bearer ${token}`}
+
+
+                    }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '90%', alignSelf: "center", marginTop: 5, height: Dimensions.get('window').height / 5 }}
                     />
                     <View style={{ marginTop: 15, marginHorizontal: 6 }}>
                         <Text numberOfLines={2} style={{ fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular' }}>{item?.productName}</Text>

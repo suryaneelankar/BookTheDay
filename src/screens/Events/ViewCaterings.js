@@ -45,6 +45,7 @@ const ViewCaterings = ({ route, navigation }) => {
     const [numPlates, setNumPlates] = useState({});
     // const [selectedIndex, SetSelectedIndex] = useState();
     const [selectedIndex, setSelectedIndex] = useState(null);
+    const [getUserAuth, setGetUserAuth] = useState('');
 
     const { categoryId } = route.params;
     console.log("CATEID I::::::", categoryId)
@@ -144,6 +145,7 @@ const ViewCaterings = ({ route, navigation }) => {
     const getCateringDetails = async () => {
         console.log("IAM CALLING API")
         const token = await getUserAuthToken();
+        setGetUserAuth(token);
         try {
             const response = await axios.get(`${BASE_URL}/getCateringDetailsById/${categoryId}`,{
                 headers: {
@@ -360,7 +362,9 @@ console.log("total price is:::::::::::::,",grandTotal)
                         style={{ flex: 1, alignSelf: "center", }}
                         renderItem={({ item }) => (
                             <View style={[{ width: Dimensions.get('window').width, height: 300 }]}>
-                                <Image source={{ uri: item }} style={styles.image}
+                                <Image source={{ uri: item,
+                                    headers:{Authorization : `Bearer ${getUserAuth}`}
+                                 }} style={styles.image}
                                     resizeMethod="auto"
                                     resizeMode="cover"
                                 />

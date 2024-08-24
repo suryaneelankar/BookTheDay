@@ -23,6 +23,7 @@ import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import LeftArrow from '../../assets/svgs/leftarrowWhite.svg';
 import moment from "moment";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
+import FastImage from "react-native-fast-image";
 
 const ViewCatDetails = ({ route }) => {
 
@@ -45,6 +46,7 @@ const ViewCatDetails = ({ route }) => {
         endDate: '',
     });
     const [numberOfDays, setNumberOfDays] = useState(0);
+    const [getUserAuth, setGetUserAuth] = useState('');
 
 
     useEffect(() => {
@@ -53,6 +55,7 @@ const ViewCatDetails = ({ route }) => {
 
     const getCategoriesDetails = async () => {
         const token = await getUserAuthToken();
+        setGetUserAuth(token);
         try {
             const response = await axios.get(`${BASE_URL}/getClothJewelsById/${catId}`,{
                 headers: {
@@ -181,7 +184,9 @@ const ViewCatDetails = ({ route }) => {
                     >
                         {specifcadditionalImages.map((item, index) => (
                             <View style={styles.slide} key={index}>
-                                <Image resizeMode="contain" source={{ uri: item.uri }} style={[styles.image, { width: viewportWidth * 0.9 }]} />
+                                <FastImage resizeMode="contain" source={{ uri: item?.uri,
+                                    headers:{Authorization : `Bearer ${getUserAuth}`}
+                                 }} style={[styles.image, { width: viewportWidth * 0.9 }]} />
                             </View>
                         ))}
                     </Swiper>

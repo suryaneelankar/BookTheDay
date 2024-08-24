@@ -73,14 +73,18 @@ import RazorpayCheckout from 'react-native-razorpay';
 import { getUserAuthToken, getVendorAuthToken } from "../../utils/StoreAuthToken";
 import { getUserLocation } from "../../../redux/actions";
 import { useDispatch } from "react-redux";
+import FastImage from "react-native-fast-image";
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
     const [address, setAddress] = useState('');
+    const [userToken, setUserToken] = useState('');
+
     const dispatch = useDispatch();
     const [eventsData, setEventsData] = useState([]);
     const [discountProducts, setDiscountProducts] = useState([]);
     const [newlyAddedProducts, setNewlyAddedProducts] = useState([]);
+    const [getUserAuth, setGetUserAuth] = useState('');
 
     const bannerImages = [
         { id: '1', image: JewelleryCard },
@@ -97,6 +101,8 @@ const HomeDashboard = () => {
         if (token) {
           // Use the token, e.g., include it in API requests
           console.log('Using stored token:', token);
+          setUserToken(token);  
+          return token;  
         } else {
           console.log('No User token found');
         }
@@ -105,7 +111,7 @@ const HomeDashboard = () => {
       
     someFunction();
     // vendorToken();
-
+    console.log("somefuntion res::::::;", someFunction())
 
     const CategoriesData = [
         { name: 'Clothes', image: CatClothes },
@@ -134,7 +140,13 @@ const HomeDashboard = () => {
         // getPermissions();
         getCategories();
         getAllEvents();
+        getUserAuthTokenRes();
     }, []);
+
+  const getUserAuthTokenRes = async () => {
+     const token = await getUserAuthToken();
+     console.log("usertoklen", token);
+  }
 
     const handlePayment = async () => {
         try {
@@ -209,6 +221,7 @@ const HomeDashboard = () => {
 
     const getCategories = async () => {
         const token = await getUserAuthToken();
+        setGetUserAuth(token);
         try {
             const response = await axios.get(`${BASE_URL}/getAllClothesJewels`,{
                 headers: {
@@ -312,7 +325,11 @@ const HomeDashboard = () => {
             <View style={{}}>
                 <TouchableOpacity
                     style={{ elevation: 5, width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginLeft: 16 }}>
-                    <Image resizeMode="contain" source={{ uri: updatedImgUrl }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '90%', alignSelf: "center", marginTop: 5, height: Dimensions.get('window').height / 5 }}
+                    <FastImage  source={{ uri: updatedImgUrl ,
+                    headers:{Authorization : `Bearer ${getUserAuth}`}
+
+
+                    }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '90%', alignSelf: "center", marginTop: 5, height: Dimensions.get('window').height / 5 }}
                     />
                     <View style={{ marginTop: 15, marginHorizontal: 6 }}>
                         <Text numberOfLines={2} style={{ fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular' }}>{item?.productName}</Text>
@@ -330,7 +347,7 @@ const HomeDashboard = () => {
     }
 
 
-    const renderItem = ({ item }) => {
+    const renderItem =  ({ item }) => {
 
         const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
         return (
@@ -338,8 +355,11 @@ const HomeDashboard = () => {
                 <TouchableOpacity
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
                     style={{ marginBottom: 5, elevation: 5, backgroundColor: "white", width: Dimensions.get('window').width / 1.3, alignSelf: 'center', borderRadius: 8, marginHorizontal: 16, marginTop: 15, height: 'auto' }}>
-                    <Image source={{ uri: updatedImgUrl }} style={{ borderRadius: 8, width: '95%', padding: 90, alignSelf: "center", marginTop: 8 }}
-                        resizeMode="stretch"
+                    <FastImage source={{ uri: updatedImgUrl ,
+                     headers: {Authorization :`Bearer ${getUserAuth}`}
+                    }} 
+                     style={{ borderRadius: 8, width: '95%', padding: 90, alignSelf: "center", marginTop: 8 }}
+                    //  resizeMode="stretch"
 
                     />
                     <View style={{ marginTop: 15, justifyContent: 'space-between', }}>

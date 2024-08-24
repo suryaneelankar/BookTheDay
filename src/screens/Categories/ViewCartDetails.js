@@ -15,6 +15,7 @@ import { formatAmount } from '../../utils/GlobalFunctions';
 import moment from 'moment';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
 import { useSelector } from 'react-redux';
+import FastImage from 'react-native-fast-image';
 
 const BookingDetailsScreen = ({ navigation, route }) => {
 
@@ -24,6 +25,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
   const [productDetails, setProductDetails] = useState();
   const [productImage, setProductImage] = useState();
   const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
+  const [getUserAuth, setGetUserAuth] = useState('');
 
 
   const { catId, NumOfDays, isDayOrMonthly, startDate, endDate, monthlyPrice } = route.params;
@@ -37,6 +39,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
   const getSelectedProductDetails = async () => {
     console.log("IAM CALLING INSIDE CART")
     const token = await getUserAuthToken();
+    setGetUserAuth(token);
     try {
       const response = await axios.get(`${BASE_URL}/getClothJewelsById/${catId}`,{
         headers: {
@@ -125,7 +128,9 @@ const BookingDetailsScreen = ({ navigation, route }) => {
 
       <View style={[styles.imgsection]}>
         <View style={styles.productContainer}>
-          <Image source={{ uri: productImage }} style={styles.productImage} resizeMode='cover' />
+          <FastImage source={{ uri: productImage,
+            headers:{Authorization : `Bearer ${getUserAuth}`}
+           }} style={styles.productImage}/>
           <View style={styles.productDetails}>
             <Text style={styles.productTitle}>{productDetails?.productName}</Text>
             <Text style={styles.productSubTitle}>Pink,{productDetails?.professionalImage?.size}</Text>

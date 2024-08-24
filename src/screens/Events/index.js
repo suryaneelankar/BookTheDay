@@ -14,6 +14,8 @@ import { verticalScale } from "../../utils/scalingMetrics";
 import TentHouseIcon from '../../assets/svgs/categories/home_tenthouseimage.svg';
 import CategoryFilter from "../../components/CategoryFilter";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import FastImage from "react-native-fast-image";
 
 const Events = () => {
     const navigation = useNavigation();
@@ -22,7 +24,7 @@ const Events = () => {
     const [decorationsData, setDecorationsData] = useState([]);
     const [cateringsData, setCateringsData] = useState([]);
 
-
+    const [getUserAuth, setGetUserAuth] = useState('');
     const [currentIndex, setCurrentIndex] = useState(0);
     const suggestions = ['Events', 'Function Hall', 'Food', 'Catering', 'Tent House', 'Decoration', 'Halls'];
     const Cats = [TentHouseIcon, TentHouseIcon, TentHouseIcon, TentHouseIcon];
@@ -63,6 +65,7 @@ const Events = () => {
 
     const getAllEvents = async () => {
         const token = await getUserAuthToken();
+        setGetUserAuth(token);
         try {
             const response = await axios.get(`${BASE_URL}/getAllFunctionHalls`,{
                 headers: {
@@ -114,12 +117,14 @@ const Events = () => {
                     Authorization: `Bearer ${token}`,
                   },
             });
-            // console.log('decorations response is::::::::', JSON.stringify(response?.data))
+            console.log('decorations response is::::::::', JSON.stringify(response?.data))
             setDecorationsData(response?.data)
         } catch (error) {
             console.log("decorations data error>>::", error);
         }
-    }
+    };
+
+    console.log("usertoken is::::::::", getUserAuth);
 
     const renderTentHouseItem = ({ item }) => {
 
@@ -146,7 +151,9 @@ const Events = () => {
                             <TouchableOpacity style={styles.slide} key={index}
                                 onPress={() => navigation.navigate('ViewTentHouse', { categoryId: item?._id })}
                             >
-                                <Image resizeMode="contain" source={{ uri: item }} style={styles.image} />
+                                <FastImage  source={{ uri: item ,   
+                                headers:{Authorization : `Bearer ${getUserAuth}`}
+                                }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
                     </Swiper>
@@ -199,8 +206,8 @@ const Events = () => {
         )
     }
 
-    const renderFoodCaterings = ({ item }) => {
-
+    const renderFoodCaterings =  ({ item }) => {
+    //    const token = await getUserAuthToken()
         const convertLocalhostUrls = (url) => {
             return url.replace("localhost", LocalHostUrl);
         };
@@ -224,7 +231,9 @@ const Events = () => {
                             <TouchableOpacity style={styles.slide} key={index}
                                 onPress={() => navigation.navigate('ViewCaterings', { categoryId: item?._id })}
                             >
-                                <Image resizeMode="contain" source={{ uri: item }} style={styles.image} />
+                                <FastImage source={{ uri: item, 
+                                    headers:{Authorization : `Bearer ${getUserAuth}`}
+                                }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
                     </Swiper>
@@ -300,7 +309,9 @@ const Events = () => {
                             <TouchableOpacity style={styles.slide} key={index}
                                 onPress={() => navigation.navigate('ViewTentHouse', { categoryId: item?._id })}
                             >
-                                <Image resizeMode="contain" source={{ uri: item }} style={styles.image} />
+                                <FastImage source={{ uri: item,
+                                 headers:{Authorization : `Bearer ${getUserAuth}`}
+                                 }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
                     </Swiper>
@@ -378,7 +389,9 @@ const Events = () => {
                             <TouchableOpacity style={styles.slide} key={index}
                                 onPress={() => navigation.navigate('ViewTentHouse', { categoryId: item?._id })}
                             >
-                                <Image resizeMode="contain" source={{ uri: item }} style={styles.image} />
+                                <FastImage  source={{ uri: item,
+                                 headers:{Authorization : `Bearer ${getUserAuth}`}
+                                 }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
                     </Swiper>

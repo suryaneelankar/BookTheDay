@@ -46,6 +46,7 @@ const ViewTentHouse = ({ route, navigation }) => {
         endDate: '',
     });
     const [numberOfDays, setNumberOfDays] = useState(0);
+    const [getUserAuth, setGetUserAuth] = useState('');
 
 
     const { categoryId } = route.params;
@@ -98,6 +99,7 @@ const ViewTentHouse = ({ route, navigation }) => {
     const getTentHouseDetails = async () => {
         console.log("IAM CALLING API")
         const token = await getUserAuthToken();
+        setGetUserAuth(token);
         try {
             const response = await axios.get(`${BASE_URL}/getTentHouseDetailsById/${categoryId}`,{
                 headers: {
@@ -275,7 +277,9 @@ const ViewTentHouse = ({ route, navigation }) => {
         const quantity = itemQuantities[item.itemName] || 0;
         return (
             <View style={styles.itemContainer}>
-                <Image source={{ uri: item?.image }} style={styles.itemImage} />
+                <Image source={{ uri: item?.image,
+                    headers:{Authorization : `Bearer ${getUserAuth}`}
+                 }} style={styles.itemImage} />
                 <View style={styles.itemDetails}>
                     <View style={{ flexDirection: "row", justifyContent: "space-between" }} >
                         <View>
@@ -321,7 +325,9 @@ const ViewTentHouse = ({ route, navigation }) => {
                         style={{ flex: 1, alignSelf: "center", }}
                         renderItem={({ item }) => (
                             <View style={[{ width: Dimensions.get('window').width, height: 300 }]}>
-                                <Image source={{ uri: item }} style={styles.image}
+                                <Image source={{ uri: item,
+                                    headers:{Authorization : `Bearer ${getUserAuth}`}
+                                 }} style={styles.image}
                                     resizeMethod="auto"
                                     resizeMode="cover"
                                 />

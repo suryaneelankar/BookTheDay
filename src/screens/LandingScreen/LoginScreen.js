@@ -34,6 +34,9 @@ const LoginScreen = ({ route }) => {
         }
         console.log("payload is:::::::", payload, type);
         const token = await getUserAuthToken();
+        console.log("LOgin screen sycan", token)
+        await AsyncStorage.setItem('userAuthToken', token);
+
         try {
             const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload,{
                 headers: {

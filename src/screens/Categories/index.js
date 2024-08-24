@@ -19,6 +19,7 @@ import Swiper from 'react-native-swiper';
 import EarRingsIcon from '../../assets/svgs/jewelleryCategories/earrings.svg';
 import ChainIcon from '../../assets/svgs/jewelleryCategories/chains.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
+import FastImage from "react-native-fast-image";
 
 const Categories = () => {
 
@@ -28,6 +29,8 @@ const Categories = () => {
     const [discountProducts, setDiscountProducts] = useState([]);
     const [jewelleryCategory, setJewelleryCategory] = useState([]);
     const [productYouMayLike, setProductYouMayLike] = useState([]);
+    const [getUserAuth, setGetUserAuth] = useState('');
+
     const bannerImages = [{ image: require('../../assets/svgs/productBanners/productBannerone.png') },
     { image: require('../../assets/svgs/productBanners/productBannerone.png') },
     { image: require('../../assets/svgs/productBanners/productBannerone.png') },
@@ -70,6 +73,7 @@ const Categories = () => {
 
     const getCategories = async () => {
         const token = await getUserAuthToken();
+        setGetUserAuth(token);
         try {
             const response = await axios.get(`${BASE_URL}/getAllClothesJewels`,{
                 headers: {
@@ -128,7 +132,9 @@ const Categories = () => {
             <View style={{}}>
                 <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })}
                     style={{ width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginLeft: 16 }}>
-                    <Image source={{ uri: updatedImgUrl }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '100%', height: Dimensions.get('window').height / 5 }}
+                    <FastImage source={{ uri: updatedImgUrl,
+                        headers:{Authorization : `Bearer ${getUserAuth}`}
+                     }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '100%', height: Dimensions.get('window').height / 5 }}
                     />
                     {item?.discountPercentage ?
                         <>
@@ -179,7 +185,9 @@ const Categories = () => {
         return (
             <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })} style={{ backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10 }}>
                 <View style={{ marginTop: 5, width: '100%', marginHorizontal: 5 }}>
-                    <Image style={{ width: '95%', height: 200, backgroundColor: 'red', borderRadius: 10 }} source={{ uri: updatedImgUrl }} resizeMode="cover" />
+                    <FastImage style={{ width: '95%', height: 200, backgroundColor: 'red', borderRadius: 10 }} source={{ uri: updatedImgUrl,
+                        headers:{Authorization : `Bearer ${getUserAuth}`}
+                     }}  />
                     <Text style={styles.productName}>{capitalizeFirstLetters(item?.productName)}</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, justifyContent: 'space-between', width: '90%', bottom: 5 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 }}>
@@ -261,7 +269,7 @@ const Categories = () => {
                     numColumns={2}
                     contentContainerStyle={{ alignSelf: "center", marginHorizontal: 10 }}
                     renderItem={renderClothesCat} />
-                <TrendingNow data={discountProducts} textHeader={'Trending Now'} />
+                <TrendingNow data={discountProducts} textHeader={'Trending Now'} token={getUserAuth} />
                 <HowItWorks />
             </ScrollView>
         </SafeAreaView>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, Modal, Alert, FlatList } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Alert, FlatList } from 'react-native';
 import BASE_URL from "../../../apiconfig";
 import axios from "axios";
 import { LocalHostUrl } from "../../../apiconfig";
@@ -13,6 +13,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { formatAmount } from "../../../utils/GlobalFunctions";
 import { useSelector } from "react-redux";
 import { getUserAuthToken, getVendorAuthToken } from "../../../utils/StoreAuthToken";
+import Modal from 'react-native-modal';
 
 const RequestConfirmation = ({ navigation, route }) => {
     const { productId, catEndPoint } = route?.params;
@@ -149,6 +150,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                 },
             });
             console.log("accept confirm response::::::::::", response?.data);
+            setIsVisible(true)
         } catch (error) {
             console.log("accept::::::::::", error);
         }
@@ -221,6 +223,56 @@ const RequestConfirmation = ({ navigation, route }) => {
 
     return (
         <View style={{ flex: 1 }}>
+
+             <Modal
+                isVisible={isVisible}
+                onBackdropPress={() => setIsVisible(false)}
+                backdropOpacity={0.9}
+                backdropColor={themevariable.Color_000000}
+                hideModalContentWhileAnimating={true}
+                animationOutTiming={500}
+                backdropTransitionInTiming={500}
+                backdropTransitionOutTiming={500}
+                animationInTiming={500}
+                style={{
+                    flex: 1,
+                }}
+                onBackButtonPress={() => {
+                    setIsVisible(false)
+                }}
+                animationOut={'slideOutDown'}
+                animationType={'slideInUp'}
+            >
+                <View style={styles.Thankcontainer}>
+                    <LinearGradient colors={['#D2453B', '#A0153E']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={{ width: "55%", padding: 4, }}>
+                        {/* <View style={{borderWidth:4, width:"50%", }}/> */}
+                    </LinearGradient>
+
+                    <View style={styles.iconContainer}>
+                        <View style={styles.iconBackground}>
+                            {/* <Image source={{ uri: 'thumbs_up_icon_url' }} style={styles.icon} /> */}
+
+                        </View>
+                    </View>
+                    <Text style={styles.title}>Thank You!</Text>
+                    <Text style={styles.description}>Our team will deliver the update to you in less than 2 hours</Text>
+                    <LinearGradient colors={['#D2453B', '#A0153E']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.doneButton}>
+                        <TouchableOpacity onPress={() => setIsVisible(false)}>
+                            <Text style={styles.doneButtonText}>Done</Text>
+                        </TouchableOpacity>
+                    </LinearGradient>
+                    <TouchableOpacity>
+                        <Text style={styles.trackProgressText}>Track your Booking Progress</Text>
+                    </TouchableOpacity>
+                </View>
+
+            </Modal>
             <Image style={{ width: '90%', alignSelf: 'center', height: 200, borderRadius: 10 }} source={{ uri: convertUrlToIp() }} resizeMode="contain" />
             <Text style={{ color: '#121212', width: '90%', alignSelf: 'center', fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 16, marginTop: 10 }}>Product Availability</Text>
 

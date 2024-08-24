@@ -36,6 +36,7 @@ const ViewEvents = ({ route, navigation }) => {
   const [isTimeSlotModalVisible, setTimeSlotModalVisible] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [amenitiesData, setAmenitiesData] = useState();
+  const [getUserAuth, setGetUserAuth] = useState('');
 
   const { categoryId } = route.params;
   console.log("CATEID I::::::", categoryId)
@@ -99,6 +100,7 @@ const ViewEvents = ({ route, navigation }) => {
 
   const getEventsDetails = async () => {
     const token = await getUserAuthToken();
+    setGetUserAuth(token);
     try {
       const response = await axios.get(`${BASE_URL}/getFunctionHallDetailsById/${categoryId}`,{
         headers: {
@@ -208,7 +210,9 @@ const ViewEvents = ({ route, navigation }) => {
             style={{ flex: 1, alignSelf: "center", }}
             renderItem={({ item }) => (
               <View style={[{ width: Dimensions.get('window').width, height: 300 }]}>
-                <Image source={{ uri: item }} style={styles.image}
+                <Image source={{ uri: item ,
+                   headers:{Authorization : `Bearer ${getUserAuth}`}
+                }} style={styles.image}
                   resizeMethod="auto"
                   resizeMode="cover"
                 />
