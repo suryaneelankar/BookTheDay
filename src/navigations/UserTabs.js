@@ -96,7 +96,7 @@ const Tab4Screen = ({ navigation }) => {
       />
 
  <Tab.Screen
-  name="Category"
+  name="Categories"
   component={Categories}
   options={{
     tabBarIcon: ({ focused }) => (

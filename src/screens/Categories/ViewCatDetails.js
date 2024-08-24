@@ -87,7 +87,7 @@ const ViewCatDetails = ({ route }) => {
           // If start date is not set or both dates are set, set the start date
           if (!startDate || (startDate && endDate)) {
             setSelectedRange({ startDate: day.dateString, endDate: '' });
-            setNumberOfDays(0); // Reset number of days when selecting a new start date
+            setNumberOfDays(1); // Reset number of days when selecting a new start date
           } else if (startDate && !endDate) {
             // Ensure the end date is after the start date
             if (moment(day.dateString).isAfter(moment(startDate))) {
@@ -118,6 +118,7 @@ const ViewCatDetails = ({ route }) => {
     //     }
     // };
 
+    console.log("numofDAYS IS::::::::::", numberOfDays)
     const getMarkedDates = () => {
         const { startDate, endDate } = selectedRange;
         if (!startDate) {

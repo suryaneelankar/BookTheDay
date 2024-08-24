@@ -76,9 +76,10 @@ const BookingDetailsScreen = ({ navigation, route }) => {
   };
 
   const calculateTotalPrice = () => {
+    // {isDayOrMonthly === 'daily' ? NumOfDays : 30}
     if (isDayOrMonthly === 'daily') {
-      const days = NumOfDays || 0;
-      const rentPricePerDay = productDetails?.rentPricePerDay || 0;
+      const days = NumOfDays;
+      const rentPricePerDay = productDetails?.rentPricePerDay;
       return days * rentPricePerDay;
     } else {
       return monthlyPrice;
@@ -254,7 +255,9 @@ const BookingDetailsScreen = ({ navigation, route }) => {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.doneButton}>
-            <TouchableOpacity onPress={() => setThankYouCardVisible(false)}>
+            <TouchableOpacity onPress={() => [setThankYouCardVisible(false),
+              navigation.navigate('Categories')
+            ]}>
               <Text style={styles.doneButtonText}>Done</Text>
             </TouchableOpacity>
           </LinearGradient>

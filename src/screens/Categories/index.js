@@ -269,7 +269,9 @@ const Categories = () => {
                     numColumns={2}
                     contentContainerStyle={{ alignSelf: "center", marginHorizontal: 10 }}
                     renderItem={renderClothesCat} />
+                 {discountProducts?.length ?
                 <TrendingNow data={discountProducts} textHeader={'Trending Now'} token={getUserAuth} />
+                 : null }
                 <HowItWorks />
             </ScrollView>
         </SafeAreaView>

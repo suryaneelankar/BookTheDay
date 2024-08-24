@@ -22,6 +22,7 @@ import ServiceTime from '../../assets/svgs/serviceTime.svg';
 import MinusIcon from '../../assets/svgs/minusIcon.svg';
 import AddIcon from '../../assets/svgs/addIcon.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
+import CustomModal from "../../components/AlertModal";
 
 const ViewCaterings = ({ route, navigation }) => {
 
@@ -46,6 +47,10 @@ const ViewCaterings = ({ route, navigation }) => {
     // const [selectedIndex, SetSelectedIndex] = useState();
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [getUserAuth, setGetUserAuth] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
+    const [missingTitle, setMissingTitle] = useState('');
+
 
     const { categoryId } = route.params;
     console.log("CATEID I::::::", categoryId)
@@ -147,12 +152,12 @@ const ViewCaterings = ({ route, navigation }) => {
         const token = await getUserAuthToken();
         setGetUserAuth(token);
         try {
-            const response = await axios.get(`${BASE_URL}/getCateringDetailsById/${categoryId}`,{
+            const response = await axios.get(`${BASE_URL}/getCateringDetailsById/${categoryId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
-            console.log("catering view details ::::::::::",JSON.stringify( response?.data));
+            console.log("catering view details ::::::::::", JSON.stringify(response?.data));
             setEventsDetails(response?.data);
 
             const imageUrls = response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
@@ -173,11 +178,11 @@ const ViewCaterings = ({ route, navigation }) => {
         return `₹${formattedAmount}`;
     };
 
-  const FoodItem = ({ item, onAdd, onDelete, addedItems, numPlates, setNumPlates, selectedIndex, setSelectedIndex, index }) => {
+    const FoodItem = ({ item, onAdd, onDelete, addedItems, numPlates, setNumPlates, selectedIndex, setSelectedIndex, index }) => {
         const isAdded = addedItems.some(addedItem => addedItem?._id === item?._id);
 
         return (
-            <View style={{ paddingHorizontal: 10, paddingVertical: 10, borderRadius:10,borderColor:"lightgray", borderWidth:1,marginVertical:10 }}>
+            <View style={{ paddingHorizontal: 10, paddingVertical: 10, borderRadius: 10, borderColor: "lightgray", borderWidth: 1, marginVertical: 10 }}>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <View style={{ width: "70%" }}>
                         <Text style={{ color: "#100D25", fontSize: 16, fontWeight: "400", fontFamily: 'ManropeRegular' }}>{item?.title}</Text>
@@ -207,13 +212,13 @@ const ViewCaterings = ({ route, navigation }) => {
 
                 {isAdded && (
                     <>
-                    <TextInput
-                        style={{ backgroundColor: "#F1F1F1", borderRadius:5 ,elevation:2,}}
-                        placeholder="Enter number of plates"
-                        keyboardType="numeric"
-                        value={numPlates[item.title]}
-                        onChangeText={(text) => setNumPlates({ ...numPlates, [item.title]: text })}
-                    />
+                        <TextInput
+                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2, }}
+                            placeholder="Enter number of plates"
+                            keyboardType="numeric"
+                            value={numPlates[item.title]}
+                            onChangeText={(text) => setNumPlates({ ...numPlates, [item.title]: text })}
+                        />
                     </>
                 )}
             </View>
@@ -328,23 +333,23 @@ const ViewCaterings = ({ route, navigation }) => {
 
     const calculateTotalPrice = (numOfPlates, addedItems) => {
         return addedItems.map(item => {
-          const numPlates = numOfPlates[item.title];
-          if (numPlates) {
-            return {
-              ...item,
-              totalPrice: numPlates * item.perPlateCost,
-            };
-          }
-          return item;
+            const numPlates = numOfPlates[item.title];
+            if (numPlates) {
+                return {
+                    ...item,
+                    totalPrice: numPlates * item.perPlateCost,
+                };
+            }
+            return item;
         });
-      };
-      const calculateGrandTotal = itemsWithTotalPrice => {
+    };
+    const calculateGrandTotal = itemsWithTotalPrice => {
         return itemsWithTotalPrice.reduce((sum, item) => sum + item.totalPrice, 0);
-      };
-      const itemsWithTotalPrice = calculateTotalPrice(numPlates, addedItems);
-  const grandTotal = calculateGrandTotal(itemsWithTotalPrice);
+    };
+    const itemsWithTotalPrice = calculateTotalPrice(numPlates, addedItems);
+    const grandTotal = calculateGrandTotal(itemsWithTotalPrice);
 
-console.log("total price is:::::::::::::,",grandTotal)
+    console.log("itemsWithTotalPrice is:::::::::::::,", itemsWithTotalPrice?.length)
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
             <ScrollView style={{ backgroundColor: "white", marginBottom: 30 }}>
@@ -362,9 +367,10 @@ console.log("total price is:::::::::::::,",grandTotal)
                         style={{ flex: 1, alignSelf: "center", }}
                         renderItem={({ item }) => (
                             <View style={[{ width: Dimensions.get('window').width, height: 300 }]}>
-                                <Image source={{ uri: item,
-                                    headers:{Authorization : `Bearer ${getUserAuth}`}
-                                 }} style={styles.image}
+                                <Image source={{
+                                    uri: item,
+                                    headers: { Authorization: `Bearer ${getUserAuth}` }
+                                }} style={styles.image}
                                     resizeMethod="auto"
                                     resizeMode="cover"
                                 />
@@ -548,13 +554,37 @@ console.log("total price is:::::::::::::,",grandTotal)
                     </View>
                 </Modal>
 
+                <CustomModal
+                    visible={modalVisible}
+                    message={modalMessage}
+                    onClose={() => setModalVisible(false)}
+                />
 
             </ScrollView>
 
             <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
                 <BookDatesButton
-                    onPress={() => navigation.navigate('CateringsOverView', { categoryId: categoryId, cateringItems: itemsWithTotalPrice, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `₹${grandTotal}` })}
-                    text={`₹${grandTotal}   View Cart`}
+                    onPress={() => 
+                    {
+                        const incompleteItem = itemsWithTotalPrice.find(item => !item.hasOwnProperty('totalPrice'));
+                          console.log("incomplete value::::::::", incompleteItem)
+                        if (incompleteItem) {
+                            // setMissingTitle(incompleteItem?.title);
+                            setModalMessage(`Please add the number of plates for ${incompleteItem.title}`);
+                            setModalVisible(true)
+                         }else if(selectedTimeSlot && selectedDate && itemsWithTotalPrice?.length !== 0){
+                        navigation.navigate('CateringsOverView', { categoryId: categoryId, cateringItems: itemsWithTotalPrice, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `₹${grandTotal}` })
+                        }  else if (itemsWithTotalPrice?.length === 0) {
+                            setModalMessage("Please select the Combo");
+                            setModalVisible(true);
+                          }  else if (!selectedDate) {
+                            setModalMessage("Please select the Dates");
+                            setModalVisible(true);
+                          } else if (!selectedTimeSlot) {
+                            setModalMessage("Please select the Time Slot");
+                            setModalVisible(true);
+                          }}}
+                    text={ itemsWithTotalPrice?.length > 0 ? `₹${grandTotal}   View Cart`: "View Cart"}
                     padding={10}
                 />
             </View>
