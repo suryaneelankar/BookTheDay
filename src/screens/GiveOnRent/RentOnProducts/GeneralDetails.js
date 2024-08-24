@@ -204,6 +204,21 @@ const GeneralDetails = () => {
     }
 
     const onPressSaveAndPost = async () => {
+
+        if(!mainImageUrl || productName === '' || productDescription === '' || productCity === ''||
+           ( perDayRentPrice === '' || perDayRentPrice === undefined)  || productAddress === '' || productPinCode === '' || (perMonthRentPrice === undefined || perMonthRentPrice === '') || (securityDeposit === undefined || securityDeposit === '')|| (advanceAmount === undefined || advanceAmount === '') || (discountPercentage === undefined || discountPercentage ==='')
+          ){
+            Alert.alert('Please fill Mandatory fields');
+            return;
+          }
+          for (const [key, value] of Object.entries(additionalImages)) {
+              if (value === undefined) {
+                  Alert.alert('Incomplete Details', `Please fill ${key.replace('additionalImage', 'Image ')}`);
+                  return;
+              }
+          }
+
+          
         const vendorMobileNumber = vendorLoggedInMobileNum
         const formData = new FormData();
         formData.append('professionalImage', {

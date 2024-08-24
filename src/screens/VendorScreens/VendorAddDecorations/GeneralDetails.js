@@ -266,7 +266,26 @@ const GeneralDetails = () => {
 
 
     const onPressSaveAndPost = async () => {
-        const vendorMobileNumber = vendorLoggedInMobileNum
+        if(!mainImageUrl || eventProviderName === '' || eventDescription === '' || eventOrgCity === ''||
+            eventOrgAddress === '' || eventOrgPinCode === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '') || (discountPercentage === undefined || discountPercentage ==='') || Object.keys(itemDetails)?.length === 0
+        ){
+          Alert.alert('Please fill Mandatory fields');
+          return;
+        }
+
+        for (const [key, value] of Object.entries(itemDetails)) {
+            if (
+                !value?.description ||
+                !value?.price ||
+                !value?.images ||
+                value?.images?.length !== 2
+            ) {
+                Alert.alert("Incomplete Details", `Please ensure ${key} has a description, price, and exactly 2 images.`);
+                return;
+            }
+        }
+
+        const vendorMobileNumber = vendorLoggedInMobileNum;
         const formData = new FormData();
         formData.append('professionalImage', {
             uri: mainImageUrl?.assets[0]?.uri,
