@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useCallback } from "react"; { }
-import { View, Text, SafeAreaView, Image, ScrollView, TouchableOpacity, Dimensions, StyleSheet, Animated, FlatList } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
+import { View, Text, SafeAreaView, Image, ScrollView,Alert, TouchableOpacity, Dimensions, StyleSheet, Animated, FlatList } from "react-native";
 import ProfileIcon from '../../../assets/vendorIcons/profileIcon.svg'
 import LinearGradient from "react-native-linear-gradient";
 import shirtImg from '../../../assets/shirt.png';
 import axios from "axios";
 import BASE_URL from "../../../apiconfig";
 import { LocalHostUrl } from "../../../apiconfig";
-import { formatAmount } from '../../../utils/GlobalFunctions';
+import { formatAmount,formatDate } from '../../../utils/GlobalFunctions';
 import ArrowRight from '../../../assets/vendorIcons/arrowRight.svg';
 import PersonOne from '../../../assets/vendorIcons/personOne.svg';
 import PersonTwo from '../../../assets/vendorIcons/personTwo.svg';
@@ -31,18 +31,7 @@ const VendorDashBoardTab = ({ navigation }) => {
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
-    console.log('vendorLoggedInMobileNum is ::>>', vendorLoggedInMobileNum);
-
-    // useEffect(() => {
-    //     getVendorClothJewelBookings();
-    //     getVendorDecorationBookings();
-    //     getVendorFunctionHallBookings();
-    //     getVendorTentHouseBookings();
-    //     getVendorFoodCateringBookings()
-
-    //     getVendorListings();
-    // }, [])
-
+    // console.log('vendorLoggedInMobileNum is ::>>', vendorLoggedInMobileNum);
 
     useFocusEffect(
         useCallback(() => {
@@ -95,13 +84,6 @@ const VendorDashBoardTab = ({ navigation }) => {
         },
     }
 
-    const returnVendorToekn = async () => {
-        const token = await getVendorAuthToken();
-        console.log("vendor token:::::::::", token);
-        return token;
-
-    }
-
     const getVendorListings = async () => {
         const vendorMobileNumber = vendorLoggedInMobileNum;
         const token = await getVendorAuthToken();
@@ -134,12 +116,15 @@ const VendorDashBoardTab = ({ navigation }) => {
                 }
 
                 return {
-                    _id: item._id,
+                    _id: response?.data?._id,
                     productName: productName,
-                    productImage: item.postId.professionalImage.url
+                    productImage: item.postId.professionalImage.url,
+                    particularPostId: item?.postId?._id,
+                    createdAt: response?.data?.createdAt
                 };
             });
             setVendorListings(result);
+            console.log('result is ::>>',result);
 
         } catch (error) {
             console.log("categories::::::::::", error);
@@ -237,12 +222,62 @@ const VendorDashBoardTab = ({ navigation }) => {
         }
     }
 
+    const deleteTheVendorPost = async (vendorId,postId) => {
+        const token = await getVendorAuthToken();
+        console.log('vendorId is:::',vendorId,postId);
+        try {
+            const response = await axios.delete(`${BASE_URL}/deleteVendorPost/${vendorId}/post/${postId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            console.log('response is:::>>',response)
+         if(response?.status == 200){
+            showSuccessAlert();
+            getVendorListings();
+         }
+        } catch (error) {
+            console.log("categories::::::::::", error);
+        }
+    }
+
+    const showConfirmationAlert = (vendorId,postId) => {
+        Alert.alert(
+            "Confirmation",
+            "Are you sure you want to delete the post?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("No Pressed"),
+                    style: "cancel"
+                },
+                { text: "Yes", onPress: () => deleteTheVendorPost(vendorId,postId) }
+            ],
+            { cancelable: false }
+        );
+    }
+
+    const showSuccessAlert = () => {
+        Alert.alert(
+            "Confirmation",
+            "Your post has been deleted successfully.",
+            [
+                {
+                    text: "Ok",
+                    onPress: () => console.log("No Pressed"),
+                    // style: "cancel"
+                },
+            ],
+            { cancelable: false }
+        );
+    }
+
     const renderVendorList = async ({ item }) => {
         const token = await getVendorAuthToken();
 
         const convertedImageUrl = item?.productImage !== undefined ? item?.productImage.replace('localhost', LocalHostUrl) : item?.productImage;
-        console.log('item?.professionalImage?.url is::>>>', convertedImageUrl);
-        console.log("token is:::::::", token);
+        console.log('items are is::>>>', item);
+        // console.log("token is:::::::", token);
         return (
             <TouchableOpacity style={{ backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10 }}>
                 <View style={{ marginTop: 5, width: '100%', marginHorizontal: 5 }}>
@@ -253,16 +288,17 @@ const VendorDashBoardTab = ({ navigation }) => {
                             uri: convertedImageUrl,
                             headers: { Authorization: `Bearer ${token}` }
                         }}
-                        // resizeMode={FastImage.resizeMode.cover}
                     />
                     {/* <Image style={{ width: '95%', height: 200, borderRadius: 10 }} source={{ uri: convertedImageUrl, headers: { Authorization: `Bearer ${token}` }, }} resizeMode="cover" /> */}
                     <Text style={styles.productName}>{capitalizeFirstLetters(item?.productName)}</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, justifyContent: 'space-between', width: '90%', bottom: 5 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 }}>
                             <ListedTimeIcon />
-                            <Text style={styles.price}>22 April</Text>
+                            <Text style={styles.price}>{formatDate(item?.createdAt)}</Text>
                         </View>
+                        <TouchableOpacity onPress={() => {showConfirmationAlert(item?._id,item?.particularPostId)}}>
                         <EditButton />
+                        </TouchableOpacity>
                     </View>
                 </View>
             </TouchableOpacity>
@@ -611,7 +647,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                 <FlatList
                     data={vendorListing}
                     renderItem={renderVendorList}
-                    contentContainerStyle={{ borderRadius: 15, margin: 15, bottom: 20 }}
+                    contentContainerStyle={{ borderRadius: 15, margin: 15, paddingBottom: 40 }}
                     numColumns={2}
                 />
             </ScrollView>

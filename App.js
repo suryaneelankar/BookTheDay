@@ -41,7 +41,7 @@ const App = () => {
 
   const getToken = async () => {
     const fcmToken = await messaging().getToken();
-    console.log('token is ::>>',fcmToken);
+    // console.log('token is ::>>',fcmToken);
   }
 
   useEffect(() => {

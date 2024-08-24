@@ -20,11 +20,10 @@ const RequestConfirmation = ({ navigation, route }) => {
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [wholeBookingData, setWholeBookingData] = useState([]);
-    const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
-    console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
+    // console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
 
     useEffect(() => {
         getProductDetails();

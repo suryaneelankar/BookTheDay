@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, Dimensions, ImageBackground, FlatList, PermissionsAndroid, Pressable, StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import Wedding from '../../assets/wedding.png';
@@ -73,6 +73,8 @@ import RazorpayCheckout from 'react-native-razorpay';
 import { getUserAuthToken, getVendorAuthToken } from "../../utils/StoreAuthToken";
 import { getUserLocation } from "../../../redux/actions";
 import { useDispatch } from "react-redux";
+import FastImage from 'react-native-fast-image';
+import { useFocusEffect } from "@react-navigation/native";
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
@@ -133,8 +135,20 @@ const HomeDashboard = () => {
     useEffect(() => {
         // getPermissions();
         getCategories();
-        getAllEvents();
+        // getAllEvents();
     }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            // Code to run when the screen is focused
+            getAllEvents();
+
+            // Cleanup function to run when the screen loses focus
+            return () => {
+                console.log('Screen is unfocused');
+            };
+        }, [])
+    );
 
     const handlePayment = async () => {
         try {
@@ -329,18 +343,26 @@ const HomeDashboard = () => {
         )
     }
 
-
+    // const renderVendorList = async ({ item }) => {
     const renderItem = ({ item }) => {
-
+        // const token = await getVendorAuthToken();
         const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
         return (
             <View style={{}}>
                 <TouchableOpacity
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
                     style={{ marginBottom: 5, elevation: 5, backgroundColor: "white", width: Dimensions.get('window').width / 1.3, alignSelf: 'center', borderRadius: 8, marginHorizontal: 16, marginTop: 15, height: 'auto' }}>
-                    <Image source={{ uri: updatedImgUrl }} style={{ borderRadius: 8, width: '95%', padding: 90, alignSelf: "center", marginTop: 8 }}
+                    {/* <Image source={{ uri: updatedImgUrl }} style={{ borderRadius: 8, width: '95%', padding: 90, alignSelf: "center", marginTop: 8 }}
                         resizeMode="stretch"
 
+                    /> */}
+                     <FastImage
+                        style={{ borderRadius: 8, width: '95%', padding: 90, alignSelf: "center", marginTop: 8 }}
+                        source={{
+                            uri: updatedImgUrl,
+                            headers: { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtb2JpbGVOdW1iZXIiOiI5MDEwMjAzMDQwIiwidXNlcklkIjoiNjZiYzRkYjc4NzRmNWQ3OGNlYTQ3NGEwIiwicm9sZSI6InVzZXIiLCJpYXQiOjE3MjQ0MjkzOTIsImV4cCI6MTcyNDQzMjk5Mn0._90_JwhJYwPpKzqKwOda_fCFmYd870TlWQ9FWqAf-Dw` }
+                        }}
+                        // resizeMode="contain"
                     />
                     <View style={{ marginTop: 15, justifyContent: 'space-between', }}>
 
