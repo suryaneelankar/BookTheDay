@@ -607,6 +607,29 @@ const GeneralDetails = () => {
     };
 
     const onPressSaveAndPost = async () => {
+        if(!mainImageUrl || foodCateringName === '' || cateringDescription === '' || cateringCity === ''||
+            cateringAddress === '' || cateringPincode === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '') || (discountPercentage === undefined || discountPercentage ==='') || finalCombomenu?.length === 0
+        ){
+          Alert.alert('Please fill Mandatory fields');
+          return;
+        }
+        for (const [key, value] of Object.entries(additionalImages)) {
+            if (value === undefined) {
+                Alert.alert('Incomplete Details', `Please fill ${key.replace('additionalImage', 'Image ')}`);
+                return;
+            }
+        }
+        finalCombomenu.forEach((obj) => {
+            console.log('Checking object:', obj);  // Debugging line to check object structure
+            
+            // Check if both minOrder and perPlateCost are 0
+            if (obj?.minOrder === 0 && obj?.perPlateCost === 0) {
+              Alert.alert('Please fill Mandatory fields', `Details missing for: ${obj.title}`);
+              return;
+            }
+          });
+
+        
         const vendorMobileNumber = vendorLoggedInMobileNum
         const formData = new FormData();
         formData.append('professionalImage', {

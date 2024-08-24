@@ -22,6 +22,7 @@ import ServiceTime from '../../assets/svgs/serviceTime.svg';
 import MinusIcon from '../../assets/svgs/minusIcon.svg';
 import AddIcon from '../../assets/svgs/addIcon.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
+import CustomModal from "../../components/AlertModal";
 
 const ViewDecors = ({ route, navigation }) => {
 
@@ -42,7 +43,8 @@ const ViewDecors = ({ route, navigation }) => {
     const [addedItems, setAddedItems] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
     const [getUserAuth, setGetUserAuth] = useState('');
-
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
 
     const { categoryId } = route.params;
     console.log("CATEID I::::::", categoryId)
@@ -140,10 +142,10 @@ const ViewDecors = ({ route, navigation }) => {
         setGetUserAuth(token);
         console.log('cat id::>> ',categoryId);
         try {
-            const response = await axios.get(`${BASE_URL}/getDecorationDetailsById/${categoryId}`,{
+            const response = await axios.get(`${BASE_URL}/getDecorationDetailsById/${categoryId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
             console.log("decorations view details ::::::::::", JSON.stringify(response?.data));
             setEventsDetails(response?.data);
@@ -178,7 +180,7 @@ const ViewDecors = ({ route, navigation }) => {
     useEffect(() => {
         const total = addedItems.reduce((sum, item) => sum + item.packagePrice, 0);
         setTotalPrice(total);
-      }, [addedItems]);
+    }, [addedItems]);
 
     console.log("added to cart is:::::::", JSON.stringify(addedItems))
 
@@ -253,8 +255,8 @@ const ViewDecors = ({ route, navigation }) => {
 
 
 
-    const RentalItem = ({ item , addItem, isAdded}) => {
-        console.log('getUserAuth i s::>>>',getUserAuth)
+    const RentalItem = ({ item, addItem, isAdded }) => {
+
         return (
             <View style={styles.itemContainer}>
                 <View style={{ width: Dimensions.get('window').width / 4, height: 100 }}>
@@ -268,8 +270,9 @@ const ViewDecors = ({ route, navigation }) => {
                         {item.packageImages.map((image, index) => (
                             <Image
                                 key={index}
-                                source={{ uri: image.url.replace('localhost', LocalHostUrl) ,
-                                    headers:{Authorization : `Bearer ${getUserAuth}`}
+                                source={{
+                                    uri: image.url.replace('localhost', LocalHostUrl),
+                                    headers: { Authorization: `Bearer ${getUserAuth}` }
                                 }}
                                 style={{
                                     width: '100%',
@@ -288,9 +291,9 @@ const ViewDecors = ({ route, navigation }) => {
                             <Text style={styles.itemPrice}><Text style={{ fontSize: 12, fontWeight: "400" }}></Text> ₹{item?.packagePrice}/-</Text>
                         </View>
 
-                        <View style={styles.quantityContainer}> 
+                        <View style={styles.quantityContainer}>
                             <TouchableOpacity onPress={() => addItem(item)}>
-                            <Text style={styles.addText}>{isAdded ? 'Added -' : 'ADD'}</Text>
+                                <Text style={styles.addText}>{isAdded ? 'Added -' : 'ADD'}</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -301,7 +304,6 @@ const ViewDecors = ({ route, navigation }) => {
             </View>
         );
     };
-
 
 
     return (
@@ -321,8 +323,9 @@ const ViewDecors = ({ route, navigation }) => {
                         style={{ flex: 1, alignSelf: "center", }}
                         renderItem={({ item }) => (
                             <View style={[{ width: Dimensions.get('window').width, height: 300 }]}>
-                                <Image source={{ uri: item ,
-                                    headers:{Authorization : `Bearer ${getUserAuth}`}
+                                <Image source={{
+                                    uri: item,
+                                    headers: { Authorization: `Bearer ${getUserAuth}` }
                                 }} style={styles.image}
                                     resizeMethod="auto"
                                     resizeMode="cover"
@@ -386,7 +389,7 @@ const ViewDecors = ({ route, navigation }) => {
                         <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{noOfDays > 1 ? `${noOfDays} days` : '1 day'}</Text>
                     </View>
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20,marginBottom:"20%" }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, marginBottom: "20%" }}>
 
                         <Text style={[styles.title, { marginTop: 10 }]}>Total Price :</Text>
                         <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{formatAmount(totalPrice)}</Text>
@@ -489,15 +492,34 @@ const ViewDecors = ({ route, navigation }) => {
                 </Modal>
 
 
+                <CustomModal
+                    visible={modalVisible}
+                    message={modalMessage}
+                    onClose={() => setModalVisible(false)}
+                />
+
             </ScrollView>
 
             <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
-        <BookDatesButton
-          onPress={() => navigation.navigate('DecorsBookingOverView', { categoryId: categoryId, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `${formatAmount(totalPrice)}`, addedItems: addedItems})}
-          text={` View Cart`}
-          padding={10}
-        />
-      </View>
+                <BookDatesButton
+                    onPress={() =>{
+                        if(selectedTimeSlot && selectedDate && addedItems?.length !== 0){
+                         navigation.navigate('DecorsBookingOverView', { categoryId: categoryId, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `${formatAmount(totalPrice)}`, addedItems: addedItems })              
+                        } else if (!selectedDate) {
+                            setModalMessage("Please select the Dates");
+                            setModalVisible(true);
+                          } else if (!selectedTimeSlot) {
+                            setModalMessage("Please select the Time Slot");
+                            setModalVisible(true);
+                          } else if (addedItems?.length === 0) {
+                            setModalMessage("Please select the Package");
+                            setModalVisible(true);
+                          }
+                    }}
+                    text={` View Cart`}
+                    padding={10}
+                />
+            </View>
             {/* <Text style={{ padding: 10, color: 'black', fontWeight: '600' }}>Total for {noOfDays} days</Text> */}
             {/* <View style={{ backgroundColor: 'white', flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
                 <TouchableOpacity style={{ backgroundColor: 'white', borderRadius: 8, padding: 10, borderColor: '#D2453B', borderWidth: 2, width: '45%' }}

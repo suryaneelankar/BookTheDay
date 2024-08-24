@@ -530,10 +530,12 @@ const HomeDashboard = () => {
                     </View>
                 </LinearGradient>
 
+               {discountProducts?.length > 0 ? 
+
                 <TrendingNow data={discountProducts} textHeader={'Live Offers!'} />
-
+                : 
+                null}
                 <View style={{ marginTop: 20, }}>
-
                     <FlatList
                         data={trendingData}
                         horizontal
@@ -544,6 +546,7 @@ const HomeDashboard = () => {
                     />
 
                 </View>
+                
                 {newlyAddedProducts?.length ?
                     <>
                         <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: 20 }}>
@@ -570,7 +573,7 @@ const HomeDashboard = () => {
                     {/* AddFunctionalHall */}
                     {/* AddFoodCatering */}
                     {/* AddDecorations */}
-                    <TouchableOpacity onPress={() => navigation.navigate('LandingScreen')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Events')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
                         <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
                         <RightArrowIcon width={25} height={25} />
                     </TouchableOpacity>

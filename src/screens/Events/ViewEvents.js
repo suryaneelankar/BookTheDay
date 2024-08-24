@@ -20,6 +20,7 @@ import LeftArrow from '../../assets/svgs/leftarrowWhite.svg';
 import BookDatesButton from "../../components/GradientButton";
 import ServiceTime from '../../assets/svgs/serviceTime.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
+import CustomModal from "../../components/AlertModal";
 
 const ViewEvents = ({ route, navigation }) => {
 
@@ -37,6 +38,8 @@ const ViewEvents = ({ route, navigation }) => {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [amenitiesData, setAmenitiesData] = useState();
   const [getUserAuth, setGetUserAuth] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   const { categoryId } = route.params;
   console.log("CATEID I::::::", categoryId)
@@ -426,12 +429,27 @@ const ViewEvents = ({ route, navigation }) => {
           </View>
         </Modal>
 
-
+        <CustomModal
+        visible={modalVisible}
+        message={modalMessage}
+        onClose={() => setModalVisible(false)}
+        />
       </ScrollView>
 
       <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
         <BookDatesButton
-          onPress={() => navigation.navigate('HallsBookingOverView', { categoryId: categoryId, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `${formatAmount(eventsDetails?.rentPricePerDay)}` })}
+        
+          onPress={() =>{
+            if(selectedTimeSlot && selectedDate){
+             navigation.navigate('HallsBookingOverView', { categoryId: categoryId, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `${formatAmount(eventsDetails?.rentPricePerDay)}` })
+            } else if (!selectedDate) {
+              setModalMessage("Please select the Dates");
+              setModalVisible(true);
+            } else if (!selectedTimeSlot) {
+              setModalMessage("Please select the Time Slot");
+              setModalVisible(true);
+            }
+          }}
           text={`${formatAmount(eventsDetails?.rentPricePerDay)} View Cart`}
           padding={10}
         />
