@@ -14,6 +14,7 @@ import { verticalScale } from "../../utils/scalingMetrics";
 import TentHouseIcon from '../../assets/svgs/categories/home_tenthouseimage.svg';
 import CategoryFilter from "../../components/CategoryFilter";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
+import FastImage from "react-native-fast-image";
 
 const Events = () => {
     const navigation = useNavigation();
@@ -22,7 +23,7 @@ const Events = () => {
     const [decorationsData, setDecorationsData] = useState([]);
     const [cateringsData, setCateringsData] = useState([]);
 
-
+    const [getUserAuth, setGetUserAuth] = useState('');
     const [currentIndex, setCurrentIndex] = useState(0);
     const suggestions = ['Events', 'Function Hall', 'Food', 'Catering', 'Tent House', 'Decoration', 'Halls'];
     const Cats = [TentHouseIcon, TentHouseIcon, TentHouseIcon, TentHouseIcon];
@@ -63,6 +64,7 @@ const Events = () => {
 
     const getAllEvents = async () => {
         const token = await getUserAuthToken();
+        setGetUserAuth(token);
         try {
             const response = await axios.get(`${BASE_URL}/getAllFunctionHalls`,{
                 headers: {
@@ -84,7 +86,7 @@ const Events = () => {
                     Authorization: `Bearer ${token}`,
                   },
             });
-            console.log('catering response is::::::::', JSON.stringify(response?.data));
+            // console.log('catering response is::::::::', JSON.stringify(response?.data));
             setCateringsData(response?.data)
         } catch (error) {
             console.log("caterings data error>>::", error);
@@ -114,12 +116,14 @@ const Events = () => {
                     Authorization: `Bearer ${token}`,
                   },
             });
-            // console.log('decorations response is::::::::', JSON.stringify(response?.data))
+            console.log('decorations response is::::::::', JSON.stringify(response?.data))
             setDecorationsData(response?.data)
         } catch (error) {
             console.log("decorations data error>>::", error);
         }
-    }
+    };
+
+    console.log("usertoken is::::::::", getUserAuth);
 
     const renderTentHouseItem = ({ item }) => {
 
@@ -142,11 +146,13 @@ const Events = () => {
                         activeDotStyle={{ width: 12, height: 12, borderRadius: 6 }}
                         dot={<View style={{ backgroundColor: '#FFFFFF', width: 8, height: 8, borderRadius: 6, marginHorizontal: 8 }} />}
                     >
-                        {imageUrls.map((item, index) => (
+                        {imageUrls.map((itemData, index) => (
                             <TouchableOpacity style={styles.slide} key={index}
                                 onPress={() => navigation.navigate('ViewTentHouse', { categoryId: item?._id })}
                             >
-                                <Image resizeMode="contain" source={{ uri: item }} style={styles.image} />
+                                <FastImage  source={{ uri: itemData ,   
+                                headers:{Authorization : `Bearer ${getUserAuth}`}
+                                }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
                     </Swiper>
@@ -199,8 +205,8 @@ const Events = () => {
         )
     }
 
-    const renderFoodCaterings = ({ item }) => {
-
+    const renderFoodCaterings =  ({ item }) => {
+    //    const token = await getUserAuthToken()
         const convertLocalhostUrls = (url) => {
             return url.replace("localhost", LocalHostUrl);
         };
@@ -220,11 +226,13 @@ const Events = () => {
                         activeDotStyle={{ width: 12, height: 12, borderRadius: 6 }}
                         dot={<View style={{ backgroundColor: '#FFFFFF', width: 8, height: 8, borderRadius: 6, marginHorizontal: 8 }} />}
                     >
-                        {imageUrls.map((item, index) => (
+                        {imageUrls.map((itemData, index) => (
                             <TouchableOpacity style={styles.slide} key={index}
                                 onPress={() => navigation.navigate('ViewCaterings', { categoryId: item?._id })}
                             >
-                                <Image resizeMode="contain" source={{ uri: item }} style={styles.image} />
+                                <FastImage source={{ uri: itemData, 
+                                    headers:{Authorization : `Bearer ${getUserAuth}`}
+                                }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
                     </Swiper>
@@ -296,23 +304,21 @@ const Events = () => {
                         activeDotStyle={{ width: 12, height: 12, borderRadius: 6 }}
                         dot={<View style={{ backgroundColor: '#FFFFFF', width: 8, height: 8, borderRadius: 6, marginHorizontal: 8 }} />}
                     >
-                        {imageUrls.map((item, index) => (
+                        {imageUrls.map((itemData, index) => (
                             <TouchableOpacity style={styles.slide} key={index}
-                                onPress={() => navigation.navigate('ViewTentHouse', { categoryId: item?._id })}
+                                onPress={() => navigation.navigate('ViewDecors', { categoryId: item?._id })}
                             >
-                                <Image resizeMode="contain" source={{ uri: item }} style={styles.image} />
+                                <FastImage source={{ uri: itemData,
+                                 headers:{Authorization : `Bearer ${getUserAuth}`}
+                                 }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
                     </Swiper>
                 </View>
                 <TouchableOpacity
                     onPress={() => {
-                        if (selectedCategory === 'Tent House') {
-                            navigation.navigate('ViewTentHouse', { categoryId: item?._id });
-                        } else if (selectedCategory === 'Decoration') {
                             navigation.navigate('ViewDecors', { categoryId: item?._id });
-                        }
-                    }} style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
+                        }} style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                         <View style={{ width: '60%', }}>
                             <Text style={{ color: 'black', fontSize: 17, fontWeight: "700", fontFamily: "ManropeRegular" }} >{item?.eventOrganiserName}</Text>
@@ -374,11 +380,13 @@ const Events = () => {
                         activeDotStyle={{ width: 12, height: 12, borderRadius: 6 }}
                         dot={<View style={{ backgroundColor: '#FFFFFF', width: 8, height: 8, borderRadius: 6, marginHorizontal: 8 }} />}
                     >
-                        {imageUrls.map((item, index) => (
+                        {imageUrls.map((itemData, index) => (
                             <TouchableOpacity style={styles.slide} key={index}
-                                onPress={() => navigation.navigate('ViewTentHouse', { categoryId: item?._id })}
+                                onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
                             >
-                                <Image resizeMode="contain" source={{ uri: item }} style={styles.image} />
+                                <FastImage  source={{ uri: itemData,
+                                 headers:{Authorization : `Bearer ${getUserAuth}`}
+                                 }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
                     </Swiper>
@@ -424,7 +432,22 @@ const Events = () => {
     }
 
 
-
+    const returnCategoriesCount = () => {
+        let count = 0;
+        if(selectedCategory === 'Tent House'){
+            count = tentHouseData?.length;
+            return count;
+        }else if(selectedCategory === 'Halls'){
+            count = eventsData?.length;
+            return count;
+        }else if (selectedCategory === 'Decoration'){
+            count = decorationsData?.length;
+            return count;
+        }else{
+            count = cateringsData?.length;
+            return count;
+        }
+    }
 
 
     return (
@@ -463,7 +486,7 @@ const Events = () => {
             </View> */}
             <View style={{ marginHorizontal: 20 }}>
                 <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
-                <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>243 Decoration Service in Bangalore</Text>
+                <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} {selectedCategory} Service in Hyderabad</Text>
             </View>
             {selectedCategory === 'Tent House' ?
 

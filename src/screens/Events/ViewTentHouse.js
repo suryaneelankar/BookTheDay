@@ -46,6 +46,7 @@ const ViewTentHouse = ({ route, navigation }) => {
         endDate: '',
     });
     const [numberOfDays, setNumberOfDays] = useState(0);
+    const [getUserAuth, setGetUserAuth] = useState('');
 
 
     const { categoryId } = route.params;
@@ -98,6 +99,7 @@ const ViewTentHouse = ({ route, navigation }) => {
     const getTentHouseDetails = async () => {
         console.log("IAM CALLING API")
         const token = await getUserAuthToken();
+        setGetUserAuth(token);
         try {
             const response = await axios.get(`${BASE_URL}/getTentHouseDetailsById/${categoryId}`,{
                 headers: {
@@ -275,13 +277,14 @@ const ViewTentHouse = ({ route, navigation }) => {
         const quantity = itemQuantities[item.itemName] || 0;
         return (
             <View style={styles.itemContainer}>
-                <Image source={{ uri: item?.image }} style={styles.itemImage} />
+                <Image source={{ uri: item?.image,
+                    headers:{Authorization : `Bearer ${getUserAuth}`}
+                 }} style={styles.itemImage} />
                 <View style={styles.itemDetails}>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between" }} >
+                    <View style={{ flexDirection: "row",justifyContent:'flex-start' }} >
                         <View>
                             <Text style={styles.itemName}>{item?.itemName}</Text>
-                            {/* <Text style={styles.itemPrice}><Text style={{fontSize:12, fontWeight:"400"}}>Per Hour</Text> ₹{item?.perHourPrice}/-</Text> */}
-                            <Text style={styles.itemPrice}><Text style={{ fontSize: 12, fontWeight: "400", }}>Per Day </Text>₹{item?.perDayPrice}/-</Text>
+                            <Text style={styles.itemPrice}><Text style={{ fontSize: 12, fontWeight: "400", }}>Per Day </Text>{formatAmount(item?.perDayPrice)}/-</Text>
                         </View>
 
                         <View style={styles.quantityContainer}>
@@ -321,7 +324,9 @@ const ViewTentHouse = ({ route, navigation }) => {
                         style={{ flex: 1, alignSelf: "center", }}
                         renderItem={({ item }) => (
                             <View style={[{ width: Dimensions.get('window').width, height: 300 }]}>
-                                <Image source={{ uri: item }} style={styles.image}
+                                <Image source={{ uri: item,
+                                    headers:{Authorization : `Bearer ${getUserAuth}`}
+                                 }} style={styles.image}
                                     resizeMethod="auto"
                                     resizeMode="cover"
                                 />
@@ -367,7 +372,7 @@ const ViewTentHouse = ({ route, navigation }) => {
                     <TouchableOpacity style={{ marginTop: 15, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }} onPress={() => setIsVisible(true)}>
                         <View style={{ alignItems: "center" }}>
                             <CalendarIcon />
-                            <Text style={{ fontSize: 12, fontFamily: 'ManropeRegular', fontWeight: "400" }}>{selectedDate ? 'Booking Date' : 'Select The Date'}</Text>
+                            <Text style={{ fontSize: 12, fontFamily: 'ManropeRegular', fontWeight: "400" }}>Select The Date</Text>
                         </View>
                         <View>
                         <Text style={[styles.title, { marginTop: 2 }]}>{selectedRange ? `${selectedRange?.startDate} to ${selectedRange?.endDate}`: null}</Text>
@@ -642,7 +647,7 @@ const styles = StyleSheet.create({
         fontWeight: '400',
         color: "#000000",
         fontFamily: 'ManropeRegular',
-
+        width:Dimensions.get('window').width/2.3
     },
     itemPrice: {
         fontSize: 13,
@@ -665,7 +670,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 10,
         paddingHorizontal: 10,
-        height: "50%"
+        height: 30
     },
     quantityText: {
         fontSize: 13,

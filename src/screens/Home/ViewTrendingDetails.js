@@ -14,7 +14,7 @@ const ViewTrendingDetails = ({ route }) => {
   const [selectedEndDate, setSelectedEndDate] = useState('');
   const [isCalendarVisible, setCalendarVisible] = useState(false);
   const [noOfDays, setNoOfDays] = useState();
-
+  const [getUserAuth, setGetUserAuth] = useState('')
 
   const { categoryId } = route.params;
   console.log("CATEID I::::::", categoryId)
@@ -26,6 +26,7 @@ const ViewTrendingDetails = ({ route }) => {
   const getCategoriesDetails = async () => {
     console.log("IAM CALLING API")
     const token = await getUserAuthToken();
+    getUserAuth(token);
     try {
       const response = await axios.get(`${BASE_URL}/getCategory/${categoryId}`,{
         headers: {
@@ -91,7 +92,9 @@ const ViewTrendingDetails = ({ route }) => {
           style={{ flex: 1, alignSelf: "center", marginTop: 10 }}
           renderItem={({ item }) => (
             <View style={[{ width: Dimensions.get('window').width, justifyContent: 'center', height: 400 }]}>
-              <Image source={{ uri: item }} style={styles.image}
+              <Image source={{ uri: item,
+                headers:{Authorization : `Bearer ${getUserAuth}`}
+               }} style={styles.image}
                 resizeMethod="auto"
                 resizeMode="contain"
               />

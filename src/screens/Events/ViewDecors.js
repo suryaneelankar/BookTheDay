@@ -41,6 +41,7 @@ const ViewDecors = ({ route, navigation }) => {
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
     const [addedItems, setAddedItems] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
+    const [getUserAuth, setGetUserAuth] = useState('');
 
 
     const { categoryId } = route.params;
@@ -134,8 +135,10 @@ const ViewDecors = ({ route, navigation }) => {
     }, []);
 
     const getDecorDetails = async () => {
-        console.log("IAM CALLING API")
+        console.log("IAM CALLING API Final test")
         const token = await getUserAuthToken();
+        setGetUserAuth(token);
+        console.log('cat id::>> ',categoryId);
         try {
             const response = await axios.get(`${BASE_URL}/getDecorationDetailsById/${categoryId}`,{
                 headers: {
@@ -251,7 +254,7 @@ const ViewDecors = ({ route, navigation }) => {
 
 
     const RentalItem = ({ item , addItem, isAdded}) => {
-
+        console.log('getUserAuth i s::>>>',getUserAuth)
         return (
             <View style={styles.itemContainer}>
                 <View style={{ width: Dimensions.get('window').width / 4, height: 100 }}>
@@ -265,7 +268,9 @@ const ViewDecors = ({ route, navigation }) => {
                         {item.packageImages.map((image, index) => (
                             <Image
                                 key={index}
-                                source={{ uri: image.url.replace('localhost', LocalHostUrl) }}
+                                source={{ uri: image.url.replace('localhost', LocalHostUrl) ,
+                                    headers:{Authorization : `Bearer ${getUserAuth}`}
+                                }}
                                 style={{
                                     width: '100%',
                                     height: "95%",
@@ -316,7 +321,9 @@ const ViewDecors = ({ route, navigation }) => {
                         style={{ flex: 1, alignSelf: "center", }}
                         renderItem={({ item }) => (
                             <View style={[{ width: Dimensions.get('window').width, height: 300 }]}>
-                                <Image source={{ uri: item }} style={styles.image}
+                                <Image source={{ uri: item ,
+                                    headers:{Authorization : `Bearer ${getUserAuth}`}
+                                }} style={styles.image}
                                     resizeMethod="auto"
                                     resizeMode="cover"
                                 />

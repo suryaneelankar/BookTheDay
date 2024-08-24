@@ -8,6 +8,7 @@ import themevariable from "../../utils/themevariable";
 import { formatAmount } from "../../utils/GlobalFunctions";
 import OfferStikcer from '../../assets/svgs/offerSticker.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
+import FastImage from "react-native-fast-image";
 
 const CategoriesList = ({ route }) => {
     const { catType,componentType } = route.params;
@@ -16,6 +17,7 @@ const CategoriesList = ({ route }) => {
     // console.log("final catetype:::::::::::", CategoryType)
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true); // Add loading state
+    const [getUserAuth, setGetUserAuth] = useState('');
 
     console.log("passed cat type ::::", catType, componentType)
 
@@ -25,6 +27,7 @@ const CategoriesList = ({ route }) => {
 
     const getCategories = async () => {
         const token = await getUserAuthToken();
+        setGetUserAuth(token);
         try {
             const response = await axios.get(`${BASE_URL}/getAllClothesJewels`,{
                 headers: {
@@ -86,7 +89,9 @@ const CategoriesList = ({ route }) => {
             <View style={{}}>
                 <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })}
                     style={{ elevation: 5, width: Dimensions.get('window').width / 2.2, margin: 5, borderRadius: 8, backgroundColor: 'white', height: 'auto' }}>
-                    <Image resizeMode="contain" source={{ uri: updatedImgUrl }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '100%', height: Dimensions.get('window').height / 5 }}
+                    <FastImage source={{ uri: updatedImgUrl,
+                        headers:{Authorization : `Bearer ${getUserAuth}`}
+                     }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '100%', height: Dimensions.get('window').height / 5 }}
                     />
                     {item?.discountPercentage ?
                         <>
