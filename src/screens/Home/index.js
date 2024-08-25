@@ -80,7 +80,7 @@ const HomeDashboard = () => {
     const [address, setAddress] = useState('');
     const [userToken, setUserToken] = useState('');
     const userLocationFetched = useSelector((state) => state.userLocation);
-
+    console.log("userlocation dispctahed:::::;;", userLocationFetched)
     const dispatch = useDispatch();
     const [eventsData, setEventsData] = useState([]);
     const [discountProducts, setDiscountProducts] = useState([]);
@@ -262,8 +262,8 @@ const HomeDashboard = () => {
                         .then(data => {
                             console.log("address is::::::", data)
                             setAddress(data?.address);
-                            dispatch(getUserLocation(data?.display_name));
-                            dispatch(setUserCurrentLocation(data?.display_name));
+                            dispatch(getUserLocation(data));
+                            dispatch(setUserCurrentLocation(data));
 
                         })
                         .catch(error => {
@@ -437,7 +437,7 @@ const HomeDashboard = () => {
                                     <LocationMarkIcon />
                                 </TouchableOpacity>
                                 <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={() => {navigation.navigate('LocationAdded')}}>
-                                    <Text numberOfLines={1} style={styles.retrievedLoc}>{userLocationFetched}</Text>
+                                    <Text numberOfLines={1} style={styles.retrievedLoc}>{userLocationFetched?.display_name ? userLocationFetched?.display_name : userLocationFetched?.address}</Text>
                                     <ArrowDown />
                                 </TouchableOpacity>
                             </View>

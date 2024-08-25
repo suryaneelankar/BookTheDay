@@ -126,11 +126,11 @@ const LocationAdded = () => {
     };
 
     const saveSelectedLoaction = () => {
-        if(selectedAddressVal?.address){
-            dispatch(getUserLocation(selectedAddressVal?.address))
-        }else{
+        // if(selectedAddressVal?.address){
+        //     dispatch(getUserLocation(selectedAddressVal?.address))
+        // }else{
             dispatch(getUserLocation(selectedAddressVal))
-        }
+        // }
     }
 
     return (
@@ -158,10 +158,11 @@ const LocationAdded = () => {
                 </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={[styles.locationItem,{borderColor: selectedCurrentAddress ? 'red' : '', borderWidth: selectedCurrentAddress ? 1 : 0, borderRadius: selectedCurrentAddress ? 10 : 0}]} onPress={() => {setSelectedAddressVal(userLocationFetched),setSelectedCurrentAddress(true)}}>
+            <TouchableOpacity style={[styles.locationItem,{borderColor: selectedCurrentAddress ? 'red' : '', borderWidth: selectedCurrentAddress ? 1 : 0, borderRadius: selectedCurrentAddress ? 10 : 0}]} 
+            onPress={() => {setSelectedAddressVal(userLocationFetched),setSelectedCurrentAddress(true)}}>
                 <View style={styles.locationTextContainer}>
                     <Text style={styles.locationText}>Use Current Location</Text>
-                    <Text style={styles.addressText}>{userLocationFetched}</Text>
+                    <Text style={styles.addressText}>{userLocationFetched?.display_name}</Text>
                 </View>
             </TouchableOpacity>
 
@@ -171,7 +172,8 @@ const LocationAdded = () => {
                 renderItem={({ item, index }) => {
                     const selectedId = selectedAddressId
                     return (
-                        <TouchableOpacity style={[styles.locationItem, { borderColor: selectedAddressId == item?._id ? 'red' : '', borderWidth: selectedAddressId == item?._id ? 1 : 0, borderRadius: selectedAddressId == item?._id ? 10 : 0 }]} onPress={() => { setSelectedAddressId(item?._id),setSelectedAddressVal(item) }}>
+                        <TouchableOpacity style={[styles.locationItem, { borderColor: selectedAddressId == item?._id ? 'red' : '', borderWidth: selectedAddressId == item?._id ? 1 : 0, borderRadius: selectedAddressId == item?._id ? 10 : 0 }]}
+                         onPress={() => { setSelectedAddressId(item?._id),setSelectedAddressVal(item) }}>
                             <View style={[styles.locationTextContainer, { flexDirection: "row", alignItems: "center" }]}>
                                 <View style={{ width: "85%" }} >
                                     <Text style={styles.locationText}>{item?.addressType}</Text>

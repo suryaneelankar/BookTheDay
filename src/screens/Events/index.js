@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions, FlatList, Pressable, SafeAreaView } from 'react-native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import SwiperFlatList from 'react-native-swiper-flatlist';
 import axios from "axios";
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../utils/GlobalFunctions';
 import SearchIcon from '../../assets/svgs/searchIcon.svg';
 import FilterIcon from '../../assets/svgs/filter.svg';
@@ -15,6 +15,7 @@ import TentHouseIcon from '../../assets/svgs/categories/home_tenthouseimage.svg'
 import CategoryFilter from "../../components/CategoryFilter";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
+import { useSelector } from "react-redux";
 
 const Events = () => {
     const navigation = useNavigation();
@@ -28,13 +29,111 @@ const Events = () => {
     const suggestions = ['Events', 'Function Hall', 'Food', 'Catering', 'Tent House', 'Decoration', 'Halls'];
     const Cats = [TentHouseIcon, TentHouseIcon, TentHouseIcon, TentHouseIcon];
     const [selectedCategory, setSelectedCategory] = useState('Tent House');
+    const userLocationFetched = useSelector((state) => state.userLocation);
+    console.log("user selevcted address is events::::::::", userLocationFetched)
 
-    useEffect(() => {
-        getAllEvents();
-        getTentHouse();
-        getDecorations();
-        getAllCaterings();
-    }, []);
+    
+
+    useFocusEffect(
+        useCallback(() => {
+            // Code to run when the screen is focused
+            getAllEvents();
+            getTentHouse();
+            getDecorations();
+            getAllCaterings();
+            // Cleanup function to run when the screen loses focus
+            return () => {
+                console.log('Screen is unfocused');
+            };
+        }, [userLocationFetched])
+    );
+
+    const MAX_DESTINATIONS_PER_BATCH = 25;
+
+    const splitArrayIntoChunks = (array, chunkSize) => {
+        const chunks = [];
+        for (let i = 0; i < array.length; i += chunkSize) {
+            chunks.push(array.slice(i, i + chunkSize));
+        }
+        return chunks;
+    };
+
+    const getDistanceMatrixForAll = async (origin, locations) => {
+        const locationChunks = splitArrayIntoChunks(locations, MAX_DESTINATIONS_PER_BATCH);
+        const allDistances = [];
+
+        for (const chunk of locationChunks) {
+            const distanceMatrix = await getDistanceMatrix(origin, chunk);
+            // console.log("Distance matrix is:::::::::", distanceMatrix);
+
+            if (distanceMatrix.status === "OK") {
+                const distances = distanceMatrix.rows[0].elements.map((element, index) => {
+                    if (element.status === "OK" && element.distance) {
+                        return {
+                            ...chunk[index],
+                            distanceText: element.distance.text,
+                            distanceValue: element.distance.value,
+                        };
+                    } else {
+                        console.warn(`Invalid distance data for destination: ${chunk[index].latitude}, ${chunk[index].longitude}`);
+                        return {};  // Return an empty object for invalid data
+                    }
+                });
+                allDistances.push(...distances);
+            } else {
+                console.error('Error in one of the batches:', distanceMatrix.status);
+            }
+        }
+
+        return allDistances;
+    };
+
+
+    const API_KEY = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo';
+
+    const getDistanceMatrix = async (origin, destinations) => {
+        const originStr = `${origin.latitude},${origin.longitude}`;
+        const destinationsStr = destinations
+            .map((dest) => `${dest.latitude},${dest.longitude}`)
+            .join('|');
+
+        const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=${originStr}&destinations=${destinationsStr}&key=${API_KEY}`;
+
+        try {
+            const response = await axios.get(url);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching Distance Matrix:', error);
+            throw error;
+        }
+    };
+
+    const sortLocationsByDistance = async (origin, locations, eventsData) => {
+        // console.log("events data receivedd is::::::::::;", eventsData);
+        try {
+            const allDistances = await getDistanceMatrixForAll(origin, locations);
+
+            const validDistances = allDistances.filter((distanceData) => {
+                return distanceData.distanceValue !== undefined;  // Filter out invalid distances
+            });
+
+            validDistances.sort((a, b) => a.distanceValue - b.distanceValue);
+
+            const sortedEventsData = validDistances.map(distanceData => {
+                const matchingEvent = eventsData.find(
+                    event => event.latitude === distanceData.latitude && event.longitude === distanceData.longitude
+                );
+                return { ...matchingEvent, ...distanceData };
+            });
+
+            return sortedEventsData;
+        } catch (error) {
+            console.error('Error sorting locations by distance:', error);
+        }
+    };
+
+
+
 
     const [text, setText] = useState('');
     const [filteredSuggestions, setFilteredSuggestions] = useState([]);
@@ -66,13 +165,29 @@ const Events = () => {
         const token = await getUserAuthToken();
         setGetUserAuth(token);
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls`,{
+            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
-            // console.log('events response is::::::::', response?.data?.data);
-            setEventsData(response?.data)
+            // console.log('events response is::::::::', response?.data);
+            // setEventsData(response?.data);
+         console.log("insdie events call::::;", userLocationFetched);
+            const origin = {
+                 latitude: userLocationFetched?.lat ?  userLocationFetched?.lat  :  userLocationFetched?.latitude ,
+                 longitude: userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude 
+                };
+
+
+                 console.log("origin avlues :::::::::::", origin)
+            const locations = response?.data.map(item => ({
+                latitude: item.latitude,
+                longitude: item.longitude,
+            }));
+            const sortedEvents = await sortLocationsByDistance(origin, locations, response?.data);
+            // console.log("soreted adat is:::::::::", sortedEvents)
+            setEventsData(sortedEvents);  // Set the sorted data
+
         } catch (error) {
             console.log("events data error>>::", error);
         }
@@ -81,10 +196,10 @@ const Events = () => {
     const getAllCaterings = async () => {
         const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFoodCaterings`,{
+            const response = await axios.get(`${BASE_URL}/getAllFoodCaterings`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
             // console.log('catering response is::::::::', JSON.stringify(response?.data));
             setCateringsData(response?.data)
@@ -96,10 +211,10 @@ const Events = () => {
     const getTentHouse = async () => {
         const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllTentHouses`,{
+            const response = await axios.get(`${BASE_URL}/getAllTentHouses`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
             // console.log('Tent house response is::::::::', JSON.stringify(response?.data))
             setTentHouseData(response?.data)
@@ -111,19 +226,19 @@ const Events = () => {
     const getDecorations = async () => {
         const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllDecorations`,{
+            const response = await axios.get(`${BASE_URL}/getAllDecorations`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
-            console.log('decorations response is::::::::', JSON.stringify(response?.data))
+            // console.log('decorations response is::::::::', JSON.stringify(response?.data))
             setDecorationsData(response?.data)
         } catch (error) {
             console.log("decorations data error>>::", error);
         }
     };
 
-    console.log("usertoken is::::::::", getUserAuth);
+    // console.log("usertoken is::::::::", getUserAuth);
 
     const renderTentHouseItem = ({ item }) => {
 
@@ -150,8 +265,9 @@ const Events = () => {
                             <TouchableOpacity style={styles.slide} key={index}
                                 onPress={() => navigation.navigate('ViewTentHouse', { categoryId: item?._id })}
                             >
-                                <FastImage  source={{ uri: itemData ,   
-                                headers:{Authorization : `Bearer ${getUserAuth}`}
+                                <FastImage source={{
+                                    uri: itemData,
+                                    headers: { Authorization: `Bearer ${getUserAuth}` }
                                 }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
@@ -205,8 +321,8 @@ const Events = () => {
         )
     }
 
-    const renderFoodCaterings =  ({ item }) => {
-    //    const token = await getUserAuthToken()
+    const renderFoodCaterings = ({ item }) => {
+        //    const token = await getUserAuthToken()
         const convertLocalhostUrls = (url) => {
             return url.replace("localhost", LocalHostUrl);
         };
@@ -230,8 +346,9 @@ const Events = () => {
                             <TouchableOpacity style={styles.slide} key={index}
                                 onPress={() => navigation.navigate('ViewCaterings', { categoryId: item?._id })}
                             >
-                                <FastImage source={{ uri: itemData, 
-                                    headers:{Authorization : `Bearer ${getUserAuth}`}
+                                <FastImage source={{
+                                    uri: itemData,
+                                    headers: { Authorization: `Bearer ${getUserAuth}` }
                                 }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
@@ -275,7 +392,7 @@ const Events = () => {
                                 <Text style={{ fontWeight: '600', color: '#4A4A4A', fontSize: 13, marginHorizontal: 5, fontFamily: "ManropeRegular" }}>Booked</Text>
                             }
                         </View>
-                       
+
                     </View>
                 </TouchableOpacity>
             </View>
@@ -290,8 +407,8 @@ const Events = () => {
         const imageUrls = item?.packages.flatMap(packageItem =>
             packageItem.packageImages.map(image => convertLocalhostUrls(image.url))
         );
-    
-        console.log("IMAGE URLS IS:::::::::::::", imageUrls)
+
+        // console.log("IMAGE URLS IS:::::::::::::", imageUrls)
         return (
             <View style={{ borderRadius: 20, marginHorizontal: 20, marginBottom: 5, elevation: -10 }}>
                 <View style={[styles.container]}>
@@ -308,17 +425,18 @@ const Events = () => {
                             <TouchableOpacity style={styles.slide} key={index}
                                 onPress={() => navigation.navigate('ViewDecors', { categoryId: item?._id })}
                             >
-                                <FastImage source={{ uri: itemData,
-                                 headers:{Authorization : `Bearer ${getUserAuth}`}
-                                 }} style={styles.image} />
+                                <FastImage source={{
+                                    uri: itemData,
+                                    headers: { Authorization: `Bearer ${getUserAuth}` }
+                                }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
                     </Swiper>
                 </View>
                 <TouchableOpacity
                     onPress={() => {
-                            navigation.navigate('ViewDecors', { categoryId: item?._id });
-                        }} style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
+                        navigation.navigate('ViewDecors', { categoryId: item?._id });
+                    }} style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                         <View style={{ width: '60%', }}>
                             <Text style={{ color: 'black', fontSize: 17, fontWeight: "700", fontFamily: "ManropeRegular" }} >{item?.eventOrganiserName}</Text>
@@ -366,11 +484,11 @@ const Events = () => {
         };
         // console.log("insdie render item")
         const imageUrls = item?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
-        console.log("image urls arrya:", imageUrls)
+        // console.log("image urls arrya:", imageUrls)
 
         return (
             <View style={{ borderRadius: 20, marginHorizontal: 20, marginBottom: 5, elevation: -10 }}>
-               <View style={[styles.container]}>
+                <View style={[styles.container]}>
                     <Swiper
                         style={styles.wrapper}
                         loop={false}
@@ -384,9 +502,10 @@ const Events = () => {
                             <TouchableOpacity style={styles.slide} key={index}
                                 onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
                             >
-                                <FastImage  source={{ uri: itemData,
-                                 headers:{Authorization : `Bearer ${getUserAuth}`}
-                                 }} style={styles.image} />
+                                <FastImage source={{
+                                    uri: itemData,
+                                    headers: { Authorization: `Bearer ${getUserAuth}` }
+                                }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
                     </Swiper>
@@ -410,7 +529,7 @@ const Events = () => {
                             </View> */}
                         </View>
                     </View>
-                    
+
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "50%" }}>
 
                         <View style={{ backgroundColor: item?.available ? "#FEF7DE" : "#FEF7DE", flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
@@ -425,6 +544,9 @@ const Events = () => {
                             <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} />
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> {item?.seatingCapacity}</Text>
                         </View>
+                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
+                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> {item?.distanceText}</Text>
+                        </View>
                     </View>
                 </TouchableOpacity>
             </View>
@@ -434,16 +556,16 @@ const Events = () => {
 
     const returnCategoriesCount = () => {
         let count = 0;
-        if(selectedCategory === 'Tent House'){
+        if (selectedCategory === 'Tent House') {
             count = tentHouseData?.length;
             return count;
-        }else if(selectedCategory === 'Halls'){
+        } else if (selectedCategory === 'Halls') {
             count = eventsData?.length;
             return count;
-        }else if (selectedCategory === 'Decoration'){
+        } else if (selectedCategory === 'Decoration') {
             count = decorationsData?.length;
             return count;
-        }else{
+        } else {
             count = cateringsData?.length;
             return count;
         }
@@ -451,7 +573,7 @@ const Events = () => {
 
 
     return (
-        <SafeAreaView style={{ flex: 1,marginBottom:"10%" }}>
+        <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
             <View style={{ backgroundColor: "white" }}>
                 <View style={styles.searchProduct}>
                     <View style={styles.searchProHeader}>
@@ -501,21 +623,21 @@ const Events = () => {
                         renderItem={renderItem}
                         keyExtractor={(item) => item._id}
                     />
-                    : 
+                    :
                     selectedCategory === 'Decoration' ?
-                    <FlatList
-                        data={decorationsData}
-                        renderItem={renderDecorationItem}
-                        keyExtractor={(item) => item._id}
-                    />
-                    : 
-                     selectedCategory === 'Catering' ?
-                     <FlatList
-                        data={cateringsData}
-                        renderItem={renderFoodCaterings}
-                        keyExtractor={(item) => item._id}
-                    />
-                    : null}
+                        <FlatList
+                            data={decorationsData}
+                            renderItem={renderDecorationItem}
+                            keyExtractor={(item) => item._id}
+                        />
+                        :
+                        selectedCategory === 'Catering' ?
+                            <FlatList
+                                data={cateringsData}
+                                renderItem={renderFoodCaterings}
+                                keyExtractor={(item) => item._id}
+                            />
+                            : null}
         </SafeAreaView>
     )
 }
