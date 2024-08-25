@@ -22,7 +22,7 @@ import ServiceTime from '../../assets/svgs/serviceTime.svg';
 import MinusIcon from '../../assets/svgs/minusIcon.svg';
 import AddIcon from '../../assets/svgs/addIcon.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
-import CustomModal from "../../components/AlertModal";
+// import CustomModal from "../../components/AlertModal";
 
 const ViewDecors = ({ route, navigation }) => {
 
@@ -293,7 +293,7 @@ const ViewDecors = ({ route, navigation }) => {
 
                         <View style={styles.quantityContainer}>
                             <TouchableOpacity onPress={() => addItem(item)}>
-                                <Text style={styles.addText}>{isAdded ? 'Added -' : 'ADD'}</Text>
+                                <Text style={styles.addText}>{isAdded ? 'Remove' : 'ADD'}</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -492,11 +492,11 @@ const ViewDecors = ({ route, navigation }) => {
                 </Modal>
 
 
-                <CustomModal
+                {/* <CustomModal
                     visible={modalVisible}
                     message={modalMessage}
                     onClose={() => setModalVisible(false)}
-                />
+                /> */}
 
             </ScrollView>
 
@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 8,
         paddingHorizontal: 10,
-        height: "50%"
+        height: "70%"
     },
     addText: {
         color: "#4E7B10",

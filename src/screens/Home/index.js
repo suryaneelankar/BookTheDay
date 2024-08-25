@@ -71,14 +71,15 @@ import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.svg
 import ClothesCard from '../../assets/svgs/homeSwippers/home_shirtcard.svg';
 import RazorpayCheckout from 'react-native-razorpay';
 import { getUserAuthToken, getVendorAuthToken } from "../../utils/StoreAuthToken";
-import { getUserLocation } from "../../../redux/actions";
-import { useDispatch } from "react-redux";
+import { getUserLocation,setUserCurrentLocation } from "../../../redux/actions";
+import { useDispatch,useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
     const [address, setAddress] = useState('');
     const [userToken, setUserToken] = useState('');
+    const userLocationFetched = useSelector((state) => state.userLocation);
 
     const dispatch = useDispatch();
     const [eventsData, setEventsData] = useState([]);
@@ -99,16 +100,16 @@ const HomeDashboard = () => {
     const someFunction = async () => {
         const token = await getUserAuthToken();
         if (token) {
-          // Use the token, e.g., include it in API requests
-          console.log('Using stored token:', token);
-          setUserToken(token);  
-          return token;  
+            // Use the token, e.g., include it in API requests
+            console.log('Using stored token:', token);
+            setUserToken(token);
+            return token;
         } else {
-          console.log('No User token found');
+            console.log('No User token found');
         }
-      };
-      
-      
+    };
+
+
     someFunction();
     // vendorToken();
     console.log("somefuntion res::::::;", someFunction())
@@ -143,75 +144,75 @@ const HomeDashboard = () => {
         getUserAuthTokenRes();
     }, []);
 
-  const getUserAuthTokenRes = async () => {
-     const token = await getUserAuthToken();
-     console.log("usertoklen", token);
-  }
+    const getUserAuthTokenRes = async () => {
+        const token = await getUserAuthToken();
+        console.log("usertoklen", token);
+    }
 
     const handlePayment = async () => {
         try {
-          // Fetch the order details from your backend
-          const response = await fetch(`${BASE_URL}/create-order`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              amount: 1, // Amount in INR
-              currency: 'INR',
-              receipt: 'receipt#1'
-            })
-          });
-          
-          const data = await response.json();
-          console.log('razor pay data is ::>>',data);
-          // Start the Razorpay payment process
-          var options = {
-            description: 'Test Transaction',
-            image: 'https://your-logo-url.com/logo.png',
-            currency: data.currency,
-            key: 'rzp_test_SFQjGVsyEZ2P05', // Your Razorpay Key ID
-            amount: data.amount, // Amount in smallest currency unit
-            order_id: data.orderId, // Order ID returned from backend
-            name: 'Book the day',
-            prefill: {
-              email: 'bookthedaytechnologies@gmail.com',
-              contact: '8297735285',
-              name: 'Surya Neelankar',
-            //   method: 'upi',  // Pre-select UPI as the payment method
-              vpa: ''
-            },
-            theme: { color: '#FFDB7E' }
-          };
-
-          console.log('options is::>>',options)
-    
-          RazorpayCheckout.open(options)
-            .then((paymentData) => {
-              // Success callback
-              Alert.alert(`Success: ${paymentData.razorpay_payment_id}`);
-              // Verify the payment on the server-side
-              console.log('success resp::>>',paymentData);
-            //   verifyPayment(paymentData);
-            })
-            .catch((error) => {
-              // Failure callback
-              Alert.alert(`Error: ${error.code} | ${error.description}`);
-              console.error(error);
+            // Fetch the order details from your backend
+            const response = await fetch(`${BASE_URL}/create-order`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    amount: 1, // Amount in INR
+                    currency: 'INR',
+                    receipt: 'receipt#1'
+                })
             });
+
+            const data = await response.json();
+            console.log('razor pay data is ::>>', data);
+            // Start the Razorpay payment process
+            var options = {
+                description: 'Test Transaction',
+                image: 'https://your-logo-url.com/logo.png',
+                currency: data.currency,
+                key: 'rzp_test_SFQjGVsyEZ2P05', // Your Razorpay Key ID
+                amount: data.amount, // Amount in smallest currency unit
+                order_id: data.orderId, // Order ID returned from backend
+                name: 'Book the day',
+                prefill: {
+                    email: 'bookthedaytechnologies@gmail.com',
+                    contact: '8297735285',
+                    name: 'Surya Neelankar',
+                    //   method: 'upi',  // Pre-select UPI as the payment method
+                    vpa: ''
+                },
+                theme: { color: '#FFDB7E' }
+            };
+
+            console.log('options is::>>', options)
+
+            RazorpayCheckout.open(options)
+                .then((paymentData) => {
+                    // Success callback
+                    Alert.alert(`Success: ${paymentData.razorpay_payment_id}`);
+                    // Verify the payment on the server-side
+                    console.log('success resp::>>', paymentData);
+                    //   verifyPayment(paymentData);
+                })
+                .catch((error) => {
+                    // Failure callback
+                    Alert.alert(`Error: ${error.code} | ${error.description}`);
+                    console.error(error);
+                });
         } catch (error) {
-          console.error(error);
-          Alert.alert('Error', 'Something went wrong');
+            console.error(error);
+            Alert.alert('Error', 'Something went wrong');
         }
-      };
+    };
 
     const getAllEvents = async () => {
         const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls`,{
+            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
             setEventsData(response?.data)
         } catch (error) {
@@ -223,10 +224,10 @@ const HomeDashboard = () => {
         const token = await getUserAuthToken();
         setGetUserAuth(token);
         try {
-            const response = await axios.get(`${BASE_URL}/getAllClothesJewels`,{
+            const response = await axios.get(`${BASE_URL}/getAllClothesJewels`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
             // console.log("Products res:::::::", JSON.stringify(response?.data))
             setCategories(response?.data)
@@ -261,7 +262,8 @@ const HomeDashboard = () => {
                         .then(data => {
                             console.log("address is::::::", data)
                             setAddress(data?.address);
-                        dispatch(getUserLocation(data?.display_name));
+                            dispatch(getUserLocation(data?.display_name));
+                            dispatch(setUserCurrentLocation(data?.display_name));
 
                         })
                         .catch(error => {
@@ -281,7 +283,7 @@ const HomeDashboard = () => {
             const granted = await PermissionsAndroid.request(
                 PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
                 {
-                    title: 'APP location permission',
+                    title: 'BookTheDay location permission',
                     message: 'App needs location Permissions',
                     buttonNeutral: 'Ask Me Later',
                     buttonNegative: 'Cancel',
@@ -291,7 +293,7 @@ const HomeDashboard = () => {
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                 getLocation()
             } else {
-                Alert.alert("Location persmiion denied")
+                Alert.alert("Location permissions denied")
             }
         } catch (err) {
             // console.warn(err)
@@ -325,8 +327,9 @@ const HomeDashboard = () => {
             <View style={{}}>
                 <TouchableOpacity
                     style={{ elevation: 5, width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginLeft: 16 }}>
-                    <FastImage  source={{ uri: updatedImgUrl ,
-                    headers:{Authorization : `Bearer ${getUserAuth}`}
+                    <FastImage source={{
+                        uri: updatedImgUrl,
+                        headers: { Authorization: `Bearer ${getUserAuth}` }
 
 
                     }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '90%', alignSelf: "center", marginTop: 5, height: Dimensions.get('window').height / 5 }}
@@ -347,7 +350,7 @@ const HomeDashboard = () => {
     }
 
 
-    const renderItem =  ({ item }) => {
+    const renderItem = ({ item }) => {
 
         const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
         return (
@@ -355,10 +358,11 @@ const HomeDashboard = () => {
                 <TouchableOpacity
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
                     style={{ marginBottom: 5, elevation: 5, backgroundColor: "white", width: Dimensions.get('window').width / 1.3, alignSelf: 'center', borderRadius: 8, marginHorizontal: 16, marginTop: 15, height: 'auto' }}>
-                    <FastImage source={{ uri: updatedImgUrl ,
-                     headers: {Authorization :`Bearer ${getUserAuth}`}
-                    }} 
-                     style={{ borderRadius: 8, width: '95%', padding: 90, alignSelf: "center", marginTop: 8 }}
+                    <FastImage source={{
+                        uri: updatedImgUrl,
+                        headers: { Authorization: `Bearer ${getUserAuth}` }
+                    }}
+                        style={{ borderRadius: 8, width: '95%', padding: 90, alignSelf: "center", marginTop: 8 }}
                     />
                     <View style={{ marginTop: 15, justifyContent: 'space-between', }}>
 
@@ -427,12 +431,16 @@ const HomeDashboard = () => {
                     <View style={styles.topContainer}>
                         <View style={styles.locationContainer}>
                             <Text style={styles.currentLoc}>Your current location</Text>
-                            <TouchableOpacity onPress={getLocation} style={styles.getLoc}>
-                                <LocationMarkIcon />
-
-                                <Text style={styles.retrievedLoc}>{address?.neighbourhood}, {address?.city}</Text>
-                                <ArrowDown />
-                            </TouchableOpacity>
+                            {/* navigation.navigate('LocationAdded') */}
+                            <View style={{ flexDirection: 'row',alignItems:'center' }}>
+                                <TouchableOpacity onPress={() => getLocation()} style={styles.getLoc}>
+                                    <LocationMarkIcon />
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={() => {navigation.navigate('LocationAdded')}}>
+                                    <Text numberOfLines={1} style={styles.retrievedLoc}>{userLocationFetched}</Text>
+                                    <ArrowDown />
+                                </TouchableOpacity>
+                            </View>
                         </View>
                         <Pressable onPress={() => navigation.navigate('ProfileScreen')}>
                             <FontAwesome name={"user-circle"} color={"#000000"} size={35} />
@@ -452,7 +460,7 @@ const HomeDashboard = () => {
                             <FilterIcon />
                         </View>
                     </View>
-                    <TouchableOpacity onPress={() => {handlePayment()}}>
+                    <TouchableOpacity onPress={() => { handlePayment() }}>
                         <Text>Initiate Razopr Pay Payment</Text>
                     </TouchableOpacity>
                     {/* <View style={{ width: "100%" }}> */}
@@ -530,11 +538,11 @@ const HomeDashboard = () => {
                     </View>
                 </LinearGradient>
 
-               {discountProducts?.length > 0 ? 
+                {discountProducts?.length > 0 ?
 
-                <TrendingNow data={discountProducts} textHeader={'Live Offers!'} />
-                : 
-                null}
+                    <TrendingNow data={discountProducts} textHeader={'Live Offers!'} />
+                    :
+                    null}
                 <View style={{ marginTop: 20, }}>
                     <FlatList
                         data={trendingData}
@@ -546,7 +554,7 @@ const HomeDashboard = () => {
                     />
 
                 </View>
-                
+
                 {newlyAddedProducts?.length ?
                     <>
                         <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: 20 }}>
@@ -694,6 +702,7 @@ const styles = StyleSheet.create({
     },
     locationContainer: {
         flexDirection: 'column',
+        width:'70%'
         // marginLeft: 10,
     },
     locationSubContainer: {
@@ -811,7 +820,8 @@ const styles = StyleSheet.create({
         color: '#1A1E25',
         fontSize: 16,
         fontWeight: '400',
-        marginHorizontal: 5
+        marginHorizontal: 5,
+        // width:'60%'
     },
     searchContainer: {
         marginHorizontal: 20,
