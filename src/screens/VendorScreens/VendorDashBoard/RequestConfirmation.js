@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, Alert, FlatList } from 'react-native';
+import React, { useEffect, useState, useRef } from "react";
+import { View, Text, Image, TouchableOpacity, StyleSheet, Alert, FlatList, Button, Linking, ScrollView } from 'react-native';
 import BASE_URL from "../../../apiconfig";
 import axios from "axios";
 import { LocalHostUrl } from "../../../apiconfig";
@@ -14,6 +14,13 @@ import { formatAmount } from "../../../utils/GlobalFunctions";
 import { useSelector } from "react-redux";
 import { getUserAuthToken, getVendorAuthToken } from "../../../utils/StoreAuthToken";
 import Modal from 'react-native-modal';
+import ActionSheet from 'react-native-actions-sheet';
+import Feather from 'react-native-vector-icons/Feather';
+import UserIcon from '../../../assets/vendorIcons/userIcon.svg';
+import LocationIcon from '../../../assets/vendorIcons/locationIcon.svg';
+import PhoneIcon from '../../../assets/vendorIcons/phoneIcon.svg';
+import AdvPayIcon from '../../../assets/vendorIcons/advPayIcon.svg';
+import FastImage from "react-native-fast-image";
 
 const RequestConfirmation = ({ navigation, route }) => {
     const { productId, catEndPoint } = route?.params;
@@ -21,21 +28,22 @@ const RequestConfirmation = ({ navigation, route }) => {
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [wholeBookingData, setWholeBookingData] = useState([]);
+    const actionSheetRef = useRef(null);
+    const [selectedItemDetails, setSelectedItemDetails] = useState([]);
+    const [getVendorAuth, setGetVendorAuth] = useState('');
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
-    // console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
-
     useEffect(() => {
         getProductDetails();
-        getVendorClothJewelBookings();
+        getProductBookingDetails();
     }, [])
 
-    const getVendorClothJewelBookings = async () => {
+    const getProductBookingDetails = async () => {
         const vendorMobileNumber = vendorLoggedInMobileNum;
         const token = await getVendorAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/${catEndPoint?.bookingDetailsEndpoint}/${vendorMobileNumber}`,{
+            const response = await axios.get(`${BASE_URL}/${catEndPoint?.bookingDetailsEndpoint}/${vendorMobileNumber}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -53,29 +61,108 @@ const RequestConfirmation = ({ navigation, route }) => {
             (x[y.productId] = x[y.productId] || []).push(y);
             return x;
         }, {});
-        setWholeBookingData(result[`${productId}`]);
-        console.log('final res is ::>>', result[`${productId}`]);
+
+        const finalResult = result[`${productId}`]?.map(item => {
+            const catType = item?.catType;
+            let productName = '';
+            let numOfDays = 0;
+            let vendorAddress = '';
+            let bookingItem = undefined;
+            let startDate = '';
+            let endDate = '';
+            let totalAmount = '';
+            let bookingStatus = '';
+
+            if (catType === 'functionHalls') {
+                productName = item?.functionHallName;
+                vendorAddress = item?.address;
+                numOfDays = item?.numOfDays;
+                startDate = item?.startDate;
+                endDate = item?.endDate;
+                totalAmount = item?.totalAmount;
+                bookingStatus = item?.bookingStatus;
+            }
+            else if (catType === 'tentHouses') {
+                productName = item?.tentHouseName;
+                vendorAddress = item?.address;
+                numOfDays = item?.numOfDays;
+                bookingItem = item?.bookingItems;
+                startDate = item?.startDate;
+                endDate = item?.endDate;
+                totalAmount = item?.totalAmount;
+                bookingStatus = item?.bookingStatus;
+            }
+            else if (catType === 'clothJewels') {
+                productName = item?.productName;
+                numOfDays = item?.numOfDays;
+                vendorAddress = item?.address;
+                startDate = item?.startDate;
+                endDate = item?.endDate;
+                totalAmount = item?.totalAmount;
+                bookingStatus = item?.bookingStatus;
+            }
+            else if (catType === 'decorations') {
+                productName = item?.eventOrganiserName;
+                vendorAddress = item?.address;
+                numOfDays = item?.numOfDays;
+                bookingItem = item?.particularPackageData;
+                startDate = item?.startDate;
+                endDate = item?.endDate;
+                totalAmount = item?.totalAmount;
+                bookingStatus = item?.bookingStatus;
+            }
+            else if (catType === 'caterings') {
+                productName = item?.foodCateringName;
+                vendorAddress = item?.address;
+                bookingItem = item?.bookedFoodItems;
+                startDate = item?.startDate;
+                endDate = item?.endDate;
+                totalAmount = item?.totalAmount;
+                bookingStatus = item?.bookingStatus;
+            }
+
+            return {
+                // _id: data?._id,
+                productName: productName,
+                productImage: item?.professionalImage.url,
+                createdAt: data?.createdAt,
+                bookingStatus: bookingStatus,
+                userMobileNumber: item?.userMobileNumber,
+                numOfDays: numOfDays,
+                vendorAddress: vendorAddress,
+                bookingItem: bookingItem,
+                startDate: startDate,
+                endDate: endDate,
+                totalAmount: totalAmount,
+
+            };
+        });
+        // setWholeBookingData(result[`${productId}`]);
+        setWholeBookingData(finalResult);
+        console.log('final res is ::>>', finalResult);
     }
 
 
     const getProductDetails = async () => {
         console.log('productId is ::>>', productId);
         const token = await getUserAuthToken();
+
         try {
-            const response = await axios.get(`${BASE_URL}/${catEndPoint?.productDetailsEndpoint}/${productId}`,{
+            const response = await axios.get(`${BASE_URL}/${catEndPoint?.productDetailsEndpoint}/${productId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            // console.log("getClothJewelsById::::::::::", response?.data);
-            setProductDetails(response?.data)
+            console.log("getClothJewelsById::::::::::", response?.data);
+            setProductDetails(response?.data);
         } catch (error) {
             console.log("categories::::::::::", error);
         }
     }
 
     const convertUrlToIp = () => {
-        const convertedImageUrl = productDetails?.professionalImage?.url !== undefined ? productDetails?.professionalImage?.url.replace('localhost', LocalHostUrl) : productDetails?.professionalImage?.url;
+        const convertedImageUrl = wholeBookingData[0]?.productImage !== undefined ? wholeBookingData[0]?.productImage.replace('localhost', LocalHostUrl) : wholeBookingData[0]?.productImage;
+        console.log('convertedImageUrl is::>>', convertedImageUrl);
         return convertedImageUrl;
     }
 
@@ -142,8 +229,9 @@ const RequestConfirmation = ({ navigation, route }) => {
         }
         console.log('updatedParams is::>>', updatedParams);
         const token = await getVendorAuthToken();
+        setGetVendorAuth(token);
         try {
-            const response = await axios.patch(`${BASE_URL}/${catEndPoint?.confirmationEndpoint}`, updatedParams,{
+            const response = await axios.patch(`${BASE_URL}/${catEndPoint?.confirmationEndpoint}`, updatedParams, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -180,12 +268,16 @@ const RequestConfirmation = ({ navigation, route }) => {
     };
 
     const renderItem = ({ item }) => {
+
+
         return (
-            <View onPress={() => { }} style={{ borderRadius: 10, backgroundColor: "white", marginHorizontal: 15, marginTop: 10, paddingHorizontal: 10, paddingVertical: 10 }}>
-                <View style={{ flexDirection: "row", alignItems: 'center' }}>
+            <View onPress={() => { }} style={{ borderRadius: 10, backgroundColor: item?.bookingStatus == 'rejected' || item?.bookingStatus == 'approved' ? '#dddddd' : 'white', marginHorizontal: 15, marginTop: 10, paddingHorizontal: 10, paddingVertical: 10 }}>
+                <TouchableOpacity style={{ flexDirection: "row", alignItems: 'center' }}
+                    onPress={() => { actionSheetRef.current?.show(), setSelectedItemDetails(item) }}
+                >
                     <Avatar widthDyn={61} heightDyn={61} borderRadiusDyn={8} name={'Surya Neelankar'} imageUrl={''} />
                     <View style={{ marginLeft: 10, width: "50%" }}>
-                        <Text style={{ marginTop: 5, color: "#101010", fontSize: 14, fontWeight: "500", fontFamily: "ManropeRegular", }}>Surya Neelankar</Text>
+                        <Text style={{ marginTop: 5, color: "#101010", fontSize: 14, fontWeight: "500", fontFamily: "ManropeRegular", }}>{item?.productName}</Text>
                         <View style={{ marginTop: 5 }}>
                             <Text style={{ color: "#1A1E25", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular" }}>Banglore, KA</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
@@ -197,25 +289,118 @@ const RequestConfirmation = ({ navigation, route }) => {
                             </View>
                         </View>
                     </View>
-                    <View style={{ alignItems: 'center', alignSelf: 'center' }}>
-                        <TouchableOpacity style={{ alignItems: 'center', borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
-                            onPress={() => { showAlert("Are you sure you want to accept the order?", item?.userMobileNumber) }}
-                        >
-                            <AcceptIcon />
-                            <Text style={{ color: "#57A64F", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Accept</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={{ alignItems: 'center', marginTop: 10, borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
-                            onPress={() => { showAlert("Are you sure you want to reject/cancel the order?", item?.userMobileNumber) }}
-                        >
-                            
-                            <RejectIcon />
-                            <Text style={{ color: "#EF0000", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Reject</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
 
-
+                    {item?.bookingStatus == 'requested' ?
+                        <View style={{ alignItems: 'center', alignSelf: 'center' }}>
+                            <TouchableOpacity style={{ alignItems: 'center', borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
+                                onPress={() => { showAlert("Are you sure you want to accept the order?", item?.userMobileNumber) }}
+                            >
+                                <AcceptIcon />
+                                <Text style={{ color: "#57A64F", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Accept</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={{ alignItems: 'center', marginTop: 10, borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
+                                onPress={() => { showAlert("Are you sure you want to reject/cancel the order?", item?.userMobileNumber) }}
+                            >
+                                <RejectIcon />
+                                <Text style={{ color: "#EF0000", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Reject</Text>
+                            </TouchableOpacity>
+                        </View>
+                        :
+                        <View style={{ alignItems: 'center', alignSelf: 'center' }}>
+                            <TouchableOpacity style={{ alignItems: 'center', borderRadius: 5, padding: 5, height: 30, flexDirection: 'row' }}
+                                onPress={() => { showAlert("Are you sure you want to reject/cancel the order?", item?.userMobileNumber) }}
+                                disabled={true}
+                            >
+                                {item?.bookingStatus == 'rejected' ?
+                                    <RejectIcon /> :
+                                    <AcceptIcon />
+                                }
+                                <Text style={{ color: item?.bookingStatus == 'rejected' ? "#EF0000" : "#57A64F", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", textTransform: 'capitalize' }}>{item?.bookingStatus}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    }
+                    {item?.bookingStatus == 'requested' ?
+                        <Feather style={[styles.icon, { marginHorizontal: 5 }]} name='chevron-right' size={25} color={'black'} />
+                        :
+                        <></>}
+                </TouchableOpacity>
             </View>
+        )
+    }
+
+    const openDialPad = (number) => {
+        if (Platform.OS === 'ios') {
+            number = `telprompt:${number}`;
+        }
+        else {
+            number = `tel:${number}`;
+        }
+        Linking.openURL(number);
+    }
+
+
+    const openMap = (lat, lon) => {
+        const url = Platform.select({
+            ios: `maps:0,0?q=${lat},${lon}`, // Apple Maps for iOS
+            android: `geo:0,0?q=${lat},${lon}` // Google Maps for Android
+        });
+        Linking.openURL(url);
+    };
+
+
+    const renderActionSheetWithProductDetais = () => {
+        console.log('selectedItemDetails is::>>>', selectedItemDetails);
+        return (
+            <ActionSheet
+                animated={false}
+                ref={actionSheetRef}
+                statusBarTranslucent
+                closeOnPressBack={true}
+                defaultOverlayOpacity={0.5}
+                containerStyle={styles.actionSheetContainer}>
+                <ScrollView>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', padding: 15 }}>
+                        <View>
+                            <Text>{selectedItemDetails?.productName}</Text>
+                            <Text>{selectedItemDetails?.startDate} - {selectedItemDetails?.endDate}</Text>
+                        </View>
+                        <View style={{ backgroundColor: '#FFF8F0', borderRadius: 10, padding: 5, width: 80, alignItems: 'center', alignContent: 'center', alignSelf: 'center' }}>
+                            <Text style={{ color: '#FD813B', fontWeight: '700' }}>{selectedItemDetails?.bookingStatus}</Text>
+                        </View>
+                    </View>
+                    <View style={{ backgroundColor: '#dddddd', height: 1, width: '80%', alignSelf: 'center', marginTop: 0 }} />
+                    <View style={{ padding: 20, marginHorizontal: 38 }}>
+                        <Text style={{ color: 'black', fontFamily: 'ManropeRegular', fontWeight: '900', fontSize: 16 }}>Other Details</Text>
+                        <View style={styles.detailsViewStyle}>
+                            <UserIcon />
+                            <Text style={styles.detailsStyle}>Ashok Reddy</Text>
+                        </View>
+                        <TouchableOpacity style={styles.detailsViewStyle}
+                            onPress={() => openDialPad('+91 9876543210')}
+                        >
+                            <PhoneIcon />
+                            <Text style={styles.detailsStyle}>{selectedItemDetails?.userMobileNumber}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.detailsViewStyle} onPress={() => openMap(37.7749, -122.4194)}>
+                            <LocationIcon />
+                            <Text style={styles.detailsStyle}>#12, Bachupally, Hyderabad</Text>
+                        </TouchableOpacity>
+                        <View style={styles.detailsViewStyle}>
+                            <AdvPayIcon />
+                            <Text style={styles.detailsStyle}>Advance Paid: ₹ {selectedItemDetails?.advanceAmountPaid}/-</Text>
+                        </View>
+                        <View style={styles.detailsViewStyle}>
+                            <AdvPayIcon />
+                            <Text style={styles.detailsStyle}>Balance Payable: ₹ 4000/-</Text>
+                        </View>
+
+                        <View>
+                            <Text >Booked Items</Text>
+                            
+                        </View>
+                    </View>
+                </ScrollView>
+            </ActionSheet>
         )
     }
 
@@ -223,7 +408,7 @@ const RequestConfirmation = ({ navigation, route }) => {
     return (
         <View style={{ flex: 1 }}>
 
-             <Modal
+            <Modal
                 isVisible={isVisible}
                 onBackdropPress={() => setIsVisible(false)}
                 backdropOpacity={0.9}
@@ -272,14 +457,23 @@ const RequestConfirmation = ({ navigation, route }) => {
                 </View>
 
             </Modal>
-            <Image style={{ width: '90%', alignSelf: 'center', height: 200, borderRadius: 10 }} source={{ uri: convertUrlToIp() }} resizeMode="contain" />
+            <FastImage source={{
+                uri: convertUrlToIp(),
+                headers: { Authorization: `Bearer ${getVendorAuth}` }
+            }} style={{ width: '90%', alignSelf: 'center', height: 200, borderRadius: 10 }}
+            />
+            {/* <Image style={{ width: '90%', alignSelf: 'center', height: 200, borderRadius: 10 }} source={{ uri: convertUrlToIp() }} resizeMode="contain" /> */}
             <Text style={{ color: '#121212', width: '90%', alignSelf: 'center', fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 16, marginTop: 10 }}>Product Availability</Text>
 
             <Text style={{ color: '#969696', width: '90%', alignSelf: 'center', fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 16, marginTop: 10 }}>Product Details</Text>
+            <Button title="Open Action Sheet" onPress={() => actionSheetRef.current?.show()} />
+
+            {renderActionSheetWithProductDetais()}
             <FlatList
                 data={wholeBookingData}
                 renderItem={renderItem}
             />
+
 
             {/* {renderProductDetails()} */}
             {/* {renderModal()} */}
@@ -302,6 +496,25 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 5,
         elevation: 5,
+    },
+    detailsStyle: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: '500',
+        marginHorizontal: 5
+    },
+    detailsViewStyle: {
+        flexDirection: 'row',
+        padding: 10,
+        right: 15
+    },
+    sheetContent: {
+        backgroundColor: '#fff',
+        padding: 16,
+        height: 250,
+    },
+    actionSheetContainer: {
+        backgroundColor: 'white',
+        paddingBottom: 20,
     },
     iconContainer: {
         margin: 20

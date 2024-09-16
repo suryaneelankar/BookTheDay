@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, SafeAreaView, Image, ScrollView,Alert, TouchableOpacity, Dimensions, StyleSheet, Animated, FlatList } from "react-native";
+import { View, Text, SafeAreaView, Image, ScrollView, Alert, TouchableOpacity, Dimensions, StyleSheet, Animated, FlatList } from "react-native";
 import ProfileIcon from '../../../assets/vendorIcons/profileIcon.svg'
 import LinearGradient from "react-native-linear-gradient";
 import shirtImg from '../../../assets/shirt.png';
 import axios from "axios";
 import BASE_URL from "../../../apiconfig";
 import { LocalHostUrl } from "../../../apiconfig";
-import { formatAmount,formatDate } from '../../../utils/GlobalFunctions';
+import { formatAmount, formatDate } from '../../../utils/GlobalFunctions';
 import ArrowRight from '../../../assets/vendorIcons/arrowRight.svg';
 import PersonOne from '../../../assets/vendorIcons/personOne.svg';
 import PersonTwo from '../../../assets/vendorIcons/personTwo.svg';
@@ -28,6 +28,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     const [functionHallBookingsData, setFunctionHallBookingsData] = useState([]);
     const [tentHouseBookingsData, setTentHouseBookingsData] = useState([]);
     const [cateringsBookingsData, setCateringBookingsData] = useState([]);
+    const [getVendorAuth, setGetVendorAuth] = useState('');
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
@@ -93,7 +94,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            console.log("postsposts events halls test******::::::::::", response?.data?.posts);
+            // console.log("postsposts events halls test******::::::::::", response?.data?.posts);
             // setVendorListings(response?.data?.posts);
 
             const result = response?.data?.posts.map(item => {
@@ -124,7 +125,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                 };
             });
             setVendorListings(result);
-            console.log('result is ::>>',result);
+            // console.log('result is ::>>',result);
 
         } catch (error) {
             console.log("categories::::::::::", error);
@@ -135,6 +136,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     const getVendorClothJewelBookings = async () => {
         const vendorMobileNumber = vendorLoggedInMobileNum;
         const token = await getVendorAuthToken();
+        setGetVendorAuth(token);
         try {
             const response = await axios.get(`${BASE_URL}/clothJewelBookingsGotForVendor/${vendorMobileNumber}`, {
                 headers: {
@@ -142,7 +144,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                 },
             });
             const output = consolidateByProductId(response?.data?.data);
-            console.log('output is ::>>', output);
+            // console.log('output is ::>>', output);
             setclothJewelBookingsData(output)
         } catch (error) {
             console.log("categories::::::::::", error);
@@ -150,7 +152,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     const getVendorDecorationBookings = async () => {
-        console.log("getVendorChefDriverBookings::::::::::");
+        // console.log("getVendorChefDriverBookings::::::::::");
         const vendorMobileNumber = vendorLoggedInMobileNum;
         const token = await getVendorAuthToken();
         try {
@@ -213,7 +215,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            console.log('resp foodcateringBookings ::>>', response?.data?.data);
+            // console.log('resp foodcateringBookings ::>>', response?.data?.data);
             const outputData = consolidateFoodCateringDataByProductId(response?.data?.data);
             setCateringBookingsData(outputData);
 
@@ -222,26 +224,26 @@ const VendorDashBoardTab = ({ navigation }) => {
         }
     }
 
-    const deleteTheVendorPost = async (vendorId,postId) => {
+    const deleteTheVendorPost = async (vendorId, postId) => {
         const token = await getVendorAuthToken();
-        console.log('vendorId is:::',vendorId,postId);
+        // console.log('vendorId is:::',vendorId,postId);
         try {
             const response = await axios.delete(`${BASE_URL}/deleteVendorPost/${vendorId}/post/${postId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            console.log('response is:::>>',response)
-         if(response?.status == 200){
-            showSuccessAlert();
-            getVendorListings();
-         }
+            // console.log('response is:::>>',response);
+            if (response?.status == 200) {
+                showSuccessAlert();
+                getVendorListings();
+            }
         } catch (error) {
             console.log("categories::::::::::", error);
         }
     }
 
-    const showConfirmationAlert = (vendorId,postId) => {
+    const showConfirmationAlert = (vendorId, postId) => {
         Alert.alert(
             "Confirmation",
             "Are you sure you want to delete the post?",
@@ -251,7 +253,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                     onPress: () => console.log("No Pressed"),
                     style: "cancel"
                 },
-                { text: "Yes", onPress: () => deleteTheVendorPost(vendorId,postId) }
+                { text: "Yes", onPress: () => deleteTheVendorPost(vendorId, postId) }
             ],
             { cancelable: false }
         );
@@ -276,7 +278,7 @@ const VendorDashBoardTab = ({ navigation }) => {
         const token = await getVendorAuthToken();
 
         const convertedImageUrl = item?.productImage !== undefined ? item?.productImage.replace('localhost', LocalHostUrl) : item?.productImage;
-        console.log('items are is::>>>', item);
+        // console.log('items are is::>>>', item);
         // console.log("token is:::::::", token);
         return (
             <TouchableOpacity style={{ backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10 }}>
@@ -296,8 +298,8 @@ const VendorDashBoardTab = ({ navigation }) => {
                             <ListedTimeIcon />
                             <Text style={styles.price}>{formatDate(item?.createdAt)}</Text>
                         </View>
-                        <TouchableOpacity onPress={() => {showConfirmationAlert(item?._id,item?.particularPostId)}}>
-                        <EditButton />
+                        <TouchableOpacity onPress={() => { showConfirmationAlert(item?._id, item?.particularPostId) }}>
+                            <EditButton />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -313,7 +315,12 @@ const VendorDashBoardTab = ({ navigation }) => {
                 onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId, catEndPoint: allCatProductDetailEndpoints?.decorations })}
                 style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" />
+                    {/* <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" /> */}
+                    <FastImage source={{
+                        uri: convertedImageUrl,
+                        headers: { Authorization: `Bearer ${getVendorAuth}` }
+                    }} style={{ width: 50, height: 50 }}
+                    />
                     <View style={{ margin: 10 }}>
                         <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{item?.productName} </Text>
                         <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.totalAmount)}</Text>
@@ -343,7 +350,12 @@ const VendorDashBoardTab = ({ navigation }) => {
                 onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId, catEndPoint: allCatProductDetailEndpoints?.functionhalls })}
                 style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" />
+                    {/* <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" /> */}
+                    <FastImage source={{
+                        uri: convertedImageUrl,
+                        headers: { Authorization: `Bearer ${getVendorAuth}` }
+                    }} style={{ width: 60, height: 60 }}
+                    />
                     <View style={{ margin: 10 }}>
                         <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{item?.productName} </Text>
                         <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.totalAmount)}</Text>
@@ -373,7 +385,12 @@ const VendorDashBoardTab = ({ navigation }) => {
                 onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId, catEndPoint: allCatProductDetailEndpoints?.tenthouse })}
                 style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" />
+                    {/* <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" /> */}
+                    <FastImage source={{
+                        uri: convertedImageUrl,
+                        headers: { Authorization: `Bearer ${getVendorAuth}` }
+                    }} style={{ width: 60, height: 60 }}
+                    />
                     <View style={{ margin: 10 }}>
                         <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{item?.productName} </Text>
                         <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.totalAmount)}</Text>
@@ -403,7 +420,12 @@ const VendorDashBoardTab = ({ navigation }) => {
                 onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId, catEndPoint: allCatProductDetailEndpoints?.foodcatering })}
                 style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" />
+                    {/* <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" /> */}
+                    <FastImage source={{
+                        uri: convertedImageUrl,
+                        headers: { Authorization: `Bearer ${getVendorAuth}` }
+                    }} style={{ width: 60, height: 60 }}
+                    />
                     <View style={{ margin: 10 }}>
                         <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{item?.productName} </Text>
                         <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.totalAmount)}</Text>
@@ -426,7 +448,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     function capitalizeFirstLetters(str) {
-        console.log('str is::>>', str)
+        // console.log('str is::>>', str)
         if (str) {
             return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
         }
@@ -440,7 +462,12 @@ const VendorDashBoardTab = ({ navigation }) => {
                 onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId, catEndPoint: allCatProductDetailEndpoints?.clothjewels })}
                 style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" />
+                    {/* <Image source={{ uri: convertedImageUrl }} style={{ width: 50, height: 50 }} resizeMode="contain" /> */}
+                    <FastImage source={{
+                        uri: convertedImageUrl,
+                        headers: { Authorization: `Bearer ${getVendorAuth}` }
+                    }} style={{ width: 60, height: 60 }}
+                    />
                     <View style={{ margin: 10 }}>
                         <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{capitalizeFirstLetters(item?.productName)} </Text>
                         <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.perDayPrice)} / day</Text>

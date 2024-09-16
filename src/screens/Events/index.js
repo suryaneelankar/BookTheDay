@@ -32,7 +32,7 @@ const Events = () => {
     const userLocationFetched = useSelector((state) => state.userLocation);
     console.log("user selevcted address is events::::::::", userLocationFetched)
 
-    
+
 
     useFocusEffect(
         useCallback(() => {
@@ -84,23 +84,23 @@ const Events = () => {
                 console.error('Error in one of the batches:', distanceMatrix.status);
             }
         }
-
         return allDistances;
     };
 
 
     const API_KEY = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo';
 
-    const getDistanceMatrix = async (origin, destinations) => {
-        const originStr = `${origin.latitude},${origin.longitude}`;
-        const destinationsStr = destinations
-            .map((dest) => `${dest.latitude},${dest.longitude}`)
-            .join('|');
+    const getDistanceMatrix = async () => {
+        // const originStr = `${origin.latitude},${origin.longitude}`;
+        // const destinationsStr = destinations
+        //     .map((dest) => `${dest.latitude},${dest.longitude}`)
+        //     .join('|');
 
-        const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=${originStr}&destinations=${destinationsStr}&key=${API_KEY}`;
-
+        // const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=${originStr}&destinations=${destinationsStr}&key=${API_KEY}`;
+        const url = `https://api.distancematrix.ai/maps/api/distancematrix/json?units=metric&origins=51.4822656,-0.1933769&destinations=51.4994794,-0.1269979&key=${API_KEY}`
         try {
             const response = await axios.get(url);
+            console.log('response data is for matrxi apis is:::: ::>>',response);
             return response.data;
         } catch (error) {
             console.error('Error fetching Distance Matrix:', error);
@@ -171,23 +171,22 @@ const Events = () => {
                 },
             });
             // console.log('events response is::::::::', response?.data);
-            // setEventsData(response?.data);
-         console.log("insdie events call::::;", userLocationFetched);
+            setEventsData(response?.data);
+            console.log("insdie events call::::;", userLocationFetched);
             const origin = {
-                 latitude: userLocationFetched?.lat ?  userLocationFetched?.lat  :  userLocationFetched?.latitude ,
-                 longitude: userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude 
-                };
+                latitude: userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude,
+                longitude: userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude
+            };
 
 
-                 console.log("origin avlues :::::::::::", origin)
+            console.log("origin avlues :::::::::::", origin)
             const locations = response?.data.map(item => ({
                 latitude: item.latitude,
                 longitude: item.longitude,
             }));
-            const sortedEvents = await sortLocationsByDistance(origin, locations, response?.data);
-            // console.log("soreted adat is:::::::::", sortedEvents)
-            setEventsData(sortedEvents);  // Set the sorted data
-
+            // const sortedEvents = await sortLocationsByDistance(origin, locations, response?.data);
+            // setEventsData(sortedEvents);  // Set the sorted data
+            getDistanceMatrix()
         } catch (error) {
             console.log("events data error>>::", error);
         }
