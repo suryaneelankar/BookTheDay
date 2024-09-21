@@ -23,6 +23,7 @@ import MinusIcon from '../../assets/svgs/minusIcon.svg';
 import AddIcon from '../../assets/svgs/addIcon.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import CustomModal from "../../components/AlertModal";
+import FastImage from "react-native-fast-image";
 
 const ViewTentHouse = ({ route, navigation }) => {
 
@@ -281,7 +282,7 @@ const ViewTentHouse = ({ route, navigation }) => {
         const quantity = itemQuantities[item.itemName] || 0;
         return (
             <View style={styles.itemContainer}>
-                <Image source={{
+                <FastImage source={{
                     uri: item?.image,
                     headers: { Authorization: `Bearer ${getUserAuth}` }
                 }} style={styles.itemImage} />

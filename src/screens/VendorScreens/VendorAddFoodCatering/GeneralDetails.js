@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, TextInput, alert, Modal, Button, ScrollView, ActivityIndicator } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, TextInput, alert, Modal, Button } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
@@ -57,13 +57,11 @@ const GeneralDetails = () => {
     const [comboPrice, setComboPrice] = useState({});
     const [minOrderMembers, setMinOrderMembers] = useState({});
     const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
-    const discountPercentageArr = ['5', '10', '15', '20', '30', '50'];
-    const [selectedDiscountVal, setSelectedDiscountVal] = useState();
-    const [loading, setLoading] = useState(false);
 
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
+    console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
 
     const [rentalItemPricingDetails, setRentalItemPricingDetails] = useState({
         "Carpet": [{ "itemName": "Carpet", "perDayPrice": 0 }],
@@ -87,7 +85,7 @@ const GeneralDetails = () => {
     const getFoodMenuItems = async () => {
         const token = await getVendorAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFoodItems`, {
+            const response = await axios.get(`${BASE_URL}/getAllFoodItems`,{
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
@@ -193,10 +191,11 @@ const GeneralDetails = () => {
     const RentalItemsList = () => {
         // const [selectedId, setSelectedId] = useState(null);
         // const [isCollapsed, setIsCollapsed] = useState(true);
-        // const [selectedItems, setSelectedItems] = useState({});
+        const [selectedTitle, setSelectedTitle] = useState({});
 
-        const toggleCollapse = (id) => {
+        const toggleCollapse = (id, title) => {
             setSelectedId(id);
+            setSelectedTitle(title);
             setIsCollapsed(id === selectedId ? !isCollapsed : true);
         };
 
@@ -304,14 +303,14 @@ const GeneralDetails = () => {
             console.log("custom item :::::::::", customItem)
             return (
                 <TouchableOpacity
-                    onPress={() => toggleCollapse(item?._id)}
+                    onPress={() => toggleCollapse(item?._id, item?.title)}
                     style={{ backgroundColor: '#FFF4E1', width: '100%', padding: 10, borderRadius: 10, marginTop: 20 }}
                 >
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={styles.headerText}>{item.title}</Text>
-                        <Icon name={isCollapsed ? 'arrow-down' : 'arrow-up'} size={20} />
+                        <Text style={styles.headerText}>{item?.title}</Text>
+                        <Icon name={currentSelected ? 'arrow-down' : 'arrow-up'} size={20} />
                     </View>
-                    {isCollapsed &&
+                    {currentSelected &&
                         <View>
                             <FlatList
                                 data={item?.subItems}
@@ -399,7 +398,7 @@ const GeneralDetails = () => {
                         </View>
                         : null}
 
-                    {isCollapsed ?
+                    {currentSelected ?
                         <TouchableOpacity style={{ backgroundColor: '#D2453B', padding: 10, borderRadius: 10, alignItems: 'center', marginTop: 10 }}
                             onPress={() => { onPressAddCustomizedItem() }}
                         >
@@ -407,7 +406,7 @@ const GeneralDetails = () => {
                         </TouchableOpacity>
                         : null}
 
-                    {isCollapsed &&
+                    {currentSelected &&
                         <>
                             <TextInput
                                 style={{ borderColor: "lightgray", borderWidth: 1, marginTop: 5, padding: 5 }}
@@ -469,8 +468,16 @@ const GeneralDetails = () => {
         setAdvanceAmount(value);
     }
 
+    const onChangeDiscountPercentage = (value) => {
+        setDiscountPercentage(value);
+    }
+
     const onChangeCateringAddress = (value) => {
         setCateringAddress(value);
+    }
+
+    const onChangeOverTimeCharges = (value) => {
+        setOverTimeCharges(value);
     }
 
     const onChangetentHouseCity = (value) => {
@@ -601,11 +608,11 @@ const GeneralDetails = () => {
     };
 
     const onPressSaveAndPost = async () => {
-        if (!mainImageUrl || foodCateringName === '' || cateringDescription === '' || cateringCity === '' ||
-            cateringAddress === '' || cateringPincode === '' || (advanceAmount === undefined || advanceAmount === '') || (discountPercentage === undefined || discountPercentage === '') || finalCombomenu?.length === 0
-        ) {
-            Alert.alert('Please fill Mandatory fields');
-            return;
+        if(!mainImageUrl || foodCateringName === '' || cateringDescription === '' || cateringCity === ''||
+            cateringAddress === '' || cateringPincode === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '') || (discountPercentage === undefined || discountPercentage ==='') || finalCombomenu?.length === 0
+        ){
+          Alert.alert('Please fill Mandatory fields');
+          return;
         }
         for (const [key, value] of Object.entries(additionalImages)) {
             if (value === undefined) {
@@ -615,15 +622,15 @@ const GeneralDetails = () => {
         }
         finalCombomenu.forEach((obj) => {
             console.log('Checking object:', obj);  // Debugging line to check object structure
-
+            
             // Check if both minOrder and perPlateCost are 0
             if (obj?.minOrder === 0 && obj?.perPlateCost === 0) {
-                Alert.alert('Please fill Mandatory fields', `Details missing for: ${obj.title}`);
-                return;
+              Alert.alert('Please fill Mandatory fields', `Details missing for: ${obj.title}`);
+              return;
             }
-        });
+          });
 
-
+        
         const vendorMobileNumber = vendorLoggedInMobileNum
         const formData = new FormData();
         formData.append('professionalImage', {
@@ -672,7 +679,6 @@ const GeneralDetails = () => {
 
         console.log('formdata is ::>>', JSON.stringify(formData));
         const token = await getVendorAuthToken();
-        setLoading(true);
         try {
             const response = await axios.post(`${BASE_URL}/AddFoodCatering`, formData, {
                 headers: {
@@ -682,12 +688,16 @@ const GeneralDetails = () => {
             });
             if (response.status === 201) {
                 console.log('Success', `uploaded successfully`);
-                setLoading(false);
                 Alert.alert(
                     "Confirmation",
-                    "Your Item posted successfully",
+                    "Your proudct posted successfully",
                     [
-                        { text: "Ok", onPress: () => console.log("yes pressed") }
+                        {
+                            text: "No",
+                            onPress: () => console.log("No Pressed"),
+                            style: "cancel"
+                        },
+                        { text: "Yes", onPress: () => console.log("yes pressed") }
                     ],
                     { cancelable: false }
                 );
@@ -695,7 +705,6 @@ const GeneralDetails = () => {
                 console.log('Error', 'Failed to upload document');
             }
         } catch (error) {
-            setLoading(false);
             console.error('Error uploading document:', error);
             console.log('Error', 'Failed to upload document');
         }
@@ -730,168 +739,164 @@ const GeneralDetails = () => {
     };
 
 
-    const discountPercentageList = () => {
+    const allItemsValid = finalCombomenu.every(item => item.items && item.items.length > 0);
 
-        const onPressDiscountPercentage = (item) => {
-            setDiscountPercentage(item);
-            setSelectedDiscountVal(item);
-        }
-
-        return (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ width: '100%' }}>
-                {discountPercentageArr.map((item) => {
-                    const isSelected = item === selectedDiscountVal;
-                    const backgroundColor = isSelected ? '#FFD700' : '#FFF5E3';
-                    return (
-                        <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
-                            onPress={() => onPressDiscountPercentage(item)}
-                        >
-                            <Text>{item} %</Text>
-                        </TouchableOpacity>
-                    )
-                })}
-            </ScrollView>
-        );
-    }
 
     return (
-        <View style={{ flex: 1 }}>
-            {loading ? (
-                <View style={{ alignSelf:'center',flex:1,width:'100%',height:Dimensions.get('window').height,justifyContent:'center' }}>
-                    <ActivityIndicator size="large" color="green" />
-                </View>
-            ) :
-                <View>
-                    <Modal visible={isLocationPickerVisible} animationType="slide">
-                        <LocationPicker onLocationSelected={handleLocationSelected} />
-                        <Button title="Close" onPress={handleCloseLocationPicker} />
-                    </Modal>
-                    <View style={styles.mainContainer}>
-                        <ChooseFileField
-                            label={'Tent House Image'}
-                            isRequired={true}
-                            placeholder={'Add Tent House Image'}
-                            onPressChooseFile={openGalleryOrCamera}
-                        />
-                        {mainImageUrl ?
-                            <Image
-                                source={{ uri: mainImageUrl?.assets[0]?.uri }}
-                                width={'100%'}
-                                height={300}
-                                resizeMode='cover'
-                            /> : null}
+        <View style={{}}>
 
-                        <Text style={styles.title}>Additional Images</Text>
-                        <Text style={styles.subTitle}>Please add up to 4 images*</Text>
-                        <FlatList
-                            data={data}
-                            renderItem={ListItem}
-                            keyExtractor={item => item.id}
-                            horizontal
-                            contentContainerStyle={{ width: '100%', justifyContent: 'space-around' }}
-                        />
-                        <TextField
-                            label='Catering Name'
-                            placeholder="Please Enter Catering Name"
-                            value={foodCateringName}
-                            onChangeHandler={onChangetentHouseName}
-                            keyboardType='default'
-                            isRequired={true}
-                        />
+         <Modal visible={isLocationPickerVisible} animationType="slide">
+                <LocationPicker onLocationSelected={handleLocationSelected} />
+                <Button title="Close" onPress={handleCloseLocationPicker} />
+            </Modal>
+            <View style={styles.mainContainer}>
+                <ChooseFileField
+                    label={'Tent House Image'}
+                    isRequired={true}
+                    placeholder={'Add Tent House Image'}
+                    onPressChooseFile={openGalleryOrCamera}
+                />
+                {mainImageUrl ?
+                    <Image
+                        source={{ uri: mainImageUrl?.assets[0]?.uri }}
+                        width={'100%'}
+                        height={300}
+                        resizeMode='cover'
+                    /> : null}
 
-                        <TextField
-                            label='Catering Description'
-                            placeholder="Describe about your service"
-                            value={cateringDescription}
-                            onChangeHandler={onChangeDescription}
-                            keyboardType='default'
-                            isRequired={true}
-                            isDescriptionField={true}
-                        />
-                    </View>
+                <Text style={styles.title}>Additional Images</Text>
+                <Text style={styles.subTitle}>Please add up to 4 images*</Text>
+                <FlatList
+                    data={data}
+                    renderItem={ListItem}
+                    keyExtractor={item => item.id}
+                    horizontal
+                    contentContainerStyle={{ width: '100%', justifyContent: 'space-around' }}
+                />
+                <TextField
+                    label='Catering Name'
+                    placeholder="Please Enter Catering Name"
+                    value={foodCateringName}
+                    onChangeHandler={onChangetentHouseName}
+                    keyboardType='default'
+                    isRequired={true}
+                />
+
+                <TextField
+                    label='Catering Description'
+                    placeholder="Describe about your service"
+                    value={cateringDescription}
+                    onChangeHandler={onChangeDescription}
+                    keyboardType='default'
+                    isRequired={true}
+                    isDescriptionField={true}
+                />
+            </View>
 
 
-                    <Text style={styles.title}>Add Menu Items</Text>
-                    <View style={styles.mainContainer}>
-                        {RentalItemsList()}
-                        {/* {ItemList()} */}
-                    </View>
+            <Text style={styles.title}>Add Menu Items</Text>
+            <View style={styles.mainContainer}>
+                {RentalItemsList()}
+                {/* {ItemList()} */}
+            </View>
 
-                    {finalCombomenu?.length > 0 ?
-                        <View style={styles.mainContainer}>
-                            <Text style={{ color: "black", fontSize: 14, fontWeight: "500", marginBottom: 5, marginHorizontal: 8 }}>Added Combos</Text>
-                            <FlatList
-                                data={finalCombomenu}
-                                renderItem={renderMenuItem}
-                                keyExtractor={(item, index) => index.toString()}
-                                horizontal
-                                showsHorizontalScrollIndicator={false}
-                            />
-                        </View> :
-                        null}
+            {finalCombomenu?.length > 0  ?
+                <View style={styles.mainContainer}>
+                    <Text style={{ color: "black", fontSize: 14, fontWeight: "500", marginBottom: 5, marginHorizontal: 8 }}>Added Combos</Text>
+                    <FlatList
+                        data={finalCombomenu.filter(item => item.items?.length > 0)} 
+                        renderItem={renderMenuItem}
+                        keyExtractor={(item, index) => index.toString()}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                    />
+                </View> :
+                null}
 
-                    <Text style={styles.title}>Pricing Details</Text>
-                    <View style={styles.mainContainer}>
+            <Text style={styles.title}>Pricing Details</Text>
+            <View style={styles.mainContainer}>
 
-                        <TextField
-                            label='Advance Amount'
-                            placeholder="Please Enter Advance Amount"
-                            value={advanceAmount}
-                            onChangeHandler={onChangeAdvanceAmount}
-                            keyboardType='numeric'
-                            isRequired={true}
-                        />
-                        <Text style={styles.textInputlabel}>Discount if any</Text>
-                        {discountPercentageList()}
-                    </View>
+                <TextField
+                    label='Advance Booking Amount'
+                    placeholder="Please Enter Advance Booking Amount"
+                    value={advanceAmount}
+                    onChangeHandler={onChangeAdvanceAmount}
+                    keyboardType='number-pad'
+                    isRequired={true}
+                />
+                <TextField
+                    label='Discount if Any'
+                    placeholder="Please Enter Discount Percentage"
+                    value={discountPercentage}
+                    onChangeHandler={onChangeDiscountPercentage}
+                    keyboardType='number-pad'
+                    isRequired={false}
+                />
+                <TextField
+                    label='Travel Chargers'
+                    placeholder="Please Enter Travel Charges"
+                    value={overTimeCharges}
+                    onChangeHandler={onChangeOverTimeCharges}
+                    keyboardType='number-pad'
+                    isRequired={true}
+                />
+            </View>
 
-                    <Text style={styles.title}>Catering Address</Text>
-                    <View style={styles.mainContainer}>
+            <Text style={styles.title}>Catering Address</Text>
+            <View style={styles.mainContainer}>
 
-                        <Text style={styles.textInputlabel}>
-                            Address<Text style={{ color: "red" }}>*</Text>
-                        </Text>
-                        <TouchableOpacity onPress={handleOpenLocationPicker} style={[styles.textTnputView, { height: 100, flexDirection: "row", }]}>
-                            <View style={{ height: '100%', width: "85%" }}>
-                                <TextInput
-                                    onChangeText={onChangeCateringAddress}
-                                    value={cateringAddress}
-                                    placeholder="Please Enter Address"
-                                    keyboardType={'default'}
-                                    style={{ height: '100%', textAlignVertical: 'top', padding: 10 }}
-                                    multiline={true}
-                                    numberOfLines={4}
-                                />
-                            </View>
-                            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                                <DetectLocation />
-                            </View>
-                        </TouchableOpacity>
-
-                        <TextField
-                            label='City'
-                            placeholder="Please Enter City"
-                            value={cateringCity}
-                            onChangeHandler={onChangetentHouseCity}
-                            keyboardType='default'
-                            isRequired={true}
-                        />
-                        <TextField
-                            label='Pin code'
-                            placeholder="Please Enter Pin code"
-                            value={cateringPincode}
-                            onChangeHandler={onChangetentHousePincode}
-                            keyboardType='default'
-                            isRequired={true}
+            <Text style={styles.textInputlabel}>
+                    Address<Text style={{ color: "red" }}>*</Text>
+                </Text>
+                <TouchableOpacity onPress={handleOpenLocationPicker} style={[styles.textTnputView, { height: 100, flexDirection: "row",}]}>
+                    <View style={{height: '100%',width:"85%" }}>
+                        <TextInput
+                            onChangeText={onChangeCateringAddress}
+                            value={cateringAddress}
+                            placeholder="Please Enter Address"
+                            keyboardType={'default'}
+                            style={{ height: '100%', textAlignVertical: 'top', padding: 10 }}
+                            multiline={true}
+                            numberOfLines={4}
                         />
                     </View>
+                    <View style={{justifyContent: 'center', alignItems: 'center' }}>
+                        <DetectLocation />
+                    </View>
+                </TouchableOpacity>
 
-                    {/* <Text style={{ fontFamily: 'InterRegular', color: '#5F6377', fontSize: 15, fontWeight: '600' }}>I Accept Terms and Conditions</Text> */}
-                    <TouchableOpacity onPress={() => { onPressSaveAndPost() }} style={{ padding: 10, backgroundColor: '#FFF5E3', alignSelf: 'center', borderRadius: 5, borderColor: '#ECA73C', borderWidth: 2, marginTop: 40, bottom: 20 }}>
-                        <Text style={{ color: '#ECA73C' }}> Save & Post </Text>
-                    </TouchableOpacity>
-                </View>
-            }
+                {/* <TextField
+                    label='Address'
+                    placeholder="Please Enter Address"
+                    value={cateringAddress}
+                    onChangeHandler={onChangeCateringAddress}
+                    keyboardType='default'
+                    isRequired={true}
+                /> */}
+                <TextField
+                    label='City'
+                    placeholder="Please Enter City"
+                    value={cateringCity}
+                    onChangeHandler={onChangetentHouseCity}
+                    keyboardType='default'
+                    isRequired={true}
+                />
+                <TextField
+                    label='Pin code'
+                    placeholder="Please Enter Pin code"
+                    value={cateringPincode}
+                    onChangeHandler={onChangetentHousePincode}
+                    keyboardType='number-pad'
+                    isRequired={true}
+                />
+            </View>
+
+            {/* <Text style={{ fontFamily: 'InterRegular', color: '#5F6377', fontSize: 15, fontWeight: '600' }}>I Accept Terms and Conditions</Text> */}
+            <TouchableOpacity onPress={() => { onPressSaveAndPost() }} style={{ padding: 10, backgroundColor: '#FFF5E3', alignSelf: 'center', borderRadius: 5, borderColor: '#ECA73C', borderWidth: 2, marginTop: 40, bottom: 20 }}>
+                <Text style={{ color: '#ECA73C' }}> Save & Post </Text>
+            </TouchableOpacity>
+
+
         </View>
     )
 }

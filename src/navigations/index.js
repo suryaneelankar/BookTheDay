@@ -307,7 +307,7 @@ const MainNavigation = () => {
                 }} />
                 {/* AddTentHouse */}
 
-                <Stack.Screen name="RentOnProducts" component={RentOnProducts} options={{ headerShown: false }} />
+                <Stack.Screen name="RentOnProducts" component={RentOnProducts} options={{  header: () => <NavigationHeader Icon={true} title="Give on Rent" />,headerShown: true }}/>
 
                 {/* AddFunctionalHall */}
                 <Stack.Screen name="AddFunctionalHall" component={AddFunctionalHall} options={{

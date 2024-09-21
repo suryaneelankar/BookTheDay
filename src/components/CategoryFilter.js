@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Image, Dimensions } from 'rea
 import LinearGradient from 'react-native-linear-gradient';
 
 const CategoryFilter = ({ onCategoryChange }) => {
-  const [selectedCategory, setSelectedCategory] = useState('Tent House');
+  const [selectedCategory, setSelectedCategory] = useState('Halls');
 
   const newData = [
     // { name: 'Tent House', image: require('../assets/categoriesPngs/tenthouse_icon.png') },
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   },
   categoryItem: {
     alignItems: 'center',
-    width: Dimensions.get('window').width / 4.1,
+    width: Dimensions.get('window').width/2,
   },
   selectedCategory: {
     borderRadius: 10,
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   gradient: {
     alignItems: 'center',
     // borderRadius: 10,
-    width:Dimensions.get('window').width / 4.1,
+    width:Dimensions.get('window').width / 2,
     // height:"auto"
     // padding: 5,
   },

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import Svg, { Circle, Text as SvgText } from 'react-native-svg';
 import { height, moderateScale } from '../utils/scalingMetrics';
 import BASE_URL, { LocalHostUrl } from '../apiconfig';
+import FastImage from 'react-native-fast-image';
 
 const Avatar = ({widthDyn,heightDyn,borderRadiusDyn, name, imageUrl }) => {
   const getInitials = (name) => {
@@ -18,7 +19,7 @@ const updatedImgUrl = imageUrl !== undefined ? imageUrl.replace('localhost', Loc
   return (
     <View style={[styles.container,{width:widthDyn, height:heightDyn, borderRadius:borderRadiusDyn}]}>
       {updatedImgUrl ? (
-        <Image source={{ uri: updatedImgUrl }} style={[styles.image, { width: widthDyn, height: heightDyn, borderRadius: borderRadiusDyn }]} />
+        <FastImage source={{ uri: updatedImgUrl }} style={[styles.image, { width: widthDyn, height: heightDyn, borderRadius: borderRadiusDyn }]} />
       ) : (
         <Svg height="100" width="100">
           <Circle cx="50" cy="50" r="50" fill="#FEF7DE" />

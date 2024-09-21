@@ -278,6 +278,7 @@ const LocationPicker = ({ onLocationSelected }) => {
           style={styles.input}
           value={pinCode}
           onChangeText={setPinCode}
+          keyboardType='number-pad'
           placeholder="Pin Code"
         />
         {/* <View style={styles.labels}>

@@ -585,6 +585,8 @@ const VendorDashBoardTab = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.mainContainer}>
+                       <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1 }}>
+
             <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'white' }}>
                 <ProfileIcon style={{}} />
                 <View>
@@ -677,6 +679,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                     numColumns={2}
                 />
             </ScrollView>
+            </LinearGradient>
         </SafeAreaView>
     );
 };

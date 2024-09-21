@@ -11,6 +11,7 @@ import LinearGradient from "react-native-linear-gradient";
 import Swiper from "react-native-swiper";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import { useSelector } from "react-redux";
+import FastImage from "react-native-fast-image";
 
 const DecorsBookingOverView = ({ route, navigation }) => {
 
@@ -145,7 +146,7 @@ const DecorsBookingOverView = ({ route, navigation }) => {
                         </View>
                         <Text style={{ color: 'black', fontSize:12, fontWeight:"500" ,fontFamily: 'ManropeRegular',}}>Booked for - Rakesh Pandit</Text>
                     </View>
-                    <Image source={{ uri: bookingDetails?.professionalImage?.url.replace('localhost', LocalHostUrl) }}
+                    <FastImage source={{ uri: bookingDetails?.professionalImage?.url.replace('localhost', LocalHostUrl) }}
                         style={{ width: 70, height: 70, borderRadius: 35 }}
                         resizeMethod="resize"
                         resizeMode="cover"
