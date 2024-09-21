@@ -113,7 +113,7 @@ const Tab4Screen = ({ navigation }) => {
     headerShown: true,
     tabBarLabel:'Services',
     tabBarShowLabel: true,
-    header: () => <NavigationHeader Icon={false} title="Services" />,
+    header: () => <NavigationHeader Icon={false} title="" />,
 
   })}
 />
