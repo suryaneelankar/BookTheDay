@@ -8,6 +8,12 @@ import VendorDashBoardTab from '../screens/VendorScreens/VendorDashBoard/DashBoa
 import VendorCategoryScreen from '../screens/VendorScreens/VendorCatergoryScreen';
 import SwitchIcon from '../assets/svgs/tabIcons/profile.svg';
 import NavigationHeader from '../components/NavigationHeader';
+import HomeIcon from '../assets/svgs/tabIcons/home.svg';
+import FocusedHomeIcon from '../assets/svgs/tabIcons/focusedHome.svg';
+import HireIcon from '../assets/svgs/tabIcons/hire.svg';
+import ActiveForm from '../assets/svgs/activeVendorServiceFormIcon.svg';
+import InActiveForm from '../assets/svgs/vendorServiceFormIcon.svg';
+import VendorProfile from '../screens/VendorScreens/VendorProfile';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -80,8 +86,8 @@ const Tab4Screen = ({ navigation }) => {
       screenOptions={props => {
         return {
           tabBarShowLabel: true,
-          tabBarActiveTintColor: 'blue', // Change the active tab color
-          tabBarInactiveTintColor: 'gray', // Change the inactive tab color
+          tabBarActiveTintColor: '#FD813B', // Change the active tab color
+          tabBarInactiveTintColor: '#AAAEBB', // Change the inactive tab color
           tabBarStyle: {
             backgroundColor: 'white',
             height: 40,
@@ -99,21 +105,13 @@ const Tab4Screen = ({ navigation }) => {
      name="VendorHome"
      component={VendorCategoryScreen}
      options={({ focused }) => ({
-     tabBarIcon: ({focused}) => (
-        <Image
-        source={require('../assets/eventsicon.png')}
-        style={{
-          width: 20,
-          height: 20,
-          marginTop: os === 'ios' ? 30 : 0,
-          tintColor: focused ? 'black' : 'gray',
-        }}
-      />
-    ),
-    headerShown: true,
+      tabBarIcon: ({ focused }) => (
+        focused ? <ActiveForm /> : <InActiveForm />
+      ),
+    headerShown: false,
     tabBarLabel:'Services',
     tabBarShowLabel: true,
-    header: () => <NavigationHeader Icon={false} title="Services" />,
+    // header: () => <NavigationHeader Icon={false} title="Services" />,
 
   })}
 />
@@ -121,17 +119,8 @@ const Tab4Screen = ({ navigation }) => {
   name="Events"
   component={VendorDashBoardTab}
   options={({ focused }) => ({
-    tabBarIcon: ({focused}) => (
-      
-        <Image
-        source={require('../assets/eventsicon.png')}
-        style={{
-          width: 20,
-          height: 20,
-          marginTop: os === 'ios' ? 30 : 0,
-          tintColor: focused ? 'black' : 'gray',
-        }}
-      />
+    tabBarIcon: ({ focused }) => (
+      focused ? <FocusedHomeIcon /> : <HomeIcon />
     ),
     headerShown: false,
     tabBarLabel:'Home',
@@ -153,13 +142,13 @@ const Tab4Screen = ({ navigation }) => {
   }}
 /> */}
       <Tab.Screen
-  name="Category"
-  component={Tab3Screen}
+  name="VendorProfile"
+  component={VendorProfile}
   options={({ focused }) => ({
-    tabBarIcon: ({focused}) => (
-      focused ? <SwitchIcon/> : <SwitchIcon/>
+    tabBarIcon: ({ focused }) => (
+      focused ? <SwitchIcon /> : <SwitchIcon />
     ),
-    headerShown: true,
+    headerShown: false,
     tabBarLabel:'Profile',
     tabBarShowLabel: true,
 

@@ -28,7 +28,7 @@ const Events = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const suggestions = ['Events', 'Function Hall', 'Food', 'Catering', 'Tent House', 'Decoration', 'Halls'];
     const Cats = [TentHouseIcon, TentHouseIcon, TentHouseIcon, TentHouseIcon];
-    const [selectedCategory, setSelectedCategory] = useState('Tent House');
+    const [selectedCategory, setSelectedCategory] = useState('Halls');
     const userLocationFetched = useSelector((state) => state.userLocation);
     console.log("user selevcted address is events::::::::", userLocationFetched)
 
@@ -37,10 +37,13 @@ const Events = () => {
     useFocusEffect(
         useCallback(() => {
             // Code to run when the screen is focused
-            getAllEvents();
-            getTentHouse();
-            getDecorations();
-            getAllCaterings();
+            if(selectedCategory === 'Halls'){
+                getAllEvents();
+            }else if(selectedCategory === 'Catering'){
+                getAllCaterings();
+            }
+            // getTentHouse();
+            // getDecorations();
             // Cleanup function to run when the screen loses focus
             return () => {
                 console.log('Screen is unfocused');

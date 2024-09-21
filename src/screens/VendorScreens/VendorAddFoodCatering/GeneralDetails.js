@@ -191,10 +191,11 @@ const GeneralDetails = () => {
     const RentalItemsList = () => {
         // const [selectedId, setSelectedId] = useState(null);
         // const [isCollapsed, setIsCollapsed] = useState(true);
-        // const [selectedItems, setSelectedItems] = useState({});
+        const [selectedTitle, setSelectedTitle] = useState({});
 
-        const toggleCollapse = (id) => {
+        const toggleCollapse = (id, title) => {
             setSelectedId(id);
+            setSelectedTitle(title);
             setIsCollapsed(id === selectedId ? !isCollapsed : true);
         };
 
@@ -302,14 +303,14 @@ const GeneralDetails = () => {
             console.log("custom item :::::::::", customItem)
             return (
                 <TouchableOpacity
-                    onPress={() => toggleCollapse(item?._id)}
+                    onPress={() => toggleCollapse(item?._id, item?.title)}
                     style={{ backgroundColor: '#FFF4E1', width: '100%', padding: 10, borderRadius: 10, marginTop: 20 }}
                 >
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={styles.headerText}>{item.title}</Text>
-                        <Icon name={isCollapsed ? 'arrow-down' : 'arrow-up'} size={20} />
+                        <Text style={styles.headerText}>{item?.title}</Text>
+                        <Icon name={currentSelected ? 'arrow-down' : 'arrow-up'} size={20} />
                     </View>
-                    {isCollapsed &&
+                    {currentSelected &&
                         <View>
                             <FlatList
                                 data={item?.subItems}
@@ -397,7 +398,7 @@ const GeneralDetails = () => {
                         </View>
                         : null}
 
-                    {isCollapsed ?
+                    {currentSelected ?
                         <TouchableOpacity style={{ backgroundColor: '#D2453B', padding: 10, borderRadius: 10, alignItems: 'center', marginTop: 10 }}
                             onPress={() => { onPressAddCustomizedItem() }}
                         >
@@ -405,7 +406,7 @@ const GeneralDetails = () => {
                         </TouchableOpacity>
                         : null}
 
-                    {isCollapsed &&
+                    {currentSelected &&
                         <>
                             <TextInput
                                 style={{ borderColor: "lightgray", borderWidth: 1, marginTop: 5, padding: 5 }}
@@ -738,6 +739,7 @@ const GeneralDetails = () => {
     };
 
 
+    const allItemsValid = finalCombomenu.every(item => item.items && item.items.length > 0);
 
 
     return (
@@ -798,11 +800,11 @@ const GeneralDetails = () => {
                 {/* {ItemList()} */}
             </View>
 
-            {finalCombomenu?.length > 0 ?
+            {finalCombomenu?.length > 0  ?
                 <View style={styles.mainContainer}>
                     <Text style={{ color: "black", fontSize: 14, fontWeight: "500", marginBottom: 5, marginHorizontal: 8 }}>Added Combos</Text>
                     <FlatList
-                        data={finalCombomenu}
+                        data={finalCombomenu.filter(item => item.items?.length > 0)} 
                         renderItem={renderMenuItem}
                         keyExtractor={(item, index) => index.toString()}
                         horizontal
@@ -819,7 +821,7 @@ const GeneralDetails = () => {
                     placeholder="Please Enter Advance Booking Amount"
                     value={advanceAmount}
                     onChangeHandler={onChangeAdvanceAmount}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={true}
                 />
                 <TextField
@@ -827,15 +829,15 @@ const GeneralDetails = () => {
                     placeholder="Please Enter Discount Percentage"
                     value={discountPercentage}
                     onChangeHandler={onChangeDiscountPercentage}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={false}
                 />
                 <TextField
-                    label='Over Time Charges'
-                    placeholder="Please Enter OverTime Charges"
+                    label='Travel Chargers'
+                    placeholder="Please Enter Travel Charges"
                     value={overTimeCharges}
                     onChangeHandler={onChangeOverTimeCharges}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={true}
                 />
             </View>
@@ -884,7 +886,7 @@ const GeneralDetails = () => {
                     placeholder="Please Enter Pin code"
                     value={cateringPincode}
                     onChangeHandler={onChangetentHousePincode}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={true}
                 />
             </View>

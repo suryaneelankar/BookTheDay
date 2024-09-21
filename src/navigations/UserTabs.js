@@ -15,7 +15,6 @@ import FocusedCollection from '../assets/svgs/tabIcons/focusedCollection.svg';
 import EventsIcon from '../assets/svgs/tabIcons/events.svg';
 import FocusedEvents from '../assets/svgs/tabIcons/focusedEvents.svg';
 import HireIcon from '../assets/svgs/tabIcons/hire.svg';
-import FocusedHire from '../assets/svgs/tabIcons/focusedHire.svg';
 import SwitchIcon from '../assets/svgs/tabIcons/profile.svg';
 import Hire from '../screens/MyBox';
 import NavigationHeader from '../components/NavigationHeader';

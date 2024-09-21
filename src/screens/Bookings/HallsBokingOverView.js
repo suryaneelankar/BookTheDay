@@ -11,6 +11,7 @@ import LinearGradient from "react-native-linear-gradient";
 import moment from "moment";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import { useSelector } from "react-redux";
+import FastImage from "react-native-fast-image";
 
 const HallsBookingOverView = ({ route, navigation }) => {
 
@@ -102,7 +103,7 @@ const HallsBookingOverView = ({ route, navigation }) => {
                         </View>
                         <Text style={{ color: 'black' }}>Booked for - Rakesh Pandit</Text>
                     </View>
-                    <Image source={{ uri: bookingDetails?.professionalImage?.url.replace('localhost', LocalHostUrl) }}
+                    <FastImage source={{ uri: bookingDetails?.professionalImage?.url.replace('localhost', LocalHostUrl) }}
                         style={{ width: 70, height: 70, borderRadius: 35 }}
                         resizeMethod="resize"
                         resizeMode="cover"

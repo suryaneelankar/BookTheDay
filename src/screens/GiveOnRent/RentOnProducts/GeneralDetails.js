@@ -16,6 +16,7 @@ import DetectLocation from '../../../assets/svgs/detectLocation.svg';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
+import FastImage from 'react-native-fast-image';
 
 const GeneralDetails = () => {
     const [productName, setProductName] = useState('');
@@ -385,7 +386,7 @@ const GeneralDetails = () => {
                     placeholder="Please Enter per Day Price"
                     value={perDayRentPrice}
                     onChangeHandler={onChangePerDayRentPrice}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={true}
                 />
                 <TextField
@@ -393,7 +394,7 @@ const GeneralDetails = () => {
                     placeholder="Please Enter Monthly Price"
                     value={perMonthRentPrice}
                     onChangeHandler={onChangePerMonthRentPrice}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={false}
                 />
                 <TextField
@@ -401,7 +402,7 @@ const GeneralDetails = () => {
                     placeholder="Please Enter Security Deposit"
                     value={securityDeposit}
                     onChangeHandler={onChangeSecurityDepositAmount}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={true}
                 />
                 <TextField
@@ -409,7 +410,7 @@ const GeneralDetails = () => {
                     placeholder="Please Enter Advance Amount"
                     value={advanceAmount}
                     onChangeHandler={onChangeAdvanceAmount}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={true}
                 />
                 <TextField
@@ -417,7 +418,7 @@ const GeneralDetails = () => {
                     placeholder="Please Enter Discount Percentage"
                     value={discountPercentage}
                     onChangeHandler={onChangeDiscountPercentage}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={false}
                 />
             </View>
@@ -464,7 +465,7 @@ const GeneralDetails = () => {
                     placeholder="Please Enter Pin code"
                     value={productPinCode}
                     onChangeHandler={onChangePinCode}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={true}
                 />
             </View>

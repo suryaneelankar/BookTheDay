@@ -497,7 +497,8 @@ const GeneralDetails = () => {
         return (
             <View style={{ flexDirection: 'row' }}>
                 {seatingCapacity.map((item) =>
-                    <TouchableOpacity style={{ backgroundColor: '#FFF5E3', marginHorizontal: 10, borderRadius: 5, padding: 10 }}
+                    <TouchableOpacity  key={item} style={{ borderWidth: item === selectedSeatingCapacity ? 2 : 0,
+                        borderColor: item === selectedSeatingCapacity ? '#ECA73C' : 'transparent',backgroundColor: '#FFF5E3', marginHorizontal: 10, borderRadius: 5, padding: 10 }}
                         onPress={() => onPressSeatingCapacity(item)}
                     >
                         <Text>{item}</Text>
@@ -578,7 +579,7 @@ const GeneralDetails = () => {
 
 
     return (
-        <View style={{ flex: 1, backgroundColor: "#EBEDF3", paddingHorizontal: 10 }}>
+        <View style={{ flex: 1,paddingHorizontal: 10 }}>
 
             <Modal visible={isLocationPickerVisible} animationType="slide">
                 <LocationPicker onLocationSelected={handleLocationSelected} />
@@ -650,7 +651,7 @@ const GeneralDetails = () => {
                     placeholder="Select Number"
                     value={BedRooms}
                     onChangeHandler={onChangeBedRooms}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={true}
                 />
 
@@ -667,7 +668,7 @@ const GeneralDetails = () => {
                     placeholder="Please Enter per Day Charge"
                     value={perDayRentPrice}
                     onChangeHandler={onChangePerDayRentPrice}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={true}
                 />
                 <TextField
@@ -675,7 +676,7 @@ const GeneralDetails = () => {
                     placeholder="Please Enter Advance Booking Amount"
                     value={advanceAmount}
                     onChangeHandler={onChangeAdvanceAmount}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={true}
                 />
                 <TextField
@@ -683,7 +684,7 @@ const GeneralDetails = () => {
                     placeholder="Please Enter OverTime Charges"
                     value={overTimeCharges}
                     onChangeHandler={onChangeOverTimeCharges}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={true}
                 />
 
@@ -692,7 +693,7 @@ const GeneralDetails = () => {
                     placeholder="Please Enter Discount Percentage"
                     value={discountPercentage}
                     onChangeHandler={onChangeDiscountPercentage}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={false}
                 />
             </View>
@@ -741,7 +742,7 @@ const GeneralDetails = () => {
                     placeholder="Please Enter Pin code"
                     value={functionHallPinCode}
                     onChangeHandler={onChangefunctionHallPinCode}
-                    keyboardType='default'
+                    keyboardType='number-pad'
                     isRequired={true}
                 />
             </View>

@@ -5,6 +5,7 @@ import BASE_URL from "../../apiconfig";
 import Icon from 'react-native-vector-icons/AntDesign';
 import IonIcon  from 'react-native-vector-icons/Ionicons';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
+import FastImage from "react-native-fast-image";
 
 const BookingConfirm = ({ route, navigation }) => {
 
@@ -58,7 +59,7 @@ const BookingConfirm = ({ route, navigation }) => {
                         <Text style={{ color: 'grey' }}>Surya Neelankar</Text>
                         <Text style={{ color: 'black' }}>Booked for - Rakesh Pandit</Text>
                     </View>
-                    <Image source={{ uri: eventsDetails?.mainImageUrl }}
+                    <FastImage source={{ uri: eventsDetails?.mainImageUrl }}
                         style={{ width: 70, height: 70,borderRadius:35 }}
                         resizeMethod="resize"
                         resizeMode="cover"
