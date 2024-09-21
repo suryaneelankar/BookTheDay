@@ -54,7 +54,6 @@ const GeneralDetails = () => {
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
     const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
 
-    console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
 
     const [rentalItemPricingDetails, setRentalItemPricingDetails] = useState({
         "Carpet": [{ "itemName": "Carpet", "perDayPrice": 0 }],
@@ -395,7 +394,7 @@ const GeneralDetails = () => {
                 console.log('Success', `uploaded successfully`);
                 Alert.alert(
                     "Confirmation",
-                    "Your proudct posted successfully",
+                    "Your product posted successfully",
                     [
                         {
                             text: "No",

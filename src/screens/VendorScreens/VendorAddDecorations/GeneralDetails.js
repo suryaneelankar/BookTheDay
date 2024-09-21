@@ -69,7 +69,6 @@ const GeneralDetails = () => {
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
-    console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
 
     const onChangeDescription = (value) => {
         setEventDescription(value);
@@ -235,7 +234,7 @@ const GeneralDetails = () => {
                 console.log('Success', `uploaded successfully`);
                 Alert.alert(
                     "Confirmation",
-                    "Your proudct posted successfully",
+                    "Your product posted successfully",
                     [
                         {
                             text: "No",

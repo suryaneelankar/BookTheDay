@@ -32,7 +32,6 @@ const VendorDashBoardTab = ({ navigation }) => {
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
-    // console.log('vendorLoggedInMobileNum is ::>>', vendorLoggedInMobileNum);
 
     useFocusEffect(
         useCallback(() => {

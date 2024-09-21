@@ -38,8 +38,6 @@ const GeneralDetails = () => {
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
-    console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
-
     const onChangePerKMChargePrice = (value) => {
         setPerKMPrice(value);
     }
@@ -267,14 +265,9 @@ const GeneralDetails = () => {
                 console.log('Success', `uploaded successfully`);
                 Alert.alert(
                     "Confirmation",
-                    "Your proudct posted successfully",
+                    "Your product posted successfully",
                     [
-                        {
-                            text: "No",
-                            onPress: () => console.log("No Pressed"),
-                            style: "cancel"
-                        },
-                        { text: "Yes", onPress: () => console.log("yes pressed") }
+                        { text: "Ok", onPress: () => console.log("yes pressed") }
                     ],
                     { cancelable: false }
                 );

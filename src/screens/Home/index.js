@@ -540,7 +540,7 @@ const HomeDashboard = () => {
 
                 {discountProducts?.length > 0 ?
 
-                    <TrendingNow data={discountProducts} textHeader={'Live Offers!'} />
+                    <TrendingNow data={discountProducts} textHeader={'Live Offers!'} token={getUserAuth}/>
                     :
                     null}
                 <View style={{ marginTop: 20, }}>
@@ -575,12 +575,6 @@ const HomeDashboard = () => {
 
                 <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
                     <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
-                    {/* HireChefOrDriverForm */}
-                    {/* RentOnProducts */}
-                    {/* AddTentHouse */}
-                    {/* AddFunctionalHall */}
-                    {/* AddFoodCatering */}
-                    {/* AddDecorations */}
                     <TouchableOpacity onPress={() => navigation.navigate('Events')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
                         <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
                         <RightArrowIcon width={25} height={25} />

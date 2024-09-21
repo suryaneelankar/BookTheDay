@@ -55,8 +55,6 @@ const TrendingNow = ({ data, textHeader , token}) => {
                     style={{ width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginLeft: 16 }}>
                     <FastImage  source={{ uri: updatedImgUrl ,
                         headers:{Authorization : `Bearer ${token}`}
-
-
                     }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '90%', alignSelf: "center", marginTop: 5, height: Dimensions.get('window').height / 5 }}
                     />
                     <View style={{ marginTop: 15, marginHorizontal: 6 }}>

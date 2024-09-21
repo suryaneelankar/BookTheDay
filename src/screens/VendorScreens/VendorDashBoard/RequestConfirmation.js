@@ -396,7 +396,6 @@ const RequestConfirmation = ({ navigation, route }) => {
 
                         <View>
                             <Text >Booked Items</Text>
-                            
                         </View>
                     </View>
                 </ScrollView>
