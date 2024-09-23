@@ -9,11 +9,13 @@ const TextField = (props)=>{
                 {isRequired && <Text style={styles.isRequired}>*</Text>}
             </Text>
             <TextInput
-                style={[styles.input,{height: isDescriptionField ? 100 : 50}]}
+                style={[styles.input,{height: isDescriptionField ? 100 : 50,textAlignVertical: isDescriptionField ? 'top' : 'center'}]}
                 onChangeText={onChangeHandler}
                 value={value}
                 placeholder={placeholder}
                 keyboardType={keyboardType}
+                multiline={true}
+                numberOfLines={4}
                 
         />
         </View>

@@ -12,7 +12,6 @@ import BASE_URL from '../../../apiconfig';
 import LocationPicker from '../../../components/LocationPicker';
 import DetectLocation from '../../../assets/svgs/detectLocation.svg';
 
-
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
@@ -41,9 +40,21 @@ const GeneralDetails = () => {
     const [isSelected, setSelection] = useState(false);
     const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
 
+    const [selectedOption, setSelectedOption] = useState(null);
+
+    // Options for radio buttons
+    const options = [
+        { id: 'clothes', label: 'Clothes' },
+        { id: 'jewels', label: 'Jewels' }
+    ];
+
+    const handleSelect = (id) => {
+        setSelectedOption(id);
+    };
+
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
-    console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
+    console.log('vendorLoggedInMobileNum is ::>>', vendorLoggedInMobileNum);
 
     const inputHandler = (value) => {
         console.log("general details inputhandler", value)
@@ -65,9 +76,9 @@ const GeneralDetails = () => {
         setPerDayRentPrice(value);
     }
 
-    const onChangePerMonthRentPrice = (value) => {
-        setPerMonthRentPrice(value);
-    }
+    // const onChangePerMonthRentPrice = (value) => {
+    //     setPerMonthRentPrice(value);
+    // }
 
     const onChangeSecurityDepositAmount = (value) => {
         setSecurityDeposit(value);
@@ -205,21 +216,22 @@ const GeneralDetails = () => {
     }
 
     const onPressSaveAndPost = async () => {
+        console.log('selectedOption os:::>>',selectedOption);
 
-        if(!mainImageUrl || productName === '' || productDescription === '' || productCity === ''||
-           ( perDayRentPrice === '' || perDayRentPrice === undefined)  || productAddress === '' || productPinCode === '' || (perMonthRentPrice === undefined || perMonthRentPrice === '') || (securityDeposit === undefined || securityDeposit === '')|| (advanceAmount === undefined || advanceAmount === '') || (discountPercentage === undefined || discountPercentage ==='')
-          ){
+        if (!mainImageUrl || productName === '' || productDescription === '' || productCity === '' ||
+            (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || productPinCode === '' || (securityDeposit === undefined || securityDeposit === '') || (advanceAmount === undefined || advanceAmount === '') || (selectedOption == null) || (discountPercentage === undefined || discountPercentage === '')
+        ) {
             Alert.alert('Please fill Mandatory fields');
             return;
-          }
-          for (const [key, value] of Object.entries(additionalImages)) {
-              if (value === undefined) {
-                  Alert.alert('Incomplete Details', `Please fill ${key.replace('additionalImage', 'Image ')}`);
-                  return;
-              }
-          }
+        }
+        for (const [key, value] of Object.entries(additionalImages)) {
+            if (value === undefined) {
+                Alert.alert('Incomplete Details', `Please fill ${key.replace('additionalImage', 'Image ')}`);
+                return;
+            }
+        }
 
-          
+
         const vendorMobileNumber = vendorLoggedInMobileNum
         const formData = new FormData();
         formData.append('professionalImage', {
@@ -267,28 +279,28 @@ const GeneralDetails = () => {
         formData.append('advanceAmount', advanceAmount);
         formData.append('discountPercentage', discountPercentage);
 
-        console.log('formdata is ::>>',JSON.stringify(formData));
+        console.log('formdata is ::>>', JSON.stringify(formData));
         const token = await getVendorAuthToken();
- 
-          try {
+
+        try {
             const response = await axios.post(`${BASE_URL}/AddClothJewels`, formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${token}`,
-              },
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`,
+                },
             });
             if (response.status === 201) {
                 console.log('Success', `uploaded successfully`);
                 Alert.alert(
                     "Confirmation",
-                    "Your proudct posted successfully",
+                    "Your product posted successfully",
                     [
-                        {
-                            text: "No",
-                            onPress: () => console.log("No Pressed"),
-                            style: "cancel"
-                        },
-                        { text: "Yes", onPress: () => console.log("yes pressed") }
+                        // {
+                        //     text: "No",
+                        //     onPress: () => console.log("No Pressed"),
+                        //     style: "cancel"
+                        // },
+                        { text: "OK", onPress: () => console.log("yes pressed") }
                     ],
                     { cancelable: false }
                 );
@@ -351,6 +363,21 @@ const GeneralDetails = () => {
                     horizontal
                     contentContainerStyle={{ width: '100%', justifyContent: 'space-around' }}
                 />
+                <View style={styles.radioViewcontainer}>
+                    <Text style={[styles.title, {}]}>Choose an option* :</Text>
+                    {options.map(option => (
+                        <TouchableOpacity
+                            key={option.id}
+                            style={styles.radioContainer}
+                            onPress={() => handleSelect(option.id)}
+                        >
+                            <View style={styles.radioCircle}>
+                                {selectedOption === option.id && <View style={styles.selectedCircle} />}
+                            </View>
+                            <Text style={styles.radioLabel}>{option.label}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
                 <TextField
                     label='Product Name'
                     placeholder="Please Enter Product Name"
@@ -382,21 +409,21 @@ const GeneralDetails = () => {
             <Text style={styles.title}>Rent Type</Text>
             <View style={styles.mainContainer}>
                 <TextField
-                    label='Day Price (₹ / 1day)*'
+                    label='Day Price (₹ / 1day)'
                     placeholder="Please Enter per Day Price"
                     value={perDayRentPrice}
                     onChangeHandler={onChangePerDayRentPrice}
                     keyboardType='number-pad'
                     isRequired={true}
                 />
-                <TextField
+                {/* <TextField
                     label='Monthly Price (₹ / 30 days)*'
                     placeholder="Please Enter Monthly Price"
                     value={perMonthRentPrice}
                     onChangeHandler={onChangePerMonthRentPrice}
                     keyboardType='number-pad'
                     isRequired={false}
-                />
+                /> */}
                 <TextField
                     label='Security Deposit'
                     placeholder="Please Enter Security Deposit"
@@ -424,11 +451,11 @@ const GeneralDetails = () => {
             </View>
             <Text style={styles.title}>Item Available Address</Text>
             <View style={styles.mainContainer}>
-            <Text style={styles.textInputlabel}>
+                <Text style={styles.textInputlabel}>
                     Address<Text style={{ color: "red" }}>*</Text>
                 </Text>
-                <TouchableOpacity onPress={handleOpenLocationPicker} style={[styles.textTnputView, { height: 100, flexDirection: "row",}]}>
-                    <View style={{height: '100%',width:"85%" }}>
+                <TouchableOpacity onPress={handleOpenLocationPicker} style={[styles.textTnputView, { height: 100, flexDirection: "row", }]}>
+                    <View style={{ height: '100%', width: "85%" }}>
                         <TextInput
                             onChangeText={onChangeAddress}
                             value={productAddress}
@@ -439,7 +466,7 @@ const GeneralDetails = () => {
                             numberOfLines={4}
                         />
                     </View>
-                    <View style={{justifyContent: 'center', alignItems: 'center' }}>
+                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                         <DetectLocation />
                     </View>
                 </TouchableOpacity>
@@ -496,6 +523,40 @@ const styles = StyleSheet.create({
         backgroundColor: 'red',
         borderRadius: 10,
 
+    },
+    radioViewcontainer: {
+        // marginTop: 10
+    },
+    radioTextlabel: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    radioContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10
+    },
+    radioCircle: {
+        height: 20,
+        width: 20,
+        borderRadius: 10,
+        borderWidth: 2,
+        borderColor: '#000',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 10,
+    },
+    selectedCircle: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: themevariable.Color_FD813B,
+    },
+    radioLabel: {
+        fontSize: 16,
+        fontFamily: 'ManropeRegular',
+        color: themevariable.Color_000000,
     },
     title: {
         fontFamily: 'ManropeRegular',
