@@ -23,6 +23,8 @@ import LinkBgm from '../../assets/profilesvgs/linkBgm.svg';
 import CrossIcon from '../../assets/profilesvgs/orangeCross.svg';
 import WhiteDashboard from '../../assets/profilesvgs/whiteDashboard.svg';
 import { moderateScale } from '../../utils/scalingMetrics';
+import LogOutIcon from '../../assets/svgs/logOutIcon.svg';
+
 
 const ProfileMainScreen = () => {
     const navigation = useNavigation();
@@ -103,26 +105,23 @@ const ProfileMainScreen = () => {
                         <DropdownItem title="My Lend" navigation={navigation} />
                     </View>
                 )}
-                <MenuItem icon={<ReferEarn />} title="Refer & Earn">
+                {/* <MenuItem icon={<ReferEarn />} title="Refer & Earn">
                     <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.copyLink}>
                         <CopyLinkIcon />
                         <Text style={styles.copyLinkText}>Copy Link</Text>
                     </TouchableOpacity>
-                </MenuItem>
-                <MenuItem icon={<TransactionIcon />} title="My Transaction" />
-                <MenuItem onPress={() => navigation.navigate('LocationAdded')} icon={<LocationIcon />} title="Manage Location" />
-                <MenuItem icon={<NotificationIcon />} title="Notification Preferences">
-                    {/* <Switch
-                        trackColor={{ false: "#767577", true: "#81b0ff" }}
-                        thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-                        onValueChange={toggleSwitch}
-                        value={isEnabled}
-                    /> */}
+                </MenuItem> */}
+                {/* <MenuItem icon={<TransactionIcon />} title="My Transaction" /> */}
+                {/* <MenuItem onPress={() => navigation.navigate('LocationAdded')} icon={<LocationIcon />} title="Manage Location" /> */}
+                {/* <MenuItem icon={<NotificationIcon />} title="Notification Preferences">
+                   
                     <CustomToggle value={isEnabled} onValueChange={toggleSwitch} />
-                </MenuItem>
+                </MenuItem> */}
                 <MenuItem icon={<AboutUsIcon />} title="About Us" />
                 <MenuItem icon={<TermsConditionIcon />} title="Terms & Condition" />
                 <MenuItem icon={<RefundPolicy />} title="Refund Policy" />
+                <MenuItem icon={<LogOutIcon />} title="Log Out" />
+
             </ScrollView>
 
             <Modal

@@ -148,7 +148,6 @@ const ViewCaterings = ({ route, navigation }) => {
     }, []);
 
     const getCateringDetails = async () => {
-        console.log("IAM CALLING API")
         const token = await getUserAuthToken();
         setGetUserAuth(token);
         try {
@@ -157,13 +156,12 @@ const ViewCaterings = ({ route, navigation }) => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log("catering view details ::::::::::", JSON.stringify(response?.data));
+            // console.log("catering view details ::::::::::", JSON.stringify(response?.data));
             setEventsDetails(response?.data);
 
             const imageUrls = response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
             setSubImages(imageUrls);
             setFoodItemsData(response?.data?.foodItems);
-            console.log("rental items::::::", response?.data?.foodItems)
         } catch (error) {
             console.log("catering details::::::::::", error);
 
@@ -215,8 +213,8 @@ const ViewCaterings = ({ route, navigation }) => {
                         <TextInput
                             style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2, }}
                             placeholder="Enter number of plates"
-                            keyboardType="numeric"
-                            value={numPlates[item.title]}
+                            keyboardType='phone-pad'
+                            value={numPlates[item.title] || ''}
                             onChangeText={(text) => setNumPlates({ ...numPlates, [item.title]: text })}
                         />
                     </>
@@ -224,6 +222,7 @@ const ViewCaterings = ({ route, navigation }) => {
             </View>
         );
     };
+    console.log("numof plates::::::::", numPlates)
 
     const handleAdd = (item) => {
         setAddedItems([...addedItems, item]);
@@ -257,7 +256,6 @@ const ViewCaterings = ({ route, navigation }) => {
     }
 
     const onDayPress = (day) => {
-        console.log('day is::>>', day)
         let startedDate;
         if (!selectedStartDate || selectedEndDate) {
             startedDate = day?.dateString;
@@ -274,13 +272,11 @@ const ViewCaterings = ({ route, navigation }) => {
             const endedDate = day?.dateString;
             const startDate = new Date(selectedStartDate);
             const endDate = new Date(endedDate);
-            console.log(selectedStartDate, endedDate, 'started and ednded dates::>>>')
             const diffInTime = endDate.getTime() - startDate.getTime();
             const diffInDays = diffInTime / (1000 * 3600 * 24);
             setNoOfDays(diffInDays);
             const formattedStartDate = formattedDates(selectedStartDate);
             setSelectedStartDate(formattedStartDate);
-            console.log('Number of days:', diffInDays);
         }
     };
 
@@ -349,7 +345,6 @@ const ViewCaterings = ({ route, navigation }) => {
     const itemsWithTotalPrice = calculateTotalPrice(numPlates, addedItems);
     const grandTotal = calculateGrandTotal(itemsWithTotalPrice);
 
-    console.log("itemsWithTotalPrice is:::::::::::::,", itemsWithTotalPrice?.length)
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
             <ScrollView style={{ backgroundColor: "white", marginBottom: 30 }}>

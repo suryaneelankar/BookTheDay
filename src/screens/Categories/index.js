@@ -208,7 +208,7 @@ const Categories = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, }}>
-            <ScrollView style={{ marginBottom: 70 }} >
+            <ScrollView style={{ marginBottom: 70 ,marginTop:20}} >
                 <View style={{ backgroundColor: "#F9F9F9" }}>
                     <View style={styles.searchProduct}>
                         <View style={styles.searchProHeader}>

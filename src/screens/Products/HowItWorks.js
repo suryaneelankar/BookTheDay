@@ -107,7 +107,6 @@ const styles=StyleSheet.create({
         height:25,
     },
     infoContainer:{
-        maxWidth:280,
         borderBottomWidth:1,
         borderBottomColor:themevariable.Color_F5E7B6,
         padding:15

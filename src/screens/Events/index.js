@@ -48,7 +48,7 @@ const Events = () => {
             return () => {
                 console.log('Screen is unfocused');
             };
-        }, [userLocationFetched])
+        }, [userLocationFetched, selectedCategory])
     );
 
     const MAX_DESTINATIONS_PER_BATCH = 25;

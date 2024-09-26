@@ -129,8 +129,8 @@ const HomeDashboard = () => {
         { id: '1', Component: TrendingTshirt },
         { id: '2', Component: TrendingBridal },
         { id: '3', Component: TrendingCatering },
-        { id: '4', Component: TrendingChef },
-        { id: '5', Component: TrendingDriver },
+        // { id: '4', Component: TrendingChef },
+        // { id: '5', Component: TrendingDriver },
         { id: '6', Component: TrendingRingBanner },
         { id: '7', Component: TrendingEarrings },
         { id: '8', Component: TrendingJewellery },
@@ -573,7 +573,7 @@ const HomeDashboard = () => {
                         />
                     </> : null}
 
-                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' ,marginTop:horizontalScale(20)}}>
                     <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
                     <TouchableOpacity onPress={() => navigation.navigate('Events')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
                         <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
