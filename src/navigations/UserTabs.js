@@ -20,6 +20,7 @@ import Hire from '../screens/MyBox';
 import NavigationHeader from '../components/NavigationHeader';
 import ViewProfile from '../screens/Profile/ViewProfile';
 import ProfileMainScreen from '../screens/Profile/ProfileScreen';
+import Caterings from '../screens/Caterings';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -94,6 +95,20 @@ const Tab4Screen = ({ navigation }) => {
         }}
       />
 
+<Tab.Screen
+  name="Caterings"
+  component={Caterings}
+  options={{
+    tabBarIcon: ({ focused }) => (
+      focused ? <FocusedEvents /> : <EventsIcon />
+    ),
+    tabBarLabel: 'Caterings',
+    tabBarShowLabel:true,
+    header: () => <NavigationHeader Icon={false} title="Catering Services" />,
+    headerShown: true,
+  }}
+/>
+
  <Tab.Screen
   name="Categories"
   component={Categories}
@@ -136,7 +151,7 @@ const Tab4Screen = ({ navigation }) => {
   }}
 /> */}
 
-<Tab.Screen
+{/* <Tab.Screen
   name="My Profile"
   // component={StackProfileNavigation}
   component={ProfileMainScreen}
@@ -155,7 +170,7 @@ const Tab4Screen = ({ navigation }) => {
   //   tabBarIcon: ({ focused }) => <TabProfile focused={focused} />,
   //   headerShown: false,
   // }}
-/>
+/> */}
 
     </Tab.Navigator>
   );

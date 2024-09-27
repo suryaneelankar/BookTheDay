@@ -392,7 +392,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                     />
                     <View style={{ margin: 10 }}>
                         <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{item?.productName} </Text>
-                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.totalAmount)}</Text>
+                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '800' }}>{formatAmount(item?.totalAmount)}</Text>
                     </View>
                 </View>
                 <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', height: 35, borderRadius: 5, position: 'absolute', right: 10 }}>
@@ -624,7 +624,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                             />
                         </>
                         : null}
-                    {decorationsBookingsData?.length ?
+                    {/* {decorationsBookingsData?.length ?
                         <>
                             <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Decoration Bookings</Text>
                             <FlatList
@@ -634,7 +634,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                                 ItemSeparatorComponent={ItemSeparator}
                             />
                         </>
-                        : null}
+                        : null} */}
 
                     {functionHallBookingsData?.length ?
                         <>
@@ -647,7 +647,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                             />
                         </>
                         : null}
-                    {tentHouseBookingsData?.length ?
+                    {/* {tentHouseBookingsData?.length ?
                         <>
                             <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Tent House Bookings</Text>
                             <FlatList
@@ -657,7 +657,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                                 ItemSeparatorComponent={ItemSeparator}
                             />
                         </>
-                        : null}
+                        : null} */}
 
                     {cateringsBookingsData?.length ?
                         <>

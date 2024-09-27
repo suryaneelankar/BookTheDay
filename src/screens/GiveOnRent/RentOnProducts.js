@@ -9,7 +9,7 @@ const RentOnProducts =()=>{
             <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1 }}>
 
        <View style={styles.subContainer}>
-       <Text style={styles.mainHeading}>General Details</Text>
+       <Text style={styles.mainHeading}>General Details </Text>
         <GeneralDetails/>
        </View>
        </LinearGradient>

@@ -15,7 +15,7 @@ import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
 import { useSelector } from "react-redux";
 
-const Events = () => {
+const Caterings = () => {
     const navigation = useNavigation();
     const [eventsData, setEventsData] = useState([]);
     const [tentHouseData, setTentHouseData] = useState([]);
@@ -25,32 +25,20 @@ const Events = () => {
     const [getUserAuth, setGetUserAuth] = useState('');
     const suggestions = ['Events', 'Function Hall', 'Food', 'Catering', 'Tent House', 'Decoration', 'Halls'];
     const Cats = [TentHouseIcon, TentHouseIcon, TentHouseIcon, TentHouseIcon];
-    const [selectedCategory, setSelectedCategory] = useState('Halls');
+    const [selectedCategory, setSelectedCategory] = useState('Catering');
     const userLocationFetched = useSelector((state) => state.userLocation);
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     // console.log("user selevcted address is events::::::::", userLocationFetched)
 
-    // useFocusEffect(
-    //     useCallback(() => {
-    //         // Code to run when the screen is focused
-    //         if (selectedCategory === 'Halls') {
-    //             getAllEvents(currentPage);
-    //         } else if (selectedCategory === 'Catering') {
-    //             getAllCaterings();
-    //         }
-    //         // getTentHouse();
-    //         // getDecorations();
-    //         return () => {
-    //             console.log('Screen is unfocused');
-    //         };
-    //     }, [userLocationFetched, selectedCategory])
-    // );
-
     useEffect(() => {
+        if (selectedCategory === 'Halls') {
             getAllEvents(currentPage);
-    },[])
+        } else if (selectedCategory === 'Catering') {
+            getAllCaterings(currentPage);
+        }
+    },[selectedCategory])
 
     const MAX_DESTINATIONS_PER_BATCH = 25;
 
@@ -166,9 +154,16 @@ const Events = () => {
     // console.log("SELECTED FILETRS", selectedCategory)
 
     const loadMoreFunctionHalls = () => {
+        // if (hasMore && !loading) {
+        //     console.log('hasmore values::>>>',hasMore,loading);
+        //     getAllEvents(currentPage + 1);
+        // }
+    };
+
+    const loadMoreCaterings = () => {
         if (hasMore && !loading) {
             console.log('hasmore values::>>>',hasMore,loading);
-            getAllEvents(currentPage + 1);
+            getAllCaterings(currentPage + 1);
         }
     };
 
@@ -229,20 +224,46 @@ const Events = () => {
         }
     };
 
-    const getAllCaterings = async () => {
+    const getAllCaterings = async (page = 1) => {
+        setLoading(true);
         const token = await getUserAuthToken();
+        setGetUserAuth(token);
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFoodCaterings`, {
+            const response = await axios.get(`${BASE_URL}/getAllFoodCaterings?page=${page}&limit=10`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            // console.log('catering response is::::::::', JSON.stringify(response?.data));
-            setCateringsData(response?.data)
+
+            const newCateringsData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
+
+            if (response?.data?.data?.length > 0) {
+                setCateringsData((prevData) => [...prevData, ...newCateringsData]); // Append new data
+                setCurrentPage(page);
+            } else {
+                setHasMore(false); // No more data to load
+            }
         } catch (error) {
-            console.log("caterings data error>>::", error);
+            setLoading(false);
+            console.error('Error fetching food caterings:', error);
         }
+        setLoading(false);
     };
+
+    // const getAllCateringsOld = async () => {
+    //     const token = await getUserAuthToken();
+    //     try {
+    //         const response = await axios.get(`${BASE_URL}/getAllFoodCaterings`, {
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`,
+    //             },
+    //         });
+    //         // console.log('catering response is::::::::', JSON.stringify(response?.data));
+    //         setCateringsData(response?.data)
+    //     } catch (error) {
+    //         console.log("caterings data error>>::", error);
+    //     }
+    // };
 
     const renderTentHouseItem = ({ item }) => {
 
@@ -477,13 +498,8 @@ const Events = () => {
 
     const returnCategoriesCount = () => {
         let count = 0;
-        if (selectedCategory === 'Halls') {
-            count = eventsData?.length;
-            return count;
-        } else if (selectedCategory === 'catering') {
             count = cateringsData?.length;
             return count;
-        }
     }
 
     return (
@@ -505,6 +521,7 @@ const Events = () => {
                 <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
                 <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} {selectedCategory} Service in Hyderabad</Text>
             </View>
+            {selectedCategory === 'Halls' ?
                     <FlatList
                         data={eventsData}
                         renderItem={renderItem}
@@ -520,6 +537,19 @@ const Events = () => {
                             </View>
                           }
                     />
+                    :
+                        selectedCategory === 'Catering' ?
+                            <FlatList
+                                data={cateringsData}
+                                renderItem={renderFoodCaterings}
+                                keyExtractor={(item) => item._id}
+                                onEndReached={loadMoreCaterings}
+                                onEndReachedThreshold={0.5}
+                                ListFooterComponent={() => 
+                                    loading ? <ActivityIndicator size="large" color="#0000ff" /> : null
+                                }
+                            />
+                            : null}
         </SafeAreaView>
     )
 }
@@ -611,4 +641,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default Events;
+export default Caterings;

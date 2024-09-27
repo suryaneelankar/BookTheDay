@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Dimensions, ImageBackground, StyleSheet, FlatList, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Dimensions, ImageBackground, StyleSheet, FlatList, Image, SafeAreaView,ActivityIndicator, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";
@@ -30,6 +30,9 @@ const Categories = () => {
     const [jewelleryCategory, setJewelleryCategory] = useState([]);
     const [productYouMayLike, setProductYouMayLike] = useState([]);
     const [getUserAuth, setGetUserAuth] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const bannerImages = [{ image: require('../../assets/svgs/productBanners/productBannerone.png') },
     { image: require('../../assets/svgs/productBanners/productBannerone.png') },
@@ -40,60 +43,56 @@ const Categories = () => {
     const [selectedJewelFilter, setSelectedJewelFilter] = useState(categoryFilterList[0]?.name);
 
 
-    const discountList = [
-        {
-            id: 0,
-            value: 'All',
-        },
-        {
-            id: 1,
-            value: '10%',
-        },
-        {
-            id: 2,
-            value: '20%',
-        },
-        {
-            id: 3,
-            value: '30%',
-        },
-        {
-            id: 4,
-            value: '40%',
-        },
-        {
-            id: 5,
-            value: '50%',
-        },
-    ];
-
     useEffect(() => {
-        getCategories();
+        getCategories(currentPage);
     }, [filteredJewellery]);
 
-    const getCategories = async () => {
+    const loadMoreClothJewels = () => {
+        if (hasMore && !loading) {
+            console.log('hasmore values::>>>',hasMore,loading);
+            getCategories(currentPage);
+        }
+    };
+
+    const getCategories = async (page) => {
         const token = await getUserAuthToken();
         setGetUserAuth(token);
+        setLoading(true);
         try {
-            const response = await axios.get(`${BASE_URL}/getAllClothesJewels`,{
+            const response = await axios.get(`${BASE_URL}/getAllClothesJewels?page=${page}&limit=100`,{
                 headers: {
                     Authorization: `Bearer ${token}`,
                   },
             });
-            setCategories(response?.data)
-            const filteredClothesCategories = response?.data.filter(category => category?.categoryType === 'clothes');
-            const filteredJewelleryCategories = response?.data.filter(category => category?.categoryType === 'jewels');
-            const filteredDiscountItems = response?.data.filter(category => category?.componentType === 'discount');
+
+            if (response?.data?.data?.length > 0) {
+                // setCurrentPage(page);
+            } else {
+                setListingLoading(false);
+                setHasMore(false); // No more data to load
+            }
+            const finalResponseData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
+            const filteredClothesCategories = finalResponseData?.filter(category => category?.categoryType === 'clothes');
+            const filteredJewelleryCategories = finalResponseData?.filter(category => category?.categoryType === 'jewels');
+            const filteredDiscountItems = finalResponseData?.filter(category => category?.componentType === 'discount');
+
+
+            // const finalResponseData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
+            console.log('finalResponseData in cat is::>>>',finalResponseData);
+        
+            // setCategories((prevData) => [...prevData, ...filteredDiscountItems]);
+
 
             setJewelleryCategory(filteredJewelleryCategories);
             setProductYouMayLike(filteredClothesCategories);
-            setDiscountProducts(filteredDiscountItems)
+            setDiscountProducts(filteredDiscountItems);
+            setLoading(false);
         } catch (error) {
             console.log("categories::::::::::", error);
-
+            setLoading(false);
         }
     }
-    const limitedData = productYouMayLike.slice(0, 6);
+    const limitedData = productYouMayLike.slice(0, 20);
 
     const renderFilterBox = ({ item }) => {
         const isSelected = selectedJewelFilter === item?.name;
@@ -245,14 +244,36 @@ const Categories = () => {
                         showsHorizontalScrollIndicator={false}
                         data={categoryFilterList}
                         contentContainerStyle={{ marginHorizontal: 20, marginTop: 15 }}
-                        renderItem={renderFilterBox} />
+                        renderItem={renderFilterBox} 
+                        // onEndReached={loadMoreClothJewels} // Fetch more when list ends
+                        onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
+                        ListFooterComponent={() =>
+                            loading ? <ActivityIndicator size="large" color="#0000ff" /> : null
+                        }
+                        ListEmptyComponent={
+                            <View >
+                              <Text>No Products Available</Text>
+                            </View>
+                          }
+                        />
 
                     <FlatList
                         horizontal
                         data={filteredJewellery}
                         showsHorizontalScrollIndicator={false}
                         contentContainerStyle={{ backgroundColor: "#FDF7D7", paddingVertical: 20 }}
-                        renderItem={renderJewellery} />
+                        renderItem={renderJewellery} 
+                        // onEndReached={loadMoreClothJewels} // Fetch more when list ends
+                        onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
+                        ListFooterComponent={() =>
+                            loading ? <ActivityIndicator size="large" color="#0000ff" /> : null
+                        }
+                        ListEmptyComponent={
+                            <View >
+                              <Text>No Products Available</Text>
+                            </View>
+                          }
+                        />
                 </View>
 
 
@@ -268,7 +289,9 @@ const Categories = () => {
                     data={limitedData}
                     numColumns={2}
                     contentContainerStyle={{ alignSelf: "center", marginHorizontal: 10 }}
-                    renderItem={renderClothesCat} />
+                    renderItem={renderClothesCat} 
+                    
+                    />
                  {discountProducts?.length ?
                 <TrendingNow data={discountProducts} textHeader={'Trending Now'} token={getUserAuth} />
                  : null }
