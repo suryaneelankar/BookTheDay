@@ -16,6 +16,8 @@ import moment from 'moment';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
 import { useSelector } from 'react-redux';
 import FastImage from 'react-native-fast-image';
+import ThumsUpIcon from '../../assets/svgs/thumsupIcon.svg';
+
 
 const BookingDetailsScreen = ({ navigation, route }) => {
 
@@ -205,10 +207,10 @@ const BookingDetailsScreen = ({ navigation, route }) => {
           <Text style={styles.footerNote} >Security Deposit confirms your order 90%</Text>
         </View>
         <View style={styles.footerButtons}>
-          <TouchableOpacity style={[styles.button, { width: "35%" }]}>
+          {/* <TouchableOpacity style={[styles.button, { width: "35%" }]}>
             <Text style={styles.buttonText}>Pay Later</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => ConfirmBooking()} style={[styles.button, { width: "60%", marginLeft: 10, backgroundColor: "#D2453B" }]}>
+          </TouchableOpacity> */}
+          <TouchableOpacity onPress={() => ConfirmBooking()} style={[styles.button, {   backgroundColor: "#D2453B" }]}>
             <Text style={[styles.buttonText, { color: "white" }]}>Confirm Booking | {formatAmount(calculateTotalPrice())}</Text>
           </TouchableOpacity>
         </View>
@@ -238,16 +240,11 @@ const BookingDetailsScreen = ({ navigation, route }) => {
           <LinearGradient colors={['#D2453B', '#A0153E']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            style={{ width: "55%", padding: 4, }}>
+            style={{ width: "55%", }}>
             {/* <View style={{borderWidth:4, width:"50%", }}/> */}
           </LinearGradient>
 
-          <View style={styles.iconContainer}>
-            <View style={styles.iconBackground}>
-              {/* <Image source={{ uri: 'thumbs_up_icon_url' }} style={styles.icon} /> */}
-
-            </View>
-          </View>
+           <ThumsUpIcon/>
           <Text style={styles.title}>Thank You!</Text>
           <Text style={styles.subtitle}>Your Booking Initiated.</Text>
           <Text style={styles.description}>Our team will deliver the update to you in less than 2 hours</Text>
@@ -261,9 +258,6 @@ const BookingDetailsScreen = ({ navigation, route }) => {
               <Text style={styles.doneButtonText}>Done</Text>
             </TouchableOpacity>
           </LinearGradient>
-          <TouchableOpacity>
-            <Text style={styles.trackProgressText}>Track your Booking Progress</Text>
-          </TouchableOpacity>
         </View>
 
       </Modal>
@@ -442,7 +436,8 @@ const styles = StyleSheet.create({
   footerButtons: {
     flexDirection: 'row',
     marginHorizontal: 20,
-    paddingVertical: 15
+    paddingVertical: 15,
+    alignSelf:"center",
   },
   button: {
     alignItems: 'center',
@@ -450,6 +445,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "#D2453B",
     borderWidth: 1,
+    width:"95%"
+
   },
   payLaterButton: {
 
@@ -516,7 +513,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "#333333",
     fontFamily: "ManropeRegular",
-    marginTop: 20
   },
   subtitle: {
     fontSize: 14,

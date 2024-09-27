@@ -172,7 +172,7 @@ const ViewCatDetails = ({ route }) => {
 
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{flex:1}}>
             <ScrollView style={{ marginBottom: '15%' }}>
                 <View style={{ backgroundColor: "white", }}>
 
@@ -310,15 +310,6 @@ const ViewCatDetails = ({ route }) => {
                                 }).start();
                             }}
                         >
-                            <View style={{
-                                alignSelf: 'center',
-                                backgroundColor: themevariable.Color_CCCCCC,
-                                height: verticalScale(5),
-                                width: horizontalScale(57),
-                                borderRadius: moderateScale(20),
-                                top: 80,
-                                position: 'absolute',
-                            }} />
                         </View>
                         <View style={{
                             flex: 1,
