@@ -105,7 +105,7 @@ const Tab4Screen = ({ navigation }) => {
     tabBarLabel: 'Caterings',
     tabBarShowLabel:true,
     header: () => <NavigationHeader Icon={false} title="Catering Services" />,
-    headerShown: true,
+    headerShown: false,
   }}
 />
 

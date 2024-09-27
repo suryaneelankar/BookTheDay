@@ -122,7 +122,11 @@ const VendorProfile = () => {
                 <MenuItem icon={<AboutUsIcon />} title="About Us" />
                 <MenuItem icon={<TermsConditionIcon />} title="Terms & Condition" />
                 <MenuItem icon={<RefundPolicy />} title="Refund Policy" />
-                <MenuItem icon={<LogOutIcon />} title="Log Out" />
+                <MenuItem icon={<LogOutIcon />} title="Log Out"
+                onPress={() => {[
+                    dispatch(getLoginUserId('')),
+                    navigation.navigate('LandingScreen')
+                ]}}  />
 
             </ScrollView>
 

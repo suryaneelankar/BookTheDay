@@ -160,7 +160,7 @@ const CategoriesList = ({ route }) => {
                         onEndReached={loadMoreClothJewels} // Fetch more when list ends
                         onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
                         ListFooterComponent={() =>
-                            listLoading ? <ActivityIndicator size="large" color="#0000ff" /> : null
+                            listLoading ? <ActivityIndicator size="large" color="#FEF7DE" /> : null
                         }
                         ListEmptyComponent={
                             <View >

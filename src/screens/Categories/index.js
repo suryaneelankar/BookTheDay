@@ -18,6 +18,10 @@ import HowItWorks from "../Products/HowItWorks";
 import Swiper from 'react-native-swiper';
 import EarRingsIcon from '../../assets/svgs/jewelleryCategories/earrings.svg';
 import ChainIcon from '../../assets/svgs/jewelleryCategories/chains.svg';
+import BanglesIcon from '../../assets/svgs/jewelleryCategories/banglesCategory.svg';
+import BraceletIcon from '../../assets/svgs/jewelleryCategories/braceletsCategory.svg';
+import RingsIcon from '../../assets/svgs/jewelleryCategories/ringsCategory.svg';
+
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
 
@@ -39,7 +43,7 @@ const Categories = () => {
     { image: require('../../assets/svgs/productBanners/productBannerone.png') },
     ]
 
-    const categoryFilterList = [{ name: 'Chains', image: ChainIcon }, { name: 'Rings', image: EarRingsIcon }, { name: 'Bridal', image: EarRingsIcon  }, { name: 'Bangles', image:EarRingsIcon  }, { name: 'EarRings', image:EarRingsIcon  }, { name: 'Bracelets' , image: EarRingsIcon }]; //svg images for swipper  
+    const categoryFilterList = [{ name: 'Chains', image: ChainIcon }, { name: 'Rings', image: RingsIcon }, { name: 'Bridal', image: ChainIcon  }, { name: 'Bangles', image:BanglesIcon  }, { name: 'EarRings', image:EarRingsIcon  }, { name: 'Bracelets' , image: BraceletIcon }]; //svg images for swipper  
     const [selectedJewelFilter, setSelectedJewelFilter] = useState(categoryFilterList[0]?.name);
 
 
@@ -248,7 +252,7 @@ const Categories = () => {
                         // onEndReached={loadMoreClothJewels} // Fetch more when list ends
                         onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
                         ListFooterComponent={() =>
-                            loading ? <ActivityIndicator size="large" color="#0000ff" /> : null
+                            loading ? <ActivityIndicator size="large" color="#FEF7DE" /> : null
                         }
                         ListEmptyComponent={
                             <View >
@@ -266,7 +270,7 @@ const Categories = () => {
                         // onEndReached={loadMoreClothJewels} // Fetch more when list ends
                         onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
                         ListFooterComponent={() =>
-                            loading ? <ActivityIndicator size="large" color="#0000ff" /> : null
+                            loading ? <ActivityIndicator size="large" color="#FEF7DE" /> : null
                         }
                         ListEmptyComponent={
                             <View >

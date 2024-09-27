@@ -22,6 +22,7 @@ import ThumsUpIcon from '../../assets/svgs/thumsupIcon.svg';
 const BookingDetailsScreen = ({ navigation, route }) => {
 
 
+  const userLocationFetched = useSelector((state) => state.userLocation);
 
   const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
   const [productDetails, setProductDetails] = useState();
@@ -124,8 +125,10 @@ const BookingDetailsScreen = ({ navigation, route }) => {
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: "#202020" }]}>Shipping Address</Text>
         <View style={{ flexDirection: "row" }}>
-          <Text style={styles.address}>26, Duong So 2, Thao Dien Ward, An Phu, District 2, Ho Chi Minh city</Text>
+        <Text numberOfLines={2} style={styles.address}>{userLocationFetched?.display_name ? userLocationFetched?.display_name : userLocationFetched?.address}</Text>
+          <TouchableOpacity onPress={() => {navigation.navigate('LocationAdded')}}>
           <EditButton />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -207,9 +210,6 @@ const BookingDetailsScreen = ({ navigation, route }) => {
           <Text style={styles.footerNote} >Security Deposit confirms your order 90%</Text>
         </View>
         <View style={styles.footerButtons}>
-          {/* <TouchableOpacity style={[styles.button, { width: "35%" }]}>
-            <Text style={styles.buttonText}>Pay Later</Text>
-          </TouchableOpacity> */}
           <TouchableOpacity onPress={() => ConfirmBooking()} style={[styles.button, {   backgroundColor: "#D2453B" }]}>
             <Text style={[styles.buttonText, { color: "white" }]}>Confirm Booking | {formatAmount(calculateTotalPrice())}</Text>
           </TouchableOpacity>
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     color: '#000000',
     fontFamily: "ManropeRegular",
-    width: "90%"
+    width: "80%"
   },
   editIcon: {
     position: 'absolute',
