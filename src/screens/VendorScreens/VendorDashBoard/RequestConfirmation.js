@@ -72,6 +72,7 @@ const RequestConfirmation = ({ navigation, route }) => {
             let endDate = '';
             let totalAmount = '';
             let bookingStatus = '';
+            let bookingId = '';
 
             if (catType === 'functionHalls') {
                 productName = item?.functionHallName;
@@ -81,16 +82,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                 endDate = item?.endDate;
                 totalAmount = item?.totalAmount;
                 bookingStatus = item?.bookingStatus;
-            }
-            else if (catType === 'tentHouses') {
-                productName = item?.tentHouseName;
-                vendorAddress = item?.address;
-                numOfDays = item?.numOfDays;
-                bookingItem = item?.bookingItems;
-                startDate = item?.startDate;
-                endDate = item?.endDate;
-                totalAmount = item?.totalAmount;
-                bookingStatus = item?.bookingStatus;
+                bookingId = item?.bookingId;
             }
             else if (catType === 'clothJewels') {
                 productName = item?.productName;
@@ -100,16 +92,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                 endDate = item?.endDate;
                 totalAmount = item?.totalAmount;
                 bookingStatus = item?.bookingStatus;
-            }
-            else if (catType === 'decorations') {
-                productName = item?.eventOrganiserName;
-                vendorAddress = item?.address;
-                numOfDays = item?.numOfDays;
-                bookingItem = item?.particularPackageData;
-                startDate = item?.startDate;
-                endDate = item?.endDate;
-                totalAmount = item?.totalAmount;
-                bookingStatus = item?.bookingStatus;
+                bookingId = item?.bookingId;
             }
             else if (catType === 'caterings') {
                 productName = item?.foodCateringName;
@@ -119,6 +102,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                 endDate = item?.endDate;
                 totalAmount = item?.totalAmount;
                 bookingStatus = item?.bookingStatus;
+                bookingId = item?.bookingId;
             }
 
             return {
@@ -134,6 +118,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                 startDate: startDate,
                 endDate: endDate,
                 totalAmount: totalAmount,
+                bookingId: bookingId
 
             };
         });
@@ -220,9 +205,9 @@ const RequestConfirmation = ({ navigation, route }) => {
         )
     }
 
-    const RequestConfirmationAcceptOrReject = async (bookingStatus, userMobileNumber) => {
+    const RequestConfirmationAcceptOrReject = async (bookingStatus, userMobileNumber,bookingId) => {
         const updatedParams = {
-            productId: productId,
+            bookingId: bookingId,
             accepted: true,
             bookingStatus: bookingStatus,
             userMobileNumber: userMobileNumber
@@ -237,21 +222,22 @@ const RequestConfirmation = ({ navigation, route }) => {
                 },
             });
             console.log("accept confirm response::::::::::", response?.data);
-            setIsVisible(true)
+            setIsVisible(true);
+            getProductBookingDetails();
         } catch (error) {
             console.log("accept::::::::::", error);
         }
     }
 
-    const callConfirmationWithStatus = (alertText, userMobileNumber) => {
+    const callConfirmationWithStatus = (alertText, userMobileNumber,bookingId) => {
         if (alertText.includes('accept')) {
-            RequestConfirmationAcceptOrReject('approved', userMobileNumber)
+            RequestConfirmationAcceptOrReject('approved', userMobileNumber,bookingId);
         } else {
-            RequestConfirmationAcceptOrReject('rejected', userMobileNumber);
+            RequestConfirmationAcceptOrReject('rejected', userMobileNumber,bookingId);
         }
     }
 
-    const showAlert = (alertText, userMobileNumber) => {
+    const showAlert = (alertText, userMobileNumber,bookingId) => {
         Alert.alert(
             "Confirmation",
             alertText,
@@ -261,7 +247,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                     onPress: () => console.log("No Pressed"),
                     style: "cancel"
                 },
-                { text: "Yes", onPress: () => callConfirmationWithStatus(alertText, userMobileNumber) }
+                { text: "Yes", onPress: () => callConfirmationWithStatus(alertText, userMobileNumber,bookingId) }
             ],
             { cancelable: false }
         );
@@ -293,13 +279,13 @@ const RequestConfirmation = ({ navigation, route }) => {
                     {item?.bookingStatus == 'requested' ?
                         <View style={{ alignItems: 'center', alignSelf: 'center' }}>
                             <TouchableOpacity style={{ alignItems: 'center', borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
-                                onPress={() => { showAlert("Are you sure you want to accept the order?", item?.userMobileNumber) }}
+                                onPress={() => { showAlert("Are you sure you want to accept the order?", item?.userMobileNumber,item?.bookingId) }}
                             >
                                 <AcceptIcon />
                                 <Text style={{ color: "#57A64F", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Accept</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={{ alignItems: 'center', marginTop: 10, borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
-                                onPress={() => { showAlert("Are you sure you want to reject/cancel the order?", item?.userMobileNumber) }}
+                                onPress={() => { showAlert("Are you sure you want to reject/cancel the order?", item?.userMobileNumber,item?.bookingId) }}
                             >
                                 <RejectIcon />
                                 <Text style={{ color: "#EF0000", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Reject</Text>
@@ -458,23 +444,15 @@ const RequestConfirmation = ({ navigation, route }) => {
                 headers: { Authorization: `Bearer ${getVendorAuth}` }
             }} style={{ width: '90%', alignSelf: 'center', height: 200, borderRadius: 10 }}
             />
-            {/* <Image style={{ width: '90%', alignSelf: 'center', height: 200, borderRadius: 10 }} source={{ uri: convertUrlToIp() }} resizeMode="contain" /> */}
             <Text style={{ color: '#121212', width: '90%', alignSelf: 'center', fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 16, marginTop: 10 }}>Product Availability</Text>
 
             <Text style={{ color: '#969696', width: '90%', alignSelf: 'center', fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 16, marginTop: 10 }}>Product Details</Text>
-            <Button title="Open Action Sheet" onPress={() => actionSheetRef.current?.show()} />
 
             {renderActionSheetWithProductDetais()}
             <FlatList
                 data={wholeBookingData}
                 renderItem={renderItem}
             />
-
-
-            {/* {renderProductDetails()} */}
-            {/* {renderModal()} */}
-
-
         </View>
     )
 }

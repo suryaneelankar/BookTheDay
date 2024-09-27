@@ -6,21 +6,13 @@ import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import { verticalScale, moderateScale, horizontalScale } from "../../utils/scalingMetrics";
 import { Calendar } from 'react-native-calendars';
 import moment from 'moment';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import Swiper from "react-native-swiper";
 import MapMarkIcon from '../../assets/svgs/orangeMapMark.svg';
-import PeopleAccommodate from '../../assets/svgs/peopleAccommodate.svg';
-import FanIcon from '../../assets/svgs/Fan.svg';
-import RoomsAvailable from '../..//assets/svgs/roomAvailable.svg';
-import AcIcon from '../../assets/svgs/AcAvailable.svg';
 import CalendarIcon from '../../assets/svgs/calendarOrangeIcon.svg';
 import Modal from 'react-native-modal';
 import themevariable from "../../utils/themevariable";
 import LeftArrow from '../../assets/svgs/leftarrowWhite.svg';
 import BookDatesButton from "../../components/GradientButton";
 import ServiceTime from '../../assets/svgs/serviceTime.svg';
-import MinusIcon from '../../assets/svgs/minusIcon.svg';
-import AddIcon from '../../assets/svgs/addIcon.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import CustomModal from "../../components/AlertModal";
 
@@ -54,58 +46,6 @@ const ViewCaterings = ({ route, navigation }) => {
 
     const { categoryId } = route.params;
     console.log("CATEID I::::::", categoryId)
-
-    const foodMenu = [{
-        title: "Non Veg Standard Menu",
-        items: [
-            "Sweet",
-            "Roti",
-            "Paneer",
-            "Veg Biryani",
-            "Veg Curry",
-            "Raitha",
-            "White Rice",
-            "Dal",
-            "Fry",
-            "Sambar",
-            "Pickel",
-            "Chutney",
-            "Papad",
-            "Salad",
-            "Veg Snack",
-            "Curd",
-            "Mouth Freshener"
-        ],
-        perPlateCost: 200,
-        minOrder: 50
-    },
-    {
-        title: "Vegetarian Standard Menu",
-        items: [
-            "Sweet",
-            "Roti",
-            "Paneer",
-            "Veg Biryani",
-            "Veg Curry",
-            "Raitha",
-            "White Rice",
-            "Dal",
-            "Fry",
-            "Sambar",
-            "Pickel",
-            "Chutney",
-            "Papad",
-            "Salad",
-            "Veg Snack",
-            "Curd",
-            "Mouth Freshener"
-        ],
-        perPlateCost: 200,
-        minOrder: 50
-    }
-    ];
-
-
 
     const timeSlots = [
         '12:00 AM',
@@ -234,23 +174,6 @@ const ViewCaterings = ({ route, navigation }) => {
         setNumPlates({ ...numPlates, [item.title]: '' });
     };
 
-    const renderCalendar = () => {
-        return (
-            <Modal visible={isCalendarVisible} animationType="slide">
-                <View style={styles.calendarContainer}>
-                    <Calendar
-                        onDayPress={onDayPress}
-                        markedDates={{
-                            [selectedStartDate]: { startingDay: true, color: 'green', textColor: 'white' },
-                            [selectedEndDate]: { endingDay: true, color: 'green', textColor: 'white' },
-                        }}
-                    />
-                    <Button title="Close Calendar" onPress={() => setCalendarVisible(false)} />
-                </View>
-            </Modal>
-        );
-    };
-
     const formattedDates = (date) => {
         const formattedDate = moment(date).format("DD MMM YYYY");
         return formattedDate;
@@ -284,52 +207,7 @@ const ViewCaterings = ({ route, navigation }) => {
         }
     };
 
-    console.log("selected dates:::::::::", selectedStartDate, selectedEndDate);
-
-
-    const updateQuantity = (item) => {
-        const quantity = itemQuantities[item.itemName] || 0;
-        const newQuantity = quantity + 1;
-        setItemQuantities(prevState => ({
-            ...prevState,
-            [item.itemName]: newQuantity
-        }));
-
-        setSelectedItems(prevState => ({
-            ...prevState,
-            [item.itemName]: {
-                name: item.itemName,
-                quantity: newQuantity,
-                perDayPrice: item.perDayPrice,
-                total: newQuantity * item.perDayPrice
-            }
-        }));
-    };
-
-    const decrementQuantity = (item) => {
-        const quantity = itemQuantities[item.itemName] || 0;
-        const newQuantity = quantity > 0 ? quantity - 1 : 0;
-        setItemQuantities(prevState => ({
-            ...prevState,
-            [item.itemName]: newQuantity
-        }));
-
-        if (newQuantity > 0) {
-            setSelectedItems(prevState => ({
-                ...prevState,
-                [item.itemName]: {
-                    name: item.itemName,
-                    quantity: newQuantity,
-                    perDayPrice: item.perDayPrice,
-                    total: newQuantity * item.perDayPrice
-                }
-            }));
-        } else {
-            const updatedItems = { ...selectedItems };
-            delete updatedItems[item.itemName];
-            setSelectedItems(updatedItems);
-        }
-    };
+    // console.log("selected dates:::::::::", selectedStartDate, selectedEndDate);
 
     const calculateTotalPrice = (numOfPlates, addedItems) => {
         return addedItems.map(item => {
@@ -399,15 +277,6 @@ const ViewCaterings = ({ route, navigation }) => {
                     <View style={{ borderColor: "#F1F1F1", borderWidth: 1, width: "100%", marginTop: 5 }} />
 
                     <Text style={{ color: "#000000", fontSize: 13, fontWeight: "700", fontFamily: 'ManropeRegular', marginTop: 15 }}>Available Food Menu</Text>
-                    {/* <FlatList
-                        data={foodMenu}
-                        keyExtractor={(item) => item}
-                        renderItem={({ item , index}) => <FoodItem item={item} index={index} onAdd={handleAdd}
-                        onDelete={handleDelete}
-                        addedItems={addedItems}
-                        numPlates={numPlates}
-                        setNumPlates={setNumPlates} />}
-                    /> */}
 
                     <FlatList
                         data={foodItemsData}
@@ -588,40 +457,6 @@ const ViewCaterings = ({ route, navigation }) => {
                     padding={10}
                 />
             </View>
-
-            {/* <Text style={{ padding: 10, color: 'black', fontWeight: '600' }}>Total for {noOfDays} days</Text> */}
-            {/* <View style={{ backgroundColor: 'white', flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
-                <TouchableOpacity style={{ backgroundColor: 'white', borderRadius: 8, padding: 10, borderColor: '#D2453B', borderWidth: 2, width: '45%' }}
-                    onPress={() => navigation.navigate('BookingOverView', { categoryId: categoryId })}
-                >
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                        <View>
-                            <Text style={[styles.strickedoffer, { fontWeight: '500', color: '#D2453B' }]}>₹1800</Text>
-                            <Text style={{ color: '#D2453B', fontWeight: '900', fontSize: 16 }}>{noOfDays ? formatAmount(eventsDetails?.price * noOfDays) : formatAmount(eventsDetails?.price)}</Text>
-                        </View>
-                        <View style={{ justifyContent: 'flex-end' }}>
-                            <Text style={{ color: '#D2453B', textAlign: 'right', fontWeight: '800', }} numberOfLines={2}>Book</Text>
-                            <Text style={{ color: '#D2453B', textAlign: 'right', fontWeight: '800', }} numberOfLines={2}>Now</Text>
-                        </View>
-                    </View>
-
-                </TouchableOpacity>
-                <TouchableOpacity style={{ backgroundColor: '#D2453B', borderRadius: 8, padding: 10, borderColor: 'white', borderWidth: 2, width: '45%' }}
-                    onPress={() => createFunctionHallBooking(categoryId)}
-                >
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                        <View>
-                            <Text style={[styles.strickedoffer, { color: 'white', fontWeight: '500' }]}>₹1800</Text>
-                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 16 }}>{noOfDays ? formatAmount(eventsDetails?.price * noOfDays) : formatAmount(eventsDetails?.price)}</Text>
-                        </View>
-                        <View>
-                            <Text style={{ color: 'white', textAlign: 'right', fontWeight: '800' }} numberOfLines={2}>Book</Text>
-                            <Text style={{ color: 'white', textAlign: 'right', fontWeight: '800' }} numberOfLines={2}>Advance</Text>
-                        </View>
-                    </View>
-                </TouchableOpacity>
-
-            </View> */}
         </View>
     )
 };

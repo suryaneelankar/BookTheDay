@@ -18,66 +18,59 @@ const CategoriesList = ({ route }) => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true); // Add loading state
     const [getUserAuth, setGetUserAuth] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [listLoading,setListingLoading] = useState(false);
 
     console.log("passed cat type ::::", catType, componentType)
 
     useEffect(() => {
-        getCategories();
+        getCategories(currentPage);
     }, []);
 
-    const getCategories = async () => {
+    const getCategories = async (page) => {
+        setListingLoading(true);
         const token = await getUserAuthToken();
         setGetUserAuth(token);
         try {
-            const response = await axios.get(`${BASE_URL}/getAllClothesJewels`,{
+            const response = await axios.get(`${BASE_URL}/getAllClothesJewels?page=${page}&limit=10`,{
                 headers: {
                     Authorization: `Bearer ${token}`,
                   },
             });
+            const finalResponseData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
+            console.log('finalResponseData is::>>>',finalResponseData);
+            if (response?.data?.data?.length > 0) {
+                // setEventsData((prevData) => [...prevData, ...finalResponseData]); // Append new data
+                setCurrentPage(page);
+            } else {
+                setListingLoading(false);
+                setHasMore(false); // No more data to load
+            }
+
             if(componentType === 'discount' || componentType === 'new'){
-                const filteredDiscountItems = response?.data.filter(category => category?.componentType === componentType);
-                setCategories(filteredDiscountItems);
+                const filteredDiscountItems = finalResponseData?.filter(category => category?.componentType === componentType);
+                // setCategories(filteredDiscountItems);
+                setCategories((prevData) => [...prevData, ...filteredDiscountItems]);
             }else{
-            const filteredCategories = response?.data.filter(category => category?.categoryType === catType);
-            setCategories(filteredCategories);
+            const filteredCategories = finalResponseData?.filter(category => category?.categoryType === catType);
+            // setCategories(filteredCategories);
+            setCategories((prevData) => [...prevData, ...filteredCategories]);
             }
         } catch (error) {
             console.log("categories::::::::::", error);
+            setListingLoading(false);
+
         } finally {
-            setLoading(false); // Set loading to false after data is fetched
+            setLoading(false);
+            setListingLoading(false); // Set loading to false after data is fetched
         }
     }
 
     const navigation = useNavigation();
-    // const renderItem = ({ item, index }) => {
-    //     return (
-    //         <TouchableOpacity
-    //             onPress={() => navigation.navigate('ViewTrendingDetails', { categoryId: item?._id })}
-    //             key={index} style={styles.itemView}>
-    //             <Image source={{ uri: item?.catImageUrl }} style={styles.renderImage} />
-    //             <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-    //                 <Text style={styles.itemHeading}>{item?.name}</Text>
-    //                 <Image
-    //                     source={require('../../assets/wishlist.png')}
-    //                     style={styles.wishListimage}
-    //                 />
-    //             </View>
-    //             <View style={styles.priceContainer}>
-    //                 <Text style={{ color: "black", fontSize: 12, fontWeight: "700" }}> ₹1000</Text>
-    //                 <Text style={styles.strickedoffer}>₹800</Text>
-    //                 <Text style={styles.off}> 20% off</Text>
-    //             </View>
-
-    //             <View>
-    //                 <Text style={[styles.status, { color: item?.rented ? "#a85705" : "white", backgroundColor: item?.rented ? "#fabdb6" : "green" }]}>{item?.rented ? 'Out of Stock' : 'Available'}</Text>
-    //             </View>
-    //         </TouchableOpacity>
-    //     )
-    // }
 
     const renderItem = ({ item }) => {
         const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
-        //  console.log("UPDATED IMAGE IN CATEGEROIES IS:::::::::", item?.professionalImage?.url)
 
         const originalPrice = item?.rentPricePerDay;
         const discountPercentage = item?.discountPercentage;
@@ -132,6 +125,13 @@ const CategoriesList = ({ route }) => {
         )
     }
 
+    const loadMoreClothJewels = () => {
+        if (hasMore && !loading) {
+            console.log('hasmore values::>>>',hasMore,loading);
+            getCategories(currentPage + 1);
+        }
+    };
+
     // console.log("cat list render:::::::::", categories)
 
     return (
@@ -147,7 +147,7 @@ const CategoriesList = ({ route }) => {
                 </View>
             </View>
 
-            <View style={{ marginBottom: "30%" }}>
+            <View style={{ marginBottom: "10%" }}>
                 {loading ? (
                     <ActivityIndicator size="large" color={themevariable.Color_202020} style={{ marginTop: 20 }} />
                 ) : (
@@ -157,6 +157,16 @@ const CategoriesList = ({ route }) => {
                         contentContainerStyle={{ alignSelf: "center", marginTop: 20 }}
                         data={categories}
                         renderItem={renderItem}
+                        onEndReached={loadMoreClothJewels} // Fetch more when list ends
+                        onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
+                        ListFooterComponent={() =>
+                            listLoading ? <ActivityIndicator size="large" color="#0000ff" /> : null
+                        }
+                        ListEmptyComponent={
+                            <View >
+                              <Text>No Products Available</Text>
+                            </View>
+                          }
                     />
                 )}
             </View>

@@ -9,7 +9,7 @@ const CategoryFilter = ({ onCategoryChange }) => {
     // { name: 'Tent House', image: require('../assets/categoriesPngs/tenthouse_icon.png') },
     { name: 'Halls', image: require('../assets/categoriesPngs/hall_icon.png') },
     // { name: 'Decoration', image: require('../assets/categoriesPngs/decoration_icon.png') },
-    { name: 'Catering', image: require('../assets/categoriesPngs/catering_icon.png') },
+    // { name: 'Catering', image: require('../assets/categoriesPngs/catering_icon.png') },
   ];
 
   const handleCategorySelect = (categoryName) => {

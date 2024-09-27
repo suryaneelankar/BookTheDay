@@ -29,7 +29,7 @@ const ViewCatDetails = ({ route }) => {
 
     const [selectedOption, setSelectedOption] = useState('daily');
     const [selectedPrice, setSelectedPrice] = useState(null);
-    const { width: viewportWidth } = Dimensions.get('window');
+    // const { width } = Dimensions.get('window').width;
     const [activeIndex, setActiveIndex] = useState(0);
     const navigation = useNavigation();
     const { catId } = route.params;
@@ -185,9 +185,9 @@ const ViewCatDetails = ({ route }) => {
                     >
                         {specifcadditionalImages.map((item, index) => (
                             <View style={styles.slide} key={index}>
-                                <FastImage resizeMode="contain" source={{ uri: item?.uri,
+                                <FastImage resizeMode='contain' source={{ uri: item?.uri,
                                     headers:{Authorization : `Bearer ${getUserAuth}`}
-                                 }} style={[styles.image, { width: viewportWidth * 0.9 }]} />
+                                 }} style={[styles.image, { width: '90%' }]} />
                             </View>
                         ))}
                     </Swiper>
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     image: {
-        height: 200,
+        height: '100%',
         borderRadius: 10,
     },
     paginationContainer: {

@@ -30,7 +30,7 @@ const PricingOptions = ({ onSelect ,dailyPrice,monthlyPrice}) => {
         </View>
         <Text style={styles.priceText}>{formatAmount(dailyPrice)}</Text>
       </TouchableOpacity> : null}
-      {monthlyPrice ?
+      {/* {monthlyPrice ?
       <TouchableOpacity
         style={[styles.optionContainer, selectedOption === 'monthly' && styles.selectedOption]}
         onPress={() => handleSelect('monthly', 600)}
@@ -45,7 +45,7 @@ const PricingOptions = ({ onSelect ,dailyPrice,monthlyPrice}) => {
         </View>
         <Text style={styles.priceText}>{formatAmount(monthlyPrice)}</Text>
       </TouchableOpacity>
-      : null}
+      : null} */}
     </View>
   );
 };
