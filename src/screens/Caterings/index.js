@@ -14,6 +14,7 @@ import CategoryFilter from "../../components/CategoryFilter";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
 import { useSelector } from "react-redux";
+import LinearGradient from "react-native-linear-gradient";
 
 const Caterings = () => {
     const navigation = useNavigation();
@@ -504,7 +505,9 @@ const Caterings = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
-            <View style={{ backgroundColor: "white" }}>
+                            <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1 }}>
+
+            <View style={{ backgroundColor: "white" ,marginTop:20}}>
                 <View style={styles.searchProduct}>
                     <View style={styles.searchProHeader}>
                         <SearchIcon style={{ marginLeft: verticalScale(20) }} />
@@ -529,7 +532,7 @@ const Caterings = () => {
                         onEndReached={loadMoreFunctionHalls} // Fetch more when list ends
                         onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
                         ListFooterComponent={() =>
-                            loading ? <ActivityIndicator size="large" color="#0000ff" /> : null
+                            loading ? <ActivityIndicator size="large" color="#FEF7DE" /> : null
                         }
                         ListEmptyComponent={
                             <View >
@@ -546,10 +549,11 @@ const Caterings = () => {
                                 onEndReached={loadMoreCaterings}
                                 onEndReachedThreshold={0.5}
                                 ListFooterComponent={() => 
-                                    loading ? <ActivityIndicator size="large" color="#0000ff" /> : null
+                                    loading ? <ActivityIndicator size="large" color="#FEF7DE" /> : null
                                 }
                             />
                             : null}
+                            </LinearGradient>
         </SafeAreaView>
     )
 }

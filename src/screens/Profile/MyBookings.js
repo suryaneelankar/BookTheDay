@@ -1,8 +1,13 @@
-import React,{useEffect, useState} from 'react';
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, ScrollView, Dimensions, Alert } from 'react-native';
 import BASE_URL, { LocalHostUrl } from '../../apiconfig';
 import axios from 'axios';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
+import FastImage from 'react-native-fast-image';
+import { formatAmount } from '../../utils/GlobalFunctions';
+import { colors } from 'react-native-swiper-flatlist/src/themes';
+import LinearGradient from 'react-native-linear-gradient';
+import RazorpayCheckout from 'react-native-razorpay';
 
 const data = [
   { id: '1', name: 'Mr. Riya Trivedi', role: 'Chef - Accord', rating: 4.5, status: 'Requested', image: 'chef-image-url' },
@@ -28,176 +33,236 @@ const ViewMyBookings = () => {
   const [cateringBookings, setCateringBookings] = useState();
   const [hallsBookings, setHallsBookings] = useState();
   const [tentHouseBookings, settentHouseBookings] = useState();
+  const [getUserAuth, setGetUserAuth] = useState('');
 
   useEffect(() => {
     getMyBookings();
-    getDecorationsBookings();
+    // getDecorationsBookings();
     getCateringsBookings();
     getHallsBookings();
-    getTentHouseBookings();
+    // getTentHouseBookings();
 
   }, []);
 
   const getMyBookings = async () => {
     const token = await getUserAuthToken();
+    setGetUserAuth(token);
     try {
-        const response = await axios.get(`${BASE_URL}/getUserClothJewelBookings`,{
-          headers: {
-              Authorization: `Bearer ${token}`,
-            },
-      });
-        console.log("BOOKINGS RES:::::::::", JSON.stringify(response?.data))
-        setMyBookings(response?.data?.data)
-    } catch (error) {
-        console.log("My Bookings data error>>::", error);
-    }
-};
-
-const getDecorationsBookings = async () => {
-  const token = await getUserAuthToken();
-  try {
-      const response = await axios.get(`${BASE_URL}/getUserDecorationBookings`,{
+      const response = await axios.get(`${BASE_URL}/getUserClothJewelBookings`, {
         headers: {
-            Authorization: `Bearer ${token}`,
-          },
-    });
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+      setMyBookings(response?.data?.data)
+    } catch (error) {
+      console.log("My Bookings data error>>::", error);
+    }
+  };
+
+  const getDecorationsBookings = async () => {
+    const token = await getUserAuthToken();
+    try {
+      const response = await axios.get(`${BASE_URL}/getUserDecorationBookings`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log("Decors BOOKINGS RES:::::::::", JSON.stringify(response?.data))
       setDecorsBookings(response?.data?.data)
-  } catch (error) {
+    } catch (error) {
       console.log("My Bookings data error>>::", error);
-  }
-};
+    }
+  };
 
-const getCateringsBookings = async () => {
-  const token = await getUserAuthToken();
-  try {
-      const response = await axios.get(`${BASE_URL}/getUserFoodCateringBookings`,{
+  const getCateringsBookings = async () => {
+    const token = await getUserAuthToken();
+    try {
+      const response = await axios.get(`${BASE_URL}/getUserFoodCateringBookings`, {
         headers: {
-            Authorization: `Bearer ${token}`,
-          },
-    });
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log("catering BOOKINGS RES:::::::::", JSON.stringify(response?.data))
       setCateringBookings(response?.data?.data)
-  } catch (error) {
+    } catch (error) {
       console.log("My Bookings data error>>::", error);
-  }
-};
+    }
+  };
 
-const getHallsBookings = async () => {
-  const token = await getUserAuthToken();
-  try {
-      const response = await axios.get(`${BASE_URL}/getUserFunctionHallBookings`,{
+  const getHallsBookings = async () => {
+    const token = await getUserAuthToken();
+    try {
+      const response = await axios.get(`${BASE_URL}/getUserFunctionHallBookings`, {
         headers: {
-            Authorization: `Bearer ${token}`,
-          },
-    });
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log("Funtional halls BOOKINGS RES:::::::::", JSON.stringify(response?.data))
       setHallsBookings(response?.data?.data)
-  } catch (error) {
+    } catch (error) {
       console.log("My Bookings data error>>::", error);
-  }
-};
+    }
+  };
 
-const getTentHouseBookings = async () => {
-  const token = await getUserAuthToken();
-  try {
-      const response = await axios.get(`${BASE_URL}/getUserTentHouseBookings`,{
+  const getTentHouseBookings = async () => {
+    const token = await getUserAuthToken();
+    try {
+      const response = await axios.get(`${BASE_URL}/getUserTentHouseBookings`, {
         headers: {
-            Authorization: `Bearer ${token}`,
-          },
-    });
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log("Tent house BOOKINGS RES:::::::::", JSON.stringify(response?.data))
       settentHouseBookings(response?.data?.data)
-  } catch (error) {
+    } catch (error) {
       console.log("My Bookings data error>>::", error);
-  }
-};
+    }
+  };
+
+  const handlePayment = async () => {
+    try {
+      // Fetch the order details from your backend
+      const response = await fetch(`${BASE_URL}/create-order`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          amount: 1, // Amount in INR
+          currency: 'INR',
+          receipt: 'receipt#1'
+        })
+      });
+
+      const data = await response.json();
+      console.log('razor pay data is ::>>', data);
+      // Start the Razorpay payment process
+      var options = {
+        description: 'Test Transaction',
+        image: 'https://your-logo-url.com/logo.png',
+        currency: data.currency,
+        key: 'rzp_test_SFQjGVsyEZ2P05', // Your Razorpay Key ID
+        amount: data.amount, // Amount in smallest currency unit
+        order_id: data.orderId, // Order ID returned from backend
+        name: 'Book the day',
+        prefill: {
+          email: 'bookthedaytechnologies@gmail.com',
+          contact: '8297735285',
+          name: 'Surya Neelankar',
+          //   method: 'upi',  // Pre-select UPI as the payment method
+          vpa: ''
+        },
+        theme: { color: '#FFDB7E' }
+      };
+
+      console.log('options is::>>', options)
+
+      RazorpayCheckout.open(options)
+        .then((paymentData) => {
+          // Success callback
+          Alert.alert(`Success: ${paymentData.razorpay_payment_id}`);
+          // Verify the payment on the server-side
+          console.log('success resp::>>', paymentData);
+          //   verifyPayment(paymentData);
+        })
+        .catch((error) => {
+          // Failure callback
+          Alert.alert(`Error: ${error.code} | ${error.description}`);
+          console.error(error);
+        });
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Something went wrong');
+    }
+  };
 
 
-  const renderItem = ({ item }) =>  {
+  const renderItem = ({ item }) => {
     const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
 
-    return(
-    <View style={styles.card}>
-      <Image resizeMode='contain' source={{ uri: updatedImgUrl }} style={styles.cardImage} />
-      <View style={styles.cardContent}>
-        <Text style={styles.cardTitle}>{item?.productName}</Text>
-        <Text style={styles.cardTitle}>{item?.totalAmount}</Text>
+    return (
+      <View style={styles.card}>
+        <FastImage resizeMode='cover' source={{
+          uri: updatedImgUrl,
+          headers: { Authorization: `Bearer ${getUserAuth}` }
+        }} style={styles.cardImage} />
+        <View style={styles.cardContent}>
+          <Text style={styles.cardTitle}>{item?.productName}</Text>
+          <Text style={styles.cardAmount}>{formatAmount(item?.totalAmount)}</Text>
 
-        <Text style={styles.cardTitle}> Start Date: {item?.startDate}</Text>
-        <Text style={styles.cardTitle}> End Date: {item?.endDate}</Text>
-        <Text style={styles.cardTitle}>{item?.bookingStatus}</Text>
+          <Text style={styles.startDate}> Start Date: {item?.startDate}</Text>
+          <Text style={styles.startDate}> End Date: {item?.endDate}</Text>
 
-        <Text style={styles.cardSubtitle}>{item.role}</Text>
-        <View style={styles.cardFooter}>
-          <Text style={styles.cardRating}>{item.rating}</Text>
-          <Text style={[styles.cardStatus, getStatusStyle(item.status)]}>{item.status}</Text>
+          <Text style={styles.cardSubtitle}>{item.role}</Text>
+          <View style={styles.cardFooter}>
+            <Text style={[styles.cardStatus, getStatusStyle(item.bookingStatus)]}>
+              {item.bookingStatus ? item.bookingStatus.charAt(0).toUpperCase() + item.bookingStatus.slice(1) : ''}
+            </Text>
+            <LinearGradient colors={item.bookingStatus === 'approved' ? ['#D2453B', '#A0153E'] : ['#B0B0B0', '#B0B0B0']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.doneButton}>
+              <TouchableOpacity disabled={item.bookingStatus !== 'approved'} onPress={() => { handlePayment() }}>
+                <Text style={styles.doneButtonText}>Pay Now</Text>
+              </TouchableOpacity>
+            </LinearGradient>
+
+          </View>
         </View>
       </View>
-    </View>
-  )};
+    )
+  };
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case 'Requested':
-        return { backgroundColor: '#FFD580' };
-      case 'Approved':
-        return { backgroundColor: '#98FB98' };
-      case 'Rejected':
-        return { backgroundColor: '#FFC0CB' };
+      case 'requested':
+        return { backgroundColor: '#ECA73C29', color: '#F29300' };
+      case 'approved':
+        return { backgroundColor: '#45FE3529', color: "#57A64F" };
+      case 'rejected':
+        return { backgroundColor: '#FE353529', color: '#EF0000' };
       default:
         return { backgroundColor: '#FFD580' };
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={{color:"black", fontSize:14,marginVertical:10}}>
-        Clothes jewellery bookings
-      </Text>
-      <FlatList
-        data={myBookings}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-      />
-      <Text style={{color:"black", fontSize:14,marginVertical:10}}>
-        Decoartions Bokkings
-      </Text>
-      <FlatList
-        data={decorsBookings}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        // numColumns={2}
-      />
-      <Text style={{color:"black", fontSize:14,marginVertical:10}}>
-        Food Catering bookings
-      </Text>
-      <FlatList
-        data={cateringBookings}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        // numColumns={2}
-      />
-      <Text style={{color:"black", fontSize:14,marginVertical:10}}>
-        Halls bookings
-      </Text>
-      <FlatList
-        data={hallsBookings}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        // numColumns={2}
-      />
-      <Text style={{color:"black", fontSize:14,marginVertical:10}}>
-        Tent House bookings
-      </Text>
-      <FlatList
-        data={tentHouseBookings}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        // numColumns={2}
-      />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1 }}>
+
+        <ScrollView style={{ flex: 1 }}>
+          <Text style={{ marginTop: 20, marginBottom: 5, marginHorizontal: 15, color: "#000000", fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular' }}>
+            Clothes jewellery bookings
+          </Text>
+          <FlatList
+            data={myBookings}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+          />
+
+          <Text style={{ marginTop: 20, marginBottom: 5, marginHorizontal: 15, color: "#000000", fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular' }}>
+            Food Catering bookings
+          </Text>
+          <FlatList
+            data={cateringBookings}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+          />
+          <Text style={{ marginTop: 20, marginBottom: 5, marginHorizontal: 15, color: "#000000", fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular' }}>
+            Halls bookings
+          </Text>
+          <FlatList
+            data={hallsBookings}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+          />
+        </ScrollView>
+      </LinearGradient>
+    </SafeAreaView>
   );
 };
 
@@ -206,28 +271,41 @@ const styles = StyleSheet.create({
     flex: 1,
     // padding: 16,
     backgroundColor: '#F3F5FB',
-},
+  },
   card: {
-    flex:1,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
-    overflow: 'hidden',
-    marginBottom: 16,
-    marginRight: 16,
     flex: 1,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    margin: 10,
   },
   cardImage: {
-    height: 120,
+    height: Dimensions.get('window').height / 5,
     width: '100%',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10
   },
+  startDate: {
+    color: "#878787",
+    fontSize: 10,
+    fontWeight: '300',
+    fontFamily: 'ManropeRegular'
+  },
+
   cardContent: {
     padding: 8,
   },
   cardTitle: {
     fontSize: 12,
-    fontWeight: '600',
-    color:"#333333",
+    fontWeight: '800',
+    color: "#333333",
     fontFamily: 'ManropeRegular'
+  },
+  cardAmount: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: "#333333",
+    fontFamily: 'ManropeRegular',
+    marginVertical: 5
   },
   cardSubtitle: {
     fontSize: 14,
@@ -245,9 +323,25 @@ const styles = StyleSheet.create({
   },
   cardStatus: {
     padding: 4,
-    borderRadius: 4,
+    borderRadius: 5,
     color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: "400",
+    fontFamily: 'ManropeRegular',
+    paddingVertical: 5,
+    paddingHorizontal: 10
+  },
+  doneButton: {
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5
+  },
+  doneButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
     fontSize: 12,
+    fontFamily: 'ManropeRegular',
+    textAlign: 'center',
   },
   sectionHeader: {
     fontSize: 18,

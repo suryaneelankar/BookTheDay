@@ -189,9 +189,6 @@ const CateringsOverView = ({ route, navigation }) => {
                             <Text style={styles.doneButtonText}>Done</Text>
                         </TouchableOpacity>
                     </LinearGradient>
-                    <TouchableOpacity>
-                        <Text style={styles.trackProgressText}>Track your Booking Progress</Text>
-                    </TouchableOpacity>
                 </View>
 
             </Modal>

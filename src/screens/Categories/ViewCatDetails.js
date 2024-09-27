@@ -172,7 +172,7 @@ const ViewCatDetails = ({ route }) => {
 
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{flex:1}}>
             <ScrollView style={{ marginBottom: '15%' }}>
                 <View style={{ backgroundColor: "white", }}>
 
@@ -218,7 +218,7 @@ const ViewCatDetails = ({ route }) => {
                     <PricingOptions
                         onSelect={handleSelect}
                         dailyPrice={jewelleryDetails?.rentPricePerDay}
-                        monthlyPrice={jewelleryDetails?.rentPricePerMonth}
+                        // monthlyPrice={jewelleryDetails?.rentPricePerMonth}
                     />
                 </View>
 
@@ -310,15 +310,6 @@ const ViewCatDetails = ({ route }) => {
                                 }).start();
                             }}
                         >
-                            <View style={{
-                                alignSelf: 'center',
-                                backgroundColor: themevariable.Color_CCCCCC,
-                                height: verticalScale(5),
-                                width: horizontalScale(57),
-                                borderRadius: moderateScale(20),
-                                top: 80,
-                                position: 'absolute',
-                            }} />
                         </View>
                         <View style={{
                             flex: 1,
@@ -344,13 +335,13 @@ const ViewCatDetails = ({ route }) => {
                             bottom: -20
                             //  top: 0
                         }}>
-                            <Text style={{ color: "#333333", fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular", }}>Select Time Slot</Text>
+                            {/* <Text style={{ color: "#333333", fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular", }}>Select Time Slot</Text>
                             <Text style={{ marginTop: 10, color: "#333333", fontSize: 16, fontWeight: "500", fontFamily: "ManropeRegular", }}>Preferred Time</Text>
 
                             <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", marginBottom: 40, marginTop: 10, padding: 10, borderRadius: 5, borderColor: '#CFD0D5', borderWidth: 1 }}>
                                 <Text style={{ width: "90%", color: "#ABABAB", fontSize: 14, fontWeight: "400", fontFamily: "ManropeRegular", }}>Pick A Time</Text>
                                 <ClockIcon />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                             <BookDatesButton onPress={() => {
                                 navigation.navigate("BookingDetailsScreen",{catId: catId, NumOfDays: numberOfDays, isDayOrMonthly: selectedOption, monthlyPrice: jewelleryDetails?.rentPricePerMonth, startDate: selectedRange?.startDate, endDate: selectedRange?.endDate })
                                 // if (productNav) {

@@ -129,8 +129,8 @@ const HomeDashboard = () => {
         { id: '1', Component: TrendingTshirt },
         { id: '2', Component: TrendingBridal },
         { id: '3', Component: TrendingCatering },
-        { id: '4', Component: TrendingChef },
-        { id: '5', Component: TrendingDriver },
+        // { id: '4', Component: TrendingChef },
+        // { id: '5', Component: TrendingDriver },
         { id: '6', Component: TrendingRingBanner },
         { id: '7', Component: TrendingEarrings },
         { id: '8', Component: TrendingJewellery },
@@ -573,7 +573,7 @@ const HomeDashboard = () => {
                         />
                     </> : null}
 
-                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' ,marginTop:horizontalScale(20)}}>
                     <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
                     <TouchableOpacity onPress={() => navigation.navigate('Events')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
                         <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
@@ -589,24 +589,7 @@ const HomeDashboard = () => {
                     showsHorizontalScrollIndicator={false}
                 />
 
-                <Swiper
-                    showsPagination={false}
-                    style={{ height: Dimensions.get('window').height / 4, marginTop: 5 }}
-                >
-                    {DriverChefCardImages.map((item, index) => {
-                        const SvgComponent = item?.image;
-                        return (
-                            <TouchableOpacity onPress={() => navigation.navigate('My Box')}>
-                                <SvgComponent
-                                    key={index}
-                                    width="90%"
-                                    height="100%"
-                                    style={{ alignSelf: "center" }}
-                                />
-                            </TouchableOpacity>
-                        );
-                    })}
-                </Swiper>
+               
 
                 <View style={{
                     alignItems: 'center',
@@ -619,7 +602,7 @@ const HomeDashboard = () => {
                     <View style={styles.textContainer}>
                         <Text style={styles.footerTitle}>Expect More With Less</Text>
                         <Text style={styles.subtitle}>We are here for your every need.</Text>
-                        <TouchableOpacity style={styles.button}>
+                        <TouchableOpacity onPress={() => navigation.navigate('CategoriesList', { catType: 'clothes' })} style={styles.button}>
                             <Text style={{ fontSize: 11, fontWeight: "700", color: "#FFFFFF", fontFamily: 'ManropeRegular', }} >About us  &raquo;</Text>
                         </TouchableOpacity>
                     </View>

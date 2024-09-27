@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Switch, ScrollView } from 'react-native';
 import ProfileIcon from '../../assets/profilesvgs/profile.svg';
 import DashboardIcon from '../../assets/profilesvgs/dashboard.svg';
@@ -23,13 +23,24 @@ import LinkBgm from '../../assets/profilesvgs/linkBgm.svg';
 import CrossIcon from '../../assets/profilesvgs/orangeCross.svg';
 import WhiteDashboard from '../../assets/profilesvgs/whiteDashboard.svg';
 import { moderateScale } from '../../utils/scalingMetrics';
+import LogOutIcon from '../../assets/svgs/logOutIcon.svg';
+import { getLoginUserId } from '../../../redux/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUserAuthToken } from '../../utils/StoreAuthToken';
+import axios from 'axios';
+import BASE_URL from '../../apiconfig';
+
 
 const ProfileMainScreen = () => {
     const navigation = useNavigation();
+    const dispatch = useDispatch();
+    const userLoggedInMobileNumber = useSelector((state) => state.userLoggedInMobileNum);
+
     const [isEnabled, setIsEnabled] = React.useState(false);
     const [isMyAccountOpen, setIsMyAccountOpen] = React.useState(false);
     const [isMyDashboardOpen, setIsMyDashboardOpen] = React.useState(false);
     const [modalVisible, setModalVisible] = useState(false);
+    const [profileData, setProfileData] = useState();
     const [selectedMyAccount, setSelectedMyAccount] = React.useState(false);
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
     const toggleMyAccount = () => {
@@ -41,6 +52,27 @@ const ProfileMainScreen = () => {
     }
 
     const link = "www.xyz.com";
+
+    useEffect(()=>{
+      getProfileData();
+    },[]);
+
+    const getProfileData = async() =>{
+        const token = await getUserAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/getAllUserLocations/${userLoggedInMobileNumber}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
+            setProfileData(response?.data?.data);
+        console.log("profile user res:::", response);
+           
+        } catch (error) {
+            console.log("profile::::::::::", error);
+            setLoading(false);
+        }
+    }
 
     const shareLink = async (platform) => {
         try {
@@ -71,16 +103,16 @@ const ProfileMainScreen = () => {
                         style={styles.profileImage}
                     />
                 </View>
-                <Text style={styles.profileName}>Donye Collins</Text>
-                <Text style={styles.profileEmail}>iamcollinsdonye@gmail.com</Text>
+                <Text style={styles.profileName}>{profileData?.fullName}</Text>
+                <Text style={styles.profileEmail}>{profileData?.email}</Text>
             </View>
 
             <ScrollView style={styles.menuContainer} showsVerticalScrollIndicator={false}>
                 <MenuItem
                     icon={<ProfileIcon />}
-                    title="My Account"
+                    title="My KYC"
                     isSelected={isMyAccountOpen ? true : false}
-                    onPress={() => toggleMyAccount()}
+                    // onPress={() => toggleMyAccount()}
                 />
                 {isMyAccountOpen && (
                     <View style={styles.dropdownContainer}>
@@ -93,9 +125,10 @@ const ProfileMainScreen = () => {
                     </View>
                 )}
                 <MenuItem icon={<DashboardIcon />}
-                    title="Dashboard"
+                    title="My Orders"
                     isSelected={isMyDashboardOpen ? true : false}
-                    onPress={() => toggleMyDashboard()}
+                    onPress={() => navigation.navigate('ViewMyBookings')}
+                    // onPress={() => toggleMyDashboard()}
                 />
                 {isMyDashboardOpen && (
                     <View style={styles.dropdownContainer}>
@@ -103,26 +136,27 @@ const ProfileMainScreen = () => {
                         <DropdownItem title="My Lend" navigation={navigation} />
                     </View>
                 )}
-                <MenuItem icon={<ReferEarn />} title="Refer & Earn">
+                {/* <MenuItem icon={<ReferEarn />} title="Refer & Earn">
                     <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.copyLink}>
                         <CopyLinkIcon />
                         <Text style={styles.copyLinkText}>Copy Link</Text>
                     </TouchableOpacity>
-                </MenuItem>
-                <MenuItem icon={<TransactionIcon />} title="My Transaction" />
-                <MenuItem onPress={() => navigation.navigate('LocationAdded')} icon={<LocationIcon />} title="Manage Location" />
-                <MenuItem icon={<NotificationIcon />} title="Notification Preferences">
-                    {/* <Switch
-                        trackColor={{ false: "#767577", true: "#81b0ff" }}
-                        thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-                        onValueChange={toggleSwitch}
-                        value={isEnabled}
-                    /> */}
+                </MenuItem> */}
+                {/* <MenuItem icon={<TransactionIcon />} title="My Transaction" /> */}
+                {/* <MenuItem onPress={() => navigation.navigate('LocationAdded')} icon={<LocationIcon />} title="Manage Location" /> */}
+                {/* <MenuItem icon={<NotificationIcon />} title="Notification Preferences">
+                   
                     <CustomToggle value={isEnabled} onValueChange={toggleSwitch} />
-                </MenuItem>
+                </MenuItem> */}
                 <MenuItem icon={<AboutUsIcon />} title="About Us" />
                 <MenuItem icon={<TermsConditionIcon />} title="Terms & Condition" />
                 <MenuItem icon={<RefundPolicy />} title="Refund Policy" />
+                <MenuItem icon={<LogOutIcon />} title="Log Out" 
+                onPress={() => {[
+                    dispatch(getLoginUserId('')),
+                    navigation.navigate('LandingScreen')
+                ]}} />
+
             </ScrollView>
 
             <Modal

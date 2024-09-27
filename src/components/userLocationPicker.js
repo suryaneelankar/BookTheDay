@@ -236,7 +236,7 @@ const UserLocationPicker = ({ onLocationSelected }) => {
 
         </MapView>
         :
-        <ActivityIndicator size={'large'} color={'orange'} />
+        <ActivityIndicator size={'large'} color={'#FEF7DE'} />
       }
 
 

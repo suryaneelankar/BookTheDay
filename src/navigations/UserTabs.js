@@ -105,7 +105,7 @@ const Tab4Screen = ({ navigation }) => {
     tabBarLabel: 'Caterings',
     tabBarShowLabel:true,
     header: () => <NavigationHeader Icon={false} title="Catering Services" />,
-    headerShown: true,
+    headerShown: false,
   }}
 />
 
@@ -119,7 +119,7 @@ const Tab4Screen = ({ navigation }) => {
     tabBarLabel: 'Collections',
     tabBarShowLabel:true,
     header: () => <NavigationHeader Icon={false} title="Products" />,
-    headerShown: true,
+    headerShown: false,
   }}
 />
 
@@ -133,7 +133,7 @@ const Tab4Screen = ({ navigation }) => {
     tabBarLabel: 'Events',
     tabBarShowLabel:true,
     header: () => <NavigationHeader Icon={false} title="Event Management" />,
-    headerShown: true,
+    headerShown: false,
   }}
 />
 
@@ -158,7 +158,8 @@ const Tab4Screen = ({ navigation }) => {
   options={{
     tabBarIcon: ({ focused }) => (
       focused ? <HireIcon /> : <SwitchIcon />
-    ),}}
+    ),
+  headerShown:false}}
   // listeners={{
   //   tabPress: (e) => {
   //     // Prevent default action

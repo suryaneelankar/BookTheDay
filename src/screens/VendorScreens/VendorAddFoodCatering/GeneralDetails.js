@@ -785,7 +785,7 @@ const GeneralDetails = () => {
         <View style={{ flex: 1 }}>
             {loading ? (
                 <View style={{ alignSelf: 'center', flex: 1, width: '100%', height: Dimensions.get('window').height, justifyContent: 'center' }}>
-                    <ActivityIndicator size="large" color="green" />
+                    <ActivityIndicator size="large" color="#FEF7DE" />
                 </View>
             ) :
                 <View>

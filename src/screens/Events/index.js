@@ -49,12 +49,8 @@ const Events = () => {
     // );
 
     useEffect(() => {
-        if (selectedCategory === 'Halls') {
             getAllEvents(currentPage);
-        } else if (selectedCategory === 'Catering') {
-            getAllCaterings();
-        }
-    },[selectedCategory])
+    },[])
 
     const MAX_DESTINATIONS_PER_BATCH = 25;
 
@@ -469,9 +465,9 @@ const Events = () => {
                             <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} />
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> {item?.seatingCapacity}</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
+                        {/* <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> {item?.distanceText}</Text>
-                        </View>
+                        </View> */}
                     </View>
                 </TouchableOpacity>
             </View>
@@ -516,7 +512,7 @@ const Events = () => {
                         onEndReached={loadMoreFunctionHalls} // Fetch more when list ends
                         onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
                         ListFooterComponent={() =>
-                            loading ? <ActivityIndicator size="large" color="#0000ff" /> : null
+                            loading ? <ActivityIndicator size="large" color="#FEF7DE" /> : null
                         }
                         ListEmptyComponent={
                             <View >
