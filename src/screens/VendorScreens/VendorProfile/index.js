@@ -21,6 +21,8 @@ import LinkBgm from '../../../assets/profilesvgs/linkBgm.svg';
 import CrossIcon from '../../../assets/profilesvgs/orangeCross.svg';
 import { moderateScale } from '../../../utils/scalingMetrics';
 import LogOutIcon from '../../../assets/svgs/logOutIcon.svg';
+import { useDispatch } from 'react-redux';
+import { getLoginUserId } from '../../../../redux/actions';
 
 
 const VendorProfile = () => {
@@ -31,13 +33,7 @@ const VendorProfile = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedMyAccount, setSelectedMyAccount] = React.useState(false);
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
-    const toggleMyAccount = () => {
-        setIsMyAccountOpen(!isMyAccountOpen);
-        setSelectedMyAccount(!selectedMyAccount)
-    }
-    const toggleMyDashboard = () => {
-        setIsMyDashboardOpen(!isMyDashboardOpen);
-    }
+    const dispatch = useDispatch();
 
     const link = "www.xyz.com";
 

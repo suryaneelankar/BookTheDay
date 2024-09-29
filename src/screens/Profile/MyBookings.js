@@ -229,7 +229,7 @@ const ViewMyBookings = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
 
         <ScrollView style={{ flex: 1 }}>
           <Text style={{ marginTop: 20, marginBottom: 5, marginHorizontal: 15, color: "#000000", fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular' }}>
@@ -240,6 +240,7 @@ const ViewMyBookings = () => {
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
             numColumns={2}
+            contentContainerStyle={{alignSelf:'center',justifyContent:'center',width:'100%'}}
           />
 
           <Text style={{ marginTop: 20, marginBottom: 5, marginHorizontal: 15, color: "#000000", fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular' }}>
@@ -261,7 +262,7 @@ const ViewMyBookings = () => {
             numColumns={2}
           />
         </ScrollView>
-      </LinearGradient>
+      </View>
     </SafeAreaView>
   );
 };
@@ -270,13 +271,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     // padding: 16,
-    backgroundColor: '#F3F5FB',
+    // backgroundColor: '#F7F7F7',
+    backgroundColor:'red',
+    // alignSelf:'center'
+    // alignItems:'center'
   },
   card: {
-    flex: 1,
+    // flex: 1,
+    width:'45%',
     backgroundColor: 'white',
     borderRadius: 10,
-    margin: 10,
+    margin: 8
   },
   cardImage: {
     height: Dimensions.get('window').height / 5,
@@ -325,8 +330,8 @@ const styles = StyleSheet.create({
     padding: 4,
     borderRadius: 5,
     color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: "400",
+    fontSize: 14,
+    fontWeight: "800",
     fontFamily: 'ManropeRegular',
     paddingVertical: 5,
     paddingHorizontal: 10
@@ -338,8 +343,8 @@ const styles = StyleSheet.create({
   },
   doneButtonText: {
     color: '#FFFFFF',
-    fontWeight: '600',
-    fontSize: 12,
+    fontWeight: '800',
+    fontSize: 13,
     fontFamily: 'ManropeRegular',
     textAlign: 'center',
   },
