@@ -169,7 +169,8 @@ const Categories = () => {
                                 <Text style={styles.strickedoffer}>{formatAmount(strikethroughPrice)}</Text>
                                 : null}
                         </View>
-                        <TouchableOpacity style={{ width: "100%", borderColor: "#D0433C", borderWidth: 1, borderRadius: 5, alignSelf: "center", alignItems: "center", padding: 5, marginVertical: 10 }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })}
+                        style={{ width: "100%", borderColor: "#D0433C", borderWidth: 1, borderRadius: 5, alignSelf: "center", alignItems: "center", padding: 5, marginVertical: 10 }}>
                             <Text style={{ color: "#D0433C", fontSize: 12, fontWeight: "700", fontFamily: 'ManropeRegular' }}>{item?.available ? 'Rent Now' : 'Not Available'}</Text>
                         </TouchableOpacity>
                     </View>

@@ -58,6 +58,8 @@ import LoginScreen from "../screens/LandingScreen/LoginScreen";
 import OtpValidation from "../screens/LandingScreen/OtpValidation";
 import { getDeviceFCMToken } from "../../redux/actions";
 import messaging from '@react-native-firebase/messaging';
+import AadharUpload from "../screens/KYC/AadharUpload";
+import BankDetailsScreen from "../screens/VendorScreens/VendorProfile/BankDetails";
 
 const MainNavigation = () => {
 
@@ -178,6 +180,22 @@ const MainNavigation = () => {
                     component={BookingDetailsScreen}
                     options={{
                         header: () => <NavigationHeader Icon={true} title="Cart" />,
+                        headerShown: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="AadharUpload"
+                    component={AadharUpload}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="KYC Documents" />,
+                        headerShown: true,
+                    }}
+                />
+                 <Stack.Screen
+                    name="BankDetailsScreen"
+                    component={BankDetailsScreen}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Bank Details" />,
                         headerShown: true,
                     }}
                 />
