@@ -192,6 +192,14 @@ const BookingDetailsScreen = ({ navigation, route }) => {
             <Text style={styles.priceDetailLabel}>Platform charges</Text>
             <Text style={styles.priceDetailValue}>₹ 100</Text>
           </View>
+          <View style={styles.priceDetailRow}>
+            <Text style={styles.priceDetailLabel}>
+              Upload Aadhar Proof*
+            </Text>
+            <TouchableOpacity onPress={() => {navigation.navigate('AadharUpload', {type: 'user'})}}>
+              <Text>UPLOAD</Text>
+            </TouchableOpacity>
+          </View>
           <View style={{ width: "90%", borderColor: "#D8D8D8", borderWidth: 0.5, marginVertical: 5, alignSelf: "center" }} />
           <View style={styles.priceDetailRow}>
             <Text style={styles.priceDetailLabel}>Total Deposit</Text>

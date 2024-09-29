@@ -112,6 +112,7 @@ const ProfileMainScreen = () => {
                     icon={<ProfileIcon />}
                     title="My KYC"
                     isSelected={isMyAccountOpen ? true : false}
+                    onPress={() => navigation.navigate('AadharUpload',{type:'user'})}
                     // onPress={() => toggleMyAccount()}
                 />
                 {isMyAccountOpen && (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Switch, ScrollView } from 'react-native';
 import ProfileIcon from '../../../assets/profilesvgs/profile.svg'
 import DashboardIcon from '../../../assets/profilesvgs/dashboard.svg';
@@ -21,6 +21,10 @@ import LinkBgm from '../../../assets/profilesvgs/linkBgm.svg';
 import CrossIcon from '../../../assets/profilesvgs/orangeCross.svg';
 import { moderateScale } from '../../../utils/scalingMetrics';
 import LogOutIcon from '../../../assets/svgs/logOutIcon.svg';
+import { getUserAuthToken } from '../../../utils/StoreAuthToken';
+import axios from 'axios';
+import BASE_URL from '../../../apiconfig';
+import { useSelector } from 'react-redux';
 
 
 const VendorProfile = () => {
@@ -31,6 +35,8 @@ const VendorProfile = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedMyAccount, setSelectedMyAccount] = React.useState(false);
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+    const [profileData, setProfileData] = useState();
+
     const toggleMyAccount = () => {
         setIsMyAccountOpen(!isMyAccountOpen);
         setSelectedMyAccount(!selectedMyAccount)
@@ -40,6 +46,28 @@ const VendorProfile = () => {
     }
 
     const link = "www.xyz.com";
+    const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
+
+    useEffect(()=>{
+        getProfileData();
+      },[]);
+  
+      const getProfileData = async() =>{
+          const token = await getUserAuthToken();
+          try {
+            console.log("vendou num:", vendorLoggedInMobileNum)
+              const response = await axios.get(`${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`,{
+                  headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+              });
+              setProfileData(response?.data?.data);
+          console.log("profile vendor res:::", response);
+             
+          } catch (error) {
+              console.log("profile::::::::::", error);
+          }
+      }
 
     const shareLink = async (platform) => {
         try {
@@ -102,23 +130,20 @@ const VendorProfile = () => {
                         <DropdownItem title="My Lend" navigation={navigation} />
                     </View>
                 )} */}
-                <MenuItem icon={<ReferEarn />} title="Refer & Earn">
-                    <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.copyLink}>
-                        <CopyLinkIcon />
-                        <Text style={styles.copyLinkText}>Copy Link</Text>
-                    </TouchableOpacity>
-                </MenuItem>
+                <MenuItem
+                    icon={<ProfileIcon />}
+                    title="My KYC"
+                    onPress={() => navigation.navigate('AadharUpload',{type: 'vendor'})}
+                />
+                <MenuItem
+                    icon={<ProfileIcon />}
+                    title="Update Bank Account"
+                    onPress={() => navigation.navigate('BankDetailsScreen')}
+                />
+              
                 <MenuItem icon={<TransactionIcon />} title="My Transaction" />
                 {/* <MenuItem onPress={() => navigation.navigate('LocationAdded')} icon={<LocationIcon />} title="Manage Location" /> */}
-                <MenuItem icon={<NotificationIcon />} title="Notification Preferences">
-                    {/* <Switch
-                        trackColor={{ false: "#767577", true: "#81b0ff" }}
-                        thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-                        onValueChange={toggleSwitch}
-                        value={isEnabled}
-                    /> */}
-                    <CustomToggle value={isEnabled} onValueChange={toggleSwitch} />
-                </MenuItem>
+              
                 <MenuItem icon={<AboutUsIcon />} title="About Us" />
                 <MenuItem icon={<TermsConditionIcon />} title="Terms & Condition" />
                 <MenuItem icon={<RefundPolicy />} title="Refund Policy" />
