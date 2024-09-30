@@ -230,7 +230,7 @@ const Caterings = () => {
         const token = await getUserAuthToken();
         setGetUserAuth(token);
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFoodCaterings?page=${page}&limit=10`, {
+            const response = await axios.get(`${BASE_URL}/getAllFoodCaterings?page=${page}&limit=10&latitude=17.4505&longitude=78.3806`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

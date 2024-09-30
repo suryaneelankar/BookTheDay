@@ -177,7 +177,7 @@ const Events = () => {
         const token = await getUserAuthToken();
         setGetUserAuth(token);
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls?page=${page}&limit=10`,{
+            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls?page=${page}&limit=10&latitude=17.4505&longitude=78.3806`,{
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -226,21 +226,6 @@ const Events = () => {
             getDistanceMatrix()
         } catch (error) {
             console.log("events data error>>::", error);
-        }
-    };
-
-    const getAllCaterings = async () => {
-        const token = await getUserAuthToken();
-        try {
-            const response = await axios.get(`${BASE_URL}/getAllFoodCaterings`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            // console.log('catering response is::::::::', JSON.stringify(response?.data));
-            setCateringsData(response?.data)
-        } catch (error) {
-            console.log("caterings data error>>::", error);
         }
     };
 
