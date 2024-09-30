@@ -17,7 +17,7 @@ import { getUserAuthToken } from '../../utils/StoreAuthToken';
 import { useSelector } from 'react-redux';
 import FastImage from 'react-native-fast-image';
 import ThumsUpIcon from '../../assets/svgs/thumsupIcon.svg';
-
+import CheckMark from '../../assets/svgs/greenChecked.svg'
 
 const BookingDetailsScreen = ({ navigation, route }) => {
 
@@ -29,6 +29,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
   const [productImage, setProductImage] = useState();
   const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
   const [getUserAuth, setGetUserAuth] = useState('');
+  const [isAadharAvailable, setIsAadharAvailable] = useState();
 
 
   const { catId, NumOfDays, isDayOrMonthly, startDate, endDate, monthlyPrice } = route.params;
@@ -37,6 +38,8 @@ const BookingDetailsScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     getSelectedProductDetails();
+    getProfileData();
+
   }, []);
 
   const getSelectedProductDetails = async () => {
@@ -56,7 +59,22 @@ const BookingDetailsScreen = ({ navigation, route }) => {
     } catch (error) {
       console.log("categories::::::::::", error);
     }
-  }
+  };
+
+  const getProfileData = async() => {
+    const token = await getUserAuthToken();
+    try {
+      console.log("vendou num:", userLoggedInMobileNum)
+      const response = await axios.get(`${BASE_URL}/getAllUserLocations/${userLoggedInMobileNum}`,{
+          headers: {
+                Authorization: `Bearer ${token}`,
+              },
+        });
+        setIsAadharAvailable( response?.data?.data?.aadharImage?.url ? true : false);
+    } catch (error) {
+        console.log("profile::::::::::", error);
+    }
+}
 
   // useEffect(() => {
   //   const backAction = () => {
@@ -91,6 +109,10 @@ const BookingDetailsScreen = ({ navigation, route }) => {
 
   const ConfirmBooking = async () => {
     const token = await getUserAuthToken();
+    if(!isAadharAvailable){
+      Alert.alert("Please Upload Aadhar Image");
+      return;
+    }
     const payload = {
       productId: catId,
       startDate: moment(startDate).format('DD MMMM YYYY'),
@@ -194,11 +216,14 @@ const BookingDetailsScreen = ({ navigation, route }) => {
           </View>
           <View style={styles.priceDetailRow}>
             <Text style={styles.priceDetailLabel}>
-              Upload Aadhar Proof*
+            Aadhar Proof <Text style={{color:"red", fontSize:18}}>*</Text>
             </Text>
-            <TouchableOpacity onPress={() => {navigation.navigate('AadharUpload', {type: 'user'})}}>
+            {isAadharAvailable ? 
+            <CheckMark/> :
+            <TouchableOpacity onPress={() => {navigation.navigate('UserAadharUpload')}}>
               <Text>UPLOAD</Text>
             </TouchableOpacity>
+            }
           </View>
           <View style={{ width: "90%", borderColor: "#D8D8D8", borderWidth: 0.5, marginVertical: 5, alignSelf: "center" }} />
           <View style={styles.priceDetailRow}>

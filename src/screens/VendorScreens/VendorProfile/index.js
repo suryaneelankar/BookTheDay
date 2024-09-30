@@ -133,7 +133,7 @@ const VendorProfile = () => {
                 <MenuItem
                     icon={<ProfileIcon />}
                     title="My KYC"
-                    onPress={() => navigation.navigate('AadharUpload',{type: 'vendor', aadharImage : profileData?.aadharImage})}
+                    onPress={() => navigation.navigate('AadharUpload')}
                 />
                 <MenuItem
                     icon={<ProfileIcon />}

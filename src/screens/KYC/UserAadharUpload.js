@@ -3,18 +3,17 @@ import { View, Text, TouchableOpacity, Image, StyleSheet, Alert } from 'react-na
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
 import BookDatesButton from '../../components/GradientButton';
-import { getVendorAuthToken } from '../../utils/StoreAuthToken';
+import { getUserAuthToken } from '../../utils/StoreAuthToken';
 import axios from 'axios';
-import BASE_URL from '../../apiconfig';
+import BASE_URL, { LocalHostUrl } from '../../apiconfig';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import FastImage from 'react-native-fast-image';
 
-const AadharUpload = () => {
-    const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
+const UserAadharUpload = () => {
+    const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
     const navigation = useNavigation();
-    const [selectedFoodLicenseImage, setSelectedFoodLicenseImage] = useState();
-    const [getVendorAuth, setGetVendorAuth] = useState('');
+    const [getUserAuth, setGetUserAuth] = useState('');
 
 
     const [selectedImage, setSelectedImage] = useState();
@@ -22,24 +21,26 @@ const AadharUpload = () => {
     const [isAadharAvailable, setIsAadharAvailable] = useState();
 
 
+
     useEffect(()=>{
         getProfileData();
       },[]);
   
       const getProfileData = async() => {
-          const token = await getVendorAuthToken();
+          const token = await getUserAuthToken();
           try {
-            console.log("vendou num:", vendorLoggedInMobileNum)
-              const response = await axios.get(`${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`,{
-                  headers: {
+            console.log("vendou num:", userLoggedInMobileNum)
+            const response = await axios.get(`${BASE_URL}/getAllUserLocations/${userLoggedInMobileNum}`,{
+                headers: {
                       Authorization: `Bearer ${token}`,
                     },
               });
               setProfileData(response?.data?.data);
+            //   setSelectedImage(response?.data?.data?.aadharImage);
               const updatedImgUrl = response?.data?.data?.aadharImage?.url ? response?.data?.data?.aadharImage?.url.replace('localhost', LocalHostUrl) : response?.data?.data?.aadharImage?.url;
               setIsAadharAvailable(updatedImgUrl);
-              setGetVendorAuth(token);
-          console.log("profile vendor res:::", response?.data?.data?.aadharImage);
+              setGetUserAuth(token);
+          console.log("profile user res:::", updatedImgUrl);
              
           } catch (error) {
               console.log("profile::::::::::", error);
@@ -56,28 +57,19 @@ const AadharUpload = () => {
         if (type === 'camera') {
             launchCamera(options, (response) => {
                 if (response.assets) {
-                    if(userType === 'aadhar'){
-                        setSelectedImage(response);
-                    }else if(userType === 'foodLicense'){
-                        selectedFoodLicenseImage(response)
-                    }
+                    setSelectedImage(response);
                 }
             });
         } else {
             launchImageLibrary(options, (response) => {
                 if (response.assets) {
-                    if(userType === 'aadhar'){
-                        setSelectedImage(response)
-                    }else if(userType === 'foodLicense'){
-                        selectedFoodLicenseImage(response)
-                    }
-                    // setSelectedImage(response.assets[0].uri);
+                    setSelectedImage(response)
                 }
             });
         }
     };
 
-    const onSubmitCallVendor = async() =>{
+    const onSubmitCallUser = async() =>{
 
         if(!selectedImage){
             Alert.alert('Please upload Aadhar Image')
@@ -90,12 +82,11 @@ const AadharUpload = () => {
             type: selectedImage?.assets[0]?.type,
             name: selectedImage?.assets[0]?.fileName,
         });
-        // formData.append('aadharImage', selectedImage?.assets[0]?.uri);
-        formData.append('vendorMobileNumber', vendorLoggedInMobileNum);
+        formData.append('userMobileNumber', userLoggedInMobileNum);
         console.log('formdata is ::>>', JSON.stringify(formData));
-        const token = await getVendorAuthToken();
+        const token = await getUserAuthToken();
         try {
-            const response = await axios.post(`${BASE_URL}/vendor/uploadVendorAadharImage`, formData, {
+            const response = await axios.post(`${BASE_URL}/user/uploadUserAadharImage`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`,
@@ -122,6 +113,8 @@ const AadharUpload = () => {
 
     }
 
+    console.log("selectmage image url::::::", isAadharAvailable)
+    
     return (
         <View style={styles.container}>
             <Text style={styles.label}>Aadhar Proof <Text style={{color:"red", fontSize:18,}}>*</Text> </Text>
@@ -129,17 +122,20 @@ const AadharUpload = () => {
                 {isAadharAvailable ? (
                     <View style={{ flex: 1, flexDirection: "row" }}>
                         {isAadharAvailable ?
+                        // <></>
                         <FastImage 
                         source={{ uri: isAadharAvailable,
-                            headers:{Authorization : `Bearer ${getVendorAuth}`}
+                            headers:{Authorization : `Bearer ${getUserAuth}`}
 
-                        }} style={styles.image} />:
+                        }} style={styles.image} />
+                         : 
                         <FastImage 
-                        source={{ uri: selectedImage?.assets[0]?.uri,
-                        }} style={styles.image} />}
+                        source={{ uri: selectedImage?.assets[0]?.uri ,
+
+                        }} style={styles.image} /> }
                         <TouchableOpacity
                             style={styles.editIconContainer}
-                            onPress={() => handleImagePick('gallery', 'aadhar')}>
+                            onPress={() => handleImagePick('gallery', 'user')}>
                             <Icon name="edit" size={24} color="red" />
                         </TouchableOpacity>
                     </View>
@@ -147,52 +143,20 @@ const AadharUpload = () => {
                     <>
                         <Text style={styles.icon}>☁️</Text>
                         <Text style={styles.uploadText}>Drag & drop files</Text>
-                        <TouchableOpacity onPress={() => handleImagePick('gallery', 'aadhar')}>
+                        <TouchableOpacity onPress={() => handleImagePick('gallery', 'user')}>
                             <Text style={styles.browseLink}>Browse</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleImagePick('camera', 'aadhar')}>
+                        <TouchableOpacity onPress={() => handleImagePick('camera', 'user')}>
                             <Text style={styles.cameraLink}>Or take a photo</Text>
                         </TouchableOpacity>
                     </>
                 )}
             </View>
 
-            
-             <Text style={[styles.label,{marginTop:20}]}>Food Safety License</Text>
-            <View style={styles.uploadBox}>
-                {selectedFoodLicenseImage ? (
-                    <View style={{ flex: 1, flexDirection: "row" }}>
-                        <Image source={{ uri: selectedFoodLicenseImage?.assets[0]?.uri }} style={styles.image} />
-                        <TouchableOpacity
-                            style={styles.editIconContainer}
-                            onPress={() => handleImagePick('gallery', 'foodLicense')}>
-                            <Icon name="edit" size={24} color="red" />
-                        </TouchableOpacity>
-                    </View>
-                ) : (
-                    <>
-                        <Text style={styles.icon}>☁️</Text>
-                        <Text style={styles.uploadText}>Drag & drop files</Text>
-                        <TouchableOpacity onPress={() => handleImagePick('gallery', 'foodLicense')}>
-                            <Text style={styles.browseLink}>Browse</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleImagePick('camera', 'foodLicense')}>
-                            <Text style={styles.cameraLink}>Or take a photo</Text>
-                        </TouchableOpacity>
-                    </>
-                )}
-            </View>
-          
 
             <View style={{ position: 'absolute', bottom: 0}}>
                 <BookDatesButton
-                    onPress={() => {
-                        if(loginType === 'vendor'){
-                            onSubmitCallVendor()
-                        }else{
-
-                        }
-                     }}
+                    onPress={() => { onSubmitCallUser()}}
                     text={'Submit'}
                     padding={10} />
             </View>
@@ -265,4 +229,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AadharUpload;
+export default UserAadharUpload;

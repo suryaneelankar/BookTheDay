@@ -60,6 +60,7 @@ import { getDeviceFCMToken } from "../../redux/actions";
 import messaging from '@react-native-firebase/messaging';
 import AadharUpload from "../screens/KYC/AadharUpload";
 import BankDetailsScreen from "../screens/VendorScreens/VendorProfile/BankDetails";
+import UserAadharUpload from "../screens/KYC/UserAadharUpload";
 
 const MainNavigation = () => {
 
@@ -186,6 +187,14 @@ const MainNavigation = () => {
                 <Stack.Screen
                     name="AadharUpload"
                     component={AadharUpload}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="KYC Documents" />,
+                        headerShown: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="UserAadharUpload"
+                    component={UserAadharUpload}
                     options={{
                         header: () => <NavigationHeader Icon={true} title="KYC Documents" />,
                         headerShown: true,
