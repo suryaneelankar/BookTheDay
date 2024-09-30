@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import BASE_URL from '../../../apiconfig';
+import BookDatesButton from '../../../components/GradientButton';
+import { useNavigation } from '@react-navigation/native';
 
 const BankDetailsScreen = () => {
     const [accountNumber, setAccountNumber] = useState('');
+    const navigation = useNavigation();
     const [ifscCode, setIfscCode] = useState('');
     const [upiId, setUpiId] = useState('');
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
@@ -14,11 +17,29 @@ const BankDetailsScreen = () => {
     const [mobileNumber, setMobileNumber] = useState(vendorLoggedInMobileNum);
 
     const handleSave = async () => {
+
+        const isValidBankAccount = /^[0-9]{9,18}$/.test(accountNumber);
+        const isValidIFSC = /^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifscCode);
+        const isValidUPI = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(upiId);
+
+        if (!isValidBankAccount) {
+            Alert.alert('Enter valid Bank Account Number');
+            return;
+        }
+        if (!isValidIFSC) {
+            Alert.alert('Enter valid IFSC Code');
+            return;
+        }
+        if (!isValidUPI) {
+            Alert.alert('Enter valid UPI ID');
+            return;
+        }
+
         let payload = {
-            bankAccountNumber : accountNumber,
-            ifscCode : ifscCode,
-            upiId : upiId,
-            vendorMobileNumber :vendorLoggedInMobileNum
+            bankAccountNumber: accountNumber,
+            ifscCode: ifscCode,
+            upiId: upiId,
+            vendorMobileNumber: vendorLoggedInMobileNum
         }
         const token = await getVendorAuthToken();
         try {
@@ -27,7 +48,6 @@ const BankDetailsScreen = () => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            console.log("response of bank:::::", response)
             if (response.status === 200) {
                 console.log('Success', `uploaded successfully`);
                 Alert.alert(
@@ -43,15 +63,13 @@ const BankDetailsScreen = () => {
             }
         } catch (error) {
             console.error('Error  updating banck details:', error);
-            console.log('Error', 'Failed to upload Bank Deatils');
+            console.log('Error', 'Failed to upload Bank Deatils', error);
         }
 
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Enter Bank Details</Text>
-
             <TextInput
                 style={styles.input}
                 placeholder="Bank Account Number"
@@ -83,9 +101,12 @@ const BankDetailsScreen = () => {
                 onChangeText={setMobileNumber}
             />
 
-            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                <Text style={styles.saveButtonText}>Save Details</Text>
-            </TouchableOpacity>
+            <View style={{ position: 'absolute', bottom: 0 }}>
+                <BookDatesButton
+                    onPress={() => {handleSave()}}
+                    text={'Submit'}
+                    padding={10} />
+            </View>
         </View>
     );
 };
@@ -95,7 +116,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
         padding: 20,
-        justifyContent: 'center',
     },
     title: {
         fontSize: 22,

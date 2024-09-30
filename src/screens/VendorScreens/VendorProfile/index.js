@@ -21,7 +21,7 @@ import LinkBgm from '../../../assets/profilesvgs/linkBgm.svg';
 import CrossIcon from '../../../assets/profilesvgs/orangeCross.svg';
 import { moderateScale } from '../../../utils/scalingMetrics';
 import LogOutIcon from '../../../assets/svgs/logOutIcon.svg';
-import { getUserAuthToken } from '../../../utils/StoreAuthToken';
+import { getUserAuthToken, getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import axios from 'axios';
 import BASE_URL from '../../../apiconfig';
 import { useSelector } from 'react-redux';
@@ -53,7 +53,7 @@ const VendorProfile = () => {
       },[]);
   
       const getProfileData = async() =>{
-          const token = await getUserAuthToken();
+          const token = await getVendorAuthToken();
           try {
             console.log("vendou num:", vendorLoggedInMobileNum)
               const response = await axios.get(`${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`,{
@@ -62,7 +62,7 @@ const VendorProfile = () => {
                     },
               });
               setProfileData(response?.data?.data);
-          console.log("profile vendor res:::", response);
+          console.log("profile vendor res:::", response?.data?.data?.aadharImage);
              
           } catch (error) {
               console.log("profile::::::::::", error);
@@ -98,8 +98,8 @@ const VendorProfile = () => {
                         style={styles.profileImage}
                     />
                 </View>
-                <Text style={styles.profileName}>Donye Collins</Text>
-                <Text style={styles.profileEmail}>iamcollinsdonye@gmail.com</Text>
+                <Text style={styles.profileName}>{profileData?.fullName}</Text>
+                <Text style={styles.profileEmail}>{profileData?.email}</Text>
             </View>
 
             <ScrollView style={styles.menuContainer} showsVerticalScrollIndicator={false}>
@@ -133,7 +133,7 @@ const VendorProfile = () => {
                 <MenuItem
                     icon={<ProfileIcon />}
                     title="My KYC"
-                    onPress={() => navigation.navigate('AadharUpload',{type: 'vendor'})}
+                    onPress={() => navigation.navigate('AadharUpload')}
                 />
                 <MenuItem
                     icon={<ProfileIcon />}
