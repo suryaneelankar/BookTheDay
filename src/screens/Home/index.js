@@ -86,6 +86,7 @@ const HomeDashboard = () => {
     const [discountProducts, setDiscountProducts] = useState([]);
     const [newlyAddedProducts, setNewlyAddedProducts] = useState([]);
     const [getUserAuth, setGetUserAuth] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
 
     const bannerImages = [
         { id: '1', image: JewelleryCard },
@@ -140,7 +141,7 @@ const HomeDashboard = () => {
     useEffect(() => {
         // getPermissions();
         getCategories();
-        getAllEvents();
+        getAllEvents(currentPage);
         getUserAuthTokenRes();
     }, []);
 
@@ -206,15 +207,16 @@ const HomeDashboard = () => {
         }
     };
 
-    const getAllEvents = async () => {
+    const getAllEvents = async (page) => {
         const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls`, {
+            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls?page=${page}&limit=10`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            setEventsData(response?.data)
+            console.log("ondemand halls::::::", response?.data?.data)
+            setEventsData(response?.data?.data)
         } catch (error) {
             console.log("events data error>>::", error);
         }
@@ -460,9 +462,9 @@ const HomeDashboard = () => {
                             <FilterIcon />
                         </View>
                     </View>
-                    <TouchableOpacity onPress={() => { handlePayment() }}>
+                    {/* <TouchableOpacity onPress={() => { handlePayment() }}>
                         <Text>Initiate Razopr Pay Payment</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                     {/* <View style={{ width: "100%" }}> */}
                     <Swiper
                         autoplay

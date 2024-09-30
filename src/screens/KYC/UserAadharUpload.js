@@ -48,7 +48,7 @@ const UserAadharUpload = () => {
       }
 
 
-    const handleImagePick = (type, userType) => {
+    const handleImagePick = (type,isEdit ) => {
         const options = {
             mediaType: 'photo',
             quality: 1,
@@ -63,7 +63,12 @@ const UserAadharUpload = () => {
         } else {
             launchImageLibrary(options, (response) => {
                 if (response.assets) {
+                    if(isEdit==='edit'){
+                        setIsAadharAvailable(response?.assets[0]?.uri);
+                        setSelectedImage(response);
+                    }else{
                     setSelectedImage(response)
+                    }
                 }
             });
         }
@@ -135,7 +140,7 @@ const UserAadharUpload = () => {
                         }} style={styles.image} /> }
                         <TouchableOpacity
                             style={styles.editIconContainer}
-                            onPress={() => handleImagePick('gallery', 'user')}>
+                            onPress={() => handleImagePick('gallery', 'edit')}>
                             <Icon name="edit" size={24} color="red" />
                         </TouchableOpacity>
                     </View>
@@ -143,10 +148,10 @@ const UserAadharUpload = () => {
                     <>
                         <Text style={styles.icon}>☁️</Text>
                         <Text style={styles.uploadText}>Drag & drop files</Text>
-                        <TouchableOpacity onPress={() => handleImagePick('gallery', 'user')}>
+                        <TouchableOpacity onPress={() => handleImagePick('gallery',)}>
                             <Text style={styles.browseLink}>Browse</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleImagePick('camera', 'user')}>
+                        <TouchableOpacity onPress={() => handleImagePick('camera',)}>
                             <Text style={styles.cameraLink}>Or take a photo</Text>
                         </TouchableOpacity>
                     </>

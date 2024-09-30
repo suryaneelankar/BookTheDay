@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import BookDatesButton from '../../components/GradientButton';
 import { getVendorAuthToken } from '../../utils/StoreAuthToken';
 import axios from 'axios';
-import BASE_URL from '../../apiconfig';
+import BASE_URL, { LocalHostUrl } from '../../apiconfig';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import FastImage from 'react-native-fast-image';
@@ -47,7 +47,7 @@ const AadharUpload = () => {
       }
 
 
-    const handleImagePick = (type, userType) => {
+    const handleImagePick = (type, userType, isEdit) => {
         const options = {
             mediaType: 'photo',
             quality: 1,
@@ -67,7 +67,13 @@ const AadharUpload = () => {
             launchImageLibrary(options, (response) => {
                 if (response.assets) {
                     if(userType === 'aadhar'){
-                        setSelectedImage(response)
+                        if(isEdit === 'edit'){
+                            console.log("insdie edit::::::", response?.assets[0])
+                            setIsAadharAvailable(response?.assets[0]?.uri);
+                            setSelectedImage(response);
+                        }else{
+                        setSelectedImage(response);
+                        }
                     }else if(userType === 'foodLicense'){
                         selectedFoodLicenseImage(response)
                     }
@@ -133,13 +139,13 @@ const AadharUpload = () => {
                         source={{ uri: isAadharAvailable,
                             headers:{Authorization : `Bearer ${getVendorAuth}`}
 
-                        }} style={styles.image} />:
+                        }} style={styles.image} /> :
                         <FastImage 
                         source={{ uri: selectedImage?.assets[0]?.uri,
                         }} style={styles.image} />}
                         <TouchableOpacity
                             style={styles.editIconContainer}
-                            onPress={() => handleImagePick('gallery', 'aadhar')}>
+                            onPress={() => handleImagePick('gallery', 'aadhar','edit')}>
                             <Icon name="edit" size={24} color="red" />
                         </TouchableOpacity>
                     </View>
@@ -187,11 +193,7 @@ const AadharUpload = () => {
             <View style={{ position: 'absolute', bottom: 0}}>
                 <BookDatesButton
                     onPress={() => {
-                        if(loginType === 'vendor'){
                             onSubmitCallVendor()
-                        }else{
-
-                        }
                      }}
                     text={'Submit'}
                     padding={10} />
