@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -8,16 +8,47 @@ import axios from 'axios';
 import BASE_URL from '../../apiconfig';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
+import FastImage from 'react-native-fast-image';
 
 const AadharUpload = ({route}) => {
-    const [selectedImage, setSelectedImage] = useState();
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
-
-
     const navigation = useNavigation();
     const [selectedFoodLicenseImage, setSelectedFoodLicenseImage] = useState();
+    const [getUserAuth, setGetUserAuth] = useState('');
+    const [getVendorAuth, setGetVendorAuth] = useState('');
+
 
     const loginType = route.params.type;
+    const aadharImage = route.params?.aadharImage;
+    console.log("aadhar image is::::::;", aadharImage)
+    const [selectedImage, setSelectedImage] = useState();
+    const [profileData, setProfileData] = useState();
+
+
+    useEffect(()=>{
+        getProfileData();
+      },[]);
+  
+      const getProfileData = async() => {
+          const token = await getVendorAuthToken();
+          try {
+            console.log("vendou num:", vendorLoggedInMobileNum)
+              const response = await axios.get(`${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`,{
+                  headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+              });
+              setProfileData(response?.data?.data);
+              setSelectedImage(response?.data?.data?.aadharImage);
+              setGetVendorAuth(token);
+          console.log("profile vendor res:::", response?.data?.data?.aadharImage);
+             
+          } catch (error) {
+              console.log("profile::::::::::", error);
+          }
+      }
+
+
     const handleImagePick = (type, userType) => {
         const options = {
             mediaType: 'photo',
@@ -99,7 +130,11 @@ const AadharUpload = ({route}) => {
             <View style={styles.uploadBox}>
                 {selectedImage ? (
                     <View style={{ flex: 1, flexDirection: "row" }}>
-                        <Image source={{ uri: selectedImage?.assets[0]?.uri }} style={styles.image} />
+                        <FastImage 
+                        source={{ uri: selectedImage?.assets[0]?.uri  || selectedImage?.url,
+                            headers:{Authorization : `Bearer ${getVendorAuth}`}
+
+                        }} style={styles.image} />
                         <TouchableOpacity
                             style={styles.editIconContainer}
                             onPress={() => handleImagePick('gallery', 'user')}>
