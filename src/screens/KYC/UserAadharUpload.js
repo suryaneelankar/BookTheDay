@@ -63,11 +63,12 @@ const UserAadharUpload = () => {
         } else {
             launchImageLibrary(options, (response) => {
                 if (response.assets) {
+                    console.log("gallery response:::;", response.assets)
                     if(isEdit==='edit'){
                         setIsAadharAvailable(response?.assets[0]?.uri);
                         setSelectedImage(response);
                     }else{
-                    setSelectedImage(response)
+                    setSelectedImage(response);
                     }
                 }
             });
@@ -141,7 +142,7 @@ const UserAadharUpload = () => {
                         <TouchableOpacity
                             style={styles.editIconContainer}
                             onPress={() => handleImagePick('gallery', 'edit')}>
-                            <Icon name="edit" size={24} color="red" />
+                            <Icon name="edit" size={24} color="orange" />
                         </TouchableOpacity>
                     </View>
                 ) : (
@@ -183,8 +184,8 @@ const styles = StyleSheet.create({
         fontFamily: 'ManropeRegular'
     },
     uploadBox: {
-        width: 200,
-        height: 150,
+        width: "90%",
+        height: "30%",
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 10,
@@ -228,7 +229,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 5,
         right: 5,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor:"white",
+        // backgroundColor: 'rgba(0, 0, 0, 0.5)',
         padding: 5,
         borderRadius: 50,
     },

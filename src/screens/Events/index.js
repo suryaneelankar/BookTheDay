@@ -177,7 +177,7 @@ const Events = () => {
         const token = await getUserAuthToken();
         setGetUserAuth(token);
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls?page=${page}&limit=10&latitude=17.4505&longitude=78.3806`,{
+            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls?page=${page}&limit=10&latitude=17.4334238&longitude=78.4368569`,{
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -303,6 +303,9 @@ const Events = () => {
                         <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
                             <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} />
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> Min 30- Max 500</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
+                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}>distance:  {item?.distance}</Text>
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -450,9 +453,9 @@ const Events = () => {
                             <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} />
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> {item?.seatingCapacity}</Text>
                         </View>
-                        {/* <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
-                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> {item?.distanceText}</Text>
-                        </View> */}
+                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
+                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> {item?.distance}</Text>
+                        </View>
                     </View>
                 </TouchableOpacity>
             </View>
@@ -487,7 +490,7 @@ const Events = () => {
             </View>
 
             <View style={{ marginHorizontal: 20 }}>
-                <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
+                <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location </Text>
                 <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} {selectedCategory} Service in Hyderabad</Text>
             </View>
                     <FlatList
@@ -497,7 +500,7 @@ const Events = () => {
                         onEndReached={loadMoreFunctionHalls} // Fetch more when list ends
                         onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
                         ListFooterComponent={() =>
-                            loading ? <ActivityIndicator size="large" color="#FEF7DE" /> : null
+                            loading ? <ActivityIndicator size="large" color="orange" /> : null
                         }
                         ListEmptyComponent={
                             <View >

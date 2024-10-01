@@ -82,7 +82,7 @@ const Categories = () => {
 
 
             // const finalResponseData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            console.log('finalResponseData in cat is::>>>',finalResponseData);
+            // console.log('finalResponseData in cat is::>>>',finalResponseData);
         
             // setCategories((prevData) => [...prevData, ...filteredDiscountItems]);
 

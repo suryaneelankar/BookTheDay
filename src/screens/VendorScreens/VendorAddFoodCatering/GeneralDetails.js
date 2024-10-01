@@ -48,6 +48,10 @@ const GeneralDetails = () => {
         additionalImageFour: undefined
     });
     const [cateringAddress, setCateringAddress] = useState('');
+    const [locationLatitude, setLocationLatitude] = useState();
+    const [locationLongitude, setLocationLongitude] = useState();
+    const [locationCountyVal, setLocationCountyVal] = useState();
+
     const [cateringCity, setCateringCity] = useState('');
     const [cateringPincode, setCateringPincode] = useState();
     const [perDayRentPrice, setPerDayRentPrice] = useState();
@@ -682,6 +686,9 @@ const GeneralDetails = () => {
         formData.append('advanceAmount', advanceAmount);
         formData.append('overTimeCharges', overTimeCharges);
         formData.append('accepted', false);
+        formData.append('county', locationCountyVal);
+        formData.append('latitude', locationLatitude);
+        formData.append('longitude', locationLongitude);
 
 
         console.log('formdata is ::>>', JSON.stringify(formData));
@@ -767,6 +774,10 @@ const GeneralDetails = () => {
 
     const handleLocationSelected = (location, address) => {
         console.log('Selected Location:', location, address);
+        setLocationCountyVal(location?.address?.county);
+        setLocationLatitude(location?.region?.latitude);
+        setLocationLongitude(location?.region?.longitude);
+
         setCateringAddress(address);
         setCateringCity(location?.address?.city);
         setCateringPincode(location.pinCode);
