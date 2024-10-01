@@ -29,6 +29,11 @@ const Events = () => {
     const [hasMore, setHasMore] = useState(true);
     const [totalNearByPages,setTotalNearByPages] = useState(0);
     const [totalEventPages,setTotalEventPages] = useState(0);
+    // console.log("user selevcted address is events::::::::", userLocationFetched)
+
+    const [userLatitude,setUserLatitude] = useState(userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude);
+    const [userLongitude,setUserLongitude] = useState(userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude);
+    console.log("latitue long", userLatitude ,'+++++++++', userLongitude);
 
     useEffect(() => {
         getAllEvents(currentPage);
@@ -204,9 +209,9 @@ const Events = () => {
                             <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} />
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> {item?.seatingCapacity}</Text>
                         </View>
-                        {/* <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
-                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> {item?.distanceText}</Text>
-                        </View> */}
+                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
+                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> {item?.distance}</Text>
+                        </View>
                     </View>
                 </TouchableOpacity>
             </View>

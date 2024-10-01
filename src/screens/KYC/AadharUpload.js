@@ -132,7 +132,7 @@ const AadharUpload = () => {
         <View style={styles.container}>
             <Text style={styles.label}>Aadhar Proof <Text style={{color:"red", fontSize:18,}}>*</Text> </Text>
             <View style={styles.uploadBox}>
-                {isAadharAvailable ? (
+                {selectedImage ? (
                     <View style={{ flex: 1, flexDirection: "row" }}>
                         {isAadharAvailable ?
                         <FastImage 

@@ -36,6 +36,12 @@ const GeneralDetails = () => {
         additionalImageFour: undefined
     });
     const [functionHallAddress, setfunctionHallAddress] = useState('');
+    const [locationLatitude, setLocationLatitude] = useState();
+    const [locationLongitude, setLocationLongitude] = useState();
+    const [locationCountyVal, setLocationCountyVal] = useState();
+
+
+
     const [functionHallCity, setfunctionHallCity] = useState('');
     const [functionHallPinCode, setfunctionHallPinCode] = useState();
     const [perDayRentPrice, setPerDayRentPrice] = useState();
@@ -331,6 +337,9 @@ const GeneralDetails = () => {
         formData.append('seatingCapacity', selectedSeatingCapacity);
         formData.append('accepted', false);
         formData.append('overTimeCharges', overTimeCharges);
+        formData.append('county', locationCountyVal);
+        formData.append('latitude', locationLatitude);
+        formData.append('longitude', locationLongitude);
 
         console.log('formdata is ::>>', formData);
         const token = await getVendorAuthToken();
@@ -603,8 +612,11 @@ const GeneralDetails = () => {
     };
 
     const handleLocationSelected = (location, address) => {
-        console.log('Selected Location:', location, address);
+        console.log('Selected Location:', location, "+++++++++",address);
         setfunctionHallAddress(address);
+        setLocationCountyVal(location?.address?.county);
+        setLocationLatitude(location?.region?.latitude);
+        setLocationLongitude(location?.region?.longitude);
         setfunctionHallCity(location?.address?.city);
         setfunctionHallPinCode(location.pinCode);
         setLocationPickerVisible(false); // Hide the LocationPicker after selection

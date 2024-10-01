@@ -31,6 +31,11 @@ const Caterings = () => {
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+
+    const [userLatitude,setUserLatitude] = useState(userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude);
+    const [userLongitude,setUserLongitude] = useState(userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude);
+    console.log("latitue long", userLatitude ,'+++++++++', userLongitude);
+
     // console.log("user selevcted address is events::::::::", userLocationFetched)
 
     useEffect(() => {
@@ -230,7 +235,7 @@ const Caterings = () => {
         const token = await getUserAuthToken();
         setGetUserAuth(token);
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFoodCaterings?page=${page}&limit=10&latitude=17.4505&longitude=78.3806`, {
+            const response = await axios.get(`${BASE_URL}/getAllFoodCaterings?page=${page}&limit=10&latitude=${userLatitude}&longitude=${userLongitude}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

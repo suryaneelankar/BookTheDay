@@ -29,6 +29,10 @@ const GeneralDetails = () => {
         additionalImageFour: undefined
     });
     const [productAddress, setProductAddress] = useState('');
+    const [locationLatitude, setLocationLatitude] = useState();
+    const [locationLongitude, setLocationLongitude] = useState();
+    const [locationCountyVal, setLocationCountyVal] = useState();
+
     const [productCity, setProductCity] = useState('');
     const [productPinCode, setProductPinCode] = useState();
     const [perDayRentPrice, setPerDayRentPrice] = useState();
@@ -278,6 +282,12 @@ const GeneralDetails = () => {
         formData.append('vendorMobileNumber', vendorMobileNumber);
         formData.append('advanceAmount', advanceAmount);
         formData.append('discountPercentage', discountPercentage);
+        formData.append('county', locationCountyVal);
+        formData.append('latitude', locationLatitude);
+        formData.append('longitude', locationLongitude);
+
+
+
 
         console.log('formdata is ::>>', JSON.stringify(formData));
         const token = await getVendorAuthToken();
@@ -319,6 +329,9 @@ const GeneralDetails = () => {
 
     const handleLocationSelected = (location, address) => {
         console.log('Selected Location:', location, address);
+        setLocationCountyVal(location?.address?.county);
+        setLocationLatitude(location?.region?.latitude);
+        setLocationLongitude(location?.region?.longitude);
         setProductAddress(address);
         setProductCity(location?.address?.city);
         setProductPinCode(location.pinCode);

@@ -343,6 +343,7 @@ const ViewCatDetails = ({ route }) => {
                                 <ClockIcon />
                             </TouchableOpacity> */}
                             <BookDatesButton onPress={() => {
+                                setIsVisible(false),
                                 navigation.navigate("BookingDetailsScreen",{catId: catId, NumOfDays: numberOfDays, isDayOrMonthly: selectedOption, monthlyPrice: jewelleryDetails?.rentPricePerMonth, startDate: selectedRange?.startDate, endDate: selectedRange?.endDate })
                                 // if (productNav) {
                                 //   callNavigation()

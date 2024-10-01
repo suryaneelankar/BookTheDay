@@ -127,16 +127,16 @@ const HomeDashboard = () => {
     ];
 
     const trendingData = [
-        { id: '1', Component: TrendingTshirt },
-        { id: '2', Component: TrendingBridal },
-        { id: '3', Component: TrendingCatering },
+        { id: '1', Component: TrendingTshirt, name:'clothes' },
+        { id: '2', Component: TrendingBridal , name:'clothes'},
+        { id: '3', Component: TrendingCatering, name:'caterings' },
         // { id: '4', Component: TrendingChef },
         // { id: '5', Component: TrendingDriver },
-        { id: '6', Component: TrendingRingBanner },
-        { id: '7', Component: TrendingEarrings },
-        { id: '8', Component: TrendingJewellery },
-        { id: '9', Component: TrendingNecklace },
-        { id: '10', Component: TrendingBracelet },
+        { id: '6', Component: TrendingRingBanner, name :'jewels' },
+        { id: '7', Component: TrendingEarrings, name :'jewels' },
+        { id: '8', Component: TrendingJewellery , name :'jewels'},
+        { id: '9', Component: TrendingNecklace, name : 'jewels' },
+        { id: '10', Component: TrendingBracelet, name: 'jewels' },
     ];
     useEffect(() => {
         // getPermissions();
@@ -411,11 +411,21 @@ const HomeDashboard = () => {
     const renderTrendingView = ({ item }) => {
         const SvgComponent = item.Component;
         return (
-            <View style={{ marginHorizontal: 10 }}>
+            <TouchableOpacity onPress={() => handleTrendingBanners(item?.name)} style={{ marginHorizontal: 10 }}>
                 <SvgComponent />
-            </View>
+            </TouchableOpacity>
         );
     };
+
+    const handleTrendingBanners = (catClicked) => {
+        if (catClicked === 'clothes') {
+            navigation.navigate('CategoriesList', { catType: 'clothes' });
+        }else if (catClicked === 'jewels') {
+            navigation.navigate('CategoriesList', { catType: 'jewels' });
+        }else if (catClicked === 'caterings') {
+            navigation.navigate('Caterings');
+        }
+    }
 
     const handlePress = (name) => {
         if (name === 'Clothes') {

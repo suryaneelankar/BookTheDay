@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, BackHandler, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
@@ -18,6 +18,7 @@ import { useSelector } from 'react-redux';
 import FastImage from 'react-native-fast-image';
 import ThumsUpIcon from '../../assets/svgs/thumsupIcon.svg';
 import CheckMark from '../../assets/svgs/greenChecked.svg'
+import { useFocusEffect } from '@react-navigation/native';
 
 const BookingDetailsScreen = ({ navigation, route }) => {
 
@@ -36,11 +37,21 @@ const BookingDetailsScreen = ({ navigation, route }) => {
   console.log("RECIED PARMS::::::::, ", catId, NumOfDays, isDayOrMonthly, startDate, endDate)
 
 
-  useEffect(() => {
-    getSelectedProductDetails();
-    getProfileData();
+  // useEffect(() => {
+  //   getSelectedProductDetails();
+  //   getProfileData();
 
-  }, []);
+  // }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getSelectedProductDetails();
+      getProfileData();
+        // Cleanup function to run when the screen loses focus
+        return () => {
+            console.log('Screen is unfocused');
+        };
+    }, [])
+);
 
   const getSelectedProductDetails = async () => {
     console.log("IAM CALLING INSIDE CART")
@@ -203,7 +214,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
 
       <View style={styles.confrimSection}>
         <Text style={styles.sectionTitle}>Confirm Your Booking</Text>
-        <View style={{ borderColor: "#FD813B", borderWidth: 1.5, marginTop: 10, marginHorizontal: 25 }} />
+        <View style={{ borderColor: "#FD813B", borderWidth: 1.5, marginTop: 10, marginHorizontal: 5 }} />
 
         <View style={{ backgroundColor: "white", borderRadius: 10, elevation: 3, paddingHorizontal: 5 }}>
           <View style={styles.priceDetailRow}>
@@ -221,7 +232,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
             {isAadharAvailable ? 
             <CheckMark/> :
             <TouchableOpacity onPress={() => {navigation.navigate('UserAadharUpload')}}>
-              <Text>UPLOAD</Text>
+              <Text style={{color:"#FD813B", fontSize:14, fontWeight:"700", fontFamily: "ManropeRegular",}}>UPLOAD</Text>
             </TouchableOpacity>
             }
           </View>
@@ -337,6 +348,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: "#FD813B",
     fontFamily: "ManropeRegular",
+    marginHorizontal:10
   },
   address: {
     fontSize: 14,
