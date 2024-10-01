@@ -32,6 +32,10 @@ const Events = () => {
     const [hasMore, setHasMore] = useState(true);
     // console.log("user selevcted address is events::::::::", userLocationFetched)
 
+    const [userLatitude,setUserLatitude] = useState(userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude);
+    const [userLongitude,setUserLongitude] = useState(userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude);
+    console.log("latitue long", userLatitude ,'+++++++++', userLongitude);
+
     // useFocusEffect(
     //     useCallback(() => {
     //         // Code to run when the screen is focused
@@ -177,7 +181,7 @@ const Events = () => {
         const token = await getUserAuthToken();
         setGetUserAuth(token);
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls?page=${page}&limit=10&latitude=17.4334238&longitude=78.4368569`,{
+            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls?page=${page}&limit=10&latitude=${userLatitude}&longitude=${userLongitude}`,{
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
