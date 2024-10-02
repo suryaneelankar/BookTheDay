@@ -32,9 +32,9 @@ const Events = () => {
     const [hasMore, setHasMore] = useState(true);
     // console.log("user selevcted address is events::::::::", userLocationFetched)
 
-    const [userLatitude,setUserLatitude] = useState(userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude);
-    const [userLongitude,setUserLongitude] = useState(userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude);
-    console.log("latitue long", userLatitude ,'+++++++++', userLongitude);
+    // const [userLatitude,setUserLatitude] = useState(userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude);
+    // const [userLongitude,setUserLongitude] = useState(userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude);
+    console.log("latitue long", userLocationFetched?.latitude ,'+++++++++', userLocationFetched?.longitude);
 
     // useFocusEffect(
     //     useCallback(() => {
@@ -181,7 +181,7 @@ const Events = () => {
         const token = await getUserAuthToken();
         setGetUserAuth(token);
         try {
-            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls?page=${page}&limit=10&latitude=${userLatitude}&longitude=${userLongitude}`,{
+            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls?page=${page}&limit=10&latitude=${userLocationFetched?.latitude}&longitude=${userLocationFetched?.longitude}`,{
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

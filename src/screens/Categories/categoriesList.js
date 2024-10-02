@@ -52,10 +52,13 @@ const CategoriesList = ({ route }) => {
                 const filteredDiscountItems = finalResponseData?.filter(category => category?.componentType === componentType);
                 // setCategories(filteredDiscountItems);
                 setCategories((prevData) => [...prevData, ...filteredDiscountItems]);
-            }else{
+            }else if(catType === 'jewels' || catType === 'clothes'){
             const filteredCategories = finalResponseData?.filter(category => category?.categoryType === catType);
             // setCategories(filteredCategories);
             setCategories((prevData) => [...prevData, ...filteredCategories]);
+            }else{
+                const filteredData=  finalResponseData.filter(item => item?.jewellaryType === catType.toLowerCase());
+                setCategories((prevData) => [...prevData, ...filteredData]);
             }
         } catch (error) {
             console.log("categories::::::::::", error);
@@ -160,7 +163,7 @@ const CategoriesList = ({ route }) => {
                         onEndReached={loadMoreClothJewels} // Fetch more when list ends
                         onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
                         ListFooterComponent={() =>
-                            listLoading ? <ActivityIndicator size="large" color="#FEF7DE" /> : null
+                            listLoading ? <ActivityIndicator size="large" color="orange" /> : null
                         }
                         ListEmptyComponent={
                             <View >
