@@ -27,31 +27,19 @@ const Events = () => {
     const [nearByLoading, setNearByLoading] = useState(false);
     const [nearByClicked, setNearByClicked] = useState(false);
     const [hasMore, setHasMore] = useState(true);
+    const userLocationFetched = useSelector((state) => state.userLocation);
     const [totalNearByPages,setTotalNearByPages] = useState(0);
     const [totalEventPages,setTotalEventPages] = useState(0);
     // console.log("user selevcted address is events::::::::", userLocationFetched)
 
-    const [userLatitude,setUserLatitude] = useState(userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude);
-    const [userLongitude,setUserLongitude] = useState(userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude);
-    console.log("latitue long", userLatitude ,'+++++++++', userLongitude);
+    // const [userLatitude,setUserLatitude] = useState(userLocationFetched?.latitude);
+    // const [userLongitude,setUserLongitude] = useState(userLocationFetched?.longitude);
+    // console.log("latitue long", userLatitude ,'+++++++++', userLongitude);
+    console.log('userLocationFetched is::>>',userLocationFetched?.latitude,userLocationFetched?.longitude);
 
     useEffect(() => {
         getAllEvents(currentPage);
     }, [])
-
-    // const loadMoreFunctionHalls = () => {
-    //     if (hasMore && !loading && currentPage <= totalEventPages) {
-    //         console.log('hasmore values::>>>', hasMore, loading,currentPage,totalEventPages);
-    //         getAllEvents(currentPage + 1);
-    //     }
-    // };
-
-    // const loadMoreNearByFunctionHalls = () => {
-    //     console.log('has more near by is::>>',hasMoreNearBy,nearByLoading,nearByCurrentPage);
-    //     if (hasMoreNearBy && !nearByLoading && nearByCurrentPage <= totalNearByPages) {
-    //         getNearByEvents(nearByCurrentPage + 1);
-    //     }
-    // }
 
     const handleAllEventsPress = async () => {
         // Reset the current page and data
@@ -119,13 +107,13 @@ const Events = () => {
     }
 
     const getNearByEvents = async (nearByPage) => {
-        console.log('nearByPage in api call::>>',nearByPage);
+        // console.log('userLatitude in api call::>>',userLatitude,userLongitude);
         setEventsData([]);
         setNearByLoading(true);
         const token = await getUserAuthToken();
         setGetUserAuth(token);
         try {
-            const response = await axios.get(`${BASE_URL}/getNearByFunctionHalls?page=${nearByPage}&limit=10&latitude=17.4334238&longitude=78.4368569`, {
+            const response = await axios.get(`${BASE_URL}/getNearByFunctionHalls?page=${nearByPage}&limit=10&latitude=${userLocationFetched?.latitude}&longitude=${userLocationFetched?.longitude}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
