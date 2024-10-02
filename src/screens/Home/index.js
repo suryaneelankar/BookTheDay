@@ -127,16 +127,16 @@ const HomeDashboard = () => {
     ];
 
     const trendingData = [
-        { id: '1', Component: TrendingTshirt, name:'clothes' },
-        { id: '2', Component: TrendingBridal , name:'clothes'},
+        { id: '1', Component: TrendingTshirt, name:'men' },
+        { id: '2', Component: TrendingBridal , name:'women'},
         { id: '3', Component: TrendingCatering, name:'caterings' },
         // { id: '4', Component: TrendingChef },
         // { id: '5', Component: TrendingDriver },
-        { id: '6', Component: TrendingRingBanner, name :'jewels' },
-        { id: '7', Component: TrendingEarrings, name :'jewels' },
-        { id: '8', Component: TrendingJewellery , name :'jewels'},
-        { id: '9', Component: TrendingNecklace, name : 'jewels' },
-        { id: '10', Component: TrendingBracelet, name: 'jewels' },
+        { id: '6', Component: TrendingRingBanner, name :'rings' },
+        { id: '7', Component: TrendingEarrings, name :'earrings' },
+        { id: '8', Component: TrendingJewellery ,name :'bridal'},
+        { id: '9', Component: TrendingNecklace, name : 'chains' },
+        { id: '10', Component: TrendingBracelet, name: 'bracelets' },
     ];
     useEffect(() => {
         // getPermissions();
@@ -418,10 +418,16 @@ const HomeDashboard = () => {
     };
 
     const handleTrendingBanners = (catClicked) => {
-        if (catClicked === 'clothes') {
-            navigation.navigate('CategoriesList', { catType: 'clothes' });
-        }else if (catClicked === 'jewels') {
-            navigation.navigate('CategoriesList', { catType: 'jewels' });
+        if (catClicked === 'rings') {
+            navigation.navigate('CategoriesList', { catType: 'rings' });
+        }else if (catClicked === 'earrings') {
+            navigation.navigate('CategoriesList', { catType: 'earrings' });
+        }else if (catClicked === 'bridal') {
+            navigation.navigate('CategoriesList', { catType: 'bridal' });
+        }else if (catClicked === 'chains') {
+            navigation.navigate('CategoriesList', { catType: 'chains' });
+        }else if (catClicked === 'bracelets') {
+            navigation.navigate('CategoriesList', { catType: 'bracelets' });
         }else if (catClicked === 'caterings') {
             navigation.navigate('Caterings');
         }

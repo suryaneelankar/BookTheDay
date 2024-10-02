@@ -43,7 +43,14 @@ const Categories = () => {
     { image: require('../../assets/svgs/productBanners/productBannerone.png') },
     ]
 
-    const categoryFilterList = [{ name: 'Chains', image: ChainIcon }, { name: 'Rings', image: RingsIcon }, { name: 'Bridal', image: ChainIcon  }, { name: 'Bangles', image:BanglesIcon  }, { name: 'EarRings', image:EarRingsIcon  }, { name: 'Bracelets' , image: BraceletIcon }]; //svg images for swipper  
+    const categoryFilterList = [
+        { name: 'Chains', image: ChainIcon }, 
+        { name: 'Rings', image: RingsIcon }, 
+        { name: 'Bridal', image: ChainIcon  }, 
+        { name: 'Bangles', image:BanglesIcon  },
+        { name: 'EarRings', image:EarRingsIcon  },
+        { name: 'Bracelets' , image: BraceletIcon }
+    ]; //svg images for swipper  
     const [selectedJewelFilter, setSelectedJewelFilter] = useState(categoryFilterList[0]?.name);
 
 
