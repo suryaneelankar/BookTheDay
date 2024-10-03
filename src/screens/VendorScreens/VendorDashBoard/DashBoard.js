@@ -96,13 +96,15 @@ const VendorDashBoardTab = ({ navigation }) => {
                 else if (catType === 'catering') {
                     productName = item.postId.foodCateringName;
                 }
-
+               console.log("listing data::::::", JSON.stringify(response?.data))
                 return {
                     _id: response?.data?._id,
                     productName: productName,
                     productImage: item.postId.professionalImage.url,
                     particularPostId: item?.postId?._id,
-                    createdAt: response?.data?.createdAt
+                    createdAt: response?.data?.createdAt,
+                    available: item?.postId?.available,
+                    catType: item?.postId?.catType
                 };
             });
             setVendorListings(result);
@@ -240,17 +242,57 @@ const VendorDashBoardTab = ({ navigation }) => {
         );
     };
 
-    const showAvailabilityConfirmation = (vendorId, postId) => {
+    const showAvailabilityConfirmation = (catType, postId, toggleAvailable) => {
         Alert.alert(
             "Confirmation",
-            "Are you sure you want to make listing Unavailable?",
+            "Are you sure you want to make listing Change?",
             [
                 {
                     text: "Cancel",
                     onPress: () => console.log("No Pressed"),
                     style: "cancel"
                 },
-                { text: "Yes", onPress: () => ('') }
+                { text: "Yes", onPress: () => toggleListingAvailability(catType, postId,toggleAvailable) }
+            ],
+            { cancelable: false }
+        );
+    };
+
+    const toggleListingAvailability = async (catType, postId,toggleAvailable) => {
+        const token = await getVendorAuthToken();
+        // console.log('vendorId is:::',vendorId,postId);
+        let payload ={
+            id: postId,
+            available: !toggleAvailable,
+            modelType: catType
+        }
+        console.log("toggle payloa d:;", payload);
+        try {
+            const response = await axios.patch(`${BASE_URL}/vendor/productRecord/availability`,payload, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            console.log('response toggle availability is:::>>',response);
+            if (response?.status == 200) {
+                showSuccessToggleAlert();
+                getVendorListings();
+            }
+        } catch (error) {
+            console.log("categories::::::::::", error);
+        }
+    };
+
+    const showSuccessToggleAlert = () => {
+        Alert.alert(
+            "Confirmation",
+            "Your Product has been Updated successfully.",
+            [
+                {
+                    text: "Ok",
+                    onPress: () => console.log("No Pressed"),
+                    // style: "cancel"
+                },
             ],
             { cancelable: false }
         );
@@ -277,7 +319,7 @@ const VendorDashBoardTab = ({ navigation }) => {
         const convertedImageUrl = item?.productImage !== undefined ? item?.productImage.replace('localhost', LocalHostUrl) : item?.productImage;
         return (
             <TouchableOpacity 
-            style={{opacity: item?.available === true ? 1 : 1, backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10 }}
+            style={{opacity: item?.available === true ? 1 : 0.5, backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10 }}
             >
                 <View style={{ marginTop: 5, width: '100%', marginHorizontal: 5 }}>
 
@@ -295,7 +337,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                             <ListedTimeIcon />
                             <Text style={styles.price}>{formatDate(item?.createdAt)}</Text>
                         </View>
-                        <TouchableOpacity onPress={() => { showAvailabilityConfirmation(item?._id, item?.particularPostId) }}>
+                        <TouchableOpacity onPress={() => { showAvailabilityConfirmation(item?.catType, item?.particularPostId, item?.available) }}>
                             <EditButton />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => { showConfirmationAlert(item?._id, item?.particularPostId) }}>
