@@ -24,7 +24,8 @@ import LogOutIcon from '../../../assets/svgs/logOutIcon.svg';
 import { getUserAuthToken, getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import axios from 'axios';
 import BASE_URL from '../../../apiconfig';
-import { useSelector } from 'react-redux';
+import { useSelector,useDispatch } from 'react-redux';
+import { getLoginUserId } from '../../../../redux/actions';
 
 
 const VendorProfile = () => {
@@ -36,6 +37,7 @@ const VendorProfile = () => {
     const [selectedMyAccount, setSelectedMyAccount] = React.useState(false);
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
     const [profileData, setProfileData] = useState();
+    const dispatch = useDispatch();
 
     const toggleMyAccount = () => {
         setIsMyAccountOpen(!isMyAccountOpen);

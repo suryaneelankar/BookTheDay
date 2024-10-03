@@ -22,13 +22,13 @@ const AadharUpload = () => {
     const [isAadharAvailable, setIsAadharAvailable] = useState();
 
 
-    useEffect(()=>{
+    useEffect(() => {
         getProfileData();
-      },[]);
-  
-      const getProfileData = async() => {
-          const token = await getVendorAuthToken();
-          try {
+    }, []);
+
+    const getProfileData = async () => {
+        const token = await getVendorAuthToken();
+        try {
             console.log("vendou num:", vendorLoggedInMobileNum)
               const response = await axios.get(`${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`,{
                   headers: {
@@ -72,16 +72,16 @@ console.log("selected iamge:::::", selectedImage, isAadharAvailable)
         } else {
             launchImageLibrary(options, (response) => {
                 if (response.assets) {
-                    if(userType === 'aadhar'){
-                        if(isEdit === 'edit'){
+                    if (userType === 'aadhar') {
+                        if (isEdit === 'edit') {
                             console.log("insdie edit::::::", response?.assets[0])
                             setIsAadharAvailable(response?.assets[0]?.uri);
                             setSelectedImage(response);
-                        }else{
-                        setSelectedImage(response);
+                        } else {
+                            setSelectedImage(response);
                         }
-                    }else if(userType === 'foodLicense'){
-                        selectedFoodLicenseImage(response)
+                    } else if (userType === 'foodLicense') {
+                        setSelectedFoodLicenseImage(response)
                     }
                     // setSelectedImage(response.assets[0].uri);
                 }
@@ -104,7 +104,7 @@ console.log("selected iamge:::::", selectedImage, isAadharAvailable)
 
         }
         const formData = new FormData();
-        
+
         formData.append('aadharImage', {
             uri: selectedImage?.assets[0]?.uri,
             type: selectedImage?.assets[0]?.type,
@@ -128,7 +128,7 @@ console.log("selected iamge:::::", selectedImage, isAadharAvailable)
                     "Confirmation",
                     "KYC posted successfully",
                     [
-                        { text: "OK", onPress: () => {navigation.goBack()} }
+                        { text: "OK", onPress: () => { navigation.goBack() } }
                     ],
                     { cancelable: false }
                 );
@@ -144,14 +144,15 @@ console.log("selected iamge:::::", selectedImage, isAadharAvailable)
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>Aadhar Proof <Text style={{color:"red", fontSize:18,}}>*</Text> </Text>
+            <Text style={styles.label}>Aadhar Proof <Text style={{ color: "red", fontSize: 18, }}>*</Text> </Text>
             <View style={styles.uploadBox}>
                 {selectedImage || isAadharAvailable ? (
                     <View style={{ flex: 1, flexDirection: "row" }}>
                         {isAadharAvailable ?
-                        <FastImage 
-                        source={{ uri: isAadharAvailable,
-                            headers:{Authorization : `Bearer ${getVendorAuth}`}
+                            <FastImage
+                                source={{
+                                    uri: isAadharAvailable,
+                                    headers: { Authorization: `Bearer ${getVendorAuth}` }
 
                         }} style={styles.image} /> :
                         <FastImage 
@@ -178,8 +179,8 @@ console.log("selected iamge:::::", selectedImage, isAadharAvailable)
                 )}
             </View>
 
-            
-             <Text style={[styles.label,{marginTop:20}]}>Food Safety License</Text>
+
+            <Text style={[styles.label, { marginTop: 20 }]}>Food Safety License</Text>
             <View style={styles.uploadBox}>
                 {selectedFoodLicenseImage ? (
                     <View style={{ flex: 1, flexDirection: "row" }}>
@@ -203,13 +204,13 @@ console.log("selected iamge:::::", selectedImage, isAadharAvailable)
                     </>
                 )}
             </View>
-          
 
-            <View style={{ position: 'absolute', bottom: 0}}>
+
+            <View style={{ position: 'absolute', bottom: 0 }}>
                 <BookDatesButton
                     onPress={() => {
-                            onSubmitCallVendor()
-                     }}
+                        onSubmitCallVendor()
+                    }}
                     text={'Submit'}
                     padding={10} />
             </View>
@@ -231,8 +232,8 @@ const styles = StyleSheet.create({
         fontFamily: 'ManropeRegular'
     },
     uploadBox: {
-        width: 200,
-        height: 150,
+        width: '90%',
+        height: '30%',
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 10,
