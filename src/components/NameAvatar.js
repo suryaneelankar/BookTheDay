@@ -22,7 +22,7 @@ const updatedImgUrl = imageUrl !== undefined ? imageUrl.replace('localhost', Loc
         <FastImage source={{ uri: updatedImgUrl }} style={[styles.image, { width: widthDyn, height: heightDyn, borderRadius: borderRadiusDyn }]} />
       ) : (
         <Svg height="100" width="100">
-          <Circle cx="50" cy="50" r="50" fill="#FEF7DE" />
+          <Circle cx="50" cy="50" r="50" fill="orange" />
           <SvgText
             x="50"
             y="55"

@@ -193,7 +193,7 @@ const Caterings = () => {
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "50%" }}>
 
-                        <View style={{ backgroundColor: item?.available ? "#FEF7DE" : "#FEF7DE", flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
+                        <View style={{ backgroundColor: item?.available ? "orange" : "orange", flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
                             <Image source={require('../../assets/available.png')} style={{ width: 15, height: 15 }} />
                             {item?.available ?
                                 <Text style={{ fontWeight: '600', color: '#4A4A4A', fontSize: 13, marginHorizontal: 5, fontFamily: "ManropeRegular" }}>Available</Text>
@@ -255,7 +255,7 @@ const Caterings = () => {
                     onEndReached={loadMoreCaterings}
                     onEndReachedThreshold={0.5}
                     ListFooterComponent={() =>
-                        loading ? <ActivityIndicator size="large" color="#FEF7DE" /> : null
+                        loading ? <ActivityIndicator size="large" color="orange" /> : null
                     }
                 /> */}
 

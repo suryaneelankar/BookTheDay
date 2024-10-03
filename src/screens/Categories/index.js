@@ -260,7 +260,7 @@ const Categories = () => {
                         // onEndReached={loadMoreClothJewels} // Fetch more when list ends
                         onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
                         ListFooterComponent={() =>
-                            loading ? <ActivityIndicator size="large" color="#FEF7DE" /> : null
+                            loading ? <ActivityIndicator size="large" color="orange" /> : null
                         }
                         ListEmptyComponent={
                             <View >
@@ -278,7 +278,7 @@ const Categories = () => {
                         // onEndReached={loadMoreClothJewels} // Fetch more when list ends
                         onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
                         ListFooterComponent={() =>
-                            loading ? <ActivityIndicator size="large" color="#FEF7DE" /> : null
+                            loading ? <ActivityIndicator size="large" color="orange" /> : null
                         }
                         ListEmptyComponent={
                             <View >

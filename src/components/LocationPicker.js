@@ -28,7 +28,7 @@ const LocationPicker = ({ onLocationSelected }) => {
       timeout: 60000,
     })
       .then(location => {
-        console.log("getting location", location);
+        console.log("getting location picker", location);
         if (location) {
           let latitude = location?.latitude;
           let longitude = location?.longitude;
@@ -136,7 +136,7 @@ const LocationPicker = ({ onLocationSelected }) => {
     )
       .then(response => response.json())
       .then(data => {
-        console.log("address is::::::", data);
+        console.log("address is picker comp::::::", data);
         setCompleteAddress(data?.display_name);
         setAddress(data?.address);
         setPinCode(data?.address?.postcode);
@@ -199,8 +199,8 @@ const LocationPicker = ({ onLocationSelected }) => {
               longitudeDelta: 0.0121,
             });
             setCompleteAddress(data?.description);
-            setPinCode(details.address_components.find(ac => ac.types.includes('postal_code')).long_name);
-            setStreet(details.address_components.find(ac => ac.types.includes('route')).long_name);
+            setPinCode(details.address_components.find(ac => ac.types.includes('postal_code'))?.long_name);
+            setStreet(details.address_components.find(ac => ac.types.includes('route'))?.long_name);
           }}
           onFail={(err) => {console.log('failed err is :>>',err)}}
           query={{
@@ -236,7 +236,7 @@ const LocationPicker = ({ onLocationSelected }) => {
 
         </MapView>
         :
-        <ActivityIndicator size={'large'} color={'#FEF7DE'} />
+        <ActivityIndicator size={'large'} color={'orange'} />
       }
 
 

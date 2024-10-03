@@ -107,13 +107,15 @@ const Events = () => {
     }
 
     const getNearByEvents = async (nearByPage) => {
-        // console.log('userLatitude in api call::>>',userLatitude,userLongitude);
+        const userLat = userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude;
+        const userLong = userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude;
+        console.log('userLatitude in api call::>>',userLocationFetched?.lat,userLocationFetched?.lon);
         setEventsData([]);
         setNearByLoading(true);
         const token = await getUserAuthToken();
         setGetUserAuth(token);
         try {
-            const response = await axios.get(`${BASE_URL}/getNearByFunctionHalls?page=${nearByPage}&limit=10&latitude=${userLocationFetched?.latitude}&longitude=${userLocationFetched?.longitude}`, {
+            const response = await axios.get(`${BASE_URL}/getNearByFunctionHalls?page=${nearByPage}&limit=10&latitude=${userLat}&longitude=${userLong}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -185,7 +187,7 @@ const Events = () => {
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "50%" }}>
 
-                        <View style={{ backgroundColor: item?.available ? "#FEF7DE" : "#FEF7DE", flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
+                        <View style={{ backgroundColor: item?.available ? "orange" : "orange", flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
                             <Image source={require('../../assets/available.png')} style={{ width: 15, height: 15 }} />
                             {item?.available ?
                                 <Text style={{ fontWeight: '600', color: '#4A4A4A', fontSize: 13, marginHorizontal: 5, fontFamily: "ManropeRegular" }}>Available</Text>
@@ -193,11 +195,11 @@ const Events = () => {
                                 <Text style={{ fontWeight: '600', color: '#4A4A4A', fontSize: 13, marginHorizontal: 5, fontFamily: "ManropeRegular" }}>Booked</Text>
                             }
                         </View>
-                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
+                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "orange", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
                             <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} />
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> {item?.seatingCapacity}</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
+                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "orange", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> {item?.distance}</Text>
                         </View>
                     </View>

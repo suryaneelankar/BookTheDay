@@ -39,14 +39,14 @@ const AadharUpload = () => {
               const updatedImgUrl = response?.data?.data?.aadharImage?.url ? response?.data?.data?.aadharImage?.url.replace('localhost', LocalHostUrl) : response?.data?.data?.aadharImage?.url;
               setIsAadharAvailable(updatedImgUrl);
               setGetVendorAuth(token);
-          console.log("profile vendor res:::", response?.data?.data?.aadharImage);
+             console.log("profile vendor res:::", response?.data?.data);
              
           } catch (error) {
               console.log("profile::::::::::", error);
           }
       }
 
-
+console.log("selected iamge:::::", selectedImage, isAadharAvailable)
     const handleImagePick = (type, userType, isEdit) => {
         const options = {
             mediaType: 'photo',
@@ -57,8 +57,14 @@ const AadharUpload = () => {
             launchCamera(options, (response) => {
                 if (response.assets) {
                     if(userType === 'aadhar'){
+                        if(isEdit === 'edit'){
+                            console.log("insdie edit::::::", response?.assets[0])
+                            setIsAadharAvailable(response?.assets[0]?.uri);
+                            setSelectedImage(response);
+                        }else{
                         setSelectedImage(response);
-                    }else if(userType === 'foodLicense'){
+                        }                    }
+                        else if(userType === 'foodLicense'){
                         selectedFoodLicenseImage(response)
                     }
                 }
@@ -84,10 +90,18 @@ const AadharUpload = () => {
     };
 
     const onSubmitCallVendor = async() =>{
-
-        if(!selectedImage){
+        if(profileData?.kycStatus === 'approved'){
+            Alert.alert('KYC Already Approved');
+            return;
+        }
+        if(!selectedImage && !isAadharAvailable){
             Alert.alert('Please upload Aadhar Image')
             return;
+        }
+        if(isAadharAvailable && !selectedImage && profileData?.kycStatus ==='onhold'){
+            Alert.alert('KYC is Under Review, Will update shortly')
+            return; 
+
         }
         const formData = new FormData();
         
@@ -132,7 +146,7 @@ const AadharUpload = () => {
         <View style={styles.container}>
             <Text style={styles.label}>Aadhar Proof <Text style={{color:"red", fontSize:18,}}>*</Text> </Text>
             <View style={styles.uploadBox}>
-                {selectedImage ? (
+                {selectedImage || isAadharAvailable ? (
                     <View style={{ flex: 1, flexDirection: "row" }}>
                         {isAadharAvailable ?
                         <FastImage 
@@ -143,11 +157,12 @@ const AadharUpload = () => {
                         <FastImage 
                         source={{ uri: selectedImage?.assets[0]?.uri,
                         }} style={styles.image} />}
+                        {profileData?.kycStatus !== 'approved' ?
                         <TouchableOpacity
                             style={styles.editIconContainer}
                             onPress={() => handleImagePick('gallery', 'aadhar','edit')}>
-                            <Icon name="edit" size={24} color="red" />
-                        </TouchableOpacity>
+                            <Icon name="edit" size={24} color="orange" />
+                        </TouchableOpacity> : null}
                     </View>
                 ) : (
                     <>
@@ -258,10 +273,11 @@ const styles = StyleSheet.create({
         fontSize: 40,
     },
     editIconContainer: {
+        backgroundColor:"white",
         position: 'absolute',
         top: 5,
         right: 5,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        // backgroundColor: 'rgba(0, 0, 0, 0.5)',
         padding: 5,
         borderRadius: 50,
     },

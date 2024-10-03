@@ -19,6 +19,7 @@ import { useSelector } from "react-redux";
 import { getVendorAuthToken } from "../../../utils/StoreAuthToken";
 import { useFocusEffect } from "@react-navigation/native";
 import FastImage from 'react-native-fast-image';
+import DeleteIcon from '../../../assets/svgs/deleteIcon.svg';
 
 const VendorDashBoardTab = ({ navigation }) => {
 
@@ -105,7 +106,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                 };
             });
             setVendorListings(result);
-            // console.log('result is ::>>',result);
+            console.log('result is ::>>',result);
 
         } catch (error) {
             console.log("categories::::::::::", error);
@@ -237,6 +238,22 @@ const VendorDashBoardTab = ({ navigation }) => {
             ],
             { cancelable: false }
         );
+    };
+
+    const showAvailabilityConfirmation = (vendorId, postId) => {
+        Alert.alert(
+            "Confirmation",
+            "Are you sure you want to make listing Unavailable?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => console.log("No Pressed"),
+                    style: "cancel"
+                },
+                { text: "Yes", onPress: () => ('') }
+            ],
+            { cancelable: false }
+        );
     }
 
     const showSuccessAlert = () => {
@@ -258,9 +275,10 @@ const VendorDashBoardTab = ({ navigation }) => {
         const token = await getVendorAuthToken();
 
         const convertedImageUrl = item?.productImage !== undefined ? item?.productImage.replace('localhost', LocalHostUrl) : item?.productImage;
-
         return (
-            <TouchableOpacity style={{ backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10 }}>
+            <TouchableOpacity 
+            style={{opacity: item?.available === true ? 1 : 1, backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10 }}
+            >
                 <View style={{ marginTop: 5, width: '100%', marginHorizontal: 5 }}>
 
                     <FastImage
@@ -271,13 +289,17 @@ const VendorDashBoardTab = ({ navigation }) => {
                         }}
                     />
                     <Text style={styles.productName}>{capitalizeFirstLetters(item?.productName)}</Text>
+                    <Text style={{backgroundColor:"pink"}}>{item?.available ? 'available' : 'notAvai'}</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, justifyContent: 'space-between', width: '90%', bottom: 5 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 }}>
                             <ListedTimeIcon />
                             <Text style={styles.price}>{formatDate(item?.createdAt)}</Text>
                         </View>
-                        <TouchableOpacity onPress={() => { showConfirmationAlert(item?._id, item?.particularPostId) }}>
+                        <TouchableOpacity onPress={() => { showAvailabilityConfirmation(item?._id, item?.particularPostId) }}>
                             <EditButton />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => { showConfirmationAlert(item?._id, item?.particularPostId) }}>
+                            <DeleteIcon />
                         </TouchableOpacity>
                     </View>
                 </View>
