@@ -734,11 +734,6 @@ const GeneralDetails = () => {
             setDiscountPercentage(item);
             setSelectedDiscountVal(item);
         }
-
-        <Modal visible={isLocationPickerVisible} animationType="slide">
-            <LocationPicker onLocationSelected={handleLocationSelected} />
-            <Button title="Close" onPress={handleCloseLocationPicker} />
-        </Modal>
         return (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ width: '100%' }}>
                 {discountPercentageArr.map((item) => {

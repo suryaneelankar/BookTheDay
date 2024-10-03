@@ -1,21 +1,16 @@
 import { useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal, Button, TextInput } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal,ActivityIndicator, Button, TextInput, ScrollView } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
-import SelectField from '../../../commonFields/SelectField';
-import UploadIcon from '../../../assets/svgs/uploadIcon.svg';
 import SelectedUploadIcon from '../../../assets/svgs/selectedUploadIcon.svg';
-import { Dropdown } from 'react-native-element-dropdown';
 import { launchImageLibrary } from 'react-native-image-picker';
 import BASE_URL from '../../../apiconfig';
 import LocationPicker from '../../../components/LocationPicker';
 import DetectLocation from '../../../assets/svgs/detectLocation.svg';
-
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
-import FastImage from 'react-native-fast-image';
 
 const GeneralDetails = () => {
     const [productName, setProductName] = useState('');
@@ -41,10 +36,17 @@ const GeneralDetails = () => {
     const [available, setAvailable] = useState();
     const [advanceAmount, setAdvanceAmount] = useState();
     const [discountPercentage, setDiscountPercentage] = useState();
+    const discountPercentageArr = ['5', '10', '15', '20', '30', '50'];
+    const [selectedDiscountVal, setSelectedDiscountVal] = useState();
     const [isSelected, setSelection] = useState(false);
     const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
+    const jewelleryTypes = ["rings", "bridal", "chains", "earrings", "bangles"];
+    const [jewelleryTypeSelected, setJewelleryTypeSelected] = useState();
+    const [jewelleryTypeVal, setJewelleryTypeVal] = useState();
+    const [loading, setLoading] = useState(false);
 
     const [selectedOption, setSelectedOption] = useState(null);
+    const [genderTypeSelected, setGenderTypeSelected] = useState(null);
 
     // Options for radio buttons
     const options = [
@@ -52,17 +54,22 @@ const GeneralDetails = () => {
         { id: 'jewels', label: 'Jewels' }
     ];
 
+    const genderTypes = [
+        { id: 'mens', label: 'Mens' },
+        { id: 'womens', label: 'Womens' }
+    ];
+
     const handleSelect = (id) => {
         setSelectedOption(id);
+    };
+
+    const handleGenderTypeSelect = (id) => {
+        setGenderTypeSelected(id);
     };
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
     console.log('vendorLoggedInMobileNum is ::>>', vendorLoggedInMobileNum);
-
-    const inputHandler = (value) => {
-        console.log("general details inputhandler", value)
-    }
 
     const onChangeProductName = (value) => {
         setProductName(value);
@@ -80,20 +87,12 @@ const GeneralDetails = () => {
         setPerDayRentPrice(value);
     }
 
-    // const onChangePerMonthRentPrice = (value) => {
-    //     setPerMonthRentPrice(value);
-    // }
-
     const onChangeSecurityDepositAmount = (value) => {
         setSecurityDeposit(value);
     }
 
     const onChangeAdvanceAmount = (value) => {
         setAdvanceAmount(value);
-    }
-
-    const onChangeDiscountPercentage = (value) => {
-        setDiscountPercentage(value);
     }
 
     const onChangeAddress = (value) => {
@@ -220,7 +219,7 @@ const GeneralDetails = () => {
     }
 
     const onPressSaveAndPost = async () => {
-        console.log('selectedOption os:::>>',selectedOption);
+        console.log('selectedOption os:::>>', selectedOption);
 
         if (!mainImageUrl || productName === '' || productDescription === '' || productCity === '' ||
             (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || productPinCode === '' || (securityDeposit === undefined || securityDeposit === '') || (advanceAmount === undefined || advanceAmount === '') || (selectedOption == null) || (discountPercentage === undefined || discountPercentage === '')
@@ -268,7 +267,8 @@ const GeneralDetails = () => {
             name: additionalImages?.additionalImageFour?.assets[0]?.fileName,
         });
 
-        formData.append('categoryType', 'clothes');
+        formData.append('genderType', genderTypeSelected);
+        formData.append('categoryType', selectedOption);
         formData.append('description', productDescription);
         formData.append('rentPricePerMonth', perMonthRentPrice);
         formData.append('productName', productName);
@@ -285,12 +285,11 @@ const GeneralDetails = () => {
         formData.append('county', locationCountyVal);
         formData.append('latitude', locationLatitude);
         formData.append('longitude', locationLongitude);
-
-
-
+        formData.append('jewellaryType', jewelleryTypeSelected);
 
         console.log('formdata is ::>>', JSON.stringify(formData));
         const token = await getVendorAuthToken();
+        setLoading(true);
 
         try {
             const response = await axios.post(`${BASE_URL}/AddClothJewels`, formData, {
@@ -300,24 +299,22 @@ const GeneralDetails = () => {
                 },
             });
             if (response.status === 201) {
+                setLoading(false);
                 console.log('Success', `uploaded successfully`);
                 Alert.alert(
                     "Confirmation",
                     "Your product posted successfully",
                     [
-                        // {
-                        //     text: "No",
-                        //     onPress: () => console.log("No Pressed"),
-                        //     style: "cancel"
-                        // },
                         { text: "OK", onPress: () => console.log("yes pressed") }
                     ],
                     { cancelable: false }
                 );
             } else {
+                setLoading(false);
                 console.log('Error', 'Failed to upload document');
             }
         } catch (error) {
+            setLoading(false);
             console.error('Error uploading document:', error);
             console.log('Error', 'Failed to upload document');
         }
@@ -342,94 +339,171 @@ const GeneralDetails = () => {
         setLocationPickerVisible(false);
     };
 
+    const discountPercentageList = () => {
+
+        const onPressDiscountPercentage = (item) => {
+            setDiscountPercentage(item);
+            setSelectedDiscountVal(item);
+        }
+
+        return (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ width: '100%' }}>
+                {discountPercentageArr.map((item) => {
+                    const isSelected = item === selectedDiscountVal;
+                    const backgroundColor = isSelected ? '#FFD700' : '#FFF5E3';
+                    return (
+                        <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
+                            onPress={() => onPressDiscountPercentage(item)}
+                        >
+                            <Text>{item} %</Text>
+                        </TouchableOpacity>
+                    )
+                })}
+            </ScrollView>
+        );
+    }
+
+    const jewelleryTypeList = () => {
+
+        const onPressJewelleryType = (item) => {
+            setJewelleryTypeSelected(item);
+            setJewelleryTypeVal(item);
+        }
+
+        return (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ width: '100%' }}>
+                {jewelleryTypes.map((item) => {
+                    const isSelected = item === jewelleryTypeVal;
+                    const backgroundColor = isSelected ? '#FFD700' : '#FFF5E3';
+                    return (
+                        <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
+                            onPress={() => onPressJewelleryType(item)}
+                        >
+                            <Text>{item}</Text>
+                        </TouchableOpacity>
+                    )
+                })}
+            </ScrollView>
+        );
+    }
+
 
     return (
         <View>
-
-            <Modal visible={isLocationPickerVisible} animationType="slide">
-                <LocationPicker onLocationSelected={handleLocationSelected} />
-                <Button title="Close" onPress={handleCloseLocationPicker} />
-            </Modal>
-
-
-            <View style={styles.mainContainer}>
-                <ChooseFileField
-                    label={'Product Image'}
-                    isRequired={true}
-                    placeholder={'Main Image'}
-                    onPressChooseFile={openGalleryOrCamera}
-                />
-                {mainImageUrl ?
-                    <Image
-                        source={{ uri: mainImageUrl?.assets[0].uri }}
-                        width={'100%'}
-                        height={300}
-                        resizeMode='cover'
-                    /> : null}
-
-                <Text style={styles.title}>Additional Images</Text>
-                <Text style={styles.subTitle}>Please add up to 4 images*</Text>
-                <FlatList
-                    data={data}
-                    renderItem={ListItem}
-                    keyExtractor={item => item.id}
-                    horizontal
-                    contentContainerStyle={{ width: '100%', justifyContent: 'space-around' }}
-                />
-                <View style={styles.radioViewcontainer}>
-                    <Text style={[styles.title, {}]}>Choose an option* :</Text>
-                    {options.map(option => (
-                        <TouchableOpacity
-                            key={option.id}
-                            style={styles.radioContainer}
-                            onPress={() => handleSelect(option.id)}
-                        >
-                            <View style={styles.radioCircle}>
-                                {selectedOption === option.id && <View style={styles.selectedCircle} />}
-                            </View>
-                            <Text style={styles.radioLabel}>{option.label}</Text>
-                        </TouchableOpacity>
-                    ))}
+            {loading ? (
+                <View style={{ alignSelf: 'center', flex: 1, width: '100%', height: Dimensions.get('window').height, justifyContent: 'center' }}>
+                    <ActivityIndicator size="large" color="orange" />
                 </View>
-                <TextField
-                    label='Product Name'
-                    placeholder="Please Enter Product Name"
-                    value={productName}
-                    onChangeHandler={onChangeProductName}
-                    keyboardType='default'
-                    isRequired={true}
-                />
+            ) :
+                <View>
+                    <Modal visible={isLocationPickerVisible} animationType="slide">
+                        <LocationPicker onLocationSelected={handleLocationSelected} />
+                        <Button title="Close" onPress={handleCloseLocationPicker} />
+                    </Modal>
 
-                <TextField
-                    label='Product`s Brand'
-                    placeholder="Please Enter Brand"
-                    value={productBrand}
-                    onChangeHandler={onChangeProductBrand}
-                    keyboardType='default'
-                    isRequired={false}
-                />
 
-                <TextField
-                    label='Description'
-                    placeholder="Please Enter Description"
-                    value={productDescription}
-                    onChangeHandler={onChangeDescription}
-                    keyboardType='default'
-                    isRequired={true}
-                    isDescriptionField={true}
-                />
-            </View>
-            <Text style={styles.title}>Rent Type</Text>
-            <View style={styles.mainContainer}>
-                <TextField
-                    label='Day Price (₹ / 1day)'
-                    placeholder="Please Enter per Day Price"
-                    value={perDayRentPrice}
-                    onChangeHandler={onChangePerDayRentPrice}
-                    keyboardType='number-pad'
-                    isRequired={true}
-                />
-                {/* <TextField
+                    <View style={styles.mainContainer}>
+                        <ChooseFileField
+                            label={'Product Image'}
+                            isRequired={true}
+                            placeholder={'Main Image'}
+                            onPressChooseFile={openGalleryOrCamera}
+                        />
+                        {mainImageUrl ?
+                            <Image
+                                source={{ uri: mainImageUrl?.assets[0].uri }}
+                                width={'100%'}
+                                height={300}
+                                resizeMode='cover'
+                            /> : null}
+
+                        <Text style={styles.title}>Additional Images</Text>
+                        <Text style={styles.subTitle}>Please add up to 4 images*</Text>
+                        <FlatList
+                            data={data}
+                            renderItem={ListItem}
+                            keyExtractor={item => item.id}
+                            horizontal
+                            contentContainerStyle={{ width: '100%', justifyContent: 'space-around' }}
+                        />
+                        <View style={styles.radioViewcontainer}>
+                            <Text style={[styles.title, {}]}>Choose an option* :</Text>
+                            {options.map(option => (
+                                <TouchableOpacity
+                                    key={option.id}
+                                    style={styles.radioContainer}
+                                    onPress={() => handleSelect(option.id)}
+                                >
+                                    <View style={styles.radioCircle}>
+                                        {selectedOption === option.id && <View style={styles.selectedCircle} />}
+                                    </View>
+                                    <Text style={styles.radioLabel}>{option.label}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                        {/* add here */}
+                        {selectedOption !== null ?
+                            selectedOption === 'clothes' ?
+                                <View style={styles.radioViewcontainer}>
+                                    <Text style={[styles.title, {}]}>Select the Gender* :</Text>
+                                    {genderTypes.map(option => (
+                                        <TouchableOpacity
+                                            key={option.id}
+                                            style={styles.radioContainer}
+                                            onPress={() => handleGenderTypeSelect(option.id)}
+                                        >
+                                            <View style={styles.radioCircle}>
+                                                {genderTypeSelected === option.id && <View style={styles.selectedCircle} />}
+                                            </View>
+                                            <Text style={styles.radioLabel}>{option.label}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                                :
+                                <>
+                                    <Text style={styles.textInputlabel}>Select the jewellery type: </Text>
+                                    {jewelleryTypeList()}
+                                </>
+                            : null}
+                        <TextField
+                            label='Product Name'
+                            placeholder="Please Enter Product Name"
+                            value={productName}
+                            onChangeHandler={onChangeProductName}
+                            keyboardType='default'
+                            isRequired={true}
+                        />
+
+                        <TextField
+                            label='Product`s Brand'
+                            placeholder="Please Enter Brand"
+                            value={productBrand}
+                            onChangeHandler={onChangeProductBrand}
+                            keyboardType='default'
+                            isRequired={false}
+                        />
+
+                        <TextField
+                            label='Description'
+                            placeholder="Please Enter Description"
+                            value={productDescription}
+                            onChangeHandler={onChangeDescription}
+                            keyboardType='default'
+                            isRequired={true}
+                            isDescriptionField={true}
+                        />
+                    </View>
+                    <Text style={styles.title}>Rent Type</Text>
+                    <View style={styles.mainContainer}>
+                        <TextField
+                            label='Day Price (₹ / 1day)'
+                            placeholder="Please Enter per Day Price"
+                            value={perDayRentPrice}
+                            onChangeHandler={onChangePerDayRentPrice}
+                            keyboardType='number-pad'
+                            isRequired={true}
+                        />
+                        {/* <TextField
                     label='Monthly Price (₹ / 30 days)*'
                     placeholder="Please Enter Monthly Price"
                     value={perMonthRentPrice}
@@ -437,54 +511,56 @@ const GeneralDetails = () => {
                     keyboardType='number-pad'
                     isRequired={false}
                 /> */}
-                <TextField
-                    label='Security Deposit'
-                    placeholder="Please Enter Security Deposit"
-                    value={securityDeposit}
-                    onChangeHandler={onChangeSecurityDepositAmount}
-                    keyboardType='number-pad'
-                    isRequired={true}
-                />
-                <TextField
-                    label='Advance Amount'
-                    placeholder="Please Enter Advance Amount"
-                    value={advanceAmount}
-                    onChangeHandler={onChangeAdvanceAmount}
-                    keyboardType='number-pad'
-                    isRequired={true}
-                />
-                <TextField
+                        <TextField
+                            label='Security Deposit'
+                            placeholder="Please Enter Security Deposit"
+                            value={securityDeposit}
+                            onChangeHandler={onChangeSecurityDepositAmount}
+                            keyboardType='number-pad'
+                            isRequired={true}
+                        />
+                        <TextField
+                            label='Advance Amount'
+                            placeholder="Please Enter Advance Amount"
+                            value={advanceAmount}
+                            onChangeHandler={onChangeAdvanceAmount}
+                            keyboardType='number-pad'
+                            isRequired={true}
+                        />
+                        <Text style={styles.textInputlabel}>Discount if any</Text>
+                        {discountPercentageList()}
+                        {/* <TextField
                     label='Discount'
                     placeholder="Please Enter Discount Percentage"
                     value={discountPercentage}
                     onChangeHandler={onChangeDiscountPercentage}
                     keyboardType='number-pad'
                     isRequired={false}
-                />
-            </View>
-            <Text style={styles.title}>Item Available Address</Text>
-            <View style={styles.mainContainer}>
-                <Text style={styles.textInputlabel}>
-                    Address<Text style={{ color: "red" }}>*</Text>
-                </Text>
-                <TouchableOpacity onPress={handleOpenLocationPicker} style={[styles.textTnputView, { height: 100, flexDirection: "row", }]}>
-                    <View style={{ height: '100%', width: "85%" }}>
-                        <TextInput
-                            onChangeText={onChangeAddress}
-                            value={productAddress}
-                            placeholder="Please Enter Address"
-                            keyboardType={'default'}
-                            style={{ height: '100%', textAlignVertical: 'top', padding: 10 }}
-                            multiline={true}
-                            numberOfLines={4}
-                        />
+                /> */}
                     </View>
-                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                        <DetectLocation />
-                    </View>
-                </TouchableOpacity>
+                    <Text style={styles.title}>Item Available Address</Text>
+                    <View style={styles.mainContainer}>
+                        <Text style={styles.textInputlabel}>
+                            Address<Text style={{ color: "red" }}>*</Text>
+                        </Text>
+                        <TouchableOpacity onPress={handleOpenLocationPicker} style={[styles.textTnputView, { height: 100, flexDirection: "row", }]}>
+                            <View style={{ height: '100%', width: "85%" }}>
+                                <TextInput
+                                    onChangeText={onChangeAddress}
+                                    value={productAddress}
+                                    placeholder="Please Enter Address"
+                                    keyboardType={'default'}
+                                    style={{ height: '100%', textAlignVertical: 'top', padding: 10 }}
+                                    multiline={true}
+                                    numberOfLines={4}
+                                />
+                            </View>
+                            <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                <DetectLocation />
+                            </View>
+                        </TouchableOpacity>
 
-                {/* <TextField
+                        {/* <TextField
                     label='Address'
                     placeholder="Please Enter Address"
                     value={productAddress}
@@ -492,30 +568,31 @@ const GeneralDetails = () => {
                     keyboardType='default'
                     isRequired={true}
                 /> */}
-                <TextField
-                    label='City'
-                    placeholder="Please Enter City"
-                    value={productCity}
-                    onChangeHandler={onChangeCity}
-                    keyboardType='default'
-                    isRequired={true}
-                />
-                <TextField
-                    label='Pin code'
-                    placeholder="Please Enter Pin code"
-                    value={productPinCode}
-                    onChangeHandler={onChangePinCode}
-                    keyboardType='number-pad'
-                    isRequired={true}
-                />
-            </View>
+                        <TextField
+                            label='City'
+                            placeholder="Please Enter City"
+                            value={productCity}
+                            onChangeHandler={onChangeCity}
+                            keyboardType='default'
+                            isRequired={true}
+                        />
+                        <TextField
+                            label='Pin code'
+                            placeholder="Please Enter Pin code"
+                            value={productPinCode}
+                            onChangeHandler={onChangePinCode}
+                            keyboardType='number-pad'
+                            isRequired={true}
+                        />
+                    </View>
 
-            {/* <Text style={{ fontFamily: 'InterRegular', color: '#5F6377', fontSize: 15, fontWeight: '600' }}>I Accept Terms and Conditions</Text> */}
-            <TouchableOpacity onPress={() => { onPressSaveAndPost() }} style={{ padding: 10, backgroundColor: '#FFF5E3', alignSelf: 'center', borderRadius: 5, borderColor: '#ECA73C', borderWidth: 2, marginTop: 40, bottom: 20 }}>
-                <Text style={{ color: '#ECA73C' }}> Save & Post </Text>
-            </TouchableOpacity>
+                    {/* <Text style={{ fontFamily: 'InterRegular', color: '#5F6377', fontSize: 15, fontWeight: '600' }}>I Accept Terms and Conditions</Text> */}
+                    <TouchableOpacity onPress={() => { onPressSaveAndPost() }} style={{ padding: 10, backgroundColor: '#FFF5E3', alignSelf: 'center', borderRadius: 5, borderColor: '#ECA73C', borderWidth: 2, marginTop: 40, bottom: 20 }}>
+                        <Text style={{ color: '#ECA73C' }}> Save & Post </Text>
+                    </TouchableOpacity>
 
-
+                </View>
+            }
         </View>
     )
 }
