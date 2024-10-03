@@ -70,7 +70,7 @@ const Categories = () => {
         setGetUserAuth(token);
         setLoading(true);
         try {
-            const response = await axios.get(`${BASE_URL}/getAllClothesJewels?page=${page}&limit=100`,{
+            const response = await axios.get(`${BASE_URL}/getAllClothesJewels?page=${page}&limit=10`,{
                 headers: {
                     Authorization: `Bearer ${token}`,
                   },
@@ -93,7 +93,7 @@ const Categories = () => {
         
             // setCategories((prevData) => [...prevData, ...filteredDiscountItems]);
 
-
+            console.log("products u may like::::::", filteredClothesCategories);
             setJewelleryCategory(filteredJewelleryCategories);
             setProductYouMayLike(filteredClothesCategories);
             setDiscountProducts(filteredDiscountItems);

@@ -215,7 +215,7 @@ const HomeDashboard = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log("ondemand halls::::::", response?.data?.data)
+            // console.log("ondemand halls::::::", response?.data?.data)
             setEventsData(response?.data?.data)
         } catch (error) {
             console.log("events data error>>::", error);
@@ -231,10 +231,10 @@ const HomeDashboard = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            // console.log("Products res:::::::", JSON.stringify(response?.data))
-            setCategories(response?.data)
-            const filteredDiscountItems = response?.data.filter(category => category?.componentType === 'discount');
-            const filteredNewItems = response?.data.filter(category => category?.componentType === 'new');
+            console.log("Products res:::::::", JSON.stringify(response?.data))
+            setCategories(response?.data?.data)
+            const filteredDiscountItems = response?.data?.data.filter(category => category?.componentType === 'discount');
+            const filteredNewItems = response?.data?.data.filter(category => category?.componentType === 'new');
 
             setDiscountProducts(filteredDiscountItems);
             setNewlyAddedProducts(filteredNewItems)
