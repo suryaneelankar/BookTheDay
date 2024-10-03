@@ -19,9 +19,11 @@ import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import LocationPicker from '../../../components/LocationPicker';
 import DetectLocation from '../../../assets/svgs/detectLocation.svg';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import { useNavigation } from '@react-navigation/native';
 
 const GeneralDetails = () => {
     const [BedRooms, setBedRooms] = useState();
+    const navigation = useNavigation();
     const [foodType, setFoodType] = useState('');
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [functionHallName, setfunctionHallName] = useState('');
@@ -363,7 +365,7 @@ const GeneralDetails = () => {
                         //     onPress: () => console.log("No Pressed"),
                         //     style: "cancel"
                         // },
-                        { text: "Ok", onPress: () => console.log("yes pressed") }
+                        { text: "Ok", onPress: () => {console.log("yes pressed"), navigation.goBack()} }
                     ],
                     { cancelable: false }
                 );
@@ -632,7 +634,7 @@ const GeneralDetails = () => {
         <View style={{ flex: 1, backgroundColor: "#EBEDF3", paddingHorizontal: 10 }}>
             {loading ? (
                 <View style={{ alignSelf: 'center', flex: 1, width: '100%', height: Dimensions.get('window').height, justifyContent: 'center' }}>
-                    <ActivityIndicator size="large" color="#FEF7DE" />
+                    <ActivityIndicator size="large" color="orange" />
                 </View>
             ) :
                 <View>

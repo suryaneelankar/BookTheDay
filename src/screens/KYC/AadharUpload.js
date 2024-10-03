@@ -30,23 +30,23 @@ const AadharUpload = () => {
         const token = await getVendorAuthToken();
         try {
             console.log("vendou num:", vendorLoggedInMobileNum)
-            const response = await axios.get(`${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            setProfileData(response?.data?.data);
-            const updatedImgUrl = response?.data?.data?.aadharImage?.url ? response?.data?.data?.aadharImage?.url.replace('localhost', LocalHostUrl) : response?.data?.data?.aadharImage?.url;
-            setIsAadharAvailable(updatedImgUrl);
-            setGetVendorAuth(token);
-            console.log("profile vendor res:::", response?.data?.data?.aadharImage);
+              const response = await axios.get(`${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`,{
+                  headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+              });
+              setProfileData(response?.data?.data);
+              const updatedImgUrl = response?.data?.data?.aadharImage?.url ? response?.data?.data?.aadharImage?.url.replace('localhost', LocalHostUrl) : response?.data?.data?.aadharImage?.url;
+              setIsAadharAvailable(updatedImgUrl);
+              setGetVendorAuth(token);
+             console.log("profile vendor res:::", response?.data?.data);
+             
+          } catch (error) {
+              console.log("profile::::::::::", error);
+          }
+      }
 
-        } catch (error) {
-            console.log("profile::::::::::", error);
-        }
-    }
-
-
+console.log("selected iamge:::::", selectedImage, isAadharAvailable)
     const handleImagePick = (type, userType, isEdit) => {
         const options = {
             mediaType: 'photo',
@@ -56,9 +56,15 @@ const AadharUpload = () => {
         if (type === 'camera') {
             launchCamera(options, (response) => {
                 if (response.assets) {
-                    if (userType === 'aadhar') {
+                    if(userType === 'aadhar'){
+                        if(isEdit === 'edit'){
+                            console.log("insdie edit::::::", response?.assets[0])
+                            setIsAadharAvailable(response?.assets[0]?.uri);
+                            setSelectedImage(response);
+                        }else{
                         setSelectedImage(response);
-                    } else if (userType === 'foodLicense') {
+                        }                    }
+                        else if(userType === 'foodLicense'){
                         selectedFoodLicenseImage(response)
                     }
                 }
@@ -83,11 +89,19 @@ const AadharUpload = () => {
         }
     };
 
-    const onSubmitCallVendor = async () => {
-
-        if (!selectedImage && !isAadharAvailable) {
+    const onSubmitCallVendor = async() =>{
+        if(profileData?.kycStatus === 'approved'){
+            Alert.alert('KYC Already Approved');
+            return;
+        }
+        if(!selectedImage && !isAadharAvailable){
             Alert.alert('Please upload Aadhar Image')
             return;
+        }
+        if(isAadharAvailable && !selectedImage && profileData?.kycStatus ==='onhold'){
+            Alert.alert('KYC is Under Review, Will update shortly')
+            return; 
+
         }
         const formData = new FormData();
 
@@ -140,16 +154,16 @@ const AadharUpload = () => {
                                     uri: isAadharAvailable,
                                     headers: { Authorization: `Bearer ${getVendorAuth}` }
 
-                                }} style={styles.image} /> :
-                            <FastImage
-                                source={{
-                                    uri: selectedImage?.assets[0]?.uri,
-                                }} style={styles.image} />}
+                        }} style={styles.image} /> :
+                        <FastImage 
+                        source={{ uri: selectedImage?.assets[0]?.uri,
+                        }} style={styles.image} />}
+                        {profileData?.kycStatus !== 'approved' ?
                         <TouchableOpacity
                             style={styles.editIconContainer}
-                            onPress={() => handleImagePick('gallery', 'aadhar', 'edit')}>
-                            <Icon name="edit" size={24} color="red" />
-                        </TouchableOpacity>
+                            onPress={() => handleImagePick('gallery', 'aadhar','edit')}>
+                            <Icon name="edit" size={24} color="orange" />
+                        </TouchableOpacity> : null}
                     </View>
                 ) : (
                     <>
@@ -260,10 +274,11 @@ const styles = StyleSheet.create({
         fontSize: 40,
     },
     editIconContainer: {
+        backgroundColor:"white",
         position: 'absolute',
         top: 5,
         right: 5,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        // backgroundColor: 'rgba(0, 0, 0, 0.5)',
         padding: 5,
         borderRadius: 50,
     },

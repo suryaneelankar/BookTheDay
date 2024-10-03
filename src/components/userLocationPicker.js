@@ -199,8 +199,8 @@ const UserLocationPicker = ({ onLocationSelected }) => {
               longitudeDelta: 0.0121,
             });
             setCompleteAddress(data?.description);
-            setPinCode(details.address_components.find(ac => ac.types.includes('postal_code')).long_name);
-            setStreet(details.address_components.find(ac => ac.types.includes('route')).long_name);
+            setPinCode(details.address_components.find(ac => ac.types.includes('postal_code'))?.long_name);
+            setStreet(details.address_components.find(ac => ac.types.includes('route'))?.long_name);
           }}
           onFail={(err) => {console.log('failed err is :>>',err)}}
           query={{
@@ -236,7 +236,7 @@ const UserLocationPicker = ({ onLocationSelected }) => {
 
         </MapView>
         :
-        <ActivityIndicator size={'large'} color={'#FEF7DE'} />
+        <ActivityIndicator size={'large'} color={'orange'} />
       }
 
 
