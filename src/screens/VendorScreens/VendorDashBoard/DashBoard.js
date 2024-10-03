@@ -505,19 +505,21 @@ const VendorDashBoardTab = ({ navigation }) => {
             <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF3CD', '#FFDB7E']} style={{ width: '90%', alignSelf: 'center', padding: 20, borderRadius: 10, marginTop: 20 }}>
                 <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
                     <View>
-                        <Text style={{ color: '#1A1F36', fontSize: 14, fontWeight: 700, color: '#1A1F36' }}>Total Earning:</Text>
+                        <Text style={{ color: '#1A1F36', fontSize: 14, fontWeight: 700, color: '#1A1F36' }}>Total Earnings</Text>
                         <Text style={{ fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 40, color: '#1A1F36', }}>₹4,500</Text>
                     </View>
                     <View style={{ width: 2, height: '100%', backgroundColor: '#F9CD4F' }} />
                     <View>
                         <Text style={{ color: '#1A1F36', fontSize: 14, fontWeight: 700, color: '#1A1F36' }}>Current Listing</Text>
-                        <Text style={{ fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 40, color: '#1A1F36' }}>{vendorListing?.length}</Text>
+                        <Text style={{ fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 40, color: '#1A1F36',alignSelf:'center' }}>{vendorListing?.length}</Text>
                     </View>
                 </View>
 
             </LinearGradient>
             <ScrollView>
+                {clothJewelBookingsData?.length || functionHallBookingsData?.length || cateringsBookingsData?.length ?
                 <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Recent Request</Text>
+                : null}
                 <View >
                     {clothJewelBookingsData?.length ?
                         <>
@@ -555,11 +557,11 @@ const VendorDashBoardTab = ({ navigation }) => {
                         </>
                         : null}
                 </View>
-                <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%' }}>All Listed Products</Text>
+                <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%',marginTop:20 }}>All Listed Products</Text>
                 <FlatList
                     data={vendorListing}
                     renderItem={renderVendorList}
-                    contentContainerStyle={{ borderRadius: 15, margin: 15, paddingBottom: 40 }}
+                    contentContainerStyle={{ borderRadius: 15, margin: 10, paddingBottom: 40 }}
                     numColumns={2}
                 />
             </ScrollView>

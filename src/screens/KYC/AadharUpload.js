@@ -22,29 +22,29 @@ const AadharUpload = () => {
     const [isAadharAvailable, setIsAadharAvailable] = useState();
 
 
-    useEffect(()=>{
+    useEffect(() => {
         getProfileData();
-      },[]);
-  
-      const getProfileData = async() => {
-          const token = await getVendorAuthToken();
-          try {
+    }, []);
+
+    const getProfileData = async () => {
+        const token = await getVendorAuthToken();
+        try {
             console.log("vendou num:", vendorLoggedInMobileNum)
-              const response = await axios.get(`${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`,{
-                  headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-              });
-              setProfileData(response?.data?.data);
-              const updatedImgUrl = response?.data?.data?.aadharImage?.url ? response?.data?.data?.aadharImage?.url.replace('localhost', LocalHostUrl) : response?.data?.data?.aadharImage?.url;
-              setIsAadharAvailable(updatedImgUrl);
-              setGetVendorAuth(token);
-          console.log("profile vendor res:::", response?.data?.data?.aadharImage);
-             
-          } catch (error) {
-              console.log("profile::::::::::", error);
-          }
-      }
+            const response = await axios.get(`${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setProfileData(response?.data?.data);
+            const updatedImgUrl = response?.data?.data?.aadharImage?.url ? response?.data?.data?.aadharImage?.url.replace('localhost', LocalHostUrl) : response?.data?.data?.aadharImage?.url;
+            setIsAadharAvailable(updatedImgUrl);
+            setGetVendorAuth(token);
+            console.log("profile vendor res:::", response?.data?.data?.aadharImage);
+
+        } catch (error) {
+            console.log("profile::::::::::", error);
+        }
+    }
 
 
     const handleImagePick = (type, userType, isEdit) => {
@@ -56,9 +56,9 @@ const AadharUpload = () => {
         if (type === 'camera') {
             launchCamera(options, (response) => {
                 if (response.assets) {
-                    if(userType === 'aadhar'){
+                    if (userType === 'aadhar') {
                         setSelectedImage(response);
-                    }else if(userType === 'foodLicense'){
+                    } else if (userType === 'foodLicense') {
                         selectedFoodLicenseImage(response)
                     }
                 }
@@ -66,16 +66,16 @@ const AadharUpload = () => {
         } else {
             launchImageLibrary(options, (response) => {
                 if (response.assets) {
-                    if(userType === 'aadhar'){
-                        if(isEdit === 'edit'){
+                    if (userType === 'aadhar') {
+                        if (isEdit === 'edit') {
                             console.log("insdie edit::::::", response?.assets[0])
                             setIsAadharAvailable(response?.assets[0]?.uri);
                             setSelectedImage(response);
-                        }else{
-                        setSelectedImage(response);
+                        } else {
+                            setSelectedImage(response);
                         }
-                    }else if(userType === 'foodLicense'){
-                        selectedFoodLicenseImage(response)
+                    } else if (userType === 'foodLicense') {
+                        setSelectedFoodLicenseImage(response)
                     }
                     // setSelectedImage(response.assets[0].uri);
                 }
@@ -83,14 +83,14 @@ const AadharUpload = () => {
         }
     };
 
-    const onSubmitCallVendor = async() =>{
+    const onSubmitCallVendor = async () => {
 
-        if(!selectedImage){
+        if (!selectedImage && !isAadharAvailable) {
             Alert.alert('Please upload Aadhar Image')
             return;
         }
         const formData = new FormData();
-        
+
         formData.append('aadharImage', {
             uri: selectedImage?.assets[0]?.uri,
             type: selectedImage?.assets[0]?.type,
@@ -114,7 +114,7 @@ const AadharUpload = () => {
                     "Confirmation",
                     "KYC posted successfully",
                     [
-                        { text: "OK", onPress: () => {navigation.goBack()} }
+                        { text: "OK", onPress: () => { navigation.goBack() } }
                     ],
                     { cancelable: false }
                 );
@@ -130,22 +130,24 @@ const AadharUpload = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.label}>Aadhar Proof <Text style={{color:"red", fontSize:18,}}>*</Text> </Text>
+            <Text style={styles.label}>Aadhar Proof <Text style={{ color: "red", fontSize: 18, }}>*</Text> </Text>
             <View style={styles.uploadBox}>
-                {selectedImage ? (
+                {selectedImage || isAadharAvailable ? (
                     <View style={{ flex: 1, flexDirection: "row" }}>
                         {isAadharAvailable ?
-                        <FastImage 
-                        source={{ uri: isAadharAvailable,
-                            headers:{Authorization : `Bearer ${getVendorAuth}`}
+                            <FastImage
+                                source={{
+                                    uri: isAadharAvailable,
+                                    headers: { Authorization: `Bearer ${getVendorAuth}` }
 
-                        }} style={styles.image} /> :
-                        <FastImage 
-                        source={{ uri: selectedImage?.assets[0]?.uri,
-                        }} style={styles.image} />}
+                                }} style={styles.image} /> :
+                            <FastImage
+                                source={{
+                                    uri: selectedImage?.assets[0]?.uri,
+                                }} style={styles.image} />}
                         <TouchableOpacity
                             style={styles.editIconContainer}
-                            onPress={() => handleImagePick('gallery', 'aadhar','edit')}>
+                            onPress={() => handleImagePick('gallery', 'aadhar', 'edit')}>
                             <Icon name="edit" size={24} color="red" />
                         </TouchableOpacity>
                     </View>
@@ -163,8 +165,8 @@ const AadharUpload = () => {
                 )}
             </View>
 
-            
-             <Text style={[styles.label,{marginTop:20}]}>Food Safety License</Text>
+
+            <Text style={[styles.label, { marginTop: 20 }]}>Food Safety License</Text>
             <View style={styles.uploadBox}>
                 {selectedFoodLicenseImage ? (
                     <View style={{ flex: 1, flexDirection: "row" }}>
@@ -188,13 +190,13 @@ const AadharUpload = () => {
                     </>
                 )}
             </View>
-          
 
-            <View style={{ position: 'absolute', bottom: 0}}>
+
+            <View style={{ position: 'absolute', bottom: 0 }}>
                 <BookDatesButton
                     onPress={() => {
-                            onSubmitCallVendor()
-                     }}
+                        onSubmitCallVendor()
+                    }}
                     text={'Submit'}
                     padding={10} />
             </View>
@@ -216,8 +218,8 @@ const styles = StyleSheet.create({
         fontFamily: 'ManropeRegular'
     },
     uploadBox: {
-        width: 200,
-        height: 150,
+        width: '90%',
+        height: '30%',
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 10,

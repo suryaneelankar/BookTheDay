@@ -213,7 +213,7 @@ const LocationPicker = ({ onLocationSelected }) => {
         />
         
 
-      {region ?
+      {/* {region ?
         <MapView
           style={styles.map}
           //   region={{
@@ -234,10 +234,10 @@ const LocationPicker = ({ onLocationSelected }) => {
           )}
           {/* <Marker coordinate={region} /> */}
 
-        </MapView>
+        {/* </MapView>
         :
         <ActivityIndicator size={'large'} color={'#FEF7DE'} />
-      }
+      }  */}
 
 
 
