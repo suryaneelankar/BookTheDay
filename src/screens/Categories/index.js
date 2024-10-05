@@ -139,9 +139,9 @@ const Categories = () => {
             : originalPrice;
 
         return (
-            <View style={{}}>
+            <View style={{marginHorizontal:15}}>
                 <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })}
-                    style={{ width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginLeft: 16 }}>
+                    style={{ width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto' }}>
                     <FastImage source={{ uri: updatedImgUrl,
                         headers:{Authorization : `Bearer ${getUserAuth}`}
                      }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '100%', height: Dimensions.get('window').height / 5 }}
@@ -168,7 +168,7 @@ const Categories = () => {
                             </View>
                         </> : null}
                     <View style={{ marginTop: 15, marginHorizontal: 6 }}>
-                        <Text numberOfLines={1} style={{ fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular' }}>{item?.brandName}</Text>
+                        <Text numberOfLines={1} style={{ fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular' }}>{item?.productName}</Text>
                         <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
                             {/* <Text style={{ fontWeight: '700', color:'#202020', fontSize: 14, fontFamily: 'ManropeRegular' }}>{formatAmount(item?.price)}/day</Text> */}
                             <Text style={{ fontWeight: '700', color: '#202020', fontSize: 14, fontFamily: 'ManropeRegular' }}>{formatAmount(item?.rentPricePerDay)}/day</Text>
@@ -282,7 +282,7 @@ const Categories = () => {
                         }
                         ListEmptyComponent={
                             <View >
-                              <Text>No Products Available</Text>
+                              <Text style={{marginHorizontal:15,textAlign:"center",fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular'}}>Currently No Products Available</Text>
                             </View>
                           }
                         />

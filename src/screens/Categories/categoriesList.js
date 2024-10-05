@@ -56,7 +56,12 @@ const CategoriesList = ({ route }) => {
             const filteredCategories = finalResponseData?.filter(category => category?.categoryType === catType);
             // setCategories(filteredCategories);
             setCategories((prevData) => [...prevData, ...filteredCategories]);
-            }else{
+            }else if(catType === 'mens' || catType === 'womens'){
+                const filteredCategories = finalResponseData?.filter(category => 
+                    category?.categoryType === 'clothes' && category?.genderType === catType
+                );
+                setCategories((prevData) => [...prevData, ...filteredCategories]);
+                }else{
                 const filteredData=  finalResponseData.filter(item => item?.jewellaryType === catType.toLowerCase());
                 setCategories((prevData) => [...prevData, ...filteredData]);
             }
@@ -111,7 +116,7 @@ const CategoriesList = ({ route }) => {
                             </View>
                         </> : null}
                     <View style={{ marginTop: 15, marginHorizontal: 10 }}>
-                        <Text numberOfLines={1} style={{ fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular' }}>{item?.brandName}</Text>
+                        <Text numberOfLines={1} style={{ fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular' }}>{item?.productName}</Text>
                         <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
                             {/* <Text style={{ fontWeight: '700', color:'#202020', fontSize: 14, fontFamily: 'ManropeRegular' }}>{formatAmount(item?.price)}/day</Text> */}
                             <Text style={{ fontWeight: '700', color: '#202020', fontSize: 14, fontFamily: 'ManropeRegular' }}>{formatAmount(item?.rentPricePerDay)}/day</Text>
@@ -157,7 +162,7 @@ const CategoriesList = ({ route }) => {
                     <FlatList
                         numColumns={2}
                         showsVerticalScrollIndicator={false}
-                        contentContainerStyle={{ alignSelf: "center", marginTop: 20 }}
+                        contentContainerStyle={{ marginVertical: 10,marginHorizontal:15,paddingBottom:verticalScale(50) }}
                         data={categories}
                         renderItem={renderItem}
                         onEndReached={loadMoreClothJewels} // Fetch more when list ends
