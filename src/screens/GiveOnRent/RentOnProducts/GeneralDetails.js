@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal,ActivityIndicator, Button, TextInput, ScrollView } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal, ActivityIndicator, Button, TextInput, ScrollView } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
@@ -11,6 +11,8 @@ import DetectLocation from '../../../assets/svgs/detectLocation.svg';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
+import { Dropdown } from 'react-native-element-dropdown';
+
 
 const GeneralDetails = () => {
     const [productName, setProductName] = useState('');
@@ -28,6 +30,8 @@ const GeneralDetails = () => {
     const [locationLongitude, setLocationLongitude] = useState();
     const [locationCountyVal, setLocationCountyVal] = useState();
 
+
+
     const [productCity, setProductCity] = useState('');
     const [productPinCode, setProductPinCode] = useState();
     const [perDayRentPrice, setPerDayRentPrice] = useState();
@@ -37,16 +41,26 @@ const GeneralDetails = () => {
     const [advanceAmount, setAdvanceAmount] = useState();
     const [discountPercentage, setDiscountPercentage] = useState('');
     const discountPercentageArr = ['5', '10', '15', '20', '30', '50'];
+    const colorCodeArr = [
+        '#FF5733', '#33FF57', '#3357FF', '#FF33A8', '#FFC300',
+        '#C70039', '#581845', '#DAF7A6', '#900C3F', '#FFBD33',
+        '#28B463', '#2874A6', '#A569BD', '#F4D03F', '#58D68D'
+    ];
+
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
     const [isSelected, setSelection] = useState(false);
     const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
-    const jewelleryTypes = ["rings", "bridal", "chains", "earrings", "bangles","bracelets"];
+    const jewelleryTypes = ["rings", "bridal", "chains", "earrings", "bangles", "bracelets"];
     const [jewelleryTypeSelected, setJewelleryTypeSelected] = useState();
     const [jewelleryTypeVal, setJewelleryTypeVal] = useState();
     const [loading, setLoading] = useState(false);
 
     const [selectedOption, setSelectedOption] = useState(null);
     const [genderTypeSelected, setGenderTypeSelected] = useState(null);
+    const [selectedColor, setSelectedColor] = useState('');
+    const [clothSize, setClothSize] = useState(null);
+    const [isFocus, setIsFocus] = useState(false);
+
 
     // Options for radio buttons
     const options = [
@@ -58,6 +72,31 @@ const GeneralDetails = () => {
         { id: 'mens', label: 'Mens' },
         { id: 'womens', label: 'Womens' }
     ];
+
+    const clothesSizeData = [
+        { label: 'Small (S)', value: 'S' },
+        { label: 'Medium (M)', value: 'M' },
+        { label: 'Large (L)', value: 'L' },
+        { label: 'Extra Large (XL)', value: 'XL' },
+        { label: 'XXL', value: 'XXL' },
+    ];
+    const colorOptions = [
+        { label: 'Red', value: '#FF5733' },
+        { label: 'Green', value: '#33FF57' },
+        { label: 'Blue', value: '#3357FF' },
+        { label: 'Pink', value: '#FF33A8' },
+        { label: 'Yellow', value: '#FFC300' },
+        { label: 'Dark Red', value: '#C70039' },
+        { label: 'Purple', value: '#581845' },
+        { label: 'Light Green', value: '#DAF7A6' },
+    ];
+
+    const renderItem = (item) => (
+        <View style={styles.itemContainer}>
+            <View style={[styles.colorBox, { backgroundColor: item?.value }]} />
+            <Text style={styles.label}>{item.label}</Text>
+        </View>
+    );
 
     const handleSelect = (id) => {
         setSelectedOption(id);
@@ -222,7 +261,7 @@ const GeneralDetails = () => {
         console.log('selectedOption os:::>>', selectedOption);
 
         if (!mainImageUrl || productName === '' || productDescription === '' || productCity === '' ||
-            (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || productPinCode === '' || (securityDeposit === undefined || securityDeposit === '') || (advanceAmount === undefined || advanceAmount === '') || (selectedOption == null) 
+            (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || productPinCode === '' || (securityDeposit === undefined || securityDeposit === '') || (advanceAmount === undefined || advanceAmount === '') || (selectedOption == null)
         ) {
             Alert.alert('Please fill Mandatory fields');
             return;
@@ -286,6 +325,10 @@ const GeneralDetails = () => {
         formData.append('latitude', locationLatitude);
         formData.append('longitude', locationLongitude);
         formData.append('jewellaryType', jewelleryTypeSelected);
+        formData.append('size', clothSize);
+        formData.append('color', selectedColor);
+
+
 
         console.log('formdata is ::>>', JSON.stringify(formData));
         const token = await getVendorAuthToken();
@@ -482,6 +525,53 @@ const GeneralDetails = () => {
                             keyboardType='default'
                             isRequired={false}
                         />
+                        { (selectedOption !== null 
+                           && selectedOption === 'clothes') ?
+                        <>
+                        <Text style={styles.sizeLabel}>Select Cloth Size</Text>
+                        <Dropdown
+                            style={[styles.dropdown]}
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            iconStyle={styles.iconStyle}
+                            data={clothesSizeData}
+                            activeColor={'#f0e68c'}
+                            selectedStyle={{ backgroundColor: "red" }}
+                            maxHeight={300}
+                            labelField="label"
+                            valueField="value"
+                            placeholder={'Select Size'}
+                            value={clothSize}
+                            containerStyle={{ borderColor: "orange", borderWidth: 1, borderRadius: 5 }}
+                            onFocus={() => setIsFocus(true)}
+                            onBlur={() => setIsFocus(false)}
+                            onChange={item => {
+                                setClothSize(item.value);
+                                setIsFocus(false);
+                            }}
+                        />
+
+                        <Text style={styles.sizeLabel}>Select Cloth Color</Text>
+
+                        <Dropdown
+                            style={styles.dropdown}
+                            data={colorOptions}
+                            labelField="label"
+                            valueField="value"
+                            placeholder="Select a color"
+                            value={selectedColor}
+                            selectedTextStyle={[styles.selectedTextStyle,{marginHorizontal:5}]}
+                            activeColor={'#f0e68c'}
+                            onChange={(item) => {
+                                setSelectedColor(item?.value);
+                                console.log(`Selected Color Code: ${item.value}`);
+                            }}
+                            renderItem={renderItem}
+                            renderLeftIcon={() => <View style={{backgroundColor:selectedColor,borderRadius:15,width:20,height:20}}/>}
+                        />
+                        </> : null }
+
 
                         <TextField
                             label='Description'
@@ -503,14 +593,6 @@ const GeneralDetails = () => {
                             keyboardType='number-pad'
                             isRequired={true}
                         />
-                        {/* <TextField
-                    label='Monthly Price (₹ / 30 days)*'
-                    placeholder="Please Enter Monthly Price"
-                    value={perMonthRentPrice}
-                    onChangeHandler={onChangePerMonthRentPrice}
-                    keyboardType='number-pad'
-                    isRequired={false}
-                /> */}
                         <TextField
                             label='Security Deposit'
                             placeholder="Please Enter Security Deposit"
@@ -622,6 +704,40 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 10,
     },
+    sizeLabel: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: 'bold',
+        color: themevariable.Color_000000,
+        fontSize: 15,
+        marginTop: 15
+    },
+    colorBlock: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        marginHorizontal: 10,
+        marginTop: 15,
+        borderWidth: 2, // border for selection
+    },
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginBottom: 15,
+    },
+    itemContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+        marginHorizontal:10,
+        
+
+      },
+      colorBox: {
+        width: 20,
+        height: 20,
+        marginRight: 10,
+        borderRadius: 10,
+      },
     radioContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -679,24 +795,28 @@ const styles = StyleSheet.create({
         marginTop: 10,
         borderColor: themevariable.Color_C8C8C6,
         paddingHorizontal: 12,
+        borderRadius: 5
     },
     icon: {
         marginRight: 5,
     },
     label: {
-        position: 'absolute',
-        backgroundColor: 'white',
-        left: 22,
-        top: 8,
-        zIndex: 999,
-        paddingHorizontal: 8,
         fontSize: 14,
+        fontFamily: 'ManropeRegular',
+        fontWeight: "400",
+        color:"black",
     },
     placeholderStyle: {
-        fontSize: 16,
+        fontSize: 14,
+        color: "gray",
+        fontFamily: 'ManropeRegular',
+        fontWeight: "400"
     },
     selectedTextStyle: {
-        fontSize: 16,
+        fontSize: 14,
+        color: "black",
+        fontFamily: 'ManropeRegular',
+        fontWeight: "400",
     },
     iconStyle: {
         width: 20,
