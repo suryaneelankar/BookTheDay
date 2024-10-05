@@ -35,12 +35,12 @@ const GeneralDetails = () => {
     const [securityDeposit, setSecurityDeposit] = useState();
     const [available, setAvailable] = useState();
     const [advanceAmount, setAdvanceAmount] = useState();
-    const [discountPercentage, setDiscountPercentage] = useState();
+    const [discountPercentage, setDiscountPercentage] = useState('');
     const discountPercentageArr = ['5', '10', '15', '20', '30', '50'];
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
     const [isSelected, setSelection] = useState(false);
     const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
-    const jewelleryTypes = ["rings", "bridal", "chains", "earrings", "bangles"];
+    const jewelleryTypes = ["rings", "bridal", "chains", "earrings", "bangles","bracelets"];
     const [jewelleryTypeSelected, setJewelleryTypeSelected] = useState();
     const [jewelleryTypeVal, setJewelleryTypeVal] = useState();
     const [loading, setLoading] = useState(false);
@@ -222,7 +222,7 @@ const GeneralDetails = () => {
         console.log('selectedOption os:::>>', selectedOption);
 
         if (!mainImageUrl || productName === '' || productDescription === '' || productCity === '' ||
-            (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || productPinCode === '' || (securityDeposit === undefined || securityDeposit === '') || (advanceAmount === undefined || advanceAmount === '') || (selectedOption == null) || (discountPercentage === undefined || discountPercentage === '')
+            (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || productPinCode === '' || (securityDeposit === undefined || securityDeposit === '') || (advanceAmount === undefined || advanceAmount === '') || (selectedOption == null) 
         ) {
             Alert.alert('Please fill Mandatory fields');
             return;

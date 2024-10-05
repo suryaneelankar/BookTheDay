@@ -127,8 +127,8 @@ const HomeDashboard = () => {
     ];
 
     const trendingData = [
-        { id: '1', Component: TrendingTshirt, name:'men' },
-        { id: '2', Component: TrendingBridal , name:'women'},
+        { id: '1', Component: TrendingTshirt, name:'mens' },
+        { id: '2', Component: TrendingBridal , name:'womens'},
         { id: '3', Component: TrendingCatering, name:'caterings' },
         // { id: '4', Component: TrendingChef },
         // { id: '5', Component: TrendingDriver },
@@ -215,7 +215,7 @@ const HomeDashboard = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log("ondemand halls::::::", response?.data?.data)
+            // console.log("ondemand halls::::::", response?.data?.data)
             setEventsData(response?.data?.data)
         } catch (error) {
             console.log("events data error>>::", error);
@@ -231,10 +231,10 @@ const HomeDashboard = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            // console.log("Products res:::::::", JSON.stringify(response?.data))
-            setCategories(response?.data)
-            const filteredDiscountItems = response?.data.filter(category => category?.componentType === 'discount');
-            const filteredNewItems = response?.data.filter(category => category?.componentType === 'new');
+            console.log("Products res:::::::", JSON.stringify(response?.data))
+            setCategories(response?.data?.data)
+            const filteredDiscountItems = response?.data?.data.filter(category => category?.componentType === 'discount');
+            const filteredNewItems = response?.data?.data.filter(category => category?.componentType === 'new');
 
             setDiscountProducts(filteredDiscountItems);
             setNewlyAddedProducts(filteredNewItems)
@@ -328,7 +328,7 @@ const HomeDashboard = () => {
         return (
             <View style={{}}>
                 <TouchableOpacity
-                    style={{ elevation: 5, width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginLeft: 16 }}>
+                    style={{ elevation: 5, width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto',marginEnd:10 }}>
                     <FastImage source={{
                         uri: updatedImgUrl,
                         headers: { Authorization: `Bearer ${getUserAuth}` }
@@ -428,6 +428,10 @@ const HomeDashboard = () => {
             navigation.navigate('CategoriesList', { catType: 'chains' });
         }else if (catClicked === 'bracelets') {
             navigation.navigate('CategoriesList', { catType: 'bracelets' });
+        }else if (catClicked === 'mens') {
+            navigation.navigate('CategoriesList', { catType: 'mens' });
+        }else if (catClicked === 'womens') {
+            navigation.navigate('CategoriesList', { catType: 'womens' });
         }else if (catClicked === 'caterings') {
             navigation.navigate('Caterings');
         }
@@ -574,7 +578,7 @@ const HomeDashboard = () => {
                 </View>
 
                 {newlyAddedProducts?.length ?
-                    <>
+                    <View style={{}}>
                         <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: 20 }}>
                             <Text style={styles.onDemandTextStyle}>Newly Added</Text>
                             <TouchableOpacity onPress={() => navigation.navigate('CategoriesList', { componentType: 'new' })} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
@@ -585,11 +589,11 @@ const HomeDashboard = () => {
                         <FlatList
                             horizontal
                             data={newlyAddedProducts}
-                            contentContainerStyle={{ paddingVertical: verticalScale(20), marginLeft: horizontalScale(5) }}
+                            contentContainerStyle={{ backgroundColor:"#FFF7E7",paddingVertical: verticalScale(15),paddingHorizontal:10,marginTop:5 }}
                             renderItem={renderNewlyAddedDetails}
                             showsHorizontalScrollIndicator={false}
                         />
-                    </> : null}
+                    </View> : null}
 
                 <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' ,marginTop:horizontalScale(20)}}>
                     <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
