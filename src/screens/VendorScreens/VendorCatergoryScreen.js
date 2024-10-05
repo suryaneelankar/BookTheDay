@@ -12,13 +12,6 @@ import LinearGradient from 'react-native-linear-gradient';
 
 const VendorCategoryScreen = ({ navigation }) => {
 
-    {/* HireChefOrDriverForm */ }
-    {/* RentOnProducts */ }
-    {/* AddTentHouse */ }
-    {/* AddFunctionalHall */ }
-    {/* AddFoodCatering */ }
-    {/* AddDecorations */ }
-
     const vendorToken = async () => {
         const token = await getVendorAuthToken();
         if (token) {

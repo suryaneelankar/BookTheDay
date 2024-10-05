@@ -179,18 +179,8 @@ const Caterings = () => {
                                 <Text style={{ fontWeight: '500', marginHorizontal: 5, color: '#696969', fontSize: 13, marginTop: 5, fontFamily: "ManropeRegular" }}>{item?.foodCateringAddress?.address}</Text>
                             </View>
                         </View>
-                        {/* <View>
-                            <Text style={{ fontWeight: '700', color: '#202020', fontSize: 18, fontFamily: "ManropeRegular" }}>{formatAmount(item?.price)}<Text style={{ color: "gray", fontSize: 16 }}> /day</Text></Text>
-                            <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
-                                <Text style={styles.strickedoffer}>₹20000</Text>
-                                <Text style={styles.off}> 20% off</Text>
-                            </View>
-                        </View> */}
                     </View>
-                    <View style={{ marginTop: 10, flexDirection: 'row' }}>
 
-                        {/* <Text style={{ fontWeight: '600', color: '#696969', fontSize: 12, width: '100%' }}>{item?.description}</Text> */}
-                    </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "50%" }}>
 
                         <View style={{ backgroundColor: item?.available ? "orange" : "orange", flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>

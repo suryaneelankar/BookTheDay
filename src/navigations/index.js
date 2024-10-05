@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import UserTabs from "./UserTabs";
@@ -61,6 +61,7 @@ import messaging from '@react-native-firebase/messaging';
 import AadharUpload from "../screens/KYC/AadharUpload";
 import BankDetailsScreen from "../screens/VendorScreens/VendorProfile/BankDetails";
 import UserAadharUpload from "../screens/KYC/UserAadharUpload";
+import AdminDashboard from "../screens/Admin/adminDashboard";
 
 const MainNavigation = () => {
 
@@ -70,14 +71,14 @@ const MainNavigation = () => {
 
     useEffect(() => {
         getToken();
-    },[])
+    }, [])
 
     const getToken = async () => {
         const fcmToken = await messaging().getToken();
-        console.log('device fcm test token is ::>>',fcmToken);
+        console.log('device fcm test token is ::>>', fcmToken);
         dispatch(getDeviceFCMToken(fcmToken));
     }
-    
+
     console.log("switch tab id:::::::::::", switchtab)
 
     const HomeScreen = () => {
@@ -96,7 +97,7 @@ const MainNavigation = () => {
         <NavigationContainer>
 
             <Stack.Navigator>
-            <Stack.Screen
+                <Stack.Screen
                     name="LandingScreen"
                     component={LandingScreen}
                     options={{
@@ -112,7 +113,7 @@ const MainNavigation = () => {
                         headerShown: false,
                     }}
                 />
-                 <Stack.Screen
+                <Stack.Screen
                     name="OtpValidation"
                     component={OtpValidation}
                     options={{
@@ -200,7 +201,7 @@ const MainNavigation = () => {
                         headerShown: true,
                     }}
                 />
-                 <Stack.Screen
+                <Stack.Screen
                     name="BankDetailsScreen"
                     component={BankDetailsScreen}
                     options={{
@@ -248,37 +249,37 @@ const MainNavigation = () => {
                         headerShown: true,
                     }}
                 />
-                <Stack.Screen 
-               name="ViewCaterings"
-                component={ViewCaterings}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="Caterings" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="ViewCaterings"
+                    component={ViewCaterings}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Caterings" />,
+                        headerShown: true,
+                    }}
                 />
-                 <Stack.Screen 
-               name="DecorsBookingOverView"
-                component={DecorsBookingOverView}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="Cart" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="DecorsBookingOverView"
+                    component={DecorsBookingOverView}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Cart" />,
+                        headerShown: true,
+                    }}
                 />
-                 <Stack.Screen 
-               name="CateringsOverView"
-                component={CateringsOverView}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="Cart" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="CateringsOverView"
+                    component={CateringsOverView}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Cart" />,
+                        headerShown: true,
+                    }}
                 />
-                <Stack.Screen 
-               name="ViewDecors"
-                component={ViewDecors}  
-                options={{
-                         header: () => <NavigationHeader Icon={true} title="Decorations" />,
-                         headerShown: true,
-                }}
+                <Stack.Screen
+                    name="ViewDecors"
+                    component={ViewDecors}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Decorations" />,
+                        headerShown: true,
+                    }}
                 />
                 <Stack.Screen
                     name="SelectDateTime"
@@ -288,7 +289,7 @@ const MainNavigation = () => {
                         headerShown: false,
                     }}
                 />
-               
+
 
 
                 {/* ############### profile Screens ################# */}
@@ -334,7 +335,7 @@ const MainNavigation = () => {
                 }} />
                 {/* AddTentHouse */}
 
-                <Stack.Screen name="RentOnProducts" component={RentOnProducts} options={{  header: () => <NavigationHeader Icon={true} title="Give on Rent" />,headerShown: true }}/>
+                <Stack.Screen name="RentOnProducts" component={RentOnProducts} options={{ header: () => <NavigationHeader Icon={true} title="Give on Rent" />, headerShown: true }} />
 
                 {/* AddFunctionalHall */}
                 <Stack.Screen name="AddFunctionalHall" component={AddFunctionalHall} options={{
@@ -351,7 +352,10 @@ const MainNavigation = () => {
                     headerShown: true,
                 }} />
 
-                {/*  */}
+                <Stack.Screen name="AdminDashboard" component={AdminDashboard} options={{
+                    header: () => <NavigationHeader Icon={true} title="Admin Dashboard" />,
+                    headerShown: true,
+                }} />
 
             </Stack.Navigator>
         </NavigationContainer>

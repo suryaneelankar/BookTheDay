@@ -1,7 +1,7 @@
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import {Image, Platform,View, TouchableOpacity, Text, Button} from 'react-native';
+import { Image, Platform, View, TouchableOpacity, Text, Button } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { getLoginUserId } from '../../redux/actions';
 import HomeDashboard from '../screens/Home';
@@ -26,46 +26,11 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const UserTabs = () => {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-  
-const Tab4Screen = ({ navigation }) => {
   return (
-      <View>
-          <Text>Tab 4  user Profile</Text>
-          <Button title="Go to Details" onPress={() => navigation.navigate('Details')} />
-      </View>
-  );
-};
-
-  const StackProfileNavigation = () => {
-    return (
-      <Stack.Navigator initialRouteName="Tabpro">
-        <Stack.Screen name="Tabpro" component={Tab4Screen} />
-
-      </Stack.Navigator>
-    );
-  };
-
-  const TabProfile = ({focused}) => {
-  
-    const handleTabPress = () => {
-      console.log("IAM PRESSING THEDISPACTH")
-      dispatch(getLoginUserId(true));
-    };
-  
-    return (
-      <TouchableOpacity onPress={handleTabPress}>
-        {focused ? <FocusedHomeIcon/> : <SwitchIcon/>}
-      </TouchableOpacity>
-    );
-  };
-
-  const os = Platform.OS;
-  return (
-   
     <Tab.Navigator
-    initialRouteName='UserHome'
+      initialRouteName='UserHome'
       screenOptions={props => {
         return {
           tabBarShowLabel: false,
@@ -77,12 +42,12 @@ const Tab4Screen = ({ navigation }) => {
           tabBarActiveTintColor: '#ED9D20',
           tabBarInactiveTintColor: '#AAAEBB',
           tabBarLabelStyle: {
-            fontSize: 12,fontWeight:"400",
+            fontSize: 12, fontWeight: "400",
           },
         };
       }}>
 
-        <Tab.Screen
+      <Tab.Screen
         name="UserHome"
         component={HomeDashboard}
         options={{
@@ -90,87 +55,52 @@ const Tab4Screen = ({ navigation }) => {
             focused ? <FocusedHomeIcon /> : <HomeIcon />
           ),
           tabBarLabel: 'Home',
-          tabBarShowLabel:true,
+          tabBarShowLabel: true,
           headerShown: false,
         }}
       />
 
-<Tab.Screen
-  name="Caterings"
-  component={Caterings}
-  options={{
-    tabBarIcon: ({ focused }) => (
-      focused ? <FocusedEvents /> : <EventsIcon />
-    ),
-    tabBarLabel: 'Caterings',
-    tabBarShowLabel:true,
-    header: () => <NavigationHeader Icon={false} title="Catering Services" />,
-    headerShown: false,
-  }}
-/>
+      <Tab.Screen
+        name="Caterings"
+        component={Caterings}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            focused ? <FocusedEvents /> : <EventsIcon />
+          ),
+          tabBarLabel: 'Caterings',
+          tabBarShowLabel: true,
+          header: () => <NavigationHeader Icon={false} title="Catering Services" />,
+          headerShown: false,
+        }}
+      />
 
- <Tab.Screen
-  name="Categories"
-  component={Categories}
-  options={{
-    tabBarIcon: ({ focused }) => (
-      focused ? <FocusedCollection /> : <CollectionIcon />
-    ),
-    tabBarLabel: 'Collections',
-    tabBarShowLabel:true,
-    header: () => <NavigationHeader Icon={false} title="Products" />,
-    headerShown: false,
-  }}
-/>
+      <Tab.Screen
+        name="Categories"
+        component={Categories}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            focused ? <FocusedCollection /> : <CollectionIcon />
+          ),
+          tabBarLabel: 'Collections',
+          tabBarShowLabel: true,
+          header: () => <NavigationHeader Icon={false} title="Products" />,
+          headerShown: false,
+        }}
+      />
 
-<Tab.Screen
-  name="Events"
-  component={Events}
-  options={{
-    tabBarIcon: ({ focused }) => (
-      focused ? <FocusedEvents /> : <EventsIcon />
-    ),
-    tabBarLabel: 'Events',
-    tabBarShowLabel:true,
-    header: () => <NavigationHeader Icon={false} title="Event Management" />,
-    headerShown: false,
-  }}
-/>
-
-{/* <Tab.Screen
-  name="My Box"
-  component={Hire}
-  options={{
-    tabBarIcon: ({ focused }) => (
-      focused ? <FocusedHire /> : <HireIcon />
-    ),
-    tabBarLabel: 'Hire',
-    tabBarShowLabel:true,
-    header: () => <NavigationHeader Icon={false} title="Hire Professionals" />,
-    headerShown: true,
-  }}
-/> */}
-
-{/* <Tab.Screen
-  name="My Profile"
-  // component={StackProfileNavigation}
-  component={ProfileMainScreen}
-  options={{
-    tabBarIcon: ({ focused }) => (
-      focused ? <HireIcon /> : <SwitchIcon />
-    ),
-  headerShown:false}}
-  // listeners={{
-  //   tabPress: (e) => {
-  //     // Prevent default action
-  //     e.preventDefault();
-  //   },
-  // }}
-  // options={{
-  //   tabBarIcon: ({ focused }) => <TabProfile focused={focused} />,
-  //   headerShown: false,
-  // }}
-/> */}
+      <Tab.Screen
+        name="Events"
+        component={Events}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            focused ? <FocusedEvents /> : <EventsIcon />
+          ),
+          tabBarLabel: 'Events',
+          tabBarShowLabel: true,
+          header: () => <NavigationHeader Icon={false} title="Event Management" />,
+          headerShown: false,
+        }}
+      />
 
     </Tab.Navigator>
   );

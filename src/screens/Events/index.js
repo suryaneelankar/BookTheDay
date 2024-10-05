@@ -2,15 +2,13 @@ import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions, FlatList, Pressable, SafeAreaView, ActivityIndicator } from 'react-native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../utils/GlobalFunctions';
 import SearchIcon from '../../assets/svgs/searchIcon.svg';
 import FilterIcon from '../../assets/svgs/filter.svg';
 import Swiper from "react-native-swiper";
 import LocationMarkIcon from '../../assets/svgs/location.svg';
 import { verticalScale } from "../../utils/scalingMetrics";
-import TentHouseIcon from '../../assets/svgs/categories/home_tenthouseimage.svg';
-import CategoryFilter from "../../components/CategoryFilter";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
 import { useSelector } from "react-redux";
@@ -30,11 +28,6 @@ const Events = () => {
     const userLocationFetched = useSelector((state) => state.userLocation);
     const [totalNearByPages,setTotalNearByPages] = useState(0);
     const [totalEventPages,setTotalEventPages] = useState(0);
-    // console.log("user selevcted address is events::::::::", userLocationFetched)
-
-    // const [userLatitude,setUserLatitude] = useState(userLocationFetched?.latitude);
-    // const [userLongitude,setUserLongitude] = useState(userLocationFetched?.longitude);
-    // console.log("latitue long", userLatitude ,'+++++++++', userLongitude);
     console.log('userLocationFetched is::>>',userLocationFetched?.latitude,userLocationFetched?.longitude);
 
     useEffect(() => {

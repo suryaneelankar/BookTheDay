@@ -41,7 +41,8 @@ const VendorDashBoardTab = ({ navigation }) => {
             // getVendorDecorationBookings();
             getVendorFunctionHallBookings();
             // getVendorTentHouseBookings();
-            getVendorFoodCateringBookings()
+            getVendorFoodCateringBookings();
+            getAllEvents();
 
             getVendorListings();
 
@@ -83,6 +84,8 @@ const VendorDashBoardTab = ({ navigation }) => {
                 },
             });
 
+            // console.log('response?.data vendor products added is::>>',response?.data);
+
             const result = response?.data?.posts.map(item => {
                 const catType = item?.postId?.catType;
                 let productName = '';
@@ -96,11 +99,11 @@ const VendorDashBoardTab = ({ navigation }) => {
                 else if (catType === 'catering') {
                     productName = item.postId.foodCateringName;
                 }
-               console.log("listing data::::::", JSON.stringify(response?.data))
+                //    console.log("listing data::::::", JSON.stringify(response?.data))
                 return {
                     _id: response?.data?._id,
                     productName: productName,
-                    productImage: item.postId.professionalImage.url,
+                    productImage: item?.postId?.professionalImage?.url,
                     particularPostId: item?.postId?._id,
                     createdAt: response?.data?.createdAt,
                     available: item?.postId?.available,
@@ -108,13 +111,33 @@ const VendorDashBoardTab = ({ navigation }) => {
                 };
             });
             setVendorListings(result);
-            console.log('result is ::>>',result);
+            // console.log('result is ::>>',result);
 
         } catch (error) {
-            console.log("categories::::::::::", error);
+            console.log("listing error::::::::::", error);
         }
     }
 
+
+    const getAllEvents = async (page) => {
+        const token = await getVendorAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls?page=${page}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            
+
+            const newFunctionHalls = Array.isArray(response?.data?.data) ? response?.data?.data : [];
+            console.log('resp is in vendor function halls::>>>', newFunctionHalls);
+            if (response?.data?.data?.length > 0) {
+
+            }
+        } catch (error) {
+            console.error('Error fetching function halls:', error);
+        }
+    }
 
     const getVendorClothJewelBookings = async () => {
         const vendorMobileNumber = vendorLoggedInMobileNum;
@@ -130,26 +153,7 @@ const VendorDashBoardTab = ({ navigation }) => {
             // console.log('output is ::>>', output);
             setclothJewelBookingsData(output)
         } catch (error) {
-            console.log("categories::::::::::", error);
-        }
-    }
-
-    const getVendorDecorationBookings = async () => {
-        // console.log("getVendorChefDriverBookings::::::::::");
-        const vendorMobileNumber = vendorLoggedInMobileNum;
-        const token = await getVendorAuthToken();
-        try {
-            const response = await axios.get(`${BASE_URL}/decorationBookingsGotForVendor/${vendorMobileNumber}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-            // console.log('resp decorationsBookingsData ::>>', response?.data?.data);
-            const outputData = consolidateDecorationDataByProductId(response?.data?.data);
-            setDecorationsBookingsData(outputData);
-
-        } catch (error) {
-            console.log("categories::::::::::", error);
+            console.log("clothJewelBookingsGotForVendor error::::::::::", error);
         }
     }
 
@@ -167,25 +171,7 @@ const VendorDashBoardTab = ({ navigation }) => {
             setFunctionHallBookingsData(outputData);
 
         } catch (error) {
-            console.log("categories::::::::::", error);
-        }
-    }
-
-    const getVendorTentHouseBookings = async () => {
-        const vendorMobileNumber = vendorLoggedInMobileNum;
-        const token = await getVendorAuthToken();
-        try {
-            const response = await axios.get(`${BASE_URL}/tentHouseBookingsGotForVendor/${vendorMobileNumber}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-            // console.log('resp getVendorTentHouseBookings ::>>', response?.data?.data);
-            const outputData = consolidateTentHouseDataByProductId(response?.data?.data);
-            setTentHouseBookingsData(outputData);
-
-        } catch (error) {
-            console.log("categories::::::::::", error);
+            console.log("functionHallBookingsGotForVendor error::::::::::", error);
         }
     }
 
@@ -203,7 +189,7 @@ const VendorDashBoardTab = ({ navigation }) => {
             setCateringBookingsData(outputData);
 
         } catch (error) {
-            console.log("categories::::::::::", error);
+            console.log("foodCateringBookingsGotForVendor error::::::::::", error);
         }
     }
 
@@ -222,7 +208,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                 getVendorListings();
             }
         } catch (error) {
-            console.log("categories::::::::::", error);
+            console.log("deleteVendorPost error::::::::::", error);
         }
     }
 
@@ -245,41 +231,41 @@ const VendorDashBoardTab = ({ navigation }) => {
     const showAvailabilityConfirmation = (catType, postId, toggleAvailable) => {
         Alert.alert(
             "Confirmation",
-            "Are you sure you want to make listing Change?",
+            "Are you sure you want to make this available?",
             [
                 {
                     text: "Cancel",
                     onPress: () => console.log("No Pressed"),
                     style: "cancel"
                 },
-                { text: "Yes", onPress: () => toggleListingAvailability(catType, postId,toggleAvailable) }
+                { text: "Yes", onPress: () => toggleListingAvailability(catType, postId, toggleAvailable) }
             ],
             { cancelable: false }
         );
     };
 
-    const toggleListingAvailability = async (catType, postId,toggleAvailable) => {
+    const toggleListingAvailability = async (catType, postId, toggleAvailable) => {
         const token = await getVendorAuthToken();
         // console.log('vendorId is:::',vendorId,postId);
-        let payload ={
+        let payload = {
             id: postId,
             available: !toggleAvailable,
             modelType: catType
         }
         console.log("toggle payloa d:;", payload);
         try {
-            const response = await axios.patch(`${BASE_URL}/vendor/productRecord/availability`,payload, {
+            const response = await axios.patch(`${BASE_URL}/vendor/productRecord/availability`, payload, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            console.log('response toggle availability is:::>>',response);
+            console.log('response toggle availability is:::>>', response);
             if (response?.status == 200) {
                 showSuccessToggleAlert();
                 getVendorListings();
             }
         } catch (error) {
-            console.log("categories::::::::::", error);
+            console.log("vendor/productRecord/availability error::::::::::", error);
         }
     };
 
@@ -318,8 +304,8 @@ const VendorDashBoardTab = ({ navigation }) => {
 
         const convertedImageUrl = item?.productImage !== undefined ? item?.productImage.replace('localhost', LocalHostUrl) : item?.productImage;
         return (
-            <TouchableOpacity 
-            style={{opacity: item?.available === true ? 1 : 0.5, backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10 }}
+            <TouchableOpacity
+                style={{ opacity: item?.available === true ? 1 : 0.5, backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10 }}
             >
                 <View style={{ marginTop: 5, width: '100%', marginHorizontal: 5 }}>
 
@@ -331,7 +317,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                         }}
                     />
                     <Text style={styles.productName}>{capitalizeFirstLetters(item?.productName)}</Text>
-                    <Text style={{backgroundColor:"pink"}}>{item?.available ? 'available' : 'notAvai'}</Text>
+                    <Text style={{ backgroundColor: "pink" }}>{item?.available ? 'available' : 'notAvai'}</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, justifyContent: 'space-between', width: '90%', bottom: 5 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 }}>
                             <ListedTimeIcon />
@@ -555,80 +541,83 @@ const VendorDashBoardTab = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.mainContainer}>
-                       <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1 }}>
+            <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1 }}>
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'white' }}>
-                <ProfileIcon style={{}} />
-                <View>
-                    <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular' }}>Hi, Surya Neelankar</Text>
-                    <Text style={{ fontFamily: 'LeagueSpartanRegular' }}>+91 8297735285</Text>
-                </View>
-            </View>
-
-
-            <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF3CD', '#FFDB7E']} style={{ width: '90%', alignSelf: 'center', padding: 20, borderRadius: 10, marginTop: 20 }}>
-                <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'white' }}>
+                    <ProfileIcon style={{}} />
                     <View>
-                        <Text style={{ color: '#1A1F36', fontSize: 14, fontWeight: 700, color: '#1A1F36' }}>Total Earnings</Text>
-                        <Text style={{ fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 40, color: '#1A1F36', }}>₹4,500</Text>
+                        <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular' }}>Hi, Surya Neelankar</Text>
+                        <Text style={{ fontFamily: 'LeagueSpartanRegular' }}>+91 8297735285</Text>
                     </View>
-                    <View style={{ width: 2, height: '100%', backgroundColor: '#F9CD4F' }} />
-                    <View>
-                        <Text style={{ color: '#1A1F36', fontSize: 14, fontWeight: 700, color: '#1A1F36' }}>Current Listing</Text>
-                        <Text style={{ fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 40, color: '#1A1F36',alignSelf:'center' }}>{vendorListing?.length}</Text>
-                    </View>
+                    <TouchableOpacity onPress={() => navigation.navigate('AdminDashboard')}>
+                        <ProfileIcon />
+                    </TouchableOpacity>
                 </View>
 
-            </LinearGradient>
-            <ScrollView>
-                {clothJewelBookingsData?.length || functionHallBookingsData?.length || cateringsBookingsData?.length ?
-                <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Recent Request</Text>
-                : null}
-                <View >
-                    {clothJewelBookingsData?.length ?
-                        <>
-                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Cloth/Jewel Bookings</Text>
-                            <FlatList
-                                data={clothJewelBookingsData}
-                                renderItem={renderItem}
-                                contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
-                                ItemSeparatorComponent={ItemSeparator}
-                            />
-                        </>
-                        : null}
 
-                    {functionHallBookingsData?.length ?
-                        <>
-                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Function Hall Bookings</Text>
-                            <FlatList
-                                data={functionHallBookingsData}
-                                renderItem={renderFunctionHallItem}
-                                contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
-                                ItemSeparatorComponent={ItemSeparator}
-                            />
-                        </>
-                        : null}
+                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF3CD', '#FFDB7E']} style={{ width: '90%', alignSelf: 'center', padding: 20, borderRadius: 10, marginTop: 20 }}>
+                    <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
+                        <View>
+                            <Text style={{ color: '#1A1F36', fontSize: 14, fontWeight: 700, color: '#1A1F36' }}>Total Earnings</Text>
+                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 40, color: '#1A1F36', }}>₹4,500</Text>
+                        </View>
+                        <View style={{ width: 2, height: '100%', backgroundColor: '#F9CD4F' }} />
+                        <View>
+                            <Text style={{ color: '#1A1F36', fontSize: 14, fontWeight: 700, color: '#1A1F36' }}>Current Listing</Text>
+                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 40, color: '#1A1F36', alignSelf: 'center' }}>{vendorListing?.length}</Text>
+                        </View>
+                    </View>
 
-                    {cateringsBookingsData?.length ?
-                        <>
-                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Food Catering Bookings</Text>
-                            <FlatList
-                                data={cateringsBookingsData}
-                                renderItem={renderFoodCateringItem}
-                                contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
-                                ItemSeparatorComponent={ItemSeparator}
-                            />
-                        </>
+                </LinearGradient>
+                <ScrollView>
+                    {clothJewelBookingsData?.length || functionHallBookingsData?.length || cateringsBookingsData?.length ?
+                        <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Recent Request</Text>
                         : null}
-                </View>
-                <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%',marginTop:20 }}>All Listed Products</Text>
-                <FlatList
-                    data={vendorListing}
-                    renderItem={renderVendorList}
-                    contentContainerStyle={{ borderRadius: 15, margin: 10, paddingBottom: 40 }}
-                    numColumns={2}
-                />
-            </ScrollView>
+                    <View >
+                        {clothJewelBookingsData?.length ?
+                            <>
+                                <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Cloth/Jewel Bookings</Text>
+                                <FlatList
+                                    data={clothJewelBookingsData}
+                                    renderItem={renderItem}
+                                    contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
+                                    ItemSeparatorComponent={ItemSeparator}
+                                />
+                            </>
+                            : null}
+
+                        {functionHallBookingsData?.length ?
+                            <>
+                                <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Function Hall Bookings</Text>
+                                <FlatList
+                                    data={functionHallBookingsData}
+                                    renderItem={renderFunctionHallItem}
+                                    contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
+                                    ItemSeparatorComponent={ItemSeparator}
+                                />
+                            </>
+                            : null}
+
+                        {cateringsBookingsData?.length ?
+                            <>
+                                <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Food Catering Bookings</Text>
+                                <FlatList
+                                    data={cateringsBookingsData}
+                                    renderItem={renderFoodCateringItem}
+                                    contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
+                                    ItemSeparatorComponent={ItemSeparator}
+                                />
+                            </>
+                            : null}
+                    </View>
+                    <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: 20 }}>All Listed Products</Text>
+                    <FlatList
+                        data={vendorListing}
+                        renderItem={renderVendorList}
+                        contentContainerStyle={{ borderRadius: 15, margin: 10, paddingBottom: 40 }}
+                        numColumns={2}
+                    />
+                </ScrollView>
             </LinearGradient>
         </SafeAreaView>
     );
