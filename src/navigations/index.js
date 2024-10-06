@@ -173,7 +173,7 @@ const MainNavigation = () => {
                     name="ViewCatDetails"
                     component={ViewCatDetails}
                     options={{
-                        header: () => <NavigationHeader Icon={true} title="Hire Professionals" />,
+                        header: () => <NavigationHeader Icon={true} title="Product Details" />,
                         headerShown: true,
                     }}
                 />

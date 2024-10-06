@@ -1,32 +1,14 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, Dimensions, ImageBackground, FlatList, PermissionsAndroid, Pressable, StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
-import { SwiperFlatList } from 'react-native-swiper-flatlist';
-import Wedding from '../../assets/wedding.png';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
+import React, { useEffect, useState, useRef } from "react";
+import { View, Text, Dimensions, FlatList, PermissionsAndroid, Pressable, StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";
-import Geolocation from '@react-native-community/geolocation';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import GetLocation from 'react-native-get-location'
-import { height, horizontalScale, moderateScale, verticalScale } from "../../utils/scalingMetrics";
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { horizontalScale, verticalScale } from "../../utils/scalingMetrics";
 import LocationMarkIcon from '../../assets/svgs/location.svg';
-import Home_banner_chef from '../../assets/svgs/homeSwippers/Home_banner_chef.svg';
 import SearchIcon from '../../assets/svgs/searchIcon.svg';
-import HomeSwipper from '../../assets/svgs/homeswippers.svg';
 import ArrowDown from '../../assets/svgs/arrowDown.svg';
-import TentHouseIcon from '../../assets/svgs/categories/home_tenthouseimage.svg';
-import FuntionalHall from '../../assets/svgs/categories/home_hallimage.svg';
-import DecorationsIcon from '../../assets/svgs/categories/home_decorationimage.svg';
-import CateringIcon from '../../assets/svgs/categories/home_cateringimage.svg';
-import DriversIcon from '../../assets/svgs/categories/home_driverimage.svg';
-import ChefIcon from '../../assets/svgs/categories/home_chefimage.svg';
-import JewelleryIcon from '../../assets/svgs/categories/jewellery_icon.svg';
-import ClothesIcon from '../../assets/svgs/categories/clothes_icon.svg';
-import SwipperOne from '../../assets/svgs/homeSwippers/swipperOne.svg';
 import MoneyWavy from '../../assets/svgs/MoneyWavy.svg';
 import Cloth from '../../assets/svgs/cloth.svg';
 import Cheers from '../../assets/svgs/Cheers.svg';
@@ -35,24 +17,14 @@ import FilterIcon from '../../assets/svgs/filter.svg';
 import RightArrowIcon from '../../assets/svgs/rightArrow.svg';
 import themevariable from "../../utils/themevariable";
 import { formatAmount } from "../../utils/GlobalFunctions";
-import WantDriver from '../../assets/svgs/chefDriver/driver.svg';
-import WantChef from '../../assets/svgs/chefDriver/chef.svg';
-import Svg, { Circle } from 'react-native-svg';
 import { InfoBox } from "../../components/InfoBox";
-import TrendingView from "../../components/TrendingView";
-import TrendingShirtImg from '../../assets/svgs/shirtTrending.svg';
 import TrendingNow from "../Products/TrendingNow";
-import shirtImg from '../../assets/shirt.png'
-import DiscountComponent from "../Products/DiscountComponent";
 import FooterBackGround from '../../assets/svgs/categories/home_footer_banner.svg';
 import Swiper from "react-native-swiper";
-import HomeChefIcon from '../../assets/svgs/newHomeCheficon.svg';
 import TrendingRingBanner from '../../assets/svgs/trendingNow/home_trendingnow_ring.svg';
 import TrendingBracelet from '../../assets/svgs/trendingNow/home_trendingnow_bracelets.svg';
 import TrendingBridal from '../../assets/svgs/trendingNow/home_trendingnow_bridal.svg';
 import TrendingCatering from '../../assets/svgs/trendingNow/home_trendingnow_catering.svg';
-import TrendingChef from '../../assets/svgs/trendingNow/home_trendingnow_chef.svg';
-import TrendingDriver from '../../assets/svgs/trendingNow/home_trendingnow_driver.svg';
 import TrendingEarrings from '../../assets/svgs/trendingNow/home_trendingnow_earrings.svg';
 import TrendingJewellery from '../../assets/svgs/trendingNow/home_trendingnow_jewellery.svg';
 import TrendingNecklace from '../../assets/svgs/trendingNow/home_trendingnow_necklaces.svg';
@@ -65,20 +37,16 @@ import CatDriver from '../../assets/svgs/categories/home_categories_driver_icon.
 import CatHalls from '../../assets/svgs/categories/home_categories_hall_icon.svg';
 import CatJewellery from '../../assets/svgs/categories/home_categories_jewellery_icon.svg';
 import CatTentHouse from '../../assets/svgs/categories/home_categories_tent_icon.svg';
-import DriverCard from '../../assets/svgs/chefDriver/home_drivercardnew.svg';
-import ChefCard from '../../assets/svgs/chefDriver/home_chefcard.svg';
 import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.svg';
 import ClothesCard from '../../assets/svgs/homeSwippers/home_shirtcard.svg';
-import RazorpayCheckout from 'react-native-razorpay';
 import { getUserAuthToken, getVendorAuthToken } from "../../utils/StoreAuthToken";
-import { getUserLocation,setUserCurrentLocation } from "../../../redux/actions";
-import { useDispatch,useSelector } from "react-redux";
+import { getUserLocation, setUserCurrentLocation } from "../../../redux/actions";
+import { useDispatch, useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
     const [address, setAddress] = useState('');
-    const [userToken, setUserToken] = useState('');
     const userLocationFetched = useSelector((state) => state.userLocation);
     console.log("userlocation dispctahed:::::;;", userLocationFetched)
     const dispatch = useDispatch();
@@ -93,27 +61,6 @@ const HomeDashboard = () => {
         { id: '2', image: ClothesCard },
     ];
 
-    const DriverChefCardImages = [
-        { image: DriverCard },
-        { image: ChefCard },
-    ];
-
-    const someFunction = async () => {
-        const token = await getUserAuthToken();
-        if (token) {
-            // Use the token, e.g., include it in API requests
-            console.log('Using stored token:', token);
-            setUserToken(token);
-            return token;
-        } else {
-            console.log('No User token found');
-        }
-    };
-
-
-    someFunction();
-    // vendorToken();
-    console.log("somefuntion res::::::;", someFunction())
 
     const CategoriesData = [
         { name: 'Clothes', image: CatClothes },
@@ -127,15 +74,13 @@ const HomeDashboard = () => {
     ];
 
     const trendingData = [
-        { id: '1', Component: TrendingTshirt, name:'mens' },
-        { id: '2', Component: TrendingBridal , name:'womens'},
-        { id: '3', Component: TrendingCatering, name:'caterings' },
-        // { id: '4', Component: TrendingChef },
-        // { id: '5', Component: TrendingDriver },
-        { id: '6', Component: TrendingRingBanner, name :'rings' },
-        { id: '7', Component: TrendingEarrings, name :'earrings' },
-        { id: '8', Component: TrendingJewellery ,name :'bridal'},
-        { id: '9', Component: TrendingNecklace, name : 'chains' },
+        { id: '1', Component: TrendingTshirt, name: 'mens' },
+        { id: '2', Component: TrendingBridal, name: 'womens' },
+        { id: '3', Component: TrendingCatering, name: 'caterings' },
+        { id: '6', Component: TrendingRingBanner, name: 'rings' },
+        { id: '7', Component: TrendingEarrings, name: 'earrings' },
+        { id: '8', Component: TrendingJewellery, name: 'bridal' },
+        { id: '9', Component: TrendingNecklace, name: 'chains' },
         { id: '10', Component: TrendingBracelet, name: 'bracelets' },
     ];
     useEffect(() => {
@@ -149,63 +94,6 @@ const HomeDashboard = () => {
         const token = await getUserAuthToken();
         console.log("usertoklen", token);
     }
-
-    const handlePayment = async () => {
-        try {
-            // Fetch the order details from your backend
-            const response = await fetch(`${BASE_URL}/create-order`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    amount: 1, // Amount in INR
-                    currency: 'INR',
-                    receipt: 'receipt#1'
-                })
-            });
-
-            const data = await response.json();
-            console.log('razor pay data is ::>>', data);
-            // Start the Razorpay payment process
-            var options = {
-                description: 'Test Transaction',
-                image: 'https://your-logo-url.com/logo.png',
-                currency: data.currency,
-                key: 'rzp_test_SFQjGVsyEZ2P05', // Your Razorpay Key ID
-                amount: data.amount, // Amount in smallest currency unit
-                order_id: data.orderId, // Order ID returned from backend
-                name: 'Book the day',
-                prefill: {
-                    email: 'bookthedaytechnologies@gmail.com',
-                    contact: '8297735285',
-                    name: 'Surya Neelankar',
-                    //   method: 'upi',  // Pre-select UPI as the payment method
-                    vpa: ''
-                },
-                theme: { color: '#FFDB7E' }
-            };
-
-            console.log('options is::>>', options)
-
-            RazorpayCheckout.open(options)
-                .then((paymentData) => {
-                    // Success callback
-                    Alert.alert(`Success: ${paymentData.razorpay_payment_id}`);
-                    // Verify the payment on the server-side
-                    console.log('success resp::>>', paymentData);
-                    //   verifyPayment(paymentData);
-                })
-                .catch((error) => {
-                    // Failure callback
-                    Alert.alert(`Error: ${error.code} | ${error.description}`);
-                    console.error(error);
-                });
-        } catch (error) {
-            console.error(error);
-            Alert.alert('Error', 'Something went wrong');
-        }
-    };
 
     const getAllEvents = async (page) => {
         const token = await getUserAuthToken();
@@ -237,7 +125,7 @@ const HomeDashboard = () => {
             const filteredNewItems = response?.data?.data.filter(category => category?.componentType === 'new');
 
             setDiscountProducts(filteredDiscountItems);
-            setNewlyAddedProducts(filteredNewItems)
+            setNewlyAddedProducts(filteredNewItems);
         } catch (error) {
             console.log("categories discount::::::::::", error);
 
@@ -302,20 +190,6 @@ const HomeDashboard = () => {
         }
     }
 
-
-
-    // const getCategories = async () => {
-    //     // console.log("IAM CALLING API in home")
-    //     try {
-    //         const response = await axios.get(`${BASE_URL}/all-category`);
-    //         // console.log("categories::::::::::", response?.data?.data);
-    //         setCategories(response?.data?.data)
-    //     } catch (error) {
-    //         console.log("categories::::::::::", error);
-
-    //     }
-    // }
-
     const renderNewlyAddedDetails = ({ item }) => {
         const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
 
@@ -328,7 +202,7 @@ const HomeDashboard = () => {
         return (
             <View style={{}}>
                 <TouchableOpacity
-                    style={{ elevation: 5, width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto',marginEnd:10 }}>
+                    style={{ elevation: 5, width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginEnd: 10 }}>
                     <FastImage source={{
                         uri: updatedImgUrl,
                         headers: { Authorization: `Bearer ${getUserAuth}` }
@@ -377,10 +251,6 @@ const HomeDashboard = () => {
                                 <FontAwesome name={"map-marker"} color={themevariable.Color_777777} size={20} style={{}} />
                                 <Text style={{ fontWeight: '500', marginHorizontal: 5, color: themevariable.Color_777777, fontSize: 13, marginTop: 5, fontFamily: 'InterBold', bottom: 3 }}>{item?.functionHallAddress?.address}</Text>
                             </View>
-                            {/* <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
-                                <Text style={styles.strickedoffer}>{formatAmount(item?.price + 1000)}</Text>
-                                <Text style={styles.off}> 20% off</Text>
-                            </View> */}
                         </View>
                     </View>
 
@@ -420,19 +290,19 @@ const HomeDashboard = () => {
     const handleTrendingBanners = (catClicked) => {
         if (catClicked === 'rings') {
             navigation.navigate('CategoriesList', { catType: 'rings' });
-        }else if (catClicked === 'earrings') {
+        } else if (catClicked === 'earrings') {
             navigation.navigate('CategoriesList', { catType: 'earrings' });
-        }else if (catClicked === 'bridal') {
+        } else if (catClicked === 'bridal') {
             navigation.navigate('CategoriesList', { catType: 'bridal' });
-        }else if (catClicked === 'chains') {
+        } else if (catClicked === 'chains') {
             navigation.navigate('CategoriesList', { catType: 'chains' });
-        }else if (catClicked === 'bracelets') {
+        } else if (catClicked === 'bracelets') {
             navigation.navigate('CategoriesList', { catType: 'bracelets' });
-        }else if (catClicked === 'mens') {
+        } else if (catClicked === 'mens') {
             navigation.navigate('CategoriesList', { catType: 'mens' });
-        }else if (catClicked === 'womens') {
+        } else if (catClicked === 'womens') {
             navigation.navigate('CategoriesList', { catType: 'womens' });
-        }else if (catClicked === 'caterings') {
+        } else if (catClicked === 'caterings') {
             navigation.navigate('Caterings');
         }
     }
@@ -454,11 +324,11 @@ const HomeDashboard = () => {
                         <View style={styles.locationContainer}>
                             <Text style={styles.currentLoc}>Your current location</Text>
                             {/* navigation.navigate('LocationAdded') */}
-                            <View style={{ flexDirection: 'row',alignItems:'center' }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <TouchableOpacity onPress={() => getLocation()} style={styles.getLoc}>
                                     <LocationMarkIcon />
                                 </TouchableOpacity>
-                                <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} onPress={() => {navigation.navigate('LocationAdded')}}>
+                                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('LocationAdded') }}>
                                     <Text numberOfLines={1} style={styles.retrievedLoc}>{userLocationFetched?.display_name ? userLocationFetched?.display_name : userLocationFetched?.address}</Text>
                                     <ArrowDown />
                                 </TouchableOpacity>
@@ -482,10 +352,6 @@ const HomeDashboard = () => {
                             <FilterIcon />
                         </View>
                     </View>
-                    {/* <TouchableOpacity onPress={() => { handlePayment() }}>
-                        <Text>Initiate Razopr Pay Payment</Text>
-                    </TouchableOpacity> */}
-                    {/* <View style={{ width: "100%" }}> */}
                     <Swiper
                         autoplay
                         autoplayTimeout={3}
@@ -561,18 +427,18 @@ const HomeDashboard = () => {
                 </LinearGradient>
 
                 {discountProducts?.length > 0 ?
-
-                    <TrendingNow data={discountProducts} textHeader={'Live Offers!'} token={getUserAuth}/>
+                    <TrendingNow data={discountProducts} textHeader={'Live Offers!'} token={getUserAuth} />
                     :
                     null}
                 <View style={{ marginTop: 20, }}>
+                    <Text style={[styles.onDemandTextStyle, { alignSelf: 'flex-start', padding: 10, marginHorizontal: 10 }]}>Trusted Lender</Text>
                     <FlatList
                         data={trendingData}
                         horizontal
                         renderItem={renderTrendingView}
                         keyExtractor={item => item.id}
                         contentContainerStyle={{ paddingHorizontal: 10, }}
-                        showsHorizontalScrollIndicator={false}
+                        showsHorizontalScrollIndicator={true}
                     />
 
                 </View>
@@ -589,13 +455,13 @@ const HomeDashboard = () => {
                         <FlatList
                             horizontal
                             data={newlyAddedProducts}
-                            contentContainerStyle={{ backgroundColor:"#FFF7E7",paddingVertical: verticalScale(15),paddingHorizontal:10,marginTop:5 }}
+                            contentContainerStyle={{ backgroundColor: "#FFF7E7", paddingVertical: verticalScale(15), paddingHorizontal: 10, marginTop: 5 }}
                             renderItem={renderNewlyAddedDetails}
                             showsHorizontalScrollIndicator={false}
                         />
                     </View> : null}
 
-                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between' ,marginTop:horizontalScale(20)}}>
+                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: horizontalScale(20) }}>
                     <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
                     <TouchableOpacity onPress={() => navigation.navigate('Events')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
                         <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
@@ -611,7 +477,7 @@ const HomeDashboard = () => {
                     showsHorizontalScrollIndicator={false}
                 />
 
-               
+
 
                 <View style={{
                     alignItems: 'center',
@@ -701,7 +567,7 @@ const styles = StyleSheet.create({
     },
     locationContainer: {
         flexDirection: 'column',
-        width:'70%'
+        width: '70%'
         // marginLeft: 10,
     },
     locationSubContainer: {

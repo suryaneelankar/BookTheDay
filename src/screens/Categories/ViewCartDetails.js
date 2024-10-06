@@ -172,7 +172,10 @@ const BookingDetailsScreen = ({ navigation, route }) => {
            }} style={styles.productImage}/>
           <View style={styles.productDetails}>
             <Text style={styles.productTitle}>{productDetails?.productName}</Text>
-            <Text style={styles.productSubTitle}>Pink,{productDetails?.professionalImage?.size}</Text>
+            <View style={{flexDirection:'row',alignItems:'center',marginTop:5}}>
+            <View style={[styles.colorCircle,{ backgroundColor: productDetails?.color,borderRadius: 10 }]} />
+            <Text style={styles.productSubTitle}>Size: {productDetails?.size}</Text>
+            </View>
             <Text style={styles.productPrice}>{formatAmount(productDetails?.rentPricePerDay)}<Text style={styles.productPriceperDay}>/day</Text></Text>
             <View style={styles.dateContainer}>
               <CalendarIcon />
@@ -386,7 +389,9 @@ const styles = StyleSheet.create({
     color: '#000000',
     fontFamily: "ManropeRegular",
     fontWeight: "500",
-    marginTop: 2,
+    marginHorizontal:10
+    // marginTop: 2,
+
   },
   productPrice: {
     fontSize: 18,
@@ -400,6 +405,10 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#202020',
     fontFamily: "ManropeRegular",
+  },
+  colorCircle: {
+    width: 20,
+    height: 20,
   },
   dateContainer: {
     flexDirection: 'row',

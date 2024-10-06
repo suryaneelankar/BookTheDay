@@ -196,7 +196,7 @@ const Categories = () => {
         return (
             <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })} style={{ backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10 }}>
                 <View style={{ marginTop: 5, width: '100%', marginHorizontal: 5 }}>
-                    <FastImage style={{ width: '95%', height: 200, backgroundColor: 'red', borderRadius: 10 }} source={{ uri: updatedImgUrl,
+                    <FastImage style={{ width: '95%', height: 200, borderRadius: 10 }} source={{ uri: updatedImgUrl,
                         headers:{Authorization : `Bearer ${getUserAuth}`}
                      }}  />
                     <Text style={styles.productName}>{capitalizeFirstLetters(item?.productName)}</Text>

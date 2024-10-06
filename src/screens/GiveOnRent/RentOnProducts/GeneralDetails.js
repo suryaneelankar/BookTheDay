@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal,ActivityIndicator, Button, TextInput, ScrollView } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal, ActivityIndicator, Button, TextInput, ScrollView } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
@@ -36,11 +36,11 @@ const GeneralDetails = () => {
     const [available, setAvailable] = useState();
     const [advanceAmount, setAdvanceAmount] = useState();
     const [discountPercentage, setDiscountPercentage] = useState('');
-    const discountPercentageArr = ['5', '10', '15', '20', '30', '50'];
+    const discountPercentageArr = ['0', '5', '10', '15', '20', '30', '50'];
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
     const [isSelected, setSelection] = useState(false);
     const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
-    const jewelleryTypes = ["rings", "bridal", "chains", "earrings", "bangles","bracelets"];
+    const jewelleryTypes = ["rings", "bridal", "chains", "earrings", "bangles", "bracelets"];
     const [jewelleryTypeSelected, setJewelleryTypeSelected] = useState();
     const [jewelleryTypeVal, setJewelleryTypeVal] = useState();
     const [loading, setLoading] = useState(false);
@@ -69,7 +69,7 @@ const GeneralDetails = () => {
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
-    console.log('vendorLoggedInMobileNum is ::>>', vendorLoggedInMobileNum);
+    // console.log('vendorLoggedInMobileNum is ::>>', vendorLoggedInMobileNum);
 
     const onChangeProductName = (value) => {
         setProductName(value);
@@ -222,7 +222,7 @@ const GeneralDetails = () => {
         console.log('selectedOption os:::>>', selectedOption);
 
         if (!mainImageUrl || productName === '' || productDescription === '' || productCity === '' ||
-            (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || productPinCode === '' || (securityDeposit === undefined || securityDeposit === '') || (advanceAmount === undefined || advanceAmount === '') || (selectedOption == null) 
+            (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || productPinCode === '' || (securityDeposit === undefined || securityDeposit === '') || (advanceAmount === undefined || advanceAmount === '') || (selectedOption == null)
         ) {
             Alert.alert('Please fill Mandatory fields');
             return;
@@ -503,14 +503,6 @@ const GeneralDetails = () => {
                             keyboardType='number-pad'
                             isRequired={true}
                         />
-                        {/* <TextField
-                    label='Monthly Price (₹ / 30 days)*'
-                    placeholder="Please Enter Monthly Price"
-                    value={perMonthRentPrice}
-                    onChangeHandler={onChangePerMonthRentPrice}
-                    keyboardType='number-pad'
-                    isRequired={false}
-                /> */}
                         <TextField
                             label='Security Deposit'
                             placeholder="Please Enter Security Deposit"
@@ -529,14 +521,12 @@ const GeneralDetails = () => {
                         />
                         <Text style={styles.textInputlabel}>Discount if any</Text>
                         {discountPercentageList()}
-                        {/* <TextField
-                    label='Discount'
-                    placeholder="Please Enter Discount Percentage"
-                    value={discountPercentage}
-                    onChangeHandler={onChangeDiscountPercentage}
-                    keyboardType='number-pad'
-                    isRequired={false}
-                /> */}
+                        {!isNaN(perDayRentPrice - (perDayRentPrice * discountPercentage / 100)) && perDayRentPrice ? (
+                                <>
+                                    <Text style={styles.discountlabel}>Your product price: {perDayRentPrice}</Text>
+                                    <Text style={styles.discountlabel}>Your product price shown after discount: {perDayRentPrice - (perDayRentPrice * discountPercentage / 100)}</Text>
+                                </>
+                            ) : null}
                     </View>
                     <Text style={styles.title}>Item Available Address</Text>
                     <View style={styles.mainContainer}>
@@ -559,15 +549,6 @@ const GeneralDetails = () => {
                                 <DetectLocation />
                             </View>
                         </TouchableOpacity>
-
-                        {/* <TextField
-                    label='Address'
-                    placeholder="Please Enter Address"
-                    value={productAddress}
-                    onChangeHandler={onChangeAddress}
-                    keyboardType='default'
-                    isRequired={true}
-                /> */}
                         <TextField
                             label='City'
                             placeholder="Please Enter City"
@@ -709,6 +690,13 @@ const styles = StyleSheet.create({
     textInputlabel: {
         fontFamily: 'ManropeRegular',
         fontWeight: 'bold',
+        color: themevariable.Color_000000,
+        fontSize: 15,
+        marginTop: 15
+    },
+    discountlabel: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: '600',
         color: themevariable.Color_000000,
         fontSize: 15,
         marginTop: 15

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const ProductInfoCard = () => {
+const ProductInfoCard = ({size,color}) => {
   return (
     <View style={styles.container}>
       <View style={styles.item}>
@@ -10,12 +10,14 @@ const ProductInfoCard = () => {
       </View>
       <View style={styles.separator} />
       <View style={styles.item}>
-        <Text style={styles.value}>(M) 32cm</Text>
+        <Text style={styles.value}>{size}</Text>
         <Text style={styles.label}>Size</Text>
       </View>
       <View style={styles.separator} />
       <View style={styles.item}>
-        <View style={styles.colorCircle} />
+        {color ?
+        <View style={[styles.colorCircle,{ backgroundColor: color,borderRadius: 10 }]} />
+        : null}
         <Text style={styles.label}>Color</Text>
       </View>
     </View>
@@ -53,8 +55,6 @@ const styles = StyleSheet.create({
   colorCircle: {
     width: 20,
     height: 20,
-    borderRadius: 10,
-    backgroundColor: '#DAA520', // Golden color
     marginBottom: 4,
   },
 });

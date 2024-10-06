@@ -105,33 +105,7 @@ const VendorProfile = () => {
             </View>
 
             <ScrollView style={styles.menuContainer} showsVerticalScrollIndicator={false}>
-                {/* <MenuItem
-                    icon={<ProfileIcon />}
-                    title="My Account"
-                    isSelected={isMyAccountOpen ? true : false}
-                    onPress={() => toggleMyAccount()}
-                />
-                {isMyAccountOpen && (
-                    <View style={styles.dropdownContainer}>
-                        <DropdownItem title="My Profile" navigation={navigation} />
-                        <DropdownItem title="KYC Documents" navigation={navigation} />
-                        <DropdownItem title="Saved Items" navigation={navigation} />
-                        <DropdownItem title="Change Password" navigation={navigation} />
-                        <DropdownItem title="Log Out" navigation={navigation} />
-                        <DropdownItem title="Delete Account" navigation={navigation} />
-                    </View>
-                )} */}
-                {/* <MenuItem icon={<DashboardIcon />}
-                    title="Dashboard"
-                    isSelected={isMyDashboardOpen ? true : false}
-                    onPress={() => toggleMyDashboard()}
-                /> */}
-                {/* {isMyDashboardOpen && (
-                    <View style={styles.dropdownContainer}>
-                        <DropdownItem title="My Booking" navigation={navigation} />
-                        <DropdownItem title="My Lend" navigation={navigation} />
-                    </View>
-                )} */}
+        
                 <MenuItem
                     icon={<ProfileIcon />}
                     title="My KYC"
@@ -144,7 +118,6 @@ const VendorProfile = () => {
                 />
               
                 <MenuItem icon={<TransactionIcon />} title="My Transaction" />
-                {/* <MenuItem onPress={() => navigation.navigate('LocationAdded')} icon={<LocationIcon />} title="Manage Location" /> */}
               
                 <MenuItem icon={<AboutUsIcon />} title="About Us" />
                 <MenuItem icon={<TermsConditionIcon />} title="Terms & Condition" />

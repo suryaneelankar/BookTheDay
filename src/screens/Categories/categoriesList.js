@@ -12,9 +12,6 @@ import FastImage from "react-native-fast-image";
 
 const CategoriesList = ({ route }) => {
     const { catType,componentType } = route.params;
-    // console.log("RECEIED TYPE IS:::", catType)
-    // const CategoryType = catType == 'Jewellery' ? 'jewellery' : catType == 'Furniture' ? 'furniture' : catType == 'Events' ? 'event' : catType == 'Electronics' ? 'electronic' : catType == 'Drivers Rentals' ? 'driver' : catType == 'Clothes' ? 'cloth' : catType == 'Master Chefs' ? 'chef' : null;
-    // console.log("final catetype:::::::::::", CategoryType)
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true); // Add loading state
     const [getUserAuth, setGetUserAuth] = useState('');
@@ -22,64 +19,72 @@ const CategoriesList = ({ route }) => {
     const [hasMore, setHasMore] = useState(true);
     const [listLoading,setListingLoading] = useState(false);
 
-    console.log("passed cat type ::::", catType, componentType)
+    // console.log("passed cat type ::::", catType, componentType)
 
     useEffect(() => {
         getCategories(currentPage);
     }, []);
-
     const getCategories = async (page) => {
         setListingLoading(true);
+        console.log('page num is ::>>>', page);
         const token = await getUserAuthToken();
         setGetUserAuth(token);
         try {
-            const response = await axios.get(`${BASE_URL}/getAllClothesJewels?page=${page}&limit=10`,{
+            const response = await axios.get(`${BASE_URL}/getAllClothesJewels?page=${page}&limit=10`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
             const finalResponseData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            console.log('finalResponseData is::>>>',finalResponseData);
-            if (response?.data?.data?.length > 0) {
-                // setEventsData((prevData) => [...prevData, ...finalResponseData]); // Append new data
-                setCurrentPage(page);
-            } else {
+    
+            // If there's no data on this page, stop pagination
+            if (finalResponseData.length === 0) {
+                setHasMore(false);
                 setListingLoading(false);
-                setHasMore(false); // No more data to load
+                return;
             }
-
-            if(componentType === 'discount' || componentType === 'new'){
-                const filteredDiscountItems = finalResponseData?.filter(category => category?.componentType === componentType);
-                // setCategories(filteredDiscountItems);
-                setCategories((prevData) => [...prevData, ...filteredDiscountItems]);
-            }else if(catType === 'jewels' || catType === 'clothes'){
-            const filteredCategories = finalResponseData?.filter(category => category?.categoryType === catType);
-            // setCategories(filteredCategories);
-            setCategories((prevData) => [...prevData, ...filteredCategories]);
-            }else if(catType === 'mens' || catType === 'womens'){
-                const filteredCategories = finalResponseData?.filter(category => 
+    
+            let filteredData = [];
+            if (componentType === 'discount' || componentType === 'new') {
+                filteredData = finalResponseData?.filter(category => category?.componentType === componentType);
+            } else if (catType === 'jewels' || catType === 'clothes') {
+                filteredData = finalResponseData?.filter(category => category?.categoryType === catType);
+            } else if (catType === 'mens' || catType === 'womens') {
+                filteredData = finalResponseData?.filter(category =>
                     category?.categoryType === 'clothes' && category?.genderType === catType
                 );
-                setCategories((prevData) => [...prevData, ...filteredCategories]);
-                }else{
-                const filteredData=  finalResponseData.filter(item => item?.jewellaryType === catType.toLowerCase());
-                setCategories((prevData) => [...prevData, ...filteredData]);
+            } else {
+                filteredData = finalResponseData.filter(item => item?.jewellaryType === catType.toLowerCase());
             }
+    
+            // Filter out duplicates based on _id
+            const uniqueItems = filteredData.filter(newItem => {
+                return !categories.some(existingItem => existingItem._id === newItem._id);
+            });
+    
+            // Append new unique items to the existing list
+            setCategories((prevData) => [...prevData, ...uniqueItems]);
+    
+            // Update current page and stop loading more if less than 10 items were loaded
+            if (finalResponseData.length < 10) {
+                setHasMore(false);
+            }
+            setCurrentPage(page);
+    
         } catch (error) {
             console.log("categories::::::::::", error);
-            setListingLoading(false);
-
         } finally {
             setLoading(false);
             setListingLoading(false); // Set loading to false after data is fetched
         }
-    }
+    };
 
     const navigation = useNavigation();
 
     const renderItem = ({ item }) => {
         const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
 
+        // console.log('gendertype is::>>>>',item?.genderType);
         const originalPrice = item?.rentPricePerDay;
         const discountPercentage = item?.discountPercentage;
         const strikethroughPrice = discountPercentage
@@ -88,7 +93,7 @@ const CategoriesList = ({ route }) => {
 
         return (
             <View style={{}}>
-                <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })}
+                <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id,genderType: item?.genderType })}
                     style={{ elevation: 5, width: Dimensions.get('window').width / 2.2, margin: 5, borderRadius: 8, backgroundColor: 'white', height: 'auto' }}>
                     <FastImage source={{ uri: updatedImgUrl,
                         headers:{Authorization : `Bearer ${getUserAuth}`}
@@ -134,7 +139,7 @@ const CategoriesList = ({ route }) => {
     }
 
     const loadMoreClothJewels = () => {
-        if (hasMore && !loading) {
+        if (hasMore && !loading && !listLoading) {
             console.log('hasmore values::>>>',hasMore,loading);
             getCategories(currentPage + 1);
         }
@@ -156,6 +161,7 @@ const CategoriesList = ({ route }) => {
             </View>
 
             <View style={{ marginBottom: "10%" }}>
+                <Text style={{alignSelf:'center'}}>{categories?.length} products</Text>
                 {loading ? (
                     <ActivityIndicator size="large" color={themevariable.Color_202020} style={{ marginTop: 20 }} />
                 ) : (

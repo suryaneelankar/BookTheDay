@@ -49,22 +49,13 @@ const ViewHireDetails = ({ route }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [specifcadditionalImages, setSpecificAdditionImages] = useState([]);
     const [HireImage, setHireImage] = useState('');
-    const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
-    const [selectedDate, setSelectedDate] = useState('');
-    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-    const [selectedTime, setSelectedTime] = useState('');
     const [selectedRange, setSelectedRange] = useState({
         startDate: '',
         endDate: '',
     });
     const [numberOfDays, setNumberOfDays] = useState(0);
 
-    const photos = [
-        { uri: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg' },
-        { uri: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg' },
-        { uri: 'https://t4.ftcdn.net/jpg/06/35/20/15/360_F_635201516_G2TFpFPoFA6utXYNgFlgPJGwU24mj6CJ.jpg' },
-        // Add more photos as needed
-    ];
+
     useEffect(() => {
         getSpecificDetails();
         // requestGalleryPermission();

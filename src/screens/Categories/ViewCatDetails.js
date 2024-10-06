@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, SafeAreaView, Image, ScrollView,Alert, TouchableOpacity, Dimensions, StyleSheet, Animated } from "react-native";
+import { View, Text, SafeAreaView, Image, ScrollView, Alert, TouchableOpacity, Dimensions, StyleSheet, Animated } from "react-native";
 import Avatar from "../../components/NameAvatar";
 import TruestedMarkGray from '../../assets/svgs/trustedMarkGray.svg';
 // import VegNonVegIcon from '../../assets/svgs/vegNonveg.svg';
@@ -32,21 +32,41 @@ const ViewCatDetails = ({ route }) => {
     // const { width } = Dimensions.get('window').width;
     const [activeIndex, setActiveIndex] = useState(0);
     const navigation = useNavigation();
-    const { catId } = route.params;
+    const { catId, genderType } = route.params;
     const [specifcadditionalImages, setSpecificAdditionImages] = useState([]);
     const touchCoordinates = new Animated.Value(0);
     const [jewelleryDetails, setJewelleryDetails] = useState()
     const [isVisible, setIsVisible] = useState(false);
-    const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
-    const [selectedDate, setSelectedDate] = useState('');
-    const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-    const [selectedTime, setSelectedTime] = useState('');
     const [selectedRange, setSelectedRange] = useState({
         startDate: '',
         endDate: '',
     });
     const [numberOfDays, setNumberOfDays] = useState(0);
     const [getUserAuth, setGetUserAuth] = useState('');
+
+    console.log('catId is for test::>>',catId,genderType);
+
+    const womenSizes = [
+        { size: 'XS', bust: 32, waist: 26, hip: 34 },
+        { size: 'S', bust: 34, waist: 28, hip: 36 },
+        { size: 'M', bust: 36, waist: 30, hip: 38 },
+        { size: 'L', bust: 38, waist: 32, hip: 40 },
+        { size: 'XL', bust: 40, waist: 34, hip: 42 },
+        { size: 'XXL', bust: 42, waist: 36, hip: 44 },
+        { size: 'XXXL', bust: 44, waist: 38, hip: 46 },
+    ];
+
+    const menSizes = [
+        { size: 'XS', chest: '34-36', waist: '28-30' },
+        { size: 'S', chest: '36-38', waist: '30-32' },
+        { size: 'M', chest: '38-40', waist: '32-34' },
+        { size: 'L', chest: '40-42', waist: '34-36' },
+        { size: 'XL', chest: '42-44', waist: '36-38' },
+        { size: 'XXL', chest: '44-46', waist: '38-40' },
+        { size: 'XXXL', chest: '46-48', waist: '40-42' },
+    ];
+
+    const defaultDescription = 'Elevate your style without the commitment! Discover our curated collection of premium, designer, and trendy outfits for every occasion—whether its a wedding, party, corporate event, or casual outing. With our hassle-free rental process, you can enjoy high-quality garments at a fraction of the cost. Choose from an array of sizes and styles to suit your unique taste, all cleaned and prepped for a fresh, fabulous look. Renting your favorite pieces has never been easier or more sustainable!'
 
 
     useEffect(() => {
@@ -57,10 +77,10 @@ const ViewCatDetails = ({ route }) => {
         const token = await getUserAuthToken();
         setGetUserAuth(token);
         try {
-            const response = await axios.get(`${BASE_URL}/getClothJewelsById/${catId}`,{
+            const response = await axios.get(`${BASE_URL}/getClothJewelsById/${catId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
             console.log("categories each ::::::::::", JSON.stringify(response?.data));
             setJewelleryDetails(response?.data)
@@ -77,46 +97,29 @@ const ViewCatDetails = ({ route }) => {
 
     const onDayPress = (day) => {
         const { startDate, endDate } = selectedRange;
-    
-        if (selectedOption === 'monthly') {
-          // Set start date and end date to 30 days after start date for monthly option
-          const endDate = moment(day.dateString).add(29, 'days').format('YYYY-MM-DD');
-          setSelectedRange({ startDate: day.dateString, endDate });
-        //   setNumberOfDays(31); // 30 days + 1 to include both start and end date
-        } else {
-          // If start date is not set or both dates are set, set the start date
-          if (!startDate || (startDate && endDate)) {
-            setSelectedRange({ startDate: day.dateString, endDate: '' });
-            setNumberOfDays(1); // Reset number of days when selecting a new start date
-          } else if (startDate && !endDate) {
-            // Ensure the end date is after the start date
-            if (moment(day.dateString).isAfter(moment(startDate))) {
-              setSelectedRange({ startDate, endDate: day.dateString });
-              const days = moment(day.dateString).diff(moment(startDate), 'days') + 1; // Include both start and end dates
-              setNumberOfDays(days);
-            } else {
-              Alert.alert('Invalid date selection', 'End date must be after start date.');
-            }
-          }
-        }
-      };
-    // const onDayPress = (day) => {
-    //     const { startDate, endDate } = selectedRange;
 
-    //     // If start date is not set or both dates are set, set the start date
-    //     if (!startDate || (startDate && endDate)) {
-    //         setSelectedRange({ startDate: day.dateString, endDate: '' });
-    //     } else if (startDate && !endDate) {
-    //         // Ensure the end date is after the start date
-    //         if (moment(day.dateString).isAfter(moment(startDate))) {
-    //             setSelectedRange({ startDate, endDate: day.dateString });
-    //             const days = moment(day.dateString).diff(moment(startDate), 'days') + 1; // Include both start and end dates
-    //             setNumberOfDays(days);
-    //         } else {
-    //             Alert.alert('Invalid date selection', 'End date must be after start date.');
-    //         }
-    //     }
-    // };
+        if (selectedOption === 'monthly') {
+            // Set start date and end date to 30 days after start date for monthly option
+            const endDate = moment(day.dateString).add(29, 'days').format('YYYY-MM-DD');
+            setSelectedRange({ startDate: day.dateString, endDate });
+            //   setNumberOfDays(31); // 30 days + 1 to include both start and end date
+        } else {
+            // If start date is not set or both dates are set, set the start date
+            if (!startDate || (startDate && endDate)) {
+                setSelectedRange({ startDate: day.dateString, endDate: '' });
+                setNumberOfDays(1); // Reset number of days when selecting a new start date
+            } else if (startDate && !endDate) {
+                // Ensure the end date is after the start date
+                if (moment(day.dateString).isAfter(moment(startDate))) {
+                    setSelectedRange({ startDate, endDate: day.dateString });
+                    const days = moment(day.dateString).diff(moment(startDate), 'days') + 1; // Include both start and end dates
+                    setNumberOfDays(days);
+                } else {
+                    Alert.alert('Invalid date selection', 'End date must be after start date.');
+                }
+            }
+        }
+    };
 
     console.log("numofDAYS IS::::::::::", numberOfDays)
     const getMarkedDates = () => {
@@ -167,12 +170,11 @@ const ViewCatDetails = ({ route }) => {
 
     const handleBookDatesPress = () => {
         setIsVisible(true)
-        //  navigation.navigate('SelectDateTime',{productNav: true})
     };
 
 
     return (
-        <SafeAreaView style={{flex:1}}>
+        <SafeAreaView style={{ flex: 1 }}>
             <ScrollView style={{ marginBottom: '15%' }}>
                 <View style={{ backgroundColor: "white", }}>
 
@@ -185,9 +187,10 @@ const ViewCatDetails = ({ route }) => {
                     >
                         {specifcadditionalImages.map((item, index) => (
                             <View style={styles.slide} key={index}>
-                                <FastImage resizeMode='contain' source={{ uri: item?.uri,
-                                    headers:{Authorization : `Bearer ${getUserAuth}`}
-                                 }} style={[styles.image, { width: '90%' }]} />
+                                <FastImage resizeMode='contain' source={{
+                                    uri: item?.uri,
+                                    headers: { Authorization: `Bearer ${getUserAuth}` }
+                                }} style={[styles.image, { width: '90%' }]} />
                             </View>
                         ))}
                     </Swiper>
@@ -198,7 +201,7 @@ const ViewCatDetails = ({ route }) => {
                     </View>
 
                     <View style={{ marginBottom: 20, marginHorizontal: 20, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                        <Text style={{ color: "#9095A6", fontSize: 12, fontWeight: "500", fontFamily: "ManropeRegular", }}>Size : (M) {jewelleryDetails?.professionalImage?.size} cm</Text>
+                        <Text style={{ color: "#9095A6", fontSize: 14, fontWeight: "500", fontFamily: "ManropeRegular", }}>Size : {jewelleryDetails?.size}</Text>
 
                         <View style={{ flexDirection: "row", backgroundColor: "#FFF8F0", paddingVertical: 5, paddingHorizontal: 10, borderRadius: 10 }}>
                             <TruestedMarkOrange />
@@ -210,21 +213,37 @@ const ViewCatDetails = ({ route }) => {
                 </View>
                 <View style={{ borderRadius: 10, backgroundColor: "white", marginHorizontal: 15, marginTop: 15, paddingHorizontal: 20, paddingVertical: 20 }}>
                     <Text style={{ color: "#121212", fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular", }}>Description</Text>
-
+                    <Text style={{ marginBottom: 20, marginTop: 5, color: "#393C47", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>{defaultDescription}</Text>
                     <Text style={{ marginBottom: 20, marginTop: 5, color: "#393C47", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>{jewelleryDetails?.description}</Text>
-                    <ProductInfoCard />
+                    <ProductInfoCard color={jewelleryDetails?.color} size={jewelleryDetails?.size}/>
+                </View>
+
+                <View style={{ width: '92%', alignSelf: 'center', marginTop: 20 }}>
+                    <View style={styles.headerRow}>
+                        <Text style={styles.headerText}>Size</Text>
+                        <Text style={styles.headerText}>{genderType == 'womens' ? 'Bust (inches)' : 'Chest (inches)'}</Text>
+                        <Text style={styles.headerText}>Waist (inches)</Text>
+                        {genderType == 'womens' && <Text style={styles.headerText}>Hip (inches)</Text>}
+                    </View>
+
+                    {/* Dynamically render the appropriate size chart */}
+                    {(genderType == 'mens' ? menSizes : womenSizes).map((item, index) => (
+                        <View key={index} style={styles.dataRow}>
+                            <Text style={styles.cellText}>{item.size}</Text>
+                            <Text style={styles.cellText}>{genderType == 'womens' ? item.bust : item.chest}</Text>
+                            <Text style={styles.cellText}>{item.waist}</Text>
+                            {genderType == 'womens' && <Text style={styles.cellText}>{item.hip}</Text>}
+                        </View>
+                    ))}
                 </View>
                 <View style={{ marginTop: 10, marginBottom: 20 }}>
                     <PricingOptions
                         onSelect={handleSelect}
                         dailyPrice={jewelleryDetails?.rentPricePerDay}
-                        // monthlyPrice={jewelleryDetails?.rentPricePerMonth}
                     />
                 </View>
-
-
-                {/* <BookDatesButton onPress={handleBookDatesPress} width={25} text={'Book Dates'} padding={12} /> */}
             </ScrollView>
+
             <View style={{ position: 'absolute', bottom: 0 }}>
                 <BookDatesButton onPress={handleBookDatesPress} text={'Book Dates'} padding={12} />
             </View>
@@ -275,18 +294,6 @@ const ViewCatDetails = ({ route }) => {
                         }}
                         style={{ marginTop: 20, marginHorizontal: 25, borderRadius: 10 }}
                     />
-                    {/* <Calendar
-                        onDayPress={(day) => setSelectedDate(day.dateString)}
-                        headerStyle={{ backgroundColor: "#FDEEBC" }}
-                        // customHeaderTitle={}
-                        markedDates={{ [selectedDate]: { selected: true, marked: true, selectedColor: '#ED5065' } }}
-                        theme={{
-                            arrowColor: 'black',
-                            todayTextColor: '#ED5065',
-                            selectedDayBackgroundColor: '#FFC107',
-                        }}
-                        style={{ marginTop: 20, marginHorizontal: 25, borderRadius: 10 }}
-                    /> */}
 
                     <Animated.View
                         style={{
@@ -335,21 +342,10 @@ const ViewCatDetails = ({ route }) => {
                             bottom: -20
                             //  top: 0
                         }}>
-                            {/* <Text style={{ color: "#333333", fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular", }}>Select Time Slot</Text>
-                            <Text style={{ marginTop: 10, color: "#333333", fontSize: 16, fontWeight: "500", fontFamily: "ManropeRegular", }}>Preferred Time</Text>
 
-                            <TouchableOpacity style={{ flexDirection: "row", alignItems: "center", marginBottom: 40, marginTop: 10, padding: 10, borderRadius: 5, borderColor: '#CFD0D5', borderWidth: 1 }}>
-                                <Text style={{ width: "90%", color: "#ABABAB", fontSize: 14, fontWeight: "400", fontFamily: "ManropeRegular", }}>Pick A Time</Text>
-                                <ClockIcon />
-                            </TouchableOpacity> */}
                             <BookDatesButton onPress={() => {
                                 setIsVisible(false),
-                                navigation.navigate("BookingDetailsScreen",{catId: catId, NumOfDays: numberOfDays, isDayOrMonthly: selectedOption, monthlyPrice: jewelleryDetails?.rentPricePerMonth, startDate: selectedRange?.startDate, endDate: selectedRange?.endDate })
-                                // if (productNav) {
-                                //   callNavigation()
-                                // } else {
-                                //   setThankYouCardVisible(true);
-                                // }
+                                    navigation.navigate("BookingDetailsScreen", { catId: catId, NumOfDays: numberOfDays, isDayOrMonthly: selectedOption, monthlyPrice: jewelleryDetails?.rentPricePerMonth, startDate: selectedRange?.startDate, endDate: selectedRange?.endDate })
                             }}
                                 text={'Submit'} padding={10} />
                         </View>
@@ -361,7 +357,7 @@ const ViewCatDetails = ({ route }) => {
 
             </Modal>
 
-        </SafeAreaView>
+        </SafeAreaView >
     )
 }
 
@@ -485,5 +481,39 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    sizeContainer: {
+        padding: 10,
+        backgroundColor: '#f8f9fa',
+    },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        backgroundColor: '#FFF4CF',
+        borderColor: '#FFDA56',
+        borderWidth: 1,
+        padding: 10,
+        borderRadius: 5,
+    },
+    headerText: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        flex: 1,
+        textAlign: 'center',
+    },
+    dataRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        backgroundColor: '#fff',
+        padding: 10,
+        marginTop: 5,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+    },
+    cellText: {
+        fontSize: 14,
+        flex: 1,
+        textAlign: 'center',
     },
 })
