@@ -3,8 +3,6 @@ import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, 
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
-import SelectField from '../../../commonFields/SelectField';
-import UploadIcon from '../../../assets/svgs/uploadIcon.svg';
 import SelectedUploadIcon from '../../../assets/svgs/selectedUploadIcon.svg';
 import { Dropdown } from 'react-native-element-dropdown';
 import { launchImageLibrary } from 'react-native-image-picker';
