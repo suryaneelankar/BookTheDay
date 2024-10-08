@@ -16,6 +16,8 @@ const LocationPicker = ({ onLocationSelected }) => {
   const [searchLocation, setSearchLocation] = useState();
 
   const [completeAddress, setCompleteAddress] = useState();
+  const [subDivisionArea, setSubDivisionArea] = useState();
+
 
   useEffect(() => {
     getPermissions();
@@ -168,7 +170,9 @@ const LocationPicker = ({ onLocationSelected }) => {
       pinCode,
       label,
       region,
+      subDivisionArea,
     };
+    console.log("passing data::::::", locationData, '+++++++++++++', completeAddress)
     onLocationSelected(locationData, completeAddress);
   };
 
@@ -190,7 +194,7 @@ const LocationPicker = ({ onLocationSelected }) => {
             const { lat, lng } = details.geometry.location;
             console.log("details is:::::::::", data);
             setSearchLocation(data?.description);
-
+            setSubDivisionArea(data?.structured_formatting?.main_text);
             setSelectedLocation({ latitude: lat, longitude: lng });
             setRegion({
               latitude: lat,

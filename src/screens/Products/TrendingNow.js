@@ -52,6 +52,7 @@ const TrendingNow = ({ data, textHeader , token}) => {
         return (
             <View style={{}}>
                 <TouchableOpacity
+                    onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })}
                     style={{ width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginLeft: 16 }}>
                     <FastImage  source={{ uri: updatedImgUrl ,
                         headers:{Authorization : `Bearer ${token}`}

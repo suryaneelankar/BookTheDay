@@ -31,12 +31,16 @@ import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import LocationPicker from '../../../components/LocationPicker';
 import DetectLocation from '../../../assets/svgs/detectLocation.svg';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import FoodMenu from '../../../components/VendorAddOwnCombo';
+import CustomModal from '../../../components/AlertModal';
 
 
 
 
 const GeneralDetails = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [comboModalSuccess, setcomboModalSuccess] = useState(false);
+
     const [overTimeCharges, setOverTimeCharges] = useState();
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [foodCateringName, setFoodCateringName] = useState('');
@@ -100,7 +104,6 @@ const GeneralDetails = () => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            console.log("foodmenu items::::::::", JSON.stringify(response?.data?.data[0]?.foodMenuItems));
             setFoodMenuItems(response?.data?.data[0]?.foodMenuItems);
         } catch (error) {
             console.log("events data error>>::", error);
@@ -305,7 +308,6 @@ const GeneralDetails = () => {
             );
         };
 
-
         const renderItem = ({ item, index }) => {
             const currentSelected = item._id === selectedId;
             console.log("curenntsle", currentSelected);
@@ -449,6 +451,11 @@ const GeneralDetails = () => {
             </View>
         );
     };
+    const [finalCombomenu, setFinalComboMenu] = useState([]);
+     // Initial processing of items
+     useEffect(() => {
+        setFinalComboMenu(processItems());
+    }, [selectedItems, customisedItems, comboPrice, minOrderMembers]);
 
     const processItems = () => {
         return Object.keys(selectedItems).map(id => ({
@@ -459,7 +466,8 @@ const GeneralDetails = () => {
         }));
     };
 
-    const finalCombomenu = processItems();
+   
+
 
     console.log("Processed items:", finalCombomenu);
 
@@ -620,7 +628,7 @@ const GeneralDetails = () => {
 
     const onPressSaveAndPost = async () => {
         if (!mainImageUrl || foodCateringName === '' || cateringDescription === '' || cateringCity === '' ||
-            cateringAddress === '' || cateringPincode === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '') || (discountPercentage === undefined || discountPercentage === '') || finalCombomenu?.length === 0
+            cateringAddress === '' || cateringPincode === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '') || finalCombomenu?.length === 0
         ) {
             Alert.alert('Please fill Mandatory fields');
             return;
@@ -768,8 +776,8 @@ const GeneralDetails = () => {
     };
 
     const handleLocationSelected = (location, address) => {
-        console.log('Selected Location:', location, address);
-        setLocationCountyVal(location?.address?.county);
+        console.log('Selected Location food:', location, address);
+        setLocationCountyVal(location?.subDivisionArea);
         setLocationLatitude(location?.region?.latitude);
         setLocationLongitude(location?.region?.longitude);
 
@@ -846,9 +854,20 @@ const GeneralDetails = () => {
 
                     <Text style={styles.title}>Add Menu Items</Text>
                     <View style={styles.mainContainer}>
-                        {RentalItemsList()}
+                        <FoodMenu onSaveClick={(menuItems) => {
+                            setcomboModalSuccess(true);
+                            setFinalComboMenu(prevMenu => [...prevMenu, ...menuItems]);
+
+                        }} />
+                        {/* {RentalItemsList()} */}
                         {/* {ItemList()} */}
                     </View>
+
+                    <CustomModal
+                    visible={comboModalSuccess}
+                    message={'Combo Successfully Added'}
+                    onClose={() => setcomboModalSuccess(false)}
+                />
 
                     {finalCombomenu?.length > 0 ?
                         <View style={styles.mainContainer}>
