@@ -614,9 +614,9 @@ const GeneralDetails = () => {
     };
 
     const handleLocationSelected = (location, address) => {
-        console.log('Selected Location:', location, "+++++++++",address);
+        console.log('Selected Location halls:', location, "+++++++++",address);
         setfunctionHallAddress(address);
-        setLocationCountyVal(location?.address?.county);
+        setLocationCountyVal(location?.subDivisionArea);
         setLocationLatitude(location?.region?.latitude);
         setLocationLongitude(location?.region?.longitude);
         setfunctionHallCity(location?.address?.city);

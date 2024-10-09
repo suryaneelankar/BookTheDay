@@ -202,7 +202,8 @@ const HomeDashboard = () => {
         return (
             <View style={{}}>
                 <TouchableOpacity
-                    style={{ elevation: 5, width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginEnd: 10 }}>
+                     onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })}
+                    style={{ elevation: 5, width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto',marginEnd:10 }}>
                     <FastImage source={{
                         uri: updatedImgUrl,
                         headers: { Authorization: `Bearer ${getUserAuth}` }

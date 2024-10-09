@@ -257,6 +257,9 @@ const GeneralDetails = () => {
 
         if (!mainImageUrl || productName === '' || productDescription === '' || productCity === '' ||
             (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || productPinCode === '' || (securityDeposit === undefined || securityDeposit === '') || (advanceAmount === undefined || advanceAmount === '') || (selectedOption == null)
+            || (selectedColor === '' && ((selectedOption !== null 
+                && selectedOption === 'clothes'))) || (clothSize === '' && ((selectedOption !== null 
+                    && selectedOption === 'clothes')))
         ) {
             Alert.alert('Please fill Mandatory fields');
             return;
@@ -363,8 +366,8 @@ const GeneralDetails = () => {
     };
 
     const handleLocationSelected = (location, address) => {
-        console.log('Selected Location:', location, address);
-        setLocationCountyVal(location?.address?.county);
+        console.log('Selected Location products:', location, address);
+        setLocationCountyVal(location?.subDivisionArea);
         setLocationLatitude(location?.region?.latitude);
         setLocationLongitude(location?.region?.longitude);
         setProductAddress(address);

@@ -322,7 +322,7 @@ const GeneralDetails = () => {
     };
 
     const handleLocationSelected = (location, address) => {
-        console.log('Selected Location:', location, address);
+        console.log('Selected Location :', location, address);
         seteventOrgAddress(address);
         seteventOrgCity(location?.address?.city);
         seteventOrgPinCode(location.pinCode);
