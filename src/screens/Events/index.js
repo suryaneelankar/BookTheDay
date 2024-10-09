@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions, FlatList, Pressable, SafeAreaView, ActivityIndicator } from 'react-native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";
@@ -12,6 +12,8 @@ import { verticalScale } from "../../utils/scalingMetrics";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
 import { useSelector } from "react-redux";
+import { Dropdown } from 'react-native-element-dropdown';
+import themevariable from "../../utils/themevariable";
 
 const Events = () => {
     const navigation = useNavigation();
@@ -19,40 +21,31 @@ const Events = () => {
     const [getUserAuth, setGetUserAuth] = useState('');
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const [nearByCurrentPage, setNearByCurrentPage] = useState(1);
     const [nearByData, setNearByData] = useState([]);
-    const [hasMoreNearBy, setHasMoreNearBy] = useState(true);
-    const [nearByLoading, setNearByLoading] = useState(false);
     const [nearByClicked, setNearByClicked] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const userLocationFetched = useSelector((state) => state.userLocation);
-    const [totalNearByPages,setTotalNearByPages] = useState(0);
     const [totalEventPages,setTotalEventPages] = useState(0);
+    const [clothSize, setClothSize] = useState(null);
+    const clothesSizeData = [
+        { label: 'Gachibowli', value: 'Gachibowli' },
+        { label: 'Kondapur', value: 'Kondapur' },
+        { label: 'Madhapur', value: 'Madhapur' },
+        { label: 'Mehdipatnam', value: 'Mehdipatnam' },
+        { label: 'Ameerpet', value: 'Ameerpet' },
+        { label: 'Yousufguda', value: 'Yousufguda' },
+        { label: 'Nanakramguda', value: 'Nanakramguda' },
+        { label: 'Madhuranagar', value: 'Madhuranagar' },
+        { label: 'ECIL', value: 'ECIL' },
+        { label: 'BHEL', value: 'BHEL' },
+        { label: 'Lingampally', value: 'Lingampally' },
+        { label: 'Serlingampally', value: 'Serlingampally' }
+    ];
     console.log('userLocationFetched is::>>',userLocationFetched?.latitude,userLocationFetched?.longitude);
 
     useEffect(() => {
         getAllEvents(currentPage);
     }, [])
-
-    const handleAllEventsPress = async () => {
-        // Reset the current page and data
-        setNearByClicked(false); // Set "All events" view
-        setCurrentPage(1); // Reset page to 1
-        setNearByCurrentPage(1); // Reset nearby page to 1
-        setEventsData([]); // Clear current event data
-        setHasMore(true); // Reset pagination control
-        await getAllEvents(1); // Fetch initial page of all events
-    };
-    
-    const handleNearByEventsPress = async () => {
-        // Reset the nearby page and data
-        setNearByClicked(true); // Set "Nearby" view
-        setCurrentPage(1); // Reset page to 1
-        setNearByCurrentPage(1); // Reset nearby page to 1
-        setNearByData([]); // Clear nearby event data
-        setHasMoreNearBy(true); // Reset pagination control
-        await getNearByEvents(1); // Fetch initial page of nearby events
-    };
     
     // This function loads more function halls (all events) and ensures the page is incremented correctly
     const loadMoreFunctionHalls = () => {
@@ -63,14 +56,6 @@ const Events = () => {
     };
     
     // This function loads more nearby function halls and ensures the page is incremented correctly
-    const loadMoreNearByFunctionHalls = () => {
-        if (hasMoreNearBy && !nearByLoading && nearByCurrentPage < totalNearByPages) {
-            getNearByEvents(nearByCurrentPage + 1); // Fetch the next page
-            setNearByCurrentPage((prev) => prev + 1); // Increment page number
-        }
-    };
-    
-
     const getAllEvents = async (page) => {
         setNearByData([]);
         setLoading(true);
@@ -97,37 +82,6 @@ const Events = () => {
             console.error('Error fetching function halls:', error);
         }
         setLoading(false);
-    }
-
-    const getNearByEvents = async (nearByPage) => {
-        const userLat = userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude;
-        const userLong = userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude;
-        console.log('userLatitude in api call::>>',userLocationFetched?.lat,userLocationFetched?.lon);
-        setEventsData([]);
-        setNearByLoading(true);
-        const token = await getUserAuthToken();
-        setGetUserAuth(token);
-        try {
-            const response = await axios.get(`${BASE_URL}/getNearByFunctionHalls?page=${nearByPage}&limit=10&latitude=${userLat}&longitude=${userLong}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            const newFunctionHalls = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            // console.log('resp is::>>>', response?.data);
-            setTotalNearByPages(response?.data?.totalPages);
-            if (response?.data?.data?.length > 0) {
-                setNearByData((prevData) => [...prevData, ...newFunctionHalls]); // Append new data
-                setNearByCurrentPage(nearByPage);
-            } else {
-                setHasMoreNearBy(false); // No more data to load
-            }
-        } catch (error) {
-            setNearByLoading(false);
-            console.error('Error fetching function halls:', error);
-        }
-        setNearByLoading(false);
     }
 
     const renderItem = ({ item }) => {
@@ -214,17 +168,27 @@ const Events = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
-            <View style={{ backgroundColor: "white" }}>
-                <View style={styles.searchProduct}>
-                    <View style={styles.searchProHeader}>
-                        <SearchIcon style={{ marginLeft: verticalScale(20) }} />
-                        <TextInput
-                            placeholder="Search fashion"
-                            style={styles.textInput} />
-                        <FilterIcon />
-                    </View>
-                </View>
-                {/* <CategoryFilter onCategoryChange={handleCategoryChange} /> */}
+            <View style={{ backgroundColor: "white",alignSelf:'center',padding:10 }}>
+                        <Dropdown
+                            style={[styles.dropdown]}
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            iconStyle={styles.iconStyle}
+                            data={clothesSizeData}
+                            activeColor={'#f0e68c'}
+                            selectedStyle={{ backgroundColor: "red" }}
+                            maxHeight={300}
+                            search
+                            labelField="label"
+                            valueField="value"
+                            placeholder={'Search location...'}
+                            value={clothSize}
+                            containerStyle={{ borderColor: "orange", borderWidth: 1, borderRadius: 5 }}
+                            onChange={item => {
+                                setClothSize(item.value);
+                            }}
+                        />
             </View>
 
             <View style={{ marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
@@ -232,17 +196,8 @@ const Events = () => {
                     <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
                     <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Function Halls</Text>
                 </View>
-                <TouchableOpacity style={{ marginTop: 20 }} onPress={() => { handleAllEventsPress() }}>
-                    <Text style={{ backgroundColor: 'orange', borderRadius: 10, padding: 10, fontWeight: '800', fontFamily: "ManropeRegular", }}>All events</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={{ marginTop: 20 }} onPress={() => { handleNearByEventsPress() }}>
-                    <Text style={{ backgroundColor: 'orange', borderRadius: 10, padding: 10, fontWeight: '800', fontFamily: "ManropeRegular", }}>Near By</Text>
-                </TouchableOpacity>
-
             </View>
 
-
-            {!nearByClicked ?
                 <FlatList
                     data={eventsData}
                     renderItem={renderItem}
@@ -258,23 +213,7 @@ const Events = () => {
                         </View>
                     }
                 />
-                :
-                <FlatList
-                    data={nearByData}
-                    renderItem={renderItem}
-                    keyExtractor={(item) => item._id}
-                    onEndReached={loadMoreNearByFunctionHalls} // Fetch more when list ends
-                    onEndReachedThreshold={0.1} // Trigger when user scrolls near the bottom
-                    ListFooterComponent={() =>
-                        nearByLoading ? <ActivityIndicator size="large" color="orange" /> : null
-                    }
-                    ListEmptyComponent={
-                        <View >
-                            <Text>{nearByData?.length == 0 ? 'No Near By Function halls Available please check in all' : 'No Function halls found'}</Text>
-                        </View>
-                    }
-                />
-            }
+
         </SafeAreaView>
     )
 }
@@ -290,6 +229,35 @@ const styles = StyleSheet.create({
     },
     wrapper: {
         height: 200,
+    },
+    dropdown: {
+        height: 50,
+        width: 350,
+        borderWidth: 1,
+        marginTop: 10,
+        borderColor: themevariable.Color_C8C8C6,
+        paddingHorizontal: 12,
+        borderRadius: 5
+    },
+    placeholderStyle: {
+        fontSize: 14,
+        color: "gray",
+        fontFamily: 'ManropeRegular',
+        fontWeight: "400"
+    },
+    selectedTextStyle: {
+        fontSize: 14,
+        color: "black",
+        fontFamily: 'ManropeRegular',
+        fontWeight: "400",
+    },
+    iconStyle: {
+        width: 25,
+        height: 25,
+    },
+    inputSearchStyle: {
+        height: 40,
+        fontSize: 16,
     },
     strickedoffer: {
         fontSize: 12,
