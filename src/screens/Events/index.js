@@ -14,6 +14,8 @@ import FastImage from "react-native-fast-image";
 import { useSelector } from "react-redux";
 import { Dropdown } from 'react-native-element-dropdown';
 import themevariable from "../../utils/themevariable";
+import Autocomplete from 'react-native-autocomplete-input';
+
 
 const Events = () => {
     const navigation = useNavigation();
@@ -42,9 +44,24 @@ const Events = () => {
         { label: 'Serlingampally', value: 'Serlingampally' }
     ];
     console.log('userLocationFetched is::>>',userLocationFetched?.latitude,userLocationFetched?.longitude);
+    const [totalNearByPages, setTotalNearByPages] = useState(0);
+    const [allLocations, setAllLocations] = useState([]);
+    const [selectedLocation, setSelectedLocation] = useState([]);
+    const [query, setQuery] = useState('');
+    const [dropdownVisible, setDropdownVisible] = useState(false);  // New state to handle dropdown visibility
+
+
+
+    // console.log("user selevcted address is events::::::::", userLocationFetched)
+
+    // const [userLatitude,setUserLatitude] = useState(userLocationFetched?.latitude);
+    // const [userLongitude,setUserLongitude] = useState(userLocationFetched?.longitude);
+    // console.log("latitue long", userLatitude ,'+++++++++', userLongitude);
+    console.log('userLocationFetched is::>>', userLocationFetched?.latitude, userLocationFetched?.longitude);
 
     useEffect(() => {
         getAllEvents(currentPage);
+        getAllLocations();
     }, [])
     
     // This function loads more function halls (all events) and ensures the page is incremented correctly
@@ -54,7 +71,7 @@ const Events = () => {
             setCurrentPage((prev) => prev + 1); // Increment page number
         }
     };
-    
+
     // This function loads more nearby function halls and ensures the page is incremented correctly
     const getAllEvents = async (page) => {
         setNearByData([]);
@@ -82,7 +99,45 @@ const Events = () => {
             console.error('Error fetching function halls:', error);
         }
         setLoading(false);
-    }
+    };
+
+    const getAllEventsByLocation = async (value) => {
+        const token = await getUserAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/getAllFunctionHallsByLocation/${value}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            console.log("location select res:::::::", response);
+            setEventsData(response?.data?.data);
+        } catch (error) {
+            setLoading(false);
+            console.error('Error fetching function halls:', error);
+        }
+        setLoading(false);
+    };
+
+    const getAllLocations = async () => {
+        const token = await getUserAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/user/locationList`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log("all locations resL::::", response?.data);
+            setAllLocations(response?.data?.data);
+        } catch (error) {
+            setLoading(false);
+            console.error('Error fetching function halls:', error);
+        }
+        setLoading(false);
+    };
+    const filteredData = allLocations?.filter(item =>
+        item?.value.toLowerCase().includes(query.toLowerCase())
+    );
 
     const renderItem = ({ item }) => {
 
@@ -92,7 +147,7 @@ const Events = () => {
         const imageUrls = item?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
 
         return (
-            <View style={{ borderRadius: 20, marginHorizontal: 20, marginBottom: 5, elevation: -10 }}>
+            <View style={{ flex: 1, borderRadius: 20, marginHorizontal: 20, marginBottom: 5, elevation: -10 }}>
                 <View style={[styles.container]}>
                     <Swiper
                         style={styles.wrapper}
@@ -164,34 +219,58 @@ const Events = () => {
         }
         count = eventsData?.length;
         return count;
-    }
+    };
+    console.log("selected query is:::::::", query)
+    const handleQueryChange = (text) => {
+        setQuery(text);
+        if (text.length > 0) {
+            setDropdownVisible(true);  // Show dropdown when typing
+        } else {
+            setDropdownVisible(false);  // Hide dropdown if query is cleared
+        }
+        // Filter data logic can go here
+        // e.g. setFilteredData(filteredDataBasedOnQuery);
+    };
+    const handleSelect = (value) => {
+        setQuery(value);  // Set query to selected item value
+        setDropdownVisible(false);  // Hide dropdown after selection
+        getAllEventsByLocation(value)
+    };
+    
 
     return (
         <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
-            <View style={{ backgroundColor: "white",alignSelf:'center',padding:10 }}>
-                        <Dropdown
-                            style={[styles.dropdown]}
-                            placeholderStyle={styles.placeholderStyle}
-                            selectedTextStyle={styles.selectedTextStyle}
-                            inputSearchStyle={styles.inputSearchStyle}
-                            iconStyle={styles.iconStyle}
-                            data={clothesSizeData}
-                            activeColor={'#f0e68c'}
-                            selectedStyle={{ backgroundColor: "red" }}
-                            maxHeight={300}
-                            search
-                            labelField="label"
-                            valueField="value"
-                            placeholder={'Search location...'}
-                            value={clothSize}
-                            containerStyle={{ borderColor: "orange", borderWidth: 1, borderRadius: 5 }}
-                            onChange={item => {
-                                setClothSize(item.value);
-                            }}
-                        />
-            </View>
 
-            <View style={{ marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
+              <View style={styles.autocompleteContainer}>
+
+            <Autocomplete
+                data={dropdownVisible && filteredData?.length > 0 ? filteredData : []}  // Conditionally hide results based on dropdownVisible
+                value={query}
+                onChangeText={handleQueryChange}  // Handle query changes
+                placeholder="Seach Location..."
+                flatListProps={{
+                    keyExtractor: (item) => item?._id.toString(),
+                    renderItem: ({ item }) => (
+                        <TouchableOpacity onPress={() => handleSelect(item?.value)}>
+                            <Text style={{ padding: 10 }}>{item?.value}</Text>
+                        </TouchableOpacity>
+                    ),
+                }}
+                inputContainerStyle={{
+                    borderRadius: 15,
+                    height:50,
+                    width:"90%",
+                    alignSelf:"center",
+                    marginTop:10,
+                    backgroundColor:"#E3E3E7"
+                   
+                }}
+                style={{marginTop:3, borderRadius:15, width:"90%",alignSelf:"center",backgroundColor:"#E3E3E7"}}
+                hideResults={dropdownVisible === false || filteredData.length === 0}  // Hide results initially and when dropdownVisible is false
+                />
+                </View>
+
+            <View style={{marginTop:60, marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
                 <View>
                     <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
                     <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Function Halls</Text>
@@ -287,6 +366,34 @@ const styles = StyleSheet.create({
         borderWidth: 0.8,
         marginTop: 10,
         marginBottom: 15
+    },
+    autocompleteContainer: {
+        flex: 1,
+        left: 0,
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        zIndex: 1
+      },
+    dropdown: {
+        height: 50,
+        borderColor: themevariable.Color_C8C8C6,
+        borderWidth: 1,
+        borderRadius: 8,
+        paddingHorizontal: 10,
+        marginTop: 10
+    },
+    placeholderStyle: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: '500',
+        color: "gray",
+        fontSize: 14,
+    },
+    selectedText: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: '500',
+        color: "black",
+        fontSize: 14,
     },
     searchProHeader: {
         flexDirection: "row",
