@@ -14,6 +14,9 @@ import CategoryFilter from "../../components/CategoryFilter";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
 import { useSelector } from "react-redux";
+import themevariable from "../../utils/themevariable";
+import Autocomplete from 'react-native-autocomplete-input';
+
 
 const Events = () => {
     const navigation = useNavigation();
@@ -28,17 +31,25 @@ const Events = () => {
     const [nearByClicked, setNearByClicked] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const userLocationFetched = useSelector((state) => state.userLocation);
-    const [totalNearByPages,setTotalNearByPages] = useState(0);
-    const [totalEventPages,setTotalEventPages] = useState(0);
+    const [totalNearByPages, setTotalNearByPages] = useState(0);
+    const [totalEventPages, setTotalEventPages] = useState(0);
+    const [allLocations, setAllLocations] = useState([]);
+    const [selectedLocation, setSelectedLocation] = useState([]);
+    const [query, setQuery] = useState('');
+    const [dropdownVisible, setDropdownVisible] = useState(false);  // New state to handle dropdown visibility
+
+
+
     // console.log("user selevcted address is events::::::::", userLocationFetched)
 
     // const [userLatitude,setUserLatitude] = useState(userLocationFetched?.latitude);
     // const [userLongitude,setUserLongitude] = useState(userLocationFetched?.longitude);
     // console.log("latitue long", userLatitude ,'+++++++++', userLongitude);
-    console.log('userLocationFetched is::>>',userLocationFetched?.latitude,userLocationFetched?.longitude);
+    console.log('userLocationFetched is::>>', userLocationFetched?.latitude, userLocationFetched?.longitude);
 
     useEffect(() => {
         getAllEvents(currentPage);
+        getAllLocations();
     }, [])
 
     const handleAllEventsPress = async () => {
@@ -50,7 +61,7 @@ const Events = () => {
         setHasMore(true); // Reset pagination control
         await getAllEvents(1); // Fetch initial page of all events
     };
-    
+
     const handleNearByEventsPress = async () => {
         // Reset the nearby page and data
         setNearByClicked(true); // Set "Nearby" view
@@ -60,7 +71,7 @@ const Events = () => {
         setHasMoreNearBy(true); // Reset pagination control
         await getNearByEvents(1); // Fetch initial page of nearby events
     };
-    
+
     // This function loads more function halls (all events) and ensures the page is incremented correctly
     const loadMoreFunctionHalls = () => {
         if (hasMore && !loading && currentPage < totalEventPages) {
@@ -68,7 +79,7 @@ const Events = () => {
             setCurrentPage((prev) => prev + 1); // Increment page number
         }
     };
-    
+
     // This function loads more nearby function halls and ensures the page is incremented correctly
     const loadMoreNearByFunctionHalls = () => {
         if (hasMoreNearBy && !nearByLoading && nearByCurrentPage < totalNearByPages) {
@@ -76,7 +87,7 @@ const Events = () => {
             setNearByCurrentPage((prev) => prev + 1); // Increment page number
         }
     };
-    
+
 
     const getAllEvents = async (page) => {
         setNearByData([]);
@@ -104,12 +115,50 @@ const Events = () => {
             console.error('Error fetching function halls:', error);
         }
         setLoading(false);
-    }
+    };
+
+    const getAllEventsByLocation = async (value) => {
+        const token = await getUserAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/getAllFunctionHallsByLocation/${value}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            console.log("location select res:::::::", response);
+            setEventsData(response?.data?.data);
+        } catch (error) {
+            setLoading(false);
+            console.error('Error fetching function halls:', error);
+        }
+        setLoading(false);
+    };
+
+    const getAllLocations = async () => {
+        const token = await getUserAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/user/locationList`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log("all locations resL::::", response?.data);
+            setAllLocations(response?.data?.data);
+        } catch (error) {
+            setLoading(false);
+            console.error('Error fetching function halls:', error);
+        }
+        setLoading(false);
+    };
+    const filteredData = allLocations?.filter(item =>
+        item?.value.toLowerCase().includes(query.toLowerCase())
+    );
 
     const getNearByEvents = async (nearByPage) => {
         const userLat = userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude;
         const userLong = userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude;
-        console.log('userLatitude in api call::>>',userLocationFetched?.lat,userLocationFetched?.lon);
+        console.log('userLatitude in api call::>>', userLocationFetched?.lat, userLocationFetched?.lon);
         setEventsData([]);
         setNearByLoading(true);
         const token = await getUserAuthToken();
@@ -145,7 +194,7 @@ const Events = () => {
         const imageUrls = item?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
 
         return (
-            <View style={{ borderRadius: 20, marginHorizontal: 20, marginBottom: 5, elevation: -10 }}>
+            <View style={{ flex: 1, borderRadius: 20, marginHorizontal: 20, marginBottom: 5, elevation: -10 }}>
                 <View style={[styles.container]}>
                     <Swiper
                         style={styles.wrapper}
@@ -217,24 +266,58 @@ const Events = () => {
         }
         count = eventsData?.length;
         return count;
-    }
+    };
+    console.log("selected query is:::::::", query)
+    const handleQueryChange = (text) => {
+        setQuery(text);
+        if (text.length > 0) {
+            setDropdownVisible(true);  // Show dropdown when typing
+        } else {
+            setDropdownVisible(false);  // Hide dropdown if query is cleared
+        }
+        // Filter data logic can go here
+        // e.g. setFilteredData(filteredDataBasedOnQuery);
+    };
+    const handleSelect = (value) => {
+        setQuery(value);  // Set query to selected item value
+        setDropdownVisible(false);  // Hide dropdown after selection
+        getAllEventsByLocation(value)
+    };
+    
 
     return (
         <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
-            <View style={{ backgroundColor: "white" }}>
-                <View style={styles.searchProduct}>
-                    <View style={styles.searchProHeader}>
-                        <SearchIcon style={{ marginLeft: verticalScale(20) }} />
-                        <TextInput
-                            placeholder="Search fashion"
-                            style={styles.textInput} />
-                        <FilterIcon />
-                    </View>
-                </View>
-                {/* <CategoryFilter onCategoryChange={handleCategoryChange} /> */}
-            </View>
+              <View style={styles.autocompleteContainer}>
 
-            <View style={{ marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
+
+            <Autocomplete
+                data={dropdownVisible && filteredData?.length > 0 ? filteredData : []}  // Conditionally hide results based on dropdownVisible
+                value={query}
+                onChangeText={handleQueryChange}  // Handle query changes
+                placeholder="Seach Location..."
+                flatListProps={{
+                    keyExtractor: (item) => item?._id.toString(),
+                    renderItem: ({ item }) => (
+                        <TouchableOpacity onPress={() => handleSelect(item?.value)}>
+                            <Text style={{ padding: 10 }}>{item?.value}</Text>
+                        </TouchableOpacity>
+                    ),
+                }}
+                inputContainerStyle={{
+                    borderRadius: 15,
+                    height:50,
+                    width:"90%",
+                    alignSelf:"center",
+                    marginTop:10,
+                    backgroundColor:"#E3E3E7"
+                   
+                }}
+                style={{marginTop:3, borderRadius:15, width:"90%",alignSelf:"center",backgroundColor:"#E3E3E7"}}
+                hideResults={dropdownVisible === false || filteredData.length === 0}  // Hide results initially and when dropdownVisible is false
+                />
+                </View>
+
+            <View style={{marginTop:60, marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
                 <View>
                     <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
                     <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Function Halls</Text>
@@ -249,39 +332,41 @@ const Events = () => {
             </View>
 
 
-            {!nearByClicked ?
-                <FlatList
-                    data={eventsData}
-                    renderItem={renderItem}
-                    keyExtractor={(item) => item._id}
-                    onEndReached={loadMoreFunctionHalls} // Fetch more when list ends
-                    onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
-                    ListFooterComponent={() =>
-                        loading ? <ActivityIndicator size="large" color="orange" /> : null
-                    }
-                    ListEmptyComponent={
-                        <View >
-                            <Text>{eventsData?.length == 0 ? 'No Near By Function halls Available please check in all' : 'No Function halls found'}</Text>
-                        </View>
-                    }
-                />
-                :
-                <FlatList
-                    data={nearByData}
-                    renderItem={renderItem}
-                    keyExtractor={(item) => item._id}
-                    onEndReached={loadMoreNearByFunctionHalls} // Fetch more when list ends
-                    onEndReachedThreshold={0.1} // Trigger when user scrolls near the bottom
-                    ListFooterComponent={() =>
-                        nearByLoading ? <ActivityIndicator size="large" color="orange" /> : null
-                    }
-                    ListEmptyComponent={
-                        <View >
-                            <Text>{nearByData?.length == 0 ? 'No Near By Function halls Available please check in all' : 'No Function halls found'}</Text>
-                        </View>
-                    }
-                />
-            }
+            <View style={{ flex: 1 }}>
+                {!nearByClicked ?
+                    <FlatList
+                        data={eventsData}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item._id}
+                        onEndReached={loadMoreFunctionHalls} // Fetch more when list ends
+                        onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
+                        ListFooterComponent={() =>
+                            loading ? <ActivityIndicator size="large" color="orange" /> : null
+                        }
+                        ListEmptyComponent={
+                            <View >
+                                <Text>{eventsData?.length == 0 ? 'No Near By Function halls Available please check in all' : 'No Function halls found'}</Text>
+                            </View>
+                        }
+                    />
+                    :
+                    <FlatList
+                        data={nearByData}
+                        renderItem={renderItem}
+                        keyExtractor={(item) => item._id}
+                        onEndReached={loadMoreNearByFunctionHalls} // Fetch more when list ends
+                        onEndReachedThreshold={0.1} // Trigger when user scrolls near the bottom
+                        ListFooterComponent={() =>
+                            nearByLoading ? <ActivityIndicator size="large" color="orange" /> : null
+                        }
+                        ListEmptyComponent={
+                            <View >
+                                <Text>{nearByData?.length == 0 ? 'No Near By Function halls Available please check in all' : 'No Function halls found'}</Text>
+                            </View>
+                        }
+                    />
+                }
+            </View>
         </SafeAreaView>
     )
 }
@@ -326,6 +411,34 @@ const styles = StyleSheet.create({
         borderWidth: 0.8,
         marginTop: 10,
         marginBottom: 15
+    },
+    autocompleteContainer: {
+        flex: 1,
+        left: 0,
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        zIndex: 1
+      },
+    dropdown: {
+        height: 50,
+        borderColor: themevariable.Color_C8C8C6,
+        borderWidth: 1,
+        borderRadius: 8,
+        paddingHorizontal: 10,
+        marginTop: 10
+    },
+    placeholderStyle: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: '500',
+        color: "gray",
+        fontSize: 14,
+    },
+    selectedText: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: '500',
+        color: "black",
+        fontSize: 14,
     },
     searchProHeader: {
         flexDirection: "row",
