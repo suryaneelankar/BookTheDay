@@ -50,12 +50,10 @@ const GeneralDetails = () => {
     const [perKMPrice, setPerKMPrice] = useState();
     const [perMonthRentPrice, setPerMonthRentPrice] = useState();
     const [securityDeposit, setSecurityDeposit] = useState();
-    const [available, setAvailable] = useState();
     const [advanceAmount, setAdvanceAmount] = useState();
     const [discountPercentage, setDiscountPercentage] = useState();
     const [overTimeCharges, setOverTimeCharges] = useState();
     const [selectedItemArray, setSelectedItemArray] = useState([]);
-    const [selectedFoodTypeItem, setSelectedFoodTypeItem] = useState('');
     const [itemPrices, setItemPrices] = useState({});
     const [selectedSeatingCapacity, setSelectedSeatingCapacity] = useState('');
 
@@ -323,7 +321,6 @@ const GeneralDetails = () => {
         });
 
         const functionHallAddessIs = { "address": functionHallAddress, "city": functionHallCity, "pinCode": functionHallPinCode };
-        console.log('selectedItemArray is ::>>>', selectedItemArray)
         formData.append('serviceType', 'driver');
         formData.append('description', productDescription);
         // formData.append('subscriptionChargesPerMonth', perMonthRentPrice);
@@ -342,6 +339,7 @@ const GeneralDetails = () => {
         formData.append('county', locationCountyVal);
         formData.append('latitude', locationLatitude);
         formData.append('longitude', locationLongitude);
+        formData.append('foodType', selectedFoodType);
 
         console.log('formdata is ::>>', formData);
         const token = await getVendorAuthToken();
@@ -365,7 +363,11 @@ const GeneralDetails = () => {
                         //     onPress: () => console.log("No Pressed"),
                         //     style: "cancel"
                         // },
-                        { text: "Ok", onPress: () => {console.log("yes pressed"), navigation.goBack()} }
+                        {
+                            text: "Ok", onPress: () => {
+                                // navigation.goBack()
+                            }
+                        }
                     ],
                     { cancelable: false }
                 );
@@ -614,7 +616,7 @@ const GeneralDetails = () => {
     };
 
     const handleLocationSelected = (location, address) => {
-        console.log('Selected Location halls:', location, "+++++++++",address);
+        console.log('Selected Location halls:', location, "+++++++++", address);
         setfunctionHallAddress(address);
         setLocationCountyVal(location?.subDivisionArea);
         setLocationLatitude(location?.region?.latitude);

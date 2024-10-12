@@ -53,12 +53,7 @@ const ViewEvents = ({ route, navigation }) => {
 
   ]
 
-  // const amenitiesData = [
-  //   { id: '1', icon: PeopleAccommodate, label: '500-1200 pax' },
-  //   { id: '2', icon: FanIcon, label: 'Fan Available' },
-  //   { id: '3', icon: RoomsAvailable, label: '4 Bedroom' },
-  //   { id: '4', icon: AcIcon, label: 'Air Condition' },
-  // ];
+  const HallDescription = 'Transform your special occasions into unforgettable memories with our exquisite function hall rentals! Whether you are hosting a grand wedding, a lively birthday bash, or a corporate event, our halls offer the perfect blend of elegance and comfort. With spacious layouts, stunning décor, and top-notch amenities, your guests will be impressed from the moment they arrive. Book with us today and let us help you create an event that exceeds all expectations!'
 
   const timeSlots = [
     '12:00 AM',
@@ -105,11 +100,11 @@ const ViewEvents = ({ route, navigation }) => {
     const token = await getUserAuthToken();
     setGetUserAuth(token);
     try {
-      const response = await axios.get(`${BASE_URL}/getFunctionHallDetailsById/${categoryId}`,{
+      const response = await axios.get(`${BASE_URL}/getFunctionHallDetailsById/${categoryId}`, {
         headers: {
-            Authorization: `Bearer ${token}`,
-          },
-    });
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setEventsDetails(response?.data);
       const imageUrls = response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
       setSubImages(imageUrls);
@@ -213,8 +208,9 @@ const ViewEvents = ({ route, navigation }) => {
             style={{ flex: 1, alignSelf: "center", }}
             renderItem={({ item }) => (
               <View style={[{ width: Dimensions.get('window').width, height: 300 }]}>
-                <Image source={{ uri: item ,
-                   headers:{Authorization : `Bearer ${getUserAuth}`}
+                <Image source={{
+                  uri: item,
+                  headers: { Authorization: `Bearer ${getUserAuth}` }
                 }} style={styles.image}
                   resizeMethod="auto"
                   resizeMode="cover"
@@ -251,6 +247,7 @@ const ViewEvents = ({ route, navigation }) => {
 
           <View style={{ marginTop: 20 }}>
             <Text style={styles.title}>Description :</Text>
+            <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#8B8B8B", fontWeight: "400", marginTop: 4, marginBottom: 10 }}>{HallDescription}</Text>
             <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#8B8B8B", fontWeight: "400", marginTop: 4, marginBottom: 10 }}>{eventsDetails?.description}</Text>
           </View>
 
@@ -267,9 +264,9 @@ const ViewEvents = ({ route, navigation }) => {
               showsHorizontalScrollIndicator={false}
             // contentContainerStyle={styles.container}
             />
-            <View style={{marginTop:20,}}>
-              <Text style={{fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular'}}>Food Type Allowed</Text>
-              <Text style={{fontWeight: "700", color: "#8B8B8B", fontSize: 12, fontFamily: 'ManropeRegular', marginTop:10}}>{eventsDetails?.foodType}</Text>
+            <View style={{ marginTop: 20, }}>
+              <Text style={{ fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular' }}>Food Type Allowed</Text>
+              <Text style={{ fontWeight: "700", color: "#8B8B8B", fontSize: 12, fontFamily: 'ManropeRegular', marginTop: 10 }}>{eventsDetails?.foodType}</Text>
             </View>
             {/* <ScrollView horizontal>
               {editsData.map((item, index) => (
@@ -430,18 +427,18 @@ const ViewEvents = ({ route, navigation }) => {
         </Modal>
 
         <CustomModal
-        visible={modalVisible}
-        message={modalMessage}
-        onClose={() => setModalVisible(false)}
+          visible={modalVisible}
+          message={modalMessage}
+          onClose={() => setModalVisible(false)}
         />
       </ScrollView>
 
       <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
         <BookDatesButton
-        
-          onPress={() =>{
-            if(selectedTimeSlot && selectedDate){
-             navigation.navigate('HallsBookingOverView', { categoryId: categoryId, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `${formatAmount(eventsDetails?.rentPricePerDay)}` })
+
+          onPress={() => {
+            if (selectedTimeSlot && selectedDate) {
+              navigation.navigate('HallsBookingOverView', { categoryId: categoryId, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `${formatAmount(eventsDetails?.rentPricePerDay)}` })
             } else if (!selectedDate) {
               setModalMessage("Please select the Dates");
               setModalVisible(true);
@@ -504,8 +501,8 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'ManropeRegular',
     fontSize: 12,
-    color: "#8B8B8B"
-    , fontWeight: "500",
+    color: "black",
+    fontWeight: "500",
   },
   subTitle: { fontSize: 14, color: "#5a5c5a", fontWeight: "400", },
   status: {
