@@ -168,11 +168,11 @@ const Events = () => {
                                 <Text style={{ fontWeight: '400', color: '#4A4A4A', fontSize: 11, marginHorizontal: 5, fontFamily: "ManropeRegular" }}>Booked</Text>
                             }
                         </View> */}
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8}}>
                             {/* <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} /> */}
                         <Text style={{color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11,fontWeight:"400" }}> {item?.seatingCapacity} pax</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
+                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight:"400" }}> {item?.bedRooms} Rooms</Text>
                         </View>
                     </View>
