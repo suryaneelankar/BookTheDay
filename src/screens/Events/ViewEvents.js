@@ -6,7 +6,7 @@ import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import { verticalScale, moderateScale, horizontalScale } from "../../utils/scalingMetrics";
 import { Calendar } from 'react-native-calendars';
 import moment from 'moment';
-import Icon from 'react-native-vector-icons/FontAwesome';
+// import Icon from 'react-native-vector-icons/FontAwesome';
 import Swiper from "react-native-swiper";
 import MapMarkIcon from '../../assets/svgs/orangeMapMark.svg';
 import PeopleAccommodate from '../../assets/svgs/peopleAccommodate.svg';
@@ -21,6 +21,15 @@ import BookDatesButton from "../../components/GradientButton";
 import ServiceTime from '../../assets/svgs/serviceTime.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import CustomModal from "../../components/AlertModal";
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import IonIcons from 'react-native-vector-icons/Ionicons';
+
+
 
 const ViewEvents = ({ route, navigation }) => {
 
@@ -105,11 +114,11 @@ const ViewEvents = ({ route, navigation }) => {
     const token = await getUserAuthToken();
     setGetUserAuth(token);
     try {
-      const response = await axios.get(`${BASE_URL}/getFunctionHallDetailsById/${categoryId}`,{
+      const response = await axios.get(`${BASE_URL}/getFunctionHallDetailsById/${categoryId}`, {
         headers: {
-            Authorization: `Bearer ${token}`,
-          },
-    });
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setEventsDetails(response?.data);
       const imageUrls = response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
       setSubImages(imageUrls);
@@ -126,7 +135,7 @@ const ViewEvents = ({ route, navigation }) => {
     }
   }
 
-  console.log("sub images::::::", subImages);
+  console.log("Amenities::::::", amenitiesData);
 
 
   function formatAmount(amount) {
@@ -195,6 +204,49 @@ const ViewEvents = ({ route, navigation }) => {
     </View>
   );
 
+  const getIcon = (name) => {
+    switch (name) {
+      case 'Parking':
+        return  <MaterialCommunityIcons name={'parking'} size={20} color={'#FD813B'} /> ;
+      case 'Restrooms/Toilets':
+        return  <FontAwesome5 name={'restroom'} size={20} color={'#FD813B'} />;
+      case 'Wheelchair access':
+        return <FontAwesome name='wheelchair' size={20} color={'#FD813B'} />;
+      case 'Tables with basic covers':
+        return <MaterialIcon name='table-restaurant' size={20} color={'#FD813B'} />;
+      case 'Chairs':
+        return <Icon name='chair' size={20} color={'#FD813B'} />;
+      case 'Coolers / Fans':
+        return <MaterialCommunityIcons name='fan' size={20} color={'#FD813B'} />;
+      case 'Air Conditioners':
+        return <MaterialCommunityIcons name='air-conditioner' size={20} color={'#FD813B'} />;
+      case 'Bedrooms':
+        return <IonIcons name={'bed-sharp'} size={20} color={'#FD813B'} />;
+      case 'Lighting':
+        return <MaterialIcon name='lightbulb' size={20} color={'#FD813B'} />;
+      case 'Kitchen Space':
+        return <FontAwesome6 name={'kitchen-set'} size={20} color={'#FD813B'} />;
+      case 'Bridal Room':
+        return <IonIcons name={'bed-sharp'} size={20} color={'#FD813B'} />;
+      case 'Sound/music license':
+        return <MaterialIcon name='queue-music' size={20} color={'#FD813B'} />;
+      default:
+        return null;
+    }
+  };
+
+  // Helper function to chunk data into rows of 4
+  const chunkArray = (data, chunkSize) => {
+    const result = [];
+    for (let i = 0; i < data?.length; i += chunkSize) {
+      result.push(data.slice(i, i + chunkSize));
+    }
+    return result;
+  };
+
+  const rows = chunkArray(amenitiesData, 4); // Split data into rows of 4 items
+
+
 
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -213,8 +265,9 @@ const ViewEvents = ({ route, navigation }) => {
             style={{ flex: 1, alignSelf: "center", }}
             renderItem={({ item }) => (
               <View style={[{ width: Dimensions.get('window').width, height: 300 }]}>
-                <Image source={{ uri: item ,
-                   headers:{Authorization : `Bearer ${getUserAuth}`}
+                <Image source={{
+                  uri: item,
+                  headers: { Authorization: `Bearer ${getUserAuth}` }
                 }} style={styles.image}
                   resizeMethod="auto"
                   resizeMode="cover"
@@ -228,7 +281,7 @@ const ViewEvents = ({ route, navigation }) => {
         <View style={{ flex: 1, marginTop: 10, marginHorizontal: 20 }}>
 
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text style={{ fontSize: 20, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular' }}>{eventsDetails?.functionHallName}</Text>
+            <Text numberOfLines={2} style={{ fontSize: 20, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular' }}>{eventsDetails?.functionHallName}</Text>
             {/* <Text style={{ fontSize: 16, color: "#100D25", marginLeft: 5, fontFamily: 'ManropeRegular' }}>{eventsDetails?.title}</Text> */}
 
           </View>
@@ -239,7 +292,7 @@ const ViewEvents = ({ route, navigation }) => {
               color: "#100D25",
               fontWeight: "500"
             }}>MRP</Text> */}
-            <Text style={{ color: "#100D25", fontSize: 18, fontWeight: "bold" }}> {formatAmount(eventsDetails?.rentPricePerDay)}/day</Text>
+            <Text style={{ color: "#202020", fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular' }}> {formatAmount(eventsDetails?.rentPricePerDay)}/day</Text>
             {/* <Text style={styles.strickedoffer}>₹1800</Text>
             <Text style={styles.off}> (20% off) </Text> */}
           </View>
@@ -249,80 +302,64 @@ const ViewEvents = ({ route, navigation }) => {
             <Text style={{ color: "#939393", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', marginLeft: 5 }}>{eventsDetails?.functionHallAddress?.address}</Text>
           </View>
 
-          <View style={{ marginTop: 20 }}>
-            <Text style={styles.title}>Description :</Text>
-            <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#8B8B8B", fontWeight: "400", marginTop: 4, marginBottom: 10 }}>{eventsDetails?.description}</Text>
+          <View style={{ marginTop: 20, marginBottom: 10 }}>
+            <Text style={styles.title}>Description:</Text>
+            <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#8B8B8B", fontWeight: "400", marginTop: 4 }}>{eventsDetails?.description}</Text>
           </View>
 
           <View style={{ borderColor: "#F1F1F1", borderWidth: 1, width: "100%", marginTop: 5 }} />
 
           <View style={{ marginTop: 20 }}>
             <Text style={{ fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular' }}>Hall Amenities</Text>
-
             <FlatList
-              data={amenitiesData}
-              renderItem={AmenitiesRenderItem}
-              keyExtractor={item => item?.id}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-            // contentContainerStyle={styles.container}
-            />
-            <View style={{marginTop:20,}}>
-              <Text style={{fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular'}}>Food Type Allowed</Text>
-              <Text style={{fontWeight: "700", color: "#8B8B8B", fontSize: 12, fontFamily: 'ManropeRegular', marginTop:10}}>{eventsDetails?.foodType}</Text>
-            </View>
-            {/* <ScrollView horizontal>
-              {editsData.map((item, index) => (
-                <View key={index} style={{ width: 100, margin: 5, alignItems: "center", paddingVertical: 10 }} >
-                  <Image source={item.image} style={{ width: 40, height: 40, borderRadius: 20, marginTop: 10 }} />
-
-                  <Text >{item?.name}</Text>
+              data={rows}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <View style={styles.row}>
+                  {item.map((data) => (
+                    <View key={data?.id} style={styles.itemContainer}>
+                      {getIcon(data?.name)}
+                      <Text style={styles.itemText}>{data?.name}</Text>
+                    </View>
+                  ))}
                 </View>
-              ))}
-            </ScrollView> */}
-            {/* <View style={{flexDirection:"row", alignItems:"center",marginTop:10,}}>
-              <Image source={require('../../assets/chair.png')} style={{width:25, height:25,}}/>
-            <Text style={{fontFamily:"roboto", fontSize: 14, color: "#5a5c5a", fontWeight: "400",marginLeft:10 }}>300 Seating</Text>
+              )}
+            />
+
+            <View style={{ marginTop: 20, }}>
+              <Text style={{ fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular' }}>Food Type Allowed</Text>
+              <Text style={{ fontWeight: "700", color: "#8B8B8B", fontSize: 12, fontFamily: 'ManropeRegular', marginTop: 10 }}>{eventsDetails?.foodType}</Text>
             </View>
-            <View style={{flexDirection:"row", alignItems:"center",marginTop:10}}>
-              <Image source={require('../../assets/foodAvailable.png')} style={{width:25, height:25}}/>
-              <Text style={{fontFamily:"roboto", fontSize: 14, color: "#5a5c5a", fontWeight: "400",marginLeft:10 }}>Food</Text>
-            </View>
-            <View style={{flexDirection:"row", alignItems:"center",marginTop:10}}>
-              <Image source={require('../../assets/rooms.png')} style={{width:20, height:20}}/>
-              <Text style={{fontFamily:"roboto", fontSize: 14, color: "#5a5c5a", fontWeight: "400",marginLeft:10 }}>4 Rooms</Text>
-            </View>
-            <View style={{flexDirection:"row", alignItems:"center",marginTop:10}}>
-              <Image source={require('../../assets/chair.png')} style={{width:20, height:20}}/>
-              <Text style={{fontFamily:"roboto", fontSize: 14, color: "#5a5c5a", fontWeight: "400",marginLeft:10 }}>Area : 1000 sq.yrds</Text>
-            </View>
-            <View style={{flexDirection:"row", alignItems:"center",marginTop:10}}>
-              <Image source={require('../../assets/chair.png')} style={{width:20, height:20}}/>
-              <Text style={{fontFamily:"roboto", fontSize: 14, color: "#5a5c5a", fontWeight: "400", marginLeft:10 }}>No A/C</Text>
-            </View> */}
 
           </View>
 
           {renderCalendar()}
-          <Text style={{ marginTop: 20, fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular' }}>Book The Day</Text>
+          <Text style={{ marginTop: 20, fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular' }}>Select Booking Details</Text>
+          <View style={{ marginTop: 15 }}>
+            <Text style={{ fontWeight: "600", color: "#121212", fontSize: 14, fontFamily: 'ManropeRegular' }}>Booking Date</Text>
 
-          <TouchableOpacity style={{ marginTop: 15, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }} onPress={() => setIsVisible(true)}>
-            <View style={{ alignItems: "center" }}>
+            <TouchableOpacity style={{
+              marginTop: 5, flexDirection: "row",
+              alignItems: "center", justifyContent: "space-between",
+              borderWidth: 1, borderColor: "#FD813B", borderRadius: 4,
+              paddingHorizontal: 20, paddingVertical: 10
+            }} onPress={() => setIsVisible(true)}>
+              <Text style={{ fontSize: 13, fontFamily: 'ManropeRegular', fontWeight: "400", color: selectedDate ? "#121212" : "#8B8B8B", }}>{selectedDate ? moment(selectedDate).format('DD-MM-YYYY') : 'Pick A Date'}</Text>
               <CalendarIcon />
-              <Text style={{ fontSize: 12, fontFamily: 'ManropeRegular', fontWeight: "400" }}>{selectedDate ? 'Booking Date' : 'Select The Date'}</Text>
-            </View>
-            <Text style={[styles.title, { marginTop: 2 }]}>{selectedDate ? moment(selectedDate).format('DD-MM-YYYY') : null}</Text>
+            </TouchableOpacity>
 
-          </TouchableOpacity>
+            <Text style={{ marginTop: 20, fontWeight: "600", color: "#121212", fontSize: 14, fontFamily: 'ManropeRegular' }}>Booking Time</Text>
 
-          <TouchableOpacity onPress={() => setTimeSlotModalVisible(true)} style={{ marginTop: 25, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-            <View style={{ alignItems: "center" }}>
+            <TouchableOpacity style={{
+              marginTop: 5, flexDirection: "row",
+              alignItems: "center", justifyContent: "space-between",
+              borderWidth: 1, borderColor: "#FD813B", borderRadius: 4,
+              paddingHorizontal: 20, paddingVertical: 10
+            }} onPress={() => setTimeSlotModalVisible(true)}>
+              <Text style={{ fontSize: 13, fontFamily: 'ManropeRegular', fontWeight: "400", color: selectedDate ? "#121212" : "#8B8B8B", }}>{selectedTimeSlot ? selectedTimeSlot : 'Pick A Time'}</Text>
               <ServiceTime />
-              <Text style={{ fontSize: 12, fontFamily: 'ManropeRegular', fontWeight: "400" }}>{selectedDate ? 'Service Time' : 'Service Time'}</Text>
-            </View>
-            <Text style={[styles.title, { marginTop: 2 }]}>{selectedTimeSlot ? selectedTimeSlot : 'Pick A Time Slot'}</Text>
-
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
 
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
@@ -430,18 +467,18 @@ const ViewEvents = ({ route, navigation }) => {
         </Modal>
 
         <CustomModal
-        visible={modalVisible}
-        message={modalMessage}
-        onClose={() => setModalVisible(false)}
+          visible={modalVisible}
+          message={modalMessage}
+          onClose={() => setModalVisible(false)}
         />
       </ScrollView>
 
       <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
         <BookDatesButton
-        
-          onPress={() =>{
-            if(selectedTimeSlot && selectedDate){
-             navigation.navigate('HallsBookingOverView', { categoryId: categoryId, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `${formatAmount(eventsDetails?.rentPricePerDay)}` })
+
+          onPress={() => {
+            if (selectedTimeSlot && selectedDate) {
+              navigation.navigate('HallsBookingOverView', { categoryId: categoryId, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `${formatAmount(eventsDetails?.rentPricePerDay)}` })
             } else if (!selectedDate) {
               setModalMessage("Please select the Dates");
               setModalVisible(true);
@@ -453,41 +490,7 @@ const ViewEvents = ({ route, navigation }) => {
           text={`${formatAmount(eventsDetails?.rentPricePerDay)} View Cart`}
           padding={10}
         />
-      </View>
-
-      {/* <Text style={{ padding: 10, color: 'black', fontWeight: '600' }}>Total for {noOfDays} days</Text> */}
-      {/* <View style={{ backgroundColor: 'white', flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
-        <TouchableOpacity style={{ backgroundColor: 'white', borderRadius: 8, padding: 10, borderColor: '#D2453B', borderWidth: 2, width: '45%' }}
-          onPress={() => navigation.navigate('BookingOverView', { categoryId: categoryId })}
-        >
-          <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-            <View>
-              <Text style={[styles.strickedoffer, { fontWeight: '500', color: '#D2453B' }]}>₹1800</Text>
-              <Text style={{ color: '#D2453B', fontWeight: '900', fontSize: 16 }}>{noOfDays ? formatAmount(eventsDetails?.price * noOfDays) : formatAmount(eventsDetails?.price)}</Text>
-            </View>
-            <View style={{ justifyContent: 'flex-end' }}>
-              <Text style={{ color: '#D2453B', textAlign: 'right', fontWeight: '800', }} numberOfLines={2}>Book</Text>
-              <Text style={{ color: '#D2453B', textAlign: 'right', fontWeight: '800', }} numberOfLines={2}>Now</Text>
-            </View>
-          </View>
-
-        </TouchableOpacity>
-        <TouchableOpacity style={{ backgroundColor: '#D2453B', borderRadius: 8, padding: 10, borderColor: 'white', borderWidth: 2, width: '45%' }}
-          onPress={() => createFunctionHallBooking(categoryId)}
-        >
-          <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-            <View>
-              <Text style={[styles.strickedoffer, { color: 'white', fontWeight: '500' }]}>₹1800</Text>
-              <Text style={{ color: 'white', fontWeight: '900', fontSize: 16 }}>{noOfDays ? formatAmount(eventsDetails?.price * noOfDays) : formatAmount(eventsDetails?.price)}</Text>
-            </View>
-            <View>
-              <Text style={{ color: 'white', textAlign: 'right', fontWeight: '800' }} numberOfLines={2}>Book</Text>
-              <Text style={{ color: 'white', textAlign: 'right', fontWeight: '800' }} numberOfLines={2}>Advance</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
-
-      </View> */}
+      </View>      
     </View>
   )
 };
@@ -504,13 +507,32 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: 'ManropeRegular',
     fontSize: 12,
-    color: "#8B8B8B"
-    , fontWeight: "500",
+    color: "#121212",
+    fontWeight: "700",
   },
   subTitle: { fontSize: 14, color: "#5a5c5a", fontWeight: "400", },
   status: {
     fontSize: 10,
     color: 'gray',
+  },
+  row: {
+    flexDirection: 'row',
+    // justifyContent: 'space-between',
+    alignItems:"center",
+    marginHorizontal:10,
+    marginTop:5
+  },
+  itemContainer: {
+    alignItems: 'center',
+    width:Dimensions.get('window').width/5,
+    margin:5
+  },
+  itemText: {
+    fontSize:9,
+    fontWeight:"400",
+    color:"#606060",
+    fontFamily: 'ManropeRegular',
+    marginTop:5
   },
   calendarContainer: {
     flex: 1,
@@ -522,7 +544,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: verticalScale(2),
-    marginTop: 10
   },
   off: {
     fontSize: 13,

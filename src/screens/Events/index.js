@@ -118,7 +118,7 @@ const Events = () => {
         const imageUrls = item?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
 
         return (
-            <View style={{ flex: 1, borderRadius: 20, marginHorizontal: 20, marginBottom: 5, elevation: -10 }}>
+            <View style={{ flex: 1,borderRadius: 20, marginHorizontal: 20, marginBottom: 5, }}>
                 <View style={[styles.container]}>
                     <Swiper
                         style={styles.wrapper}
@@ -145,35 +145,35 @@ const Events = () => {
                 <TouchableOpacity
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
                     style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between',marginBottom:10 }}>
                         <View style={{ width: '60%', }}>
-                            <Text style={{ color: 'black', fontSize: 17, fontWeight: "700", fontFamily: "ManropeRegular" }} >{item?.functionHallName}</Text>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', }}>
-                                <LocationMarkIcon style={{ marginTop: 5 }} />
-                                <Text style={{ fontWeight: '500', marginHorizontal: 5, color: '#696969', fontSize: 13, marginTop: 5, fontFamily: "ManropeRegular" }}>{item?.functionHallAddress?.address}</Text>
+                            <Text style={{ color: '#101010', fontSize: 14, fontWeight: "700", fontFamily: "ManropeRegular" }} >{item?.functionHallName}</Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop:4}}>
+                                <LocationMarkIcon/>
+                                <Text numberOfLines={1} ellipsizeMode='tail' style={{width:"90%", fontWeight: '400', marginHorizontal: 5, color: '#939393', fontSize: 12, fontFamily: "ManropeRegular" }}>{item?.county}</Text>
                             </View>
                         </View>
                         <View>
-                            <Text style={{ fontWeight: '700', color: '#202020', fontSize: 18, fontFamily: "ManropeRegular" }}>{formatAmount(item?.rentPricePerDay)}<Text style={{ color: "gray", fontSize: 16 }}> /day</Text></Text>
+                            <Text style={{ fontWeight: '800', color: '#202020', fontSize: 14, fontFamily: "ManropeRegular" }}>{formatAmount(item?.rentPricePerDay)}<Text style={{ color: '#202020', fontFamily: "ManropeRegular",fontSize: 12 ,fontWeight:"400"}}> /day</Text></Text>
                         </View>
                     </View>
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "50%" }}>
 
-                        <View style={{ backgroundColor: item?.available ? "orange" : "orange", flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
+                        {/* <View style={{ backgroundColor: item?.available ? "#FEF7DE" : "#FEF7DE", flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
                             <Image source={require('../../assets/available.png')} style={{ width: 15, height: 15 }} />
                             {item?.available ?
-                                <Text style={{ fontWeight: '600', color: '#4A4A4A', fontSize: 13, marginHorizontal: 5, fontFamily: "ManropeRegular" }}>Available</Text>
+                                <Text style={{ fontWeight: '400', color: '#4A4A4A', fontSize: 11, marginHorizontal: 5, fontFamily: "ManropeRegular" }}>Available</Text>
                                 :
-                                <Text style={{ fontWeight: '600', color: '#4A4A4A', fontSize: 13, marginHorizontal: 5, fontFamily: "ManropeRegular" }}>Booked</Text>
+                                <Text style={{ fontWeight: '400', color: '#4A4A4A', fontSize: 11, marginHorizontal: 5, fontFamily: "ManropeRegular" }}>Booked</Text>
                             }
+                        </View> */}
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
+                            {/* <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} /> */}
+                        <Text style={{color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11,fontWeight:"400" }}> {item?.seatingCapacity} pax</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "orange", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
-                            <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} />
-                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> {item?.seatingCapacity}</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "orange", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
-                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 13 }}> {item?.distance}</Text>
+                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 2 }}>
+                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight:"400" }}> {item?.bedRooms} Rooms</Text>
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -208,7 +208,7 @@ const Events = () => {
 
 
     return (
-        <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
+        <SafeAreaView style={{ flex: 1, marginBottom: "10%",backgroundColor:"white" }}>
 
             <View style={styles.autocompleteContainer}>
 
@@ -248,7 +248,7 @@ const Events = () => {
             <View style={{ marginTop: 60, marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
                 <View>
                     <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
-                    <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Function Halls</Text>
+                    <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "400", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Function Halls in Hyderabad</Text>
                 </View>
             </View>
 

@@ -290,27 +290,33 @@ const ViewCaterings = ({ route, navigation }) => {
                             />
                         )}
                     />
+                    <Text style={{ marginTop: 20, fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular' }}>Select Booking Details</Text>
 
-                    <Text style={{ marginTop: 20, fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular' }}>Book The Day</Text>
-
-                    <TouchableOpacity style={{ marginTop: 15, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }} onPress={() => setIsVisible(true)}>
-                        <View style={{ alignItems: "center" }}>
+                    <View style={{ marginTop: 15 }}>
+                        <Text style={{ fontWeight: "600", color: "#121212", fontSize: 14, fontFamily: 'ManropeRegular' }}>Booking Date</Text>
+                        <TouchableOpacity style={{
+                            marginTop: 5, flexDirection: "row",
+                            alignItems: "center", justifyContent: "space-between",
+                            borderWidth: 1, borderColor: "#FD813B", borderRadius: 4,
+                            paddingHorizontal: 20, paddingVertical: 10
+                        }} onPress={() => setIsVisible(true)}>
+                            <Text style={{ fontSize: 13, fontFamily: 'ManropeRegular', fontWeight: "400", color: selectedDate ? "#121212" : "#8B8B8B", }}>{selectedDate ? moment(selectedDate).format('DD-MM-YYYY') : 'Pick A Date'}</Text>
                             <CalendarIcon />
-                            <Text style={{ fontSize: 12, fontFamily: 'ManropeRegular', fontWeight: "400" }}>{selectedDate ? 'Booking Date' : 'Select The Date'}</Text>
-                        </View>
-                        <Text style={[styles.title, { marginTop: 2 }]}>{selectedDate ? moment(selectedDate).format('DD-MM-YYYY') : null}</Text>
+                        </TouchableOpacity>
+                        <Text style={{ marginTop: 20, fontWeight: "600", color: "#121212", fontSize: 14, fontFamily: 'ManropeRegular' }}>Booking Time</Text>
 
-                    </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => setTimeSlotModalVisible(true)} style={{ marginTop: 25, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                        <View style={{ alignItems: "center" }}>
+                        <TouchableOpacity style={{
+                            marginTop: 5, flexDirection: "row",
+                            alignItems: "center", justifyContent: "space-between",
+                            borderWidth: 1, borderColor: "#FD813B", borderRadius: 4,
+                            paddingHorizontal: 20, paddingVertical: 10
+                        }} onPress={() => setTimeSlotModalVisible(true)}>
+                            <Text style={{ fontSize: 13, fontFamily: 'ManropeRegular', fontWeight: "400", color: selectedDate ? "#121212" : "#8B8B8B", }}>{selectedTimeSlot ? selectedTimeSlot : 'Pick A Time Slot'}</Text>
                             <ServiceTime />
-                            <Text style={{ fontSize: 12, fontFamily: 'ManropeRegular', fontWeight: "400" }}>{selectedDate ? 'Service Time' : 'Service Time'}</Text>
-                        </View>
-                        <Text style={[styles.title, { marginTop: 2 }]}>{selectedTimeSlot ? selectedTimeSlot : 'Pick A Time Slot'}</Text>
+                        </TouchableOpacity>
 
-                    </TouchableOpacity>
-
+                    </View>
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
 
@@ -428,27 +434,27 @@ const ViewCaterings = ({ route, navigation }) => {
 
             <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
                 <BookDatesButton
-                    onPress={() => 
-                    {
+                    onPress={() => {
                         const incompleteItem = itemsWithTotalPrice.find(item => !item.hasOwnProperty('totalPrice'));
-                          console.log("incomplete value::::::::", incompleteItem)
+                        console.log("incomplete value::::::::", incompleteItem)
                         if (incompleteItem) {
                             // setMissingTitle(incompleteItem?.title);
                             setModalMessage(`Please add the number of plates for ${incompleteItem.title}`);
                             setModalVisible(true)
-                         }else if(selectedTimeSlot && selectedDate && itemsWithTotalPrice?.length !== 0){
-                        navigation.navigate('CateringsOverView', { categoryId: categoryId, cateringItems: itemsWithTotalPrice, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `₹${grandTotal}` })
-                        }  else if (itemsWithTotalPrice?.length === 0) {
+                        } else if (selectedTimeSlot && selectedDate && itemsWithTotalPrice?.length !== 0) {
+                            navigation.navigate('CateringsOverView', { categoryId: categoryId, cateringItems: itemsWithTotalPrice, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `₹${grandTotal}` })
+                        } else if (itemsWithTotalPrice?.length === 0) {
                             setModalMessage("Please select the Combo");
                             setModalVisible(true);
-                          }  else if (!selectedDate) {
+                        } else if (!selectedDate) {
                             setModalMessage("Please select the Dates");
                             setModalVisible(true);
-                          } else if (!selectedTimeSlot) {
+                        } else if (!selectedTimeSlot) {
                             setModalMessage("Please select the Time Slot");
                             setModalVisible(true);
-                          }}}
-                    text={ itemsWithTotalPrice?.length > 0 ? `₹${grandTotal}   View Cart`: "View Cart"}
+                        }
+                    }}
+                    text={itemsWithTotalPrice?.length > 0 ? `₹${grandTotal}   View Cart` : "View Cart"}
                     padding={10}
                 />
             </View>
