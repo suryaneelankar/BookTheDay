@@ -15,7 +15,7 @@ import { useSelector } from "react-redux";
 import { Dropdown } from 'react-native-element-dropdown';
 import themevariable from "../../utils/themevariable";
 import Autocomplete from 'react-native-autocomplete-input';
-
+import IonIcon from 'react-native-vector-icons/Ionicons';
 
 const Events = () => {
     const navigation = useNavigation();
@@ -23,47 +23,19 @@ const Events = () => {
     const [getUserAuth, setGetUserAuth] = useState('');
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const [nearByData, setNearByData] = useState([]);
-    const [nearByClicked, setNearByClicked] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const userLocationFetched = useSelector((state) => state.userLocation);
-    const [totalEventPages,setTotalEventPages] = useState(0);
-    const [clothSize, setClothSize] = useState(null);
-    const clothesSizeData = [
-        { label: 'Gachibowli', value: 'Gachibowli' },
-        { label: 'Kondapur', value: 'Kondapur' },
-        { label: 'Madhapur', value: 'Madhapur' },
-        { label: 'Mehdipatnam', value: 'Mehdipatnam' },
-        { label: 'Ameerpet', value: 'Ameerpet' },
-        { label: 'Yousufguda', value: 'Yousufguda' },
-        { label: 'Nanakramguda', value: 'Nanakramguda' },
-        { label: 'Madhuranagar', value: 'Madhuranagar' },
-        { label: 'ECIL', value: 'ECIL' },
-        { label: 'BHEL', value: 'BHEL' },
-        { label: 'Lingampally', value: 'Lingampally' },
-        { label: 'Serlingampally', value: 'Serlingampally' }
-    ];
-    console.log('userLocationFetched is::>>',userLocationFetched?.latitude,userLocationFetched?.longitude);
-    const [totalNearByPages, setTotalNearByPages] = useState(0);
+    const [totalEventPages, setTotalEventPages] = useState(0);
     const [allLocations, setAllLocations] = useState([]);
-    const [selectedLocation, setSelectedLocation] = useState([]);
     const [query, setQuery] = useState('');
-    const [dropdownVisible, setDropdownVisible] = useState(false);  // New state to handle dropdown visibility
-
-
-
-    // console.log("user selevcted address is events::::::::", userLocationFetched)
-
-    // const [userLatitude,setUserLatitude] = useState(userLocationFetched?.latitude);
-    // const [userLongitude,setUserLongitude] = useState(userLocationFetched?.longitude);
-    // console.log("latitue long", userLatitude ,'+++++++++', userLongitude);
-    console.log('userLocationFetched is::>>', userLocationFetched?.latitude, userLocationFetched?.longitude);
+    const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [locationBasedData,setLoactionBasedData] = useState([]);
 
     useEffect(() => {
         getAllEvents(currentPage);
         getAllLocations();
     }, [])
-    
+
     // This function loads more function halls (all events) and ensures the page is incremented correctly
     const loadMoreFunctionHalls = () => {
         if (hasMore && !loading && currentPage < totalEventPages) {
@@ -74,7 +46,6 @@ const Events = () => {
 
     // This function loads more nearby function halls and ensures the page is incremented correctly
     const getAllEvents = async (page) => {
-        setNearByData([]);
         setLoading(true);
         const token = await getUserAuthToken();
         setGetUserAuth(token);
@@ -111,7 +82,7 @@ const Events = () => {
             });
 
             console.log("location select res:::::::", response);
-            setEventsData(response?.data?.data);
+            setLoactionBasedData(response?.data?.data);
         } catch (error) {
             setLoading(false);
             console.error('Error fetching function halls:', error);
@@ -213,10 +184,6 @@ const Events = () => {
 
     const returnCategoriesCount = () => {
         let count = 0;
-        if (nearByClicked) {
-            count = nearByData?.length;
-            return count;
-        }
         count = eventsData?.length;
         return count;
     };
@@ -234,64 +201,72 @@ const Events = () => {
     const handleSelect = (value) => {
         setQuery(value);  // Set query to selected item value
         setDropdownVisible(false);  // Hide dropdown after selection
-        getAllEventsByLocation(value)
+        if (value) {
+            getAllEventsByLocation(value)
+        }
     };
-    
+
 
     return (
         <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
 
-              <View style={styles.autocompleteContainer}>
+            <View style={styles.autocompleteContainer}>
 
-            <Autocomplete
-                data={dropdownVisible && filteredData?.length > 0 ? filteredData : []}  // Conditionally hide results based on dropdownVisible
-                value={query}
-                onChangeText={handleQueryChange}  // Handle query changes
-                placeholder="Seach Location..."
-                flatListProps={{
-                    keyExtractor: (item) => item?._id.toString(),
-                    renderItem: ({ item }) => (
-                        <TouchableOpacity onPress={() => handleSelect(item?.value)}>
-                            <Text style={{ padding: 10 }}>{item?.value}</Text>
-                        </TouchableOpacity>
-                    ),
-                }}
-                inputContainerStyle={{
-                    borderRadius: 15,
-                    height:50,
-                    width:"90%",
-                    alignSelf:"center",
-                    marginTop:10,
-                    backgroundColor:"#E3E3E7"
-                   
-                }}
-                style={{marginTop:3, borderRadius:15, width:"90%",alignSelf:"center",backgroundColor:"#E3E3E7"}}
-                hideResults={dropdownVisible === false || filteredData.length === 0}  // Hide results initially and when dropdownVisible is false
+                <Autocomplete
+                    data={dropdownVisible && filteredData?.length > 0 ? filteredData : []}  // Conditionally hide results based on dropdownVisible
+                    value={query}
+                    onChangeText={handleQueryChange}  // Handle query changes
+                    placeholder="Seach Location..."
+                    flatListProps={{
+                        keyExtractor: (item) => item?._id.toString(),
+                        renderItem: ({ item }) => (
+                            <TouchableOpacity onPress={() => handleSelect(item?.value)}>
+                                <Text style={{ padding: 10 }}>{item?.value}</Text>
+                            </TouchableOpacity>
+                        ),
+                    }}
+                    inputContainerStyle={{
+                        borderRadius: 35,
+                        height: 50,
+                        width: "90%",
+                        alignSelf: "center",
+                        marginTop: 10,
+                        backgroundColor: "#E3E3E7",
+
+                    }}
+                    style={{ marginTop: 3, borderRadius: 15, width: "90%", alignSelf: "center", backgroundColor: "#E3E3E7" }}
+                    hideResults={dropdownVisible === false || filteredData.length === 0}  // Hide results initially and when dropdownVisible is false
                 />
-                </View>
+                <TouchableOpacity style={{ position: 'absolute', justifyContent: 'flex-end', right: 30, marginTop: 20 }} onPress={() => {
+                    setQuery(''); // Clear the input value
+                    // You can also set dropdownVisible to false if needed
+                }}>
+                    <IonIcon name="close-circle" size={24} color="gray" style={{ marginTop: 0 }} />
+                </TouchableOpacity>
+            </View>
 
-            <View style={{marginTop:60, marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
+            <View style={{ marginTop: 60, marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
                 <View>
                     <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
                     <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Function Halls</Text>
                 </View>
             </View>
 
-                <FlatList
-                    data={eventsData}
-                    renderItem={renderItem}
-                    keyExtractor={(item) => item._id}
-                    onEndReached={loadMoreFunctionHalls} // Fetch more when list ends
-                    onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
-                    ListFooterComponent={() =>
-                        loading ? <ActivityIndicator size="large" color="orange" /> : null
-                    }
-                    ListEmptyComponent={
-                        <View >
-                            <Text>{eventsData?.length == 0 ? 'No Near By Function halls Available please check in all' : 'No Function halls found'}</Text>
-                        </View>
-                    }
-                />
+            <FlatList
+                data={query ? locationBasedData : eventsData}
+                renderItem={renderItem}
+                keyExtractor={(item) => item._id}
+                onEndReached={loadMoreFunctionHalls} // Fetch more when list ends
+                onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
+                ListFooterComponent={() =>
+                    loading ? <ActivityIndicator size="large" color="orange" /> : null
+                }
+                ListEmptyComponent={
+                    <View >
+                        <Text>{eventsData?.length == 0 ? 'No Near By Function halls Available please check in all' : 'No Function halls found'}</Text>
+                    </View>
+                }
+            />
 
         </SafeAreaView>
     )
@@ -373,8 +348,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 0,
         top: 0,
-        zIndex: 1
-      },
+        zIndex: 1,
+        flexDirection: 'row',
+    },
     dropdown: {
         height: 50,
         borderColor: themevariable.Color_C8C8C6,
