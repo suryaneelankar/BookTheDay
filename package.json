@@ -50,6 +50,7 @@
     "react-native-screens": "^3.31.1",
     "react-native-snap-carousel": "^3.9.1",
     "react-native-splash-screen": "^3.3.0",
+    "react-native-step-indicator": "^1.0.3",
     "react-native-svg": "^15.3.0",
     "react-native-svg-transformer": "^1.4.0",
     "react-native-svg-uri": "^1.2.3",

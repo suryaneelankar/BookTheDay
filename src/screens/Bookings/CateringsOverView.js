@@ -57,7 +57,8 @@ const CateringsOverView = ({ route, navigation }) => {
           numOfDays: 1,
           totalAmount: totalPrice.replace(/[^\d]/g, ''),
           bookingMenuIds: transformedData,
-          userMobileNumber: userLoggedInMobileNum
+          userMobileNumber: userLoggedInMobileNum,
+          bookingTime : timeSlot
         }
         console.log("payload is:::::::", payload);
         try {

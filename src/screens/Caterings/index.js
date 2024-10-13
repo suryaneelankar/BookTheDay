@@ -12,6 +12,12 @@ import { verticalScale } from "../../utils/scalingMetrics";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
 import { useSelector } from "react-redux";
+import Autocomplete from 'react-native-autocomplete-input';
+import IonIcon from 'react-native-vector-icons/Ionicons';
+import OfferStikcer from '../../assets/svgs/offerSticker.svg';
+import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
+import VegIcon from '../../assets/svgs/foodtype/veg.svg';
+import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 
 const Caterings = () => {
     const navigation = useNavigation();
@@ -29,16 +35,22 @@ const Caterings = () => {
     const [hasMoreNearBy, setHasMoreNearBy] = useState(true);
     const [nearByLoading, setNearByLoading] = useState(false);
     const [nearByClicked, setNearByClicked] = useState(false);
+    const [allLocations, setAllLocations] = useState([]);
+    const [query, setQuery] = useState('');
+    const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [locationBasedData, setLoactionBasedData] = useState([]);
 
     const userLatitude = userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude;
     const userLongitude = userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude;
-    console.log("latitue long", userLatitude, '+++++++++', userLongitude,userLocationFetched);
+    console.log("latitue long", userLatitude, '+++++++++', userLongitude, userLocationFetched);
 
     // console.log("user selevcted address is events::::::::", userLocationFetched)
 
     useEffect(() => {
         getAllCaterings(currentPage);
-    }, [])
+        getAllLocations();
+    }, []);
+
 
     const loadMoreCaterings = () => {
         if (hasMore && !loading) {
@@ -99,14 +111,71 @@ const Caterings = () => {
             console.error('Error fetching food caterings:', error);
         }
         setLoading(false);
-    }
+    };
+
+    const getAllCateringsByLocation = async (value) => {
+        console.log("value is :::",value);
+        const token = await getUserAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/getAllFoodCateringsByLocation/${value}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            console.log("location select res:::::::", response);
+            setLoactionBasedData(response?.data?.data);
+        } catch (error) {
+            setLoading(false);
+            console.error('Error fetching function halls:', error);
+        }
+        setLoading(false);
+    };
+
+    const getAllLocations = async () => {
+        const token = await getUserAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/user/locationList`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setAllLocations(response?.data?.data);
+        } catch (error) {
+            setLoading(false);
+            console.error('Error fetching function halls:', error);
+        }
+        setLoading(false);
+    };
+
+    const filteredData = allLocations?.filter(item =>
+        item?.value.toLowerCase().includes(query.toLowerCase())
+    );
+
+    const handleQueryChange = (text) => {
+        setQuery(text);
+        if (text.length > 0) {
+            setDropdownVisible(true);  // Show dropdown when typing
+        } else {
+            setDropdownVisible(false);  // Hide dropdown if query is cleared
+        }
+       
+    };
+    const handleSelect = (value) => {
+        setQuery(value); 
+        setDropdownVisible(false);
+        if (value) {
+            getAllCateringsByLocation(value);
+        }
+    };
+
 
     const getNearByCaterings = async (nearByPage) => {
         setCateringsData([]);
         setNearByLoading(true);
         const token = await getUserAuthToken();
         setGetUserAuth(token);
-        console.log('userLocationFetched?.latitude caters is::>>',userLatitude,userLongitude)
+        console.log('userLocationFetched?.latitude caters is::>>', userLatitude, userLongitude)
         try {
             const response = await axios.get(`${BASE_URL}/getNearByFoodCaterings?page=${nearByPage}&limit=10&latitude=${userLatitude}&longitude=${userLongitude}`, {
                 headers: {
@@ -131,14 +200,10 @@ const Caterings = () => {
     }
 
     const renderFoodCaterings = ({ item }) => {
-        //    const token = await getUserAuthToken()
         const convertLocalhostUrls = (url) => {
             return url.replace("localhost", LocalHostUrl);
         };
-        // console.log("insdie render item")
         const imageUrls = item?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
-
-        // console.log("IMAGE URLS IS:::::::::::::", imageUrls)
         return (
             <View style={{ borderRadius: 20, marginHorizontal: 20, marginBottom: 5, elevation: -10 }}>
                 <View style={[styles.container]}>
@@ -149,18 +214,43 @@ const Caterings = () => {
                         activeDotColor="#FFFFFF"
                         dotColor="#FFFFFF"
                         activeDotStyle={{ width: 12, height: 12, borderRadius: 6 }}
-                        dot={<View style={{ backgroundColor: '#FFFFFF', width: 8, height: 8, borderRadius: 6, marginHorizontal: 8 }} />}
+                        dot={<View style={{ backgroundColor: '#FFFFFF', width: 7, height: 7, borderRadius: 6, marginHorizontal: 8 }} />}
                     >
                         {imageUrls.map((itemData, index) => (
-                            <TouchableOpacity style={styles.slide} key={index}
-                                onPress={() => navigation.navigate('ViewCaterings', { categoryId: item?._id })}
-                            >
-                                <FastImage source={{
-                                    uri: itemData,
-                                    headers: { Authorization: `Bearer ${getUserAuth}` }
-                                }} style={styles.image} />
-                            </TouchableOpacity>
+                            <>
+                                <TouchableOpacity style={styles.slide} key={index}
+                                    onPress={() => navigation.navigate('ViewCaterings', { categoryId: item?._id })}
+                                >
+                                    <FastImage source={{
+                                        uri: itemData,
+                                        headers: { Authorization: `Bearer ${getUserAuth}` }
+                                    }} style={styles.image} />
+                                </TouchableOpacity>
+                                {item?.discountPercentage ?
+                                    <>
+                                        <OfferStikcer style={{
+                                            position: 'absolute',
+                                            // alignSelf:"flex-end"
+                                            top: 5,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                        }} />
+                                        <View style={{
+                                            position: 'absolute',
+                                            top: 5,
+                                            left: 5,
+                                            right: 0,
+                                            bottom: 0,
+
+                                        }}>
+                                            <Text style={{ color: "#FFFFFF", fontSize: 10, fontWeight: "700", fontFamily: 'ManropeRegular' }}>{item?.discountPercentage}%</Text>
+                                            <Text style={{ color: "#FFFFFF", fontSize: 10, fontWeight: "700", fontFamily: 'ManropeRegular' }}>Off</Text>
+                                        </View>
+                                    </> : null}
+                            </>
                         ))}
+
                     </Swiper>
                 </View>
                 <TouchableOpacity
@@ -170,26 +260,30 @@ const Caterings = () => {
                         } else if (selectedCategory === 'Catering') {
                             navigation.navigate('ViewCaterings', { categoryId: item?._id });
                         }
-                    }} style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
+                    }} style={{ width: Dimensions.get('window').width - 30, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                         <View style={{ width: '60%', }}>
-                            <Text style={{ color: 'black', fontSize: 17, fontWeight: "700", fontFamily: "ManropeRegular" }} >{item?.foodCateringName}</Text>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', }}>
-                                <LocationMarkIcon style={{ marginTop: 5 }} />
-                                <Text style={{ fontWeight: '500', marginHorizontal: 5, color: '#696969', fontSize: 13, marginTop: 5, fontFamily: "ManropeRegular" }}>{item?.foodCateringAddress?.address}</Text>
+                            <Text style={{ color: '#101010', fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular" }} >{item?.foodCateringName}</Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                                <LocationMarkIcon />
+                                <Text numberOfLines={1} ellipsizeMode='tail' style={{ width: "90%", fontWeight: '400', marginHorizontal: 5, color: '#939393', fontSize: 13, fontFamily: "ManropeRegular" }}>{item?.county}</Text>
                             </View>
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "50%" }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between',marginTop:10 }}>
 
-                        <View style={{ backgroundColor: item?.available ? "orange" : "orange", flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
+                        {/* <View style={{ backgroundColor: item?.available ? "orange" : "orange", flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
                             <Image source={require('../../assets/available.png')} style={{ width: 15, height: 15 }} />
                             {item?.available ?
                                 <Text style={{ fontWeight: '600', color: '#4A4A4A', fontSize: 13, marginHorizontal: 5, fontFamily: "ManropeRegular" }}>Available</Text>
                                 :
                                 <Text style={{ fontWeight: '600', color: '#4A4A4A', fontSize: 13, marginHorizontal: 5, fontFamily: "ManropeRegular" }}>Booked</Text>
                             }
+                        </View> */}
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center",paddingVertical:5 }}>
+                            <Text>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
                         </View>
 
                     </View>
@@ -200,11 +294,7 @@ const Caterings = () => {
 
     const returnCategoriesCount = () => {
         let count = 0;
-        if (nearByClicked) {
-            count = nearByData?.length;
-            return count;
-        }
-        count = cateringsData?.length;
+        count = query ? locationBasedData?.length : cateringsData?.length;
         return count;
     }
 
@@ -212,31 +302,63 @@ const Caterings = () => {
         <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
             <View style={{ flex: 1 }}>
 
-                <View style={{ backgroundColor: "white", marginTop: 20 }}>
-                    <View style={styles.searchProduct}>
-                        <View style={styles.searchProHeader}>
-                            <SearchIcon style={{ marginLeft: verticalScale(20) }} />
-                            <TextInput
-                                placeholder="Search fashion"
-                                style={styles.textInput} />
-                            <FilterIcon />
-                        </View>
-                    </View>
-                    {/* <CategoryFilter onCategoryChange={handleCategoryChange} /> */}
+                <View style={styles.autocompleteContainer}>
+
+                    <Autocomplete
+                        data={dropdownVisible && filteredData?.length > 0 ? filteredData : []}  // Conditionally hide results based on dropdownVisible
+                        value={query}
+                        onChangeText={handleQueryChange}  // Handle query changes
+                        placeholder="Seach Location..."
+                        flatListProps={{
+                            keyExtractor: (item) => item?._id.toString(),
+                            renderItem: ({ item }) => (
+                                <TouchableOpacity onPress={() => handleSelect(item?.value)}>
+                                    <Text style={{ padding: 10 }}>{item?.value}</Text>
+                                </TouchableOpacity>
+                            ),
+                        }}
+                        inputContainerStyle={{
+                            borderRadius: 35,
+                            height: 50,
+                            width: "90%",
+                            alignSelf: "center",
+                            marginTop: 10,
+                            backgroundColor: "#E3E3E7",
+
+                        }}
+                        style={{ marginTop: 3, borderRadius: 15, width: "90%", alignSelf: "center", backgroundColor: "#E3E3E7" }}
+                        hideResults={dropdownVisible === false || filteredData.length === 0}  // Hide results initially and when dropdownVisible is false
+                    />
+                    <TouchableOpacity style={{ position: 'absolute', justifyContent: 'flex-end', right: 30, marginTop: 20 }} onPress={() => {
+                        setQuery(''); // Clear the input value
+                    }}>
+                        <IonIcon name="close-circle" size={24} color="gray" style={{ marginTop: 0 }} />
+                    </TouchableOpacity>
                 </View>
 
-                <View style={{ marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
+                <View style={{ marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row', marginTop: 60 }}>
                     <View>
                         <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
                         <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Catering Services in Hyderabad</Text>
                     </View>
-                    <TouchableOpacity style={{ marginTop: 20 }} onPress={() => { handleAllFoodCateringsPress() }}>
-                        <Text style={{ backgroundColor: 'orange', borderRadius: 10, padding: 10, fontWeight: '800', fontFamily: "ManropeRegular", }}>All events</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={{ marginTop: 20 }} onPress={() => { handleNearByFoodCateringsPress() }}>
-                        <Text style={{ backgroundColor: 'orange', borderRadius: 10, padding: 10, fontWeight: '800', fontFamily: "ManropeRegular", }}>Near By</Text>
-                    </TouchableOpacity>
                 </View>
+
+                <FlatList
+                    data={query ? locationBasedData : cateringsData}
+                    renderItem={renderFoodCaterings}
+                    keyExtractor={(item) => item?._id}
+                    onEndReached={loadMoreCaterings} // Fetch more when list ends
+                    onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
+                    ListFooterComponent={() =>
+                        loading ? <ActivityIndicator size="large" color="orange" /> : null
+                    }
+                    ListEmptyComponent={
+                        <View >
+                            <Text>No Function halls found</Text>
+                        </View>
+                    }
+                    contentContainerStyle={{}}
+                />
 
                 {/* <FlatList
                     data={cateringsData}
@@ -249,7 +371,7 @@ const Caterings = () => {
                     }
                 /> */}
 
-                {!nearByClicked ?
+                {/* {!nearByClicked ?
                     <FlatList
                         data={cateringsData}
                         renderItem={renderFoodCaterings}
@@ -281,7 +403,7 @@ const Caterings = () => {
                             </View>
                         }
                     />
-                }
+                } */}
 
             </View>
         </SafeAreaView>
@@ -299,6 +421,15 @@ const styles = StyleSheet.create({
     },
     wrapper: {
         height: 200,
+    },
+    autocompleteContainer: {
+        flex: 1,
+        left: 0,
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        zIndex: 1,
+        flexDirection: 'row',
     },
     strickedoffer: {
         fontSize: 12,
@@ -348,7 +479,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignSelf: 'center',
-        width: Dimensions.get('window').width - 50,
+        width: Dimensions.get('window').width - 30,
         // backgroundColor:'red'
     },
     image: {
