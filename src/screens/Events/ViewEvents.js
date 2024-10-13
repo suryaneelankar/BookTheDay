@@ -26,7 +26,7 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import IonIcons from 'react-native-vector-icons/Ionicons';
-
+import Entypo from 'react-native-vector-icons/Entypo';
 
 
 const ViewEvents = ({ route, navigation }) => {
@@ -191,13 +191,15 @@ const ViewEvents = ({ route, navigation }) => {
       case 'Parking':
         return  <FontAwesome5 name={'car'} size={24} color={'#FD813B'}  />;
       case 'Restrooms/Toilets':
-        return <FontAwesome5 name={'restroom'} size={22} color={'#FD813B'}  />;
+        return <FontAwesome5 name={'restroom'} size={24} color={'#FD813B'}  />;
       case 'Wheelchair access':
-        return <FontAwesome name='wheelchair' size={20} color={'#FD813B'}/>;
+        return <FontAwesome name='wheelchair' size={24} color={'#FD813B'}/>;
       case 'Tables with basic covers':
         return <MaterialIcon name='table-restaurant' size={24} color={'#FD813B'} />;
+      case 'Power Backup':
+        return <Entypo name='power-plug' size={24} color={'#FD813B'} />;
       case 'Chairs':
-        return <Icon name='chair' size={20} color={'#FD813B'} />;
+        return <Icon name='chair' size={24} color={'#FD813B'} />;
       case 'Coolers / Fans':
         return <MaterialCommunityIcons name='fan' size={24} color={'#FD813B'} />;
       case 'Air Conditioners':
@@ -205,9 +207,9 @@ const ViewEvents = ({ route, navigation }) => {
       case 'Bedrooms':
         return <IonIcons name={'bed-sharp'} size={24} color={'#FD813B'} />;
       case 'Lighting':
-        return <MaterialCommunityIcons name='string-lights' size={28} color={'#FD813B'} />;
+        return <MaterialCommunityIcons name='string-lights' size={24} color={'#FD813B'} />;
       case 'Kitchen Space':
-        return <FontAwesome6 name={'kitchen-set'} size={22} color={'#FD813B'} />;
+        return <FontAwesome6 name={'kitchen-set'} size={24} color={'#FD813B'} />;
       case 'Bridal Room':
         return <IonIcons name={'bed-sharp'} size={24} color={'#FD813B'} />;
       case 'Sound/music license':
@@ -234,9 +236,7 @@ const ViewEvents = ({ route, navigation }) => {
       <View style={styles.row}>
         {item.map((data) => (
           <View key={data?.id} style={styles.itemContainer}>
-             
             {getIcon(data?.name)}
-
             <Text style={styles.itemText}>{data?.name}</Text>
           </View>
         ))}
@@ -257,7 +257,7 @@ const ViewEvents = ({ route, navigation }) => {
             paginationStyle={{ bottom: 15 }}
             paginationStyleItem={{ alignSelf: 'center' }}
             paginationStyleItemInactive={{ width: 7, height: 7 }}
-            paginationStyleItemActive={{ width: 10, height: 10 }}
+            paginationStyleItemActive={{ width: 12, height: 12 }}
             data={subImages}
             style={{ flex: 1, alignSelf: "center", }}
             renderItem={({ item }) => (
@@ -283,18 +283,18 @@ const ViewEvents = ({ route, navigation }) => {
 
           </View>
 
-          <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center" }}>
-            <MapMarkIcon />
+          <View style={{ flexDirection: "row", marginTop: 15, alignItems: "flex-start" }}>
+            <MapMarkIcon style={{marginTop:2}}/>
             <Text style={{ color: "#939393", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', marginLeft: 5 }}>{eventsDetails?.functionHallAddress?.address}</Text>
           </View>
 
           <View style={{ flexDirection: "row", justifyContent: "space-between",marginTop:15 }}>
             < View style={{}}>
-            <Text style={{ fontSize: 14, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular'}}>Food Type Allowed:</Text>
+            <Text style={{ fontSize: 14, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular'}}>Food Type Allowed</Text>
             <Text style={{marginTop:10}}>{eventsDetails?.foodType == 'Both' ? <VegNonVegIcon/> :  eventsDetails?.foodType == 'veg' ? <VegIcon/>  : <NonVegIcon/>}</Text>
             </View>
             <View style={{backgroundColor:"#FEF7DE",height:25}}>
-            <Text style={{textAlign:"center", color: "#FD813B", fontSize: 14, fontWeight: "700", fontFamily: 'ManropeRegular' ,paddingHorizontal:10,borderRadius:5}}> {eventsDetails?.seatingCapacity} pax</Text>
+            <Text style={{marginTop:3, color: "#FD813B", fontSize: 14, fontWeight: "700", fontFamily: 'ManropeRegular' ,paddingHorizontal:10,borderRadius:5}}> {eventsDetails?.seatingCapacity} pax</Text>
            </View>
           </View>
 
@@ -313,12 +313,8 @@ const ViewEvents = ({ route, navigation }) => {
               data={rows}
               keyExtractor={(item, index) => index.toString()}
               renderItem={renderHallAmenities}
+              contentContainerStyle={{marginTop:15}}
             />
-
-            <View style={{ marginTop: 20, }}>
-              <Text style={{ fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular' }}>Food Type Allowed</Text>
-              <Text style={{ fontWeight: "700", color: "#8B8B8B", fontSize: 12, fontFamily: 'ManropeRegular', marginTop: 10 }}>{eventsDetails?.foodType}</Text>
-            </View>
 
           </View>
 
@@ -328,7 +324,7 @@ const ViewEvents = ({ route, navigation }) => {
             <Text style={{ fontWeight: "600", color: "#121212", fontSize: 14, fontFamily: 'ManropeRegular' }}>Booking Date</Text>
 
             <TouchableOpacity style={{
-              marginTop: 5, flexDirection: "row",
+              marginTop: 10, flexDirection: "row",
               alignItems: "center", justifyContent: "space-between",
               borderWidth: 1, borderColor: "#FD813B", borderRadius: 4,
               paddingHorizontal: 20, paddingVertical: 12
@@ -340,7 +336,7 @@ const ViewEvents = ({ route, navigation }) => {
             <Text style={{ marginTop: 20, fontWeight: "600", color: "#121212", fontSize: 14, fontFamily: 'ManropeRegular' }}>Booking Time</Text>
 
             <TouchableOpacity style={{
-              marginTop: 5, flexDirection: "row",
+              marginTop: 10, flexDirection: "row",
               alignItems: "center", justifyContent: "space-between",
               borderWidth: 1, borderColor: "#FD813B", borderRadius: 4,
               paddingHorizontal: 20, paddingVertical: 12
@@ -354,12 +350,12 @@ const ViewEvents = ({ route, navigation }) => {
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
 
             <Text style={[styles.title, { marginTop: 10 }]}>Total Days :</Text>
-            <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{noOfDays > 1 ? `${noOfDays} days` : '1 day'}</Text>
+            <Text style={[styles.title, { marginTop: 10, fontWeight: "600", }]}>{noOfDays > 1 ? `${noOfDays} days` : '1 day'}</Text>
           </View>
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, marginBottom: "20%" }}>
             <Text style={[styles.title, { marginTop: 10 }]}>Total Price :</Text>
-            <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{formatAmount(eventsDetails?.rentPricePerDay)}</Text>
+            <Text style={[styles.title, { marginTop: 10, fontWeight: "600" }]}>{formatAmount(eventsDetails?.rentPricePerDay)}</Text>
           </View>
         </View>
 
@@ -495,7 +491,7 @@ const styles = StyleSheet.create({
   text: { fontSize: 12, textAlign: 'center' },
   title: {
     fontFamily: 'ManropeRegular',
-    fontSize: 12,
+    fontSize: 14,
     color: "#121212",
     fontWeight: "700",
   },
@@ -517,7 +513,7 @@ const styles = StyleSheet.create({
     marginRight:10
   },
   itemText: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: "400",
     color: "#606060",
     fontFamily: 'ManropeRegular',
