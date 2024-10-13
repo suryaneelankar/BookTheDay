@@ -29,7 +29,7 @@ const Events = () => {
     const [allLocations, setAllLocations] = useState([]);
     const [query, setQuery] = useState('');
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const [locationBasedData,setLoactionBasedData] = useState([]);
+    const [locationBasedData, setLoactionBasedData] = useState([]);
 
     useEffect(() => {
         getAllEvents(currentPage);
@@ -118,7 +118,7 @@ const Events = () => {
         const imageUrls = item?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
 
         return (
-            <View style={{ flex: 1,borderRadius: 20, marginHorizontal: 20, marginBottom: 5, }}>
+            <View style={{ flex: 1, borderRadius: 20 }}>
                 <View style={[styles.container]}>
                     <Swiper
                         style={styles.wrapper}
@@ -128,7 +128,7 @@ const Events = () => {
                         activeDotColor="#FFFFFF"
                         dotColor="#FFFFFF"
                         activeDotStyle={{ width: 12, height: 12, borderRadius: 6 }}
-                        dot={<View style={{ backgroundColor: '#FFFFFF', width: 8, height: 8, borderRadius: 6, marginHorizontal: 8 }} />}
+                        dot={<View style={{ backgroundColor: '#FFFFFF', width: 7, height: 7, borderRadius: 6, marginHorizontal: 8 }} />}
                     >
                         {imageUrls.map((itemData, index) => (
                             <TouchableOpacity style={styles.slide} key={index}
@@ -144,36 +144,27 @@ const Events = () => {
                 </View>
                 <TouchableOpacity
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
-                    style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between',marginBottom:10 }}>
+                    style={{ width: Dimensions.get('window').width - 30, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
                         <View style={{ width: '60%', }}>
-                            <Text style={{ color: '#101010', fontSize: 14, fontWeight: "700", fontFamily: "ManropeRegular" }} >{item?.functionHallName}</Text>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop:4}}>
-                                <LocationMarkIcon/>
-                                <Text numberOfLines={1} ellipsizeMode='tail' style={{width:"90%", fontWeight: '400', marginHorizontal: 5, color: '#939393', fontSize: 12, fontFamily: "ManropeRegular" }}>{item?.county}</Text>
+                            <Text style={{ color: '#101010', fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular" }} >{item?.functionHallName}</Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                                <LocationMarkIcon />
+                                <Text numberOfLines={1} ellipsizeMode='tail' style={{ width: "90%", fontWeight: '400', marginHorizontal: 5, color: '#939393', fontSize: 13, fontFamily: "ManropeRegular" }}>{item?.county}</Text>
                             </View>
                         </View>
                         <View>
-                            <Text style={{ fontWeight: '800', color: '#202020', fontSize: 14, fontFamily: "ManropeRegular" }}>{formatAmount(item?.rentPricePerDay)}<Text style={{ color: '#202020', fontFamily: "ManropeRegular",fontSize: 12 ,fontWeight:"400"}}> /day</Text></Text>
+                            <Text style={{ fontWeight: '800', color: '#202020', fontSize: 14, fontFamily: "ManropeRegular" }}>{formatAmount(item?.rentPricePerDay)}<Text style={{ color: '#202020', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}> /day</Text></Text>
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "50%" }}>
+                    <View style={{ flexDirection: 'row', }}>
 
-                        {/* <View style={{ backgroundColor: item?.available ? "#FEF7DE" : "#FEF7DE", flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
-                            <Image source={require('../../assets/available.png')} style={{ width: 15, height: 15 }} />
-                            {item?.available ?
-                                <Text style={{ fontWeight: '400', color: '#4A4A4A', fontSize: 11, marginHorizontal: 5, fontFamily: "ManropeRegular" }}>Available</Text>
-                                :
-                                <Text style={{ fontWeight: '400', color: '#4A4A4A', fontSize: 11, marginHorizontal: 5, fontFamily: "ManropeRegular" }}>Booked</Text>
-                            }
-                        </View> */}
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8}}>
-                            {/* <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} /> */}
-                        <Text style={{color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11,fontWeight:"400" }}> {item?.seatingCapacity} pax</Text>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
+                            <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.seatingCapacity} pax</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8 }}>
-                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight:"400" }}> {item?.bedRooms} Rooms</Text>
+                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
+                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.bedRooms} Rooms</Text>
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -208,7 +199,7 @@ const Events = () => {
 
 
     return (
-        <SafeAreaView style={{ flex: 1, marginBottom: "10%",backgroundColor:"white" }}>
+        <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
 
             <View style={styles.autocompleteContainer}>
 
@@ -263,9 +254,10 @@ const Events = () => {
                 }
                 ListEmptyComponent={
                     <View >
-                        <Text>{eventsData?.length == 0 ? 'No Near By Function halls Available please check in all' : 'No Function halls found'}</Text>
+                        <Text>No Function halls found</Text>
                     </View>
                 }
+                contentContainerStyle={{}}
             />
 
         </SafeAreaView>
@@ -390,7 +382,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignSelf: 'center',
-        width: Dimensions.get('window').width - 50,
+        width: Dimensions.get('window').width - 30,
         // backgroundColor:'red'
     },
     image: {
