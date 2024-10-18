@@ -62,6 +62,8 @@ import AadharUpload from "../screens/KYC/AadharUpload";
 import BankDetailsScreen from "../screens/VendorScreens/VendorProfile/BankDetails";
 import UserAadharUpload from "../screens/KYC/UserAadharUpload";
 import AdminDashboard from "../screens/Admin/adminDashboard";
+import PaymentSuccess from "../screens/PaymentScreens/PaymentSuccess";
+import PaymentFailedScreen from "../screens/PaymentScreens/PaymentFailed";
 
 const MainNavigation = () => {
 
@@ -174,6 +176,22 @@ const MainNavigation = () => {
                     component={ViewCatDetails}
                     options={{
                         header: () => <NavigationHeader Icon={true} title="Product Details" />,
+                        headerShown: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="PaymentSuccess"
+                    component={PaymentSuccess}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="PaymentSuccess" />,
+                        headerShown: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="PaymentFailed"
+                    component={PaymentFailedScreen}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="PaymentFailed" />,
                         headerShown: true,
                     }}
                 />

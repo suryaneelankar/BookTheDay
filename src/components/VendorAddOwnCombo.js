@@ -22,7 +22,7 @@ const FoodMenu = ({ onSaveClick, }) => {
 
     const foodItems = [
         { label: 'Pizza', value: 'pizza' },
-        { label: 'Burger', value: 'burger' },
+        { label: 'Burger', value: 'burger'},
         { label: 'Pasta', value: 'pasta' },
         { label: 'Salad', value: 'salad' },
         { label: 'Sushi', value: 'sushi' },
@@ -105,9 +105,6 @@ const FoodMenu = ({ onSaveClick, }) => {
         setCustomItems(customItems.filter((i) => i !== item));
     };
 
-    // console.log("custom items::::", customItems);
-    // console.log("menu list :::::::;;;", menuList);
-
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Select Food Items</Text>
@@ -150,7 +147,7 @@ const FoodMenu = ({ onSaveClick, }) => {
                 selectedTextStyle={styles.selectedText}
                 placeholderStyle={styles.placeholderStyle}
                 search
-                searchPlaceholder="Search food..."
+                searchPlaceholder="Search chicken..."
             />
             <Text style={styles.subHeading}>Select Rotis</Text>
 

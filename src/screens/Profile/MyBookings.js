@@ -8,6 +8,7 @@ import { formatAmount } from '../../utils/GlobalFunctions';
 import { colors } from 'react-native-swiper-flatlist/src/themes';
 import LinearGradient from 'react-native-linear-gradient';
 import RazorpayCheckout from 'react-native-razorpay';
+import { useNavigation } from '@react-navigation/native';
 
 const data = [
   { id: '1', name: 'Mr. Riya Trivedi', role: 'Chef - Accord', rating: 4.5, status: 'Requested', image: 'chef-image-url' },
@@ -34,14 +35,12 @@ const ViewMyBookings = () => {
   const [hallsBookings, setHallsBookings] = useState();
   const [tentHouseBookings, settentHouseBookings] = useState();
   const [getUserAuth, setGetUserAuth] = useState('');
+  const navigation = useNavigation();
 
   useEffect(() => {
     getMyBookings();
-    // getDecorationsBookings();
     getCateringsBookings();
     getHallsBookings();
-    // getTentHouseBookings();
-
   }, []);
 
   const getMyBookings = async () => {
@@ -55,21 +54,6 @@ const ViewMyBookings = () => {
       });
       console.log("BOOKINGS RES:::::::::", JSON.stringify(response?.data))
       setMyBookings(response?.data?.data)
-    } catch (error) {
-      console.log("My Bookings data error>>::", error);
-    }
-  };
-
-  const getDecorationsBookings = async () => {
-    const token = await getUserAuthToken();
-    try {
-      const response = await axios.get(`${BASE_URL}/getUserDecorationBookings`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log("Decors BOOKINGS RES:::::::::", JSON.stringify(response?.data))
-      setDecorsBookings(response?.data?.data)
     } catch (error) {
       console.log("My Bookings data error>>::", error);
     }
@@ -100,21 +84,6 @@ const ViewMyBookings = () => {
       });
       console.log("Funtional halls BOOKINGS RES:::::::::", JSON.stringify(response?.data))
       setHallsBookings(response?.data?.data)
-    } catch (error) {
-      console.log("My Bookings data error>>::", error);
-    }
-  };
-
-  const getTentHouseBookings = async () => {
-    const token = await getUserAuthToken();
-    try {
-      const response = await axios.get(`${BASE_URL}/getUserTentHouseBookings`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log("Tent house BOOKINGS RES:::::::::", JSON.stringify(response?.data))
-      settentHouseBookings(response?.data?.data)
     } catch (error) {
       console.log("My Bookings data error>>::", error);
     }
@@ -161,14 +130,17 @@ const ViewMyBookings = () => {
       RazorpayCheckout.open(options)
         .then((paymentData) => {
           // Success callback
-          Alert.alert(`Success: ${paymentData.razorpay_payment_id}`);
+          // Alert.alert(`Success: ${paymentData.razorpay_payment_id}`);
           // Verify the payment on the server-side
           console.log('success resp::>>', paymentData);
+          navigation.navigate('PaymentSuccess');
           //   verifyPayment(paymentData);
         })
         .catch((error) => {
           // Failure callback
-          Alert.alert(`Error: ${error.code} | ${error.description}`);
+          // Alert.alert(`Error: ${error.code} | ${error.description}`);
+          // navigation.navigate('PaymentSuccess');
+          navigation.navigate('PaymentFailed');
           console.error(error);
         });
     } catch (error) {

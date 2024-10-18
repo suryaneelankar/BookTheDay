@@ -11,21 +11,9 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import BASE_URL from '../../../apiconfig';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/Ionicons';
-import CarpetIcon from '../../../assets/svgs/VendorCatering/Rug.svg';
-import ChairIcon from '../../../assets/svgs/VendorCatering/Chair.svg';
-import ChefHatIcon from '../../../assets/svgs/VendorCatering/ChefHat.svg';
-import CookingPot from '../../../assets/svgs/VendorCatering/CookingPot.svg';
-import DeskIcon from '../../../assets/svgs/VendorCatering/Desk.svg';
-import JarIcon from '../../../assets/svgs/VendorCatering/Jar.svg';
-import LightsIcon from '../../../assets/svgs/VendorCatering/Lightbulb.svg';
-import RecycleIcon from '../../../assets/svgs/VendorCatering/Recycle.svg';
-import SpeakerIcon from '../../../assets/svgs/VendorCatering/SpeakerHifi.svg';
-import FanIcon from '../../../assets/svgs/VendorCatering/vendor_fan.svg';
-import WallIcon from '../../../assets/svgs/VendorCatering/Wall.svg';
-import CrossIconRed from '../../../assets/vendorIcons/crossIconRed.svg';
-import CheckIconGreen from '../../../assets/vendorIcons/checkIconGreen.svg';
-import TickIcon from '../../../assets/svgs/tickIcon.svg'
-import CrossIcon from '../../../assets/vendorIcons/crossIcon.svg';
+import VegNonVegIcon from '../../../assets/svgs/foodtype/vegNonveg.svg';
+import VegIcon from '../../../assets/svgs/foodtype/veg.svg';
+import NonVegIcon from '../../../assets/svgs/foodtype/NonVeg.svg';
 import { useSelector } from 'react-redux';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import LocationPicker from '../../../components/LocationPicker';
@@ -34,13 +22,8 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import FoodMenu from '../../../components/VendorAddOwnCombo';
 import CustomModal from '../../../components/AlertModal';
 
-
-
-
 const GeneralDetails = () => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
     const [comboModalSuccess, setcomboModalSuccess] = useState(false);
-
     const [overTimeCharges, setOverTimeCharges] = useState();
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [foodCateringName, setFoodCateringName] = useState('');
@@ -58,11 +41,9 @@ const GeneralDetails = () => {
 
     const [cateringCity, setCateringCity] = useState('');
     const [cateringPincode, setCateringPincode] = useState();
-    const [perDayRentPrice, setPerDayRentPrice] = useState();
     const [advanceAmount, setAdvanceAmount] = useState();
     const [discountPercentage, setDiscountPercentage] = useState();
 
-    const [itemPrices, setItemPrices] = useState({});
     const [selectedItems, setSelectedItems] = useState({});
     const [foodMenuItems, setFoodMenuItems] = useState();
     const [comboPrice, setComboPrice] = useState({});
@@ -71,27 +52,18 @@ const GeneralDetails = () => {
     const discountPercentageArr = ['5', '10', '15', '20', '30', '50'];
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
     const [loading, setLoading] = useState(false);
+    const [isFoodDropDownCollapsed, setIsFoodDropDownCollapsed] = useState(true);
+    const [selectedFoodType, setSelectedFoodType] = useState('');
 
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
-    // console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
+    const foodTypes = [
+        { name: 'veg', icon: VegIcon },
+        { name: 'non-veg', icon: NonVegIcon },
+        { name: 'Both', icon: VegNonVegIcon }
+    ]
 
-    const [rentalItemPricingDetails, setRentalItemPricingDetails] = useState({
-        "Carpet": [{ "itemName": "Carpet", "perDayPrice": 0 }],
-        "Chairs": [{ "itemName": "Chairs", "perDayPrice": 0 }],
-        "Side Walls": [{ "itemName": "SideWalls", "perDayPrice": 0 }],
-        "Lights": [{ "itemName": "Lights", "perDayPrice": 0 }],
-        "Tables/Furniture": [{ "itemName": "Tables/Furniture", "perDayPrice": 0 }],
-        "Portable stove or campfire cooking equipment": [{ name: 'Portable stove or campfire cooking equipment', icon: 'ios-flame' }],
-        "Cookware": [{ name: 'Cookware', icon: 'ios-restaurant' }],
-        "Coolers / Fans": [{ name: 'Coolers / Fans', icon: 'ios-snow' }],
-        "Reusable plates, cups, and cutlery": [{ name: 'Reusable plates, cups, and cutlery', icon: 'ios-cut' }],
-        "Food storage containers": [{ name: 'Food storage containers', icon: 'ios-basket' }],
-        "Sound Box/ Speakers": [{ name: 'Sound Box/ Speakers', icon: 'ios-volume-high' }]
-    });
-
-    // /getAllFoodItems
     useEffect(() => {
         getFoodMenuItems();
     }, []);
@@ -109,367 +81,8 @@ const GeneralDetails = () => {
             console.log("events data error>>::", error);
         }
     };
-
-    const foodMenu = [{
-        title: "Non Veg Standard Menu",
-        id: 1,
-        subItems: [
-            "Sweet",
-            "Roti",
-            "Paneer",
-            "Veg Biryani",
-            "Veg Curry",
-            "Raitha",
-            "White Rice",
-            "Dal",
-            "Fry",
-            "Sambar",
-            "Pickel",
-            "Chutney",
-            "Papad",
-            "Salad",
-            "Veg Snack",
-            "Curd",
-            "Mouth Freshener"
-        ],
-    },
-    {
-        title: "Vegetarian Standard Menu",
-        id: 2,
-        subItems: [
-            "Sweet",
-            "Roti",
-            "Paneer",
-            "Veg Biryani",
-            "Veg Curry",
-            "Raitha",
-            "White Rice",
-            "Dal",
-            "Fry",
-            "Sambar",
-            "Pickel",
-            "Chutney",
-            "Papad",
-            "Salad",
-            "Veg Snack",
-            "Curd",
-            "Mouth Freshener"
-        ],
-    }
-    ];
-
-    const [selectedItemArray, setSelectedItemArray] = useState([]);
-    const [selectedId, setSelectedId] = useState(true);
-    const [customItemVal, setCustomItemVal] = useState();
     const [customisedItems, setCustomisedItems] = useState([]);
-    const [showCustomTextInput, setShowCustomTextInput] = useState(false);
-
-    const onPressAddCustomizedItem = () => {
-        setShowCustomTextInput(true);
-    };
-
-    const handleInputChange = (text, index) => {
-        setCustomItemVal(text);
-    };
-
-    const handleRemoveInput = (index) => {
-        setShowCustomTextInput(false);
-    };
-
-    const onAddItemsFinish = () => {
-        setCustomisedItems(oldArray => [...oldArray, customItemVal]);
-        setCustomItemVal('');
-    }
-
-    const addRentalItemOnPress = (itemName) => {
-        setSelectedItemArray((previous) => {
-            if (previous.includes(itemName)) {
-                // Remove the item if it's already selected
-                const updatedPrices = { ...itemPrices };
-                console.log('updated price is::>>', updatedPrices);
-                delete updatedPrices[itemName];
-                setItemPrices(updatedPrices);
-                return previous.filter((item) => item !== itemName);
-            } else {
-                // Add the item if it's not already selected
-                const updatedPrices = { ...itemPrices, itemName };
-                console.log('updated price added is::>>', updatedPrices);
-                setItemPrices(updatedPrices);
-                return [...previous, itemName];
-            }
-        });
-    };
-
-
-    const RentalItemsList = () => {
-        // const [selectedId, setSelectedId] = useState(null);
-        // const [isCollapsed, setIsCollapsed] = useState(true);
-        const [selectedTitle, setSelectedTitle] = useState({});
-
-        const toggleCollapse = (id, title) => {
-            setSelectedId(id);
-            setSelectedTitle(title);
-            setIsCollapsed(id === selectedId ? !isCollapsed : true);
-        };
-
-        const handleComboPriceChange = (id, price) => {
-            setComboPrice(prevPrices => ({
-                ...prevPrices,
-                [id]: price
-            }));
-        };
-
-        const handleMinOrderMembersChange = (id, members) => {
-            setMinOrderMembers(prevMembers => ({
-                ...prevMembers,
-                [id]: members
-            }));
-        };
-
-        const handleItemSelect = (menuId, itemName) => {
-            setSelectedItems((prevState) => {
-                const updatedItems = { ...prevState };
-                if (!updatedItems[menuId]) {
-                    updatedItems[menuId] = [];
-                }
-
-                if (updatedItems[menuId].includes(itemName)) {
-                    updatedItems[menuId] = updatedItems[menuId].filter(item => item !== itemName);
-                } else {
-                    updatedItems[menuId].push(itemName);
-                }
-
-                return updatedItems;
-            });
-        };
-
-        const handleAddCustomItem = (id) => {
-            console.log("id i::::::::::::,", id)
-            // if (customItemVal.trim() !== '') {
-            //     setCustomisedItems([...customisedItems, customItemVal.trim(), id]);
-            //     setCustomItemVal('');
-            //     setShowCustomTextInput(false);
-            // }
-
-            if (customItemVal.trim() !== '') {
-                setCustomisedItems(prevItems => {
-                    const itemIndex = prevItems.findIndex(item => item.id === id);
-                    if (itemIndex > -1) {
-                        // Update existing entry
-                        const updatedItems = [...prevItems];
-                        updatedItems[itemIndex].items.push(customItemVal.trim());
-                        return updatedItems;
-                    } else {
-                        // Add new entry
-                        return [...prevItems, {
-                            id: id,
-                            items: [customItemVal.trim()],
-                        }];
-                    }
-                });
-                setCustomItemVal('');
-                setShowCustomTextInput(false);
-            }
-        };
-
-        const handleRemoveCustomItem = (id, itemIndex) => {
-            // const updatedItems = customisedItems.filter((_, i) => i !== index);
-            // setCustomisedItems(updatedItems);
-            setCustomisedItems(prevItems => {
-                const updatedItems = prevItems.map(custom => {
-                    if (custom.id === id) {
-                        return {
-                            ...custom,
-                            items: custom.items.filter((_, index) => index !== itemIndex),
-                        };
-                    }
-                    return custom;
-                }).filter(custom => custom.items.length > 0); // Remove any entries with no items
-                return updatedItems;
-            });
-        };
-
-        const renderCustomizedItems = (id) => {
-            const customItem = customisedItems.find(custom => custom.id === id);
-
-            if (!customItem) return null;
-            return (
-                <View>
-                    <Text style={{ textAlign: 'left', fontWeight: 'bold', color: 'black', fontSize: 16 }}>Your customized items</Text>
-                    {customItem.items.map((item, index) => (
-                        <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Text>{item}</Text>
-                            <TouchableOpacity onPress={() => handleRemoveCustomItem(id, index)}>
-                                <Icon name="trash" size={20} color="red" style={{ marginHorizontal: 5 }} />
-                            </TouchableOpacity>
-                        </View>
-                    ))}
-                </View>
-            );
-        };
-
-        const renderItem = ({ item, index }) => {
-            const currentSelected = item._id === selectedId;
-            console.log("curenntsle", currentSelected);
-            const customItem = customisedItems.find(custom => custom.id === item._id);
-            console.log("custom item :::::::::", customItem)
-            return (
-                <TouchableOpacity
-                    onPress={() => toggleCollapse(item?._id, item?.title)}
-                    style={{ backgroundColor: '#FFF4E1', width: '100%', padding: 10, borderRadius: 10, marginTop: 20 }}
-                >
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <Text style={styles.headerText}>{item?.title}</Text>
-                        <Icon name={currentSelected ? 'arrow-down' : 'arrow-up'} size={20} />
-                    </View>
-                    {currentSelected &&
-                        <View>
-                            <FlatList
-                                data={item?.subItems}
-                                keyExtractor={(subItem, index) => index.toString()}
-                                numColumns={2}
-                                renderItem={({ item: subItem }) => (
-                                    <TouchableOpacity
-                                        style={styles.item}
-                                        onPress={() => handleItemSelect(item._id, subItem)}
-                                    >
-                                        <View style={{ borderColor: 'green', borderWidth: 2, width: 20, height: 20, borderRadius: 5 }}>
-                                            {/* <View style={{
-                                                backgroundColor: selectedItems[item._id]?.includes(subItem) ? 'green' : 'white',
-                                                width: 10,
-                                                height: 10,
-                                                alignSelf: 'center',
-                                                marginTop: 3
-                                            }} /> */}
-                                            {selectedItems[item._id]?.includes(subItem) ? <FontAwesome5 style={{ marginHorizontal: 1 }} name={'check'} size={14} color={'green'} /> : null}
-                                        </View>
-                                        <Text style={styles.itemText}>{subItem}</Text>
-                                    </TouchableOpacity>
-                                )}
-                            />
-                        </View>
-                    }
-
-                    {selectedItems[item._id]?.length > 0 &&
-                        <View>
-                            <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Selected Items:</Text>
-                            {selectedItems[item._id].map((selectedItem, index) => (
-                                <Text key={index} style={{ marginLeft: 5 }}>{selectedItem}</Text>
-                            ))}
-                        </View>
-                    }
-
-                    {/* {customisedItems?.length > 0 ?
-                        <>
-                            <Text style={{ textAlign: 'left', fontWeight: 'bold', color: 'black', fontSize: 16 }}>Your customized items</Text>
-                            {customisedItems.map((item) => {
-                                return (
-                                    <Text>{item}</Text>
-                                )
-                            })}
-                        </> : null} */}
-                    {renderCustomizedItems(item._id)}
-
-                    {/* {customItem > 0 &&
-                        <>
-                            <Text style={{ textAlign: 'left', fontWeight: 'bold', color: 'black', fontSize: 16 }}>Your customized items</Text>
-                            {customItem.items.map.map((customItem, index) => (
-                                <View key={index} style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Text>{customItem}</Text>
-                                    <TouchableOpacity onPress={() => handleRemoveCustomItem(index)}>
-                                        <Icon name="trash" size={20} color="red" style={{marginHorizontal:5}} />
-                                    </TouchableOpacity>
-                                </View>
-                            ))}
-                        </>
-                    } */}
-                    {showCustomTextInput ?
-                        <View style={styles.inputContainer}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <TextInput
-                                    style={styles.input}
-                                    value={customItemVal}
-                                    onChangeText={(text) => setCustomItemVal(text)}
-                                    // onChangeText={(text) => handleInputChange(text, index)}
-                                    placeholder={`Add Item`}
-                                />
-                                <TouchableOpacity
-                                    style={{ marginHorizontal: 5, marginTop: 10 }}
-                                    // onPress={() => onAddItemsFinish()}
-                                    onPress={() => handleAddCustomItem(item._id)}
-
-                                >
-                                    <CheckIconGreen />
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={{ marginHorizontal: 5, marginTop: 10 }}
-                                    onPress={() => handleRemoveInput(index)}
-                                >
-                                    <CrossIconRed />
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                        : null}
-
-                    {currentSelected ?
-                        <TouchableOpacity style={{ backgroundColor: '#D2453B', padding: 10, borderRadius: 10, alignItems: 'center', marginTop: 10 }}
-                            onPress={() => { onPressAddCustomizedItem() }}
-                        >
-                            <Text style={{ color: 'white', fontFamily: 'ManropeRegular', fontWeight: 'bold', }}>Add Your Customized item in this combo</Text>
-                        </TouchableOpacity>
-                        : null}
-
-                    {currentSelected &&
-                        <>
-                            <TextInput
-                                style={{ borderColor: "lightgray", borderWidth: 1, marginTop: 5, padding: 5 }}
-                                placeholder='Enter per plate Combo price'
-                                value={comboPrice[item._id] || ''}
-                                onChangeText={(text) => handleComboPriceChange(item._id, text)}
-                            />
-                            <TextInput
-                                style={{ borderColor: "lightgray", borderWidth: 1, marginTop: 5, padding: 5 }}
-                                placeholder='Enter min Order members'
-                                value={minOrderMembers[item._id] || ''}
-                                onChangeText={(text) => handleMinOrderMembersChange(item._id, text)}
-                            />
-                        </>
-                    }
-
-                </TouchableOpacity>
-            );
-        };
-
-
-        return (
-            <View style={styles.container}>
-                <FlatList
-                    data={foodMenuItems}
-                    keyExtractor={(item) => item._id.toString()}
-                    renderItem={renderItem}
-                />
-            </View>
-        );
-    };
     const [finalCombomenu, setFinalComboMenu] = useState([]);
-     // Initial processing of items
-     useEffect(() => {
-        setFinalComboMenu(processItems());
-    }, [selectedItems, customisedItems, comboPrice, minOrderMembers]);
-
-    const processItems = () => {
-        return Object.keys(selectedItems).map(id => ({
-            title: foodMenuItems.find(item => item._id === id).title,
-            items: selectedItems[id].concat(customisedItems.find(custom => custom.id === id)?.items || []),
-            perPlateCost: comboPrice[id] || 0,
-            minOrder: minOrderMembers[id] || 0,
-        }));
-    };
-
-   
-
-
-    console.log("Processed items:", finalCombomenu);
 
     const onChangeDescription = (value) => {
         setCateringDescription(value);
@@ -479,17 +92,9 @@ const GeneralDetails = () => {
         setFoodCateringName(value);
     }
 
-    const onChangePerDayRentPrice = (value) => {
-        setPerDayRentPrice(value);
-    }
-
     const onChangeAdvanceAmount = (value) => {
         setAdvanceAmount(value);
     }
-
-    // const onChangeDiscountPercentage = (value) => {
-    //     setDiscountPercentage(value);
-    // }
 
     const onChangeCateringAddress = (value) => {
         setCateringAddress(value);
@@ -573,6 +178,50 @@ const GeneralDetails = () => {
         });
     };
 
+    const RentalFoodTypeList = () => {
+
+        const toggleCollapse = () => {
+            setIsFoodDropDownCollapsed(!isFoodDropDownCollapsed);
+        };
+
+        const onSelectFoodType = (name) => {
+            setSelectedFoodType(name);
+        }
+
+        const renderItem = ({ item }) => {
+            const IconImage = item?.icon;
+            return (
+                <TouchableOpacity style={styles.item} onPress={() => { onSelectFoodType(item?.name) }}>
+                    <View style={{ borderColor: 'green', borderWidth: 2, width: 20, height: 20, borderRadius: 5 }}>
+                        {selectedFoodType === item.name ? <FontAwesome5 style={{ marginHorizontal: 1 }} name={'check'} size={14} color={'green'} /> : null}
+                    </View>
+                    <View style={{ flexDirection: 'row', marginHorizontal: 5, alignItems: "center" }} onPress={() => { }}>
+                        <IconImage style={{ marginHorizontal: 2 }} />
+                        <Text style={styles.itemText}>{item.name}</Text>
+                    </View>
+                </TouchableOpacity>
+            )
+        }
+
+        return (
+            <View style={styles.container}>
+                <TouchableOpacity onPress={toggleCollapse} style={styles.header}>
+                    <Text style={styles.headerText}>Select Food Type</Text>
+                    <Icon name={isFoodDropDownCollapsed ? 'arrow-down' : 'arrow-up'} size={20} />
+                </TouchableOpacity>
+                {!isFoodDropDownCollapsed && (
+                    <View style={styles.itemsContainer}>
+                        <FlatList
+                            data={foodTypes}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={renderItem}
+                        />
+                    </View>
+                )}
+            </View>
+        );
+    };
+
     const ListItem = ({ item, index }) => {
 
         return (
@@ -640,9 +289,6 @@ const GeneralDetails = () => {
             }
         }
         finalCombomenu.forEach((obj) => {
-            console.log('Checking object:', obj);  // Debugging line to check object structure
-
-            // Check if both minOrder and perPlateCost are 0
             if (obj?.minOrder === 0 && obj?.perPlateCost === 0) {
                 Alert.alert('Please fill Mandatory fields', `Details missing for: ${obj.title}`);
                 return;
@@ -697,6 +343,7 @@ const GeneralDetails = () => {
         formData.append('county', locationCountyVal);
         formData.append('latitude', locationLatitude);
         formData.append('longitude', locationLongitude);
+        formData.append('foodType', selectedFoodType);
 
 
         console.log('formdata is ::>>', JSON.stringify(formData));
@@ -791,10 +438,6 @@ const GeneralDetails = () => {
         setLocationPickerVisible(false);
     };
 
-
-    const allItemsValid = finalCombomenu.every(item => item.items && item.items.length > 0);
-
-
     return (
         <View style={{ flex: 1 }}>
             {loading ? (
@@ -849,8 +492,9 @@ const GeneralDetails = () => {
                             isRequired={true}
                             isDescriptionField={true}
                         />
+                        <Text style={styles.labelText}>Food Type</Text>
+                        {RentalFoodTypeList()}
                     </View>
-
 
                     <Text style={styles.title}>Add Menu Items</Text>
                     <View style={styles.mainContainer}>
@@ -859,15 +503,13 @@ const GeneralDetails = () => {
                             setFinalComboMenu(prevMenu => [...prevMenu, ...menuItems]);
 
                         }} />
-                        {/* {RentalItemsList()} */}
-                        {/* {ItemList()} */}
                     </View>
 
                     <CustomModal
-                    visible={comboModalSuccess}
-                    message={'Combo Successfully Added'}
-                    onClose={() => setcomboModalSuccess(false)}
-                />
+                        visible={comboModalSuccess}
+                        message={'Combo Successfully Added'}
+                        onClose={() => setcomboModalSuccess(false)}
+                    />
 
                     {finalCombomenu?.length > 0 ?
                         <View style={styles.mainContainer}>
@@ -893,14 +535,7 @@ const GeneralDetails = () => {
                             keyboardType='number-pad'
                             isRequired={true}
                         />
-                        {/* <TextField
-                    label='Discount if Any'
-                    placeholder="Please Enter Discount Percentage"
-                    value={discountPercentage}
-                    onChangeHandler={onChangeDiscountPercentage}
-                    keyboardType='number-pad'
-                    isRequired={false}
-                /> */}
+
                         <Text style={styles.textInputlabel}>Discount if any</Text>
                         {discountPercentageList()}
                         <TextField
@@ -936,14 +571,6 @@ const GeneralDetails = () => {
                             </View>
                         </TouchableOpacity>
 
-                        {/* <TextField
-                    label='Address'
-                    placeholder="Please Enter Address"
-                    value={cateringAddress}
-                    onChangeHandler={onChangeCateringAddress}
-                    keyboardType='default'
-                    isRequired={true}
-                /> */}
                         <TextField
                             label='City'
                             placeholder="Please Enter City"
@@ -962,7 +589,6 @@ const GeneralDetails = () => {
                         />
                     </View>
 
-                    {/* <Text style={{ fontFamily: 'InterRegular', color: '#5F6377', fontSize: 15, fontWeight: '600' }}>I Accept Terms and Conditions</Text> */}
                     <TouchableOpacity onPress={() => { onPressSaveAndPost() }} style={{ padding: 10, backgroundColor: '#FFF5E3', alignSelf: 'center', borderRadius: 5, borderColor: '#ECA73C', borderWidth: 2, marginTop: 40, bottom: 20 }}>
                         <Text style={{ color: '#ECA73C' }}> Save & Post </Text>
                     </TouchableOpacity>
@@ -997,6 +623,14 @@ const styles = StyleSheet.create({
         color: themevariable.Color_000000,
         fontSize: 18,
         marginTop: 10
+    },
+    labelText: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: 'bold',
+        color: themevariable.Color_000000,
+        fontSize: 15,
+        marginTop: 20,
+        bottom: 10
     },
     subTitle: {
         fontFamily: 'ManropeRegular',

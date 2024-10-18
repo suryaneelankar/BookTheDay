@@ -253,24 +253,6 @@ const UserLocationPicker = ({ onLocationSelected }) => {
           multiline={true}
         />
 
-        {/* <Text style={{ color: "black", marginVertical: 5, paddingHorizontal: 5 }}>Appartment</Text>
-        <TextInput
-          style={styles.input}
-          value={apartment}
-          onChangeText={setApartment}
-          placeholder="Apartment"
-        /> */}
-
-
-
-        {/* <Text style={{ color: "black", marginVertical: 5, paddingHorizontal: 5, marginTop: 0 }}>Land Mark</Text>
-        <TextInput
-          style={[styles.input, { marginTop: 0 }]}
-          value={street}
-          onChangeText={setStreet}
-          placeholder="LandMark"
-        /> */}
-
         <Text style={{ color: "black", marginVertical: 5, paddingHorizontal: 5 }}>Pincode</Text>
 
         <TextInput
