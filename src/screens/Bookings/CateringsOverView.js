@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, Dimensions, ScrollView } from 'react-native';
 import axios from 'axios';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -13,6 +13,11 @@ import moment from "moment";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import { useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
+import EditButton from '../../assets/svgs/categories/editButton.svg';
+import CalendarIcon from '../../assets/svgs/calendarOrangeIcon.svg';
+import { formatAmount } from "../../utils/GlobalFunctions";
+import ServiceTime from '../../assets/svgs/serviceTime.svg';
+
 
 const CateringsOverView = ({ route, navigation }) => {
 
@@ -22,8 +27,9 @@ const CateringsOverView = ({ route, navigation }) => {
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
 
     const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
+    const userLocationFetched = useSelector((state) => state.userLocation);
+    const userLoggedInName = useSelector((state) => state.userLoggedInName);
 
-  console.log("date is::::", bookingDate);
     useEffect(() => {
         getEventsDetails();
     }, []);
@@ -32,10 +38,10 @@ const CateringsOverView = ({ route, navigation }) => {
     const getEventsDetails = async () => {
         const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getCateringDetailsById/${categoryId}`,{
+            const response = await axios.get(`${BASE_URL}/getCateringDetailsById/${categoryId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
             console.log(" caterings over view ::::::::::", JSON.stringify(response?.data));
             setBookingDetails(response?.data)
@@ -49,102 +55,188 @@ const CateringsOverView = ({ route, navigation }) => {
         const transformedData = cateringItems.map(item => ({
             subMenuId: item?._id,
             numOfPlatesOrdered: item?.totalPrice / item?.perPlateCost,
-          }));
+        }));
         const payload = {
-          productId: categoryId,
-          startDate: bookingDate,
-          endDate: bookingDate,
-          numOfDays: 1,
-          totalAmount: totalPrice.replace(/[^\d]/g, ''),
-          bookingMenuIds: transformedData,
-          userMobileNumber: userLoggedInMobileNum,
-          bookingTime : timeSlot
+            productId: categoryId,
+            startDate: bookingDate,
+            endDate: bookingDate,
+            numOfDays: 1,
+            totalAmount: totalPrice.replace(/[^\d]/g, ''),
+            bookingMenuIds: transformedData,
+            userMobileNumber: userLoggedInMobileNum,
+            bookingTime: timeSlot,
+            userDeliveryLocation: userLocationFetched?.display_name ? userLocationFetched?.display_name : userLocationFetched?.address,
+            advacnceAmountToPay : bookingDetails?.advanceAmount,
+            userFullName : userLoggedInName,
+            userDeliveryLocationLatitude : userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude,
+            userDeliveryLocationlongitude : userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude
+            
         }
         console.log("payload is:::::::", payload);
         try {
-          const bookingResponse = await axios.post(`${BASE_URL}/create-food-catering-booking`, payload,{
-            headers: {
-                Authorization: `Bearer ${token}`,
-              },
-        });
-           console.log("booking res:::::::::", bookingResponse);
-          if (bookingResponse?.status === 201) {
-            setThankYouCardVisible(true);
+            const bookingResponse = await axios.post(`${BASE_URL}/create-food-catering-booking`, payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log("booking res:::::::::", bookingResponse);
+            if (bookingResponse?.status === 201) {
+                setThankYouCardVisible(true);
 
-          }
+            }
         } catch (error) {
-          console.error("Error during food catering booking:", error);
+            console.error("Error during food catering booking:", error);
         }
-      }
-    
+    }
+
 
     console.log("addeiets:::::", cateringItems)
     return (
-        <View style={{ flex: 1, alignSelf: 'center', width: '100%', alignItems: 'center' }}>
+        <View style={{ flex: 1, backgroundColor: "white" }}>
 
-            {/* <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 20, marginTop: 20, width: '90%' }}>Upcoming Booking, {bookingDetails?.name}</Text> */}
-            {bookingDone ?
-                <View style={{ backgroundColor: '#fdf5e6', borderRadius: 15, padding: 10, marginTop: 20, width: '90%' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Icon name="exclamationcircleo" size={18} color="grey" />
-                        <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 16, marginHorizontal: 10 }}>Confirmation Pending</Text>
-                    </View>
-                    <Text style={{ color: 'black', fontWeight: '400', fontSize: 13, marginTop: 15 }}>We're waiting for {bookingDetails?.title} to confirm your booking request.</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <IonIcon name="time-sharp" size={18} color="green" />
-                        <Text style={{ color: 'green', fontWeight: '800', fontSize: 13, marginTop: 10, marginHorizontal: 10 }}>We'll get back with in 2 hrs with booking confirmation status.</Text>
-                    </View>
-                </View> : null}
-
-            <View style={{ backgroundColor: 'white', borderRadius: 15, padding: 10, marginTop: 20, width: '90%', paddingHorizontal: 18, }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <View style={{ width: "80%" }}>
-                        <Text style={{ color: 'black', fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular', }}>{bookingDetails?.foodCateringName}</Text>
-                        <Text style={{ color: 'black', fontSize: 14, fontWeight: "600", fontFamily: 'ManropeRegular', }}>Address : {bookingDetails?.foodCateringAddress?.address}</Text>
-
-
-                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                            <Text style={{ fontWeight: '600', fontSize: 12, fontFamily: 'ManropeRegular', }}>Booking Date : </Text>
-                            <Text style={{ fontWeight: '600', fontSize: 13, fontFamily: 'ManropeRegular', }}>{bookingDate}</Text>
-                        </View>
-                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                            <Text style={{ fontWeight: '600', fontSize: 12, fontFamily: 'ManropeRegular', }}>Booking Time : </Text>
-                            <Text style={{ fontWeight: '600', fontSize: 13, fontFamily: 'ManropeRegular', }}>{timeSlot}</Text>
-                        </View>
-                        <Text style={{ color: 'black', fontSize: 12, fontWeight: "500", fontFamily: 'ManropeRegular', }}>Booked for - Rakesh Pandit</Text>
-                    </View>
-                    <FastImage source={{ uri: bookingDetails?.professionalImage?.url.replace('localhost', LocalHostUrl) }}
-                        style={{ width: 70, height: 70, borderRadius: 35 }}
-                        resizeMethod="resize"
-                        resizeMode="cover"
-                    />
+            <View style={styles.section}>
+                <Text style={[styles.sectionTitle, { color: "#202020" }]}>Shipping Address</Text>
+                <View style={{ flexDirection: "row" }}>
+                    <Text numberOfLines={2} style={styles.address}>{userLocationFetched?.display_name ? userLocationFetched?.display_name : userLocationFetched?.address}</Text>
+                    <TouchableOpacity onPress={() => { navigation.navigate('LocationAdded') }}>
+                        <EditButton />
+                    </TouchableOpacity>
                 </View>
-
-
-
-                <View style={{ backgroundColor: '#dcdcdc', width: '100%', height: 2, alignSelf: 'center', marginTop: 10 }} />
-
-                <Text style={{ color: 'black', fontSize: 14, fontWeight: "600", fontFamily: 'ManropeRegular', }}>Package selected</Text>
-                <FlatList
-                    data={cateringItems}
-                    keyExtractor={item => item?._id}
-                    renderItem={({ item }) => {
-                        const numOfPlates = item?.totalPrice / item?.perPlateCost;
-                        return (
-                            <View style={{flexDirection:"row", paddingHorizontal:10, borderWidth:1, borderColor:"lightgray", justifyContent:"space-between"}}>
-                                <Text style={{}} >{item.title}</Text>
-                                <Text >
-                                 {numOfPlates} Plates
-                                </Text>
-                            </View>
-                        );
-                    }}
-                />
-
-                <Text style={{ marginTop:20,color: 'black', fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular', }}>Total Price : {totalPrice}</Text>
-                <Text style={{ color: 'black', fontSize: 14, fontWeight: "600", fontFamily: 'ManropeRegular', }}> Advacnce Amount : {bookingDetails?.advanceAmount}</Text>
             </View>
+            <ScrollView style={{ marginBottom: "20%" }}>
 
+                {/* <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 20, marginTop: 20, width: '90%' }}>Upcoming Booking, {bookingDetails?.name}</Text> */}
+                {bookingDone ?
+                    <View style={{ backgroundColor: '#fdf5e6', borderRadius: 15, padding: 10, marginTop: 20, width: '90%',alignSelf:"center" }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Icon name="exclamationcircleo" size={18} color="grey" />
+                            <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 16, marginHorizontal: 10 }}>Confirmation Pending</Text>
+                        </View>
+                        <Text style={{ color: 'black', fontWeight: '400', fontSize: 13, marginTop: 15 }}>We're waiting for {bookingDetails?.title} to confirm your booking request.</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <IonIcon name="time-sharp" size={18} color="green" />
+                            <Text style={{ color: 'green', fontWeight: '800', fontSize: 13, marginTop: 10, marginHorizontal: 10 }}>We'll get back with in 2 hrs with booking confirmation status.</Text>
+                        </View>
+                    </View> : null}
+
+                <View style={styles.imgsection}>
+                    <View style={styles.productContainer}>
+                        <FastImage source={{ uri: bookingDetails?.professionalImage?.url.replace('localhost', LocalHostUrl) }}
+                            style={styles.productImage}
+                            resizeMethod="resize"
+                            resizeMode="cover"
+                        />
+                        <View style={styles.productDetails}>
+                            <Text style={styles.productTitle}>{bookingDetails?.foodCateringName}</Text>
+                            <Text style={styles.productPrice}><Text style={styles.productPriceperDay}>Advance Amount  </Text>{formatAmount(bookingDetails?.advanceAmount)}</Text>
+                            <View >
+                                <View style={styles.dateContainer}>
+                                    <CalendarIcon />
+                                    <Text style={styles.dateText}>{bookingDate}</Text>
+                                </View>
+                                <View style={styles.dateContainer}>
+                                    <ServiceTime />
+                                    <Text style={styles.dateText}>{timeSlot}</Text>
+                                </View>
+
+
+                            </View>
+                        </View>
+                    </View>
+
+                    <Text style={{ color: '#000000', fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular', marginVertical: 15 }}>Package selected</Text>
+                    <FlatList
+                        data={cateringItems}
+                        keyExtractor={item => item?._id}
+                        renderItem={({ item, index }) => {
+                            const numOfPlates = item?.totalPrice / item?.perPlateCost;
+                            const itemPairs = [];
+                            for (let i = 0; i < item?.items?.length; i += 2) {
+                                itemPairs.push(item?.items?.slice(i, i + 2));
+                            }
+                            return (
+                                <View style={{ paddingHorizontal: 10, justifyContent: "space-between" }}>
+                                    <View style={{ flexDirection: "row", marginVertical: 5 }}>
+                                        <Text style={styles.comboText} >{item.title}</Text>
+                                        <Text style={styles.comboText} >{numOfPlates} Plates</Text>
+                                    </View>
+                                    <View>
+                                        {itemPairs.map((pair, index) => (
+                                            <View key={index} style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                                                {/* First Column Item */}
+                                                <Text style={{ flex: 1, color: "gray" }}>• {pair[0]}</Text>
+                                                {/* Second Column Item (if available) */}
+                                                {pair[1] && <Text style={{ flex: 1, color: "gray" }}>• {pair[1]}</Text>}
+                                            </View>
+                                        ))}
+                                    </View>
+                                    {index < itemPairs?.length - 1 && (
+                                        <View
+                                            style={{
+                                                borderBottomWidth: 1,
+                                                borderColor: 'lightgray',
+                                                borderStyle: 'dotted',
+                                            }}
+                                        />
+                                    )}
+                                </View>
+                            );
+                        }}
+                    />
+
+                    <Text style={{ marginTop: 20, color: 'black', fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular', marginVertical: 15 }}>Price Details</Text>
+                    <FlatList
+                        data={cateringItems}
+                        keyExtractor={item => item?._id}
+                        renderItem={({ item }) => {
+                            const numOfPlates = item?.totalPrice / item?.perPlateCost;
+
+                            // Split the items array into pairs for two-column layout
+                            const itemPairs = [];
+                            for (let i = 0; i < item?.items?.length; i += 2) {
+                                itemPairs.push(item?.items?.slice(i, i + 2));
+                            }
+
+                            return (
+                                <View style={{ paddingHorizontal: 10, marginBottom: 10 }}>
+                                    {/* Title and Number of Plates */}
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                                        <Text style={styles.comboPriceText}>{item?.title}</Text>
+                                    </View>
+
+                                    {/* Combo Summary UI */}
+                                    <View style={{ paddingVertical: 5 }}>
+                                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
+                                            <Text style={styles.comboPriceMainText}>Per Plate Cost:</Text>
+                                            <Text style={styles.comboPriceSubText}>{item.perPlateCost}</Text>
+                                        </View>
+                                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
+                                            <Text style={styles.comboPriceMainText}>Number of Plates:</Text>
+                                            <Text style={styles.comboPriceSubText}>{numOfPlates}</Text>
+                                        </View>
+                                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
+                                            <Text style={styles.comboPriceMainText}>Total Price:</Text>
+                                            <Text style={styles.comboPriceSubText}>{item.totalPrice}</Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            );
+                        }}
+                    />
+                    {/* <View style={{ backgroundColor: '#FD813B', width: '100%', height: 1, alignSelf: 'center', marginVertical: 10 }} /> */}
+
+                    <View>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                            <Text style={{ marginTop: 20, color: 'black', fontSize: 18, fontWeight: "500", fontFamily: 'ManropeRegular', marginVertical: 15 }}>Total Amount</Text>
+                            <Text style={{ marginTop: 20, color: 'black', fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular', marginVertical: 15 }}>{totalPrice}</Text>
+                        </View>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                            <Text style={{ color: 'black', fontSize: 18, fontWeight: "500", fontFamily: 'ManropeRegular', }}>Advacnce Amount</Text>
+                            <Text style={{ color: 'black', fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular', }}>{bookingDetails?.advanceAmount}</Text>
+                        </View>
+                    </View>
+                </View>
+            </ScrollView>
             <Modal
                 isVisible={thankyouCardVisible}
                 onBackdropPress={() => setThankYouCardVisible(false)}
@@ -217,8 +309,116 @@ const styles = StyleSheet.create({
         backgroundColor: '#f9f9f9',
 
     },
+    imgsection: {
+        backgroundColor: 'white',
+        paddingHorizontal: 5,
+        paddingVertical: 5,
+        borderRadius: 10,
+        marginHorizontal: 20,
+        marginTop: 10,
+        elevation: 15
+    },
+    sectionTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: "#FD813B",
+        fontFamily: "ManropeRegular",
+    },
+    address: {
+        fontSize: 14,
+        fontWeight: "400",
+        color: '#000000',
+        fontFamily: "ManropeRegular",
+        width: "80%"
+    },
+    section: {
+        backgroundColor: '#F9F9F9',
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        marginBottom: 8,
+        borderRadius: 8,
+        marginHorizontal: 20,
+        marginTop: 10
+    },
+    dateContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 8,
+    },
+    productContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    productImage: {
+        width: Dimensions.get('window').width / 4,
+        height: Dimensions.get('window').height / 6,
+        borderRadius: 8,
+        marginRight: 16,
+    },
+    productDetails: {
+        flex: 1,
+    },
+    productTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: "#100D25",
+        fontFamily: "ManropeRegular",
+    },
+    productSubTitle: {
+        fontSize: 14,
+        color: '#000000',
+        fontFamily: "ManropeRegular",
+        fontWeight: "500",
+        marginHorizontal: 10
+    },
+    productPrice: {
+        fontSize: 14,
+        fontWeight: '800',
+        color: '#202020',
+        fontFamily: "ManropeRegular",
+    },
+    dateText: {
+        marginLeft: 10,
+        fontSize: 13,
+        color: '#FE8235',
+        fontWeight: "600",
+        fontFamily: "ManropeRegular",
+
+    },
+    productPriceperDay: {
+        fontSize: 12,
+        fontWeight: '400',
+        color: '#202020',
+        fontFamily: "ManropeRegular",
+
+    },
     itemText: {
         fontSize: 16
+    },
+    comboText: {
+        width: "80%", fontSize: 14,
+        fontWeight: '700',
+        color: "#FD813B",
+        fontFamily: "ManropeRegular",
+    },
+    comboPriceText: {
+        width: "80%",
+        fontSize: 14,
+        fontWeight: '700',
+        color: "#FD813B",
+        fontFamily: "ManropeRegular",
+    },
+    comboPriceMainText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: "#000000",
+        fontFamily: "ManropeRegular",
+    },
+    comboPriceSubText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: "#000000",
+        fontFamily: "ManropeRegular",
     },
     Thankcontainer: {
         marginTop: 30,

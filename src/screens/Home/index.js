@@ -40,7 +40,7 @@ import CatTentHouse from '../../assets/svgs/categories/home_categories_tent_icon
 import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.svg';
 import ClothesCard from '../../assets/svgs/homeSwippers/home_shirtcard.svg';
 import { getUserAuthToken, getVendorAuthToken } from "../../utils/StoreAuthToken";
-import { getUserLocation, setUserCurrentLocation } from "../../../redux/actions";
+import { getCurrentLoggedInUserName, getUserLocation, setUserCurrentLocation } from "../../../redux/actions";
 import { useDispatch, useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
 
@@ -48,7 +48,9 @@ const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
     const [address, setAddress] = useState('');
     const userLocationFetched = useSelector((state) => state.userLocation);
-    console.log("userlocation dispctahed:::::;;", userLocationFetched)
+    const userLoggedInMobileNumber = useSelector((state) => state.userLoggedInMobileNum);
+
+    // console.log("userlocation dispctahed:::::;;", userLocationFetched)
     const dispatch = useDispatch();
     const [eventsData, setEventsData] = useState([]);
     const [discountProducts, setDiscountProducts] = useState([]);
@@ -88,12 +90,31 @@ const HomeDashboard = () => {
         getCategories();
         getAllEvents(currentPage);
         getUserAuthTokenRes();
+        getProfileData();
     }, []);
 
     const getUserAuthTokenRes = async () => {
         const token = await getUserAuthToken();
         console.log("usertoklen", token);
+    };
+
+    const getProfileData = async() =>{
+        const token = await getUserAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/getAllUserLocations/${userLoggedInMobileNumber}`,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
+            dispatch(getCurrentLoggedInUserName(response?.data?.data?.fullName));
+            console.log("profile user res:::", response?.data);
+           
+        } catch (error) {
+            console.log("profile::::::::::", error);
+            setLoading(false);
+        }
     }
+
 
     const getAllEvents = async (page) => {
         const token = await getUserAuthToken();
@@ -119,7 +140,7 @@ const HomeDashboard = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log("Products res:::::::", JSON.stringify(response?.data))
+            // console.log("Products res:::::::", JSON.stringify(response?.data))
             setCategories(response?.data?.data)
             const filteredDiscountItems = response?.data?.data.filter(category => category?.componentType === 'discount');
             const filteredNewItems = response?.data?.data.filter(category => category?.componentType === 'new');

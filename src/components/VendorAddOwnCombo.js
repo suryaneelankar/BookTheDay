@@ -66,7 +66,7 @@ const FoodMenu = ({ onSaveClick, }) => {
     }
 
     const handleSaveMenu = () => {
-        if(!minOrder || !perPlateCost || !title ){
+        if (!minOrder || !perPlateCost || !title) {
             Alert.alert("Please fill all Fields");
             return;
         }
@@ -128,7 +128,46 @@ const FoodMenu = ({ onSaveClick, }) => {
                 placeholder="Select food items"
                 value={selectedItems} // Make sure this is an array
                 onChange={(item) => {
-                    setSelectedItems(item); // Handle selection as an array
+                    setSelectedItems(item);
+                }}
+                // confirmSelectItem={true}
+                // confirmUnSelectItem={false}
+                // onConfirmSelectItem={(itemArray) => {
+                //     const selectedItem = itemArray[0]; // Access the first item in the array
+                //     console.log("Item to be confirmed :::::::", selectedItem); // Log item for debugging
+
+                //     return new Promise((resolve) => {
+                //       // Show alert only for adding an item
+                //       if (!selectedItems.includes(selectedItem)) {
+                //         Alert.alert(
+                //           "Add Item",
+                //           `Do you want to add ${selectedItem}?`,  // Display the selected item
+                //           [
+                //             { text: "No", style: "cancel", onPress: () => resolve(false) },
+                //             {
+                //               text: "Yes",
+                //               onPress: () => {
+                //                 resolve(true); // Allow item to be added on "Yes"
+                //                 console.log("Adding item:", selectedItem); // Debug log for added item
+                //               }
+                //             }
+                //           ]
+                //         );
+                //       } else {
+                //         resolve(true); // Automatically resolve for unselecting items
+                //       }
+                //     });
+                //   }}
+                selectedStyle={{ backgroundColor: '#FD813B' }}
+                renderItem={(item) => {
+                    const isSelected = selectedItems.includes(item.value);
+                    return (
+                        <View style={[styles.itemContainer, isSelected && styles.selectedItemContainer]}>
+                            <Text style={[styles.itemText, isSelected && styles.selectedItemText]}>
+                                {item.label}
+                            </Text>
+                        </View>
+                    );
                 }}
                 selectedTextStyle={styles.selectedText}
                 placeholderStyle={styles.placeholderStyle}
@@ -264,6 +303,24 @@ const styles = StyleSheet.create({
         color: themevariable.Color_000000,
         fontSize: 15,
         marginTop: 10
+    },
+    itemContainer: {
+        padding: 10,
+        backgroundColor: '#fff', // Default background for items
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+    },
+    selectedItemContainer: {
+        backgroundColor: '#FD813B', // Custom background for selected items
+    },
+    itemText: {
+        color: 'black',
+    },
+    selectedItemText: {
+        color: 'white', // Change text color for selected items
+    },
+    selectedText: {
+        color: 'black', // Default selected text color in the main component
     },
     dropdown: {
         height: 50,

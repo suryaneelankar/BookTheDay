@@ -177,7 +177,7 @@ const ViewMyBookings = () => {
               headers: { Authorization: `Bearer ${getUserAuth}` }
             }} style={styles.cardImage} />
             <View style={{ marginLeft: 15 }}>
-              <Text style={styles.cardTitle}>{item?.productName}</Text>
+              <Text style={styles.cardTitle}>{item?.catType === 'caterings' ? item?.foodCateringName : item?.catType === 'functionhall' ? item?.functionHallName : item?.productName} </Text>
               <Text style={styles.cardAmount}>{formatAmount(item?.totalAmount)}</Text>
 
               <Text style={styles.startDate}> Start Date: {item?.startDate}</Text>
