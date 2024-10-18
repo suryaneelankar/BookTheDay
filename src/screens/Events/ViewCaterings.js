@@ -74,6 +74,8 @@ const ViewCaterings = ({ route, navigation }) => {
         '11:00 PM',
     ];
 
+    const cateringsDescription = 'Exquisite Catering for Your Unforgettable Moments Elevate your event with impeccable catering services, curated to perfection by BookTheDay. Whether it’s an elegant wedding or a grand celebration, our handpicked chefs deliver gourmet experiences that delight every palate. Enjoy tailored menus, flawless service, and a culinary journey your guests will remember forever.';
+
     const handleTimeSlotSelection = (timeSlot) => {
         setSelectedTimeSlot(timeSlot);
         setTimeSlotModalVisible(false);
@@ -116,21 +118,21 @@ const ViewCaterings = ({ route, navigation }) => {
         return `₹${formattedAmount}`;
     };
 
-    const FoodItem = ({ item, onAdd, onDelete, addedItems, numPlates, setNumPlates, selectedIndex, setSelectedIndex, index }) => {
+    const FoodItem = ({ item, onAdd, onDelete, addedItems, numPlates, setNumPlates, selectedIndex, setSelectedIndex, index, totalItems }) => {
         const isAdded = addedItems.some(addedItem => addedItem?._id === item?._id);
 
         return (
-            <View style={{ paddingHorizontal: 10, paddingVertical: 10, borderRadius: 10, borderColor: "lightgray", borderWidth: 1, marginVertical: 10 }}>
+            <View style={{ marginTop:15}}>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <View style={{ width: "70%" }}>
-                        <Text style={{ color: "#100D25", fontSize: 16, fontWeight: "400", fontFamily: 'ManropeRegular' }}>{item?.title}</Text>
+                    <View style={{ width: "60%" }}>
+                        <Text style={{ color: "#100D25", fontSize: 16, fontWeight: "600", fontFamily: 'ManropeRegular' }}>{item?.title}</Text>
                         <Text style={{ fontSize: 10, color: "#FD813B", marginTop: 5 }}>{formatAmount(item?.perPlateCost)}</Text>
                         <Text style={{ fontSize: 10, color: "#FD813B", marginTop: 5 }}>Min order: {item?.minOrder}</Text>
                         <Text style={{ marginTop: 5, color: "#100D25", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular' }}>{item?.items.join(', ')}</Text>
                     </View>
 
-                    <View>
-                        <Image style={{ width: 100, height: 120, borderRadius: 5 }} source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/9/96/Lunch_Meals.jpg' }} />
+                    <View style={{ width: "40%" }}>
+                        <Image style={{ height: 120, borderRadius: 15 }} source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/9/96/Lunch_Meals.jpg' }} />
                         <TouchableOpacity
                             onPress={() => {
                                 if (isAdded) {
@@ -141,7 +143,7 @@ const ViewCaterings = ({ route, navigation }) => {
                                     setSelectedIndex(index);
                                 }
                             }}
-                            style={{ position: "relative", bottom: 10, borderRadius: 8, backgroundColor: "#F1F1F1", alignSelf: "center" }}
+                            style={{ width: "75%", position: "relative", bottom: 15, borderRadius: 10, backgroundColor: "#F1F1F1", alignSelf: "center" }}
                         >
                             <Text style={styles.addText}>{isAdded ? 'DELETE' : 'ADD'}</Text>
                         </TouchableOpacity>
@@ -151,13 +153,22 @@ const ViewCaterings = ({ route, navigation }) => {
                 {isAdded && (
                     <>
                         <TextInput
-                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2, }}
+                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2,marginBottom:15 }}
                             placeholder="Enter number of plates"
                             keyboardType='phone-pad'
                             value={numPlates[item.title] || ''}
                             onChangeText={(text) => setNumPlates({ ...numPlates, [item.title]: text })}
                         />
                     </>
+                )}
+
+                {index < totalItems - 1 && (
+                    <View style={{
+                        borderStyle: 'dashed',
+                        borderWidth: 1,
+                        borderColor: '#E0E0E0',
+
+                    }} />
                 )}
             </View>
         );
@@ -259,19 +270,20 @@ const ViewCaterings = ({ route, navigation }) => {
                         <Text style={{ fontSize: 20, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular' }}>{eventsDetails?.foodCateringName}</Text>
                     </View>
 
-                    <View style={{ flexDirection: "row", marginTop: 5, alignItems: "center" }}>
-                        <MapMarkIcon />
+                    <View style={{ flexDirection: "row", marginTop: 5, alignItems: "flex-start" }}>
+                        <MapMarkIcon style={{marginTop:2}} />
                         <Text style={{ color: "#939393", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', marginLeft: 5 }}>{eventsDetails?.foodCateringAddress?.address}</Text>
                     </View>
 
-                    <View style={{ marginTop: 20 }}>
-                        <Text style={styles.title}>Description :</Text>
-                        <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#8B8B8B", fontWeight: "400", marginTop: 4, marginBottom: 10 }}>{eventsDetails?.description}</Text>
+                    <View style={{ marginTop: 20 ,marginBottom: 10 }}>
+                        <Text style={styles.title}>Description</Text>
+                        <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#8B8B8B", fontWeight: "400", marginTop: 4, marginBottom: 10 }}>{cateringsDescription}</Text>
+                        <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#8B8B8B", fontWeight: "400", marginTop: 4, }}>{eventsDetails?.description}</Text>
                     </View>
 
                     <View style={{ borderColor: "#F1F1F1", borderWidth: 1, width: "100%", marginTop: 5 }} />
 
-                    <Text style={{ color: "#000000", fontSize: 13, fontWeight: "700", fontFamily: 'ManropeRegular', marginTop: 15 }}>Available Food Menu</Text>
+                    <Text style={{ color: "#000000", fontSize: 14, fontWeight: "700", fontFamily: 'ManropeRegular', marginTop: 15 }}>Available Food Menu</Text>
 
                     <FlatList
                         data={foodItemsData}
@@ -287,6 +299,7 @@ const ViewCaterings = ({ route, navigation }) => {
                                 setNumPlates={setNumPlates}
                                 selectedIndex={selectedIndex}
                                 setSelectedIndex={setSelectedIndex}
+                                totalItems={foodItemsData?.length}
                             />
                         )}
                     />
@@ -295,10 +308,10 @@ const ViewCaterings = ({ route, navigation }) => {
                     <View style={{ marginTop: 15 }}>
                         <Text style={{ fontWeight: "600", color: "#121212", fontSize: 14, fontFamily: 'ManropeRegular' }}>Booking Date</Text>
                         <TouchableOpacity style={{
-                            marginTop: 5, flexDirection: "row",
+                            marginTop: 10, flexDirection: "row",
                             alignItems: "center", justifyContent: "space-between",
                             borderWidth: 1, borderColor: "#FD813B", borderRadius: 4,
-                            paddingHorizontal: 20, paddingVertical: 10
+                            paddingHorizontal: 20, paddingVertical: 12
                         }} onPress={() => setIsVisible(true)}>
                             <Text style={{ fontSize: 13, fontFamily: 'ManropeRegular', fontWeight: "400", color: selectedDate ? "#121212" : "#8B8B8B", }}>{selectedDate ? moment(selectedDate).format('DD-MM-YYYY') : 'Pick A Date'}</Text>
                             <CalendarIcon />
@@ -307,10 +320,10 @@ const ViewCaterings = ({ route, navigation }) => {
 
 
                         <TouchableOpacity style={{
-                            marginTop: 5, flexDirection: "row",
+                            marginTop: 10, flexDirection: "row",
                             alignItems: "center", justifyContent: "space-between",
                             borderWidth: 1, borderColor: "#FD813B", borderRadius: 4,
-                            paddingHorizontal: 20, paddingVertical: 10
+                            paddingHorizontal: 20, paddingVertical: 12
                         }} onPress={() => setTimeSlotModalVisible(true)}>
                             <Text style={{ fontSize: 13, fontFamily: 'ManropeRegular', fontWeight: "400", color: selectedDate ? "#121212" : "#8B8B8B", }}>{selectedTimeSlot ? selectedTimeSlot : 'Pick A Time Slot'}</Text>
                             <ServiceTime />
@@ -473,9 +486,9 @@ const styles = StyleSheet.create({
     text: { fontSize: 12, textAlign: 'center' },
     title: {
         fontFamily: 'ManropeRegular',
-        fontSize: 12,
-        color: "#8B8B8B"
-        , fontWeight: "500",
+        fontSize: 14,
+        color: "#121212",
+        fontWeight: "700",
     },
     subTitle: { fontSize: 14, color: "#5a5c5a", fontWeight: "400", },
     status: {
@@ -513,16 +526,17 @@ const styles = StyleSheet.create({
     },
     addText: {
         color: "#4E7B10",
-        fontSize: 12,
+        fontSize: 16,
         fontWeight: "700",
         fontFamily: 'ManropeRegular',
         paddingVertical: 5,
         paddingHorizontal: 15,
-        borderRadius: 8,
+        borderRadius: 10,
         borderColor: "#4E7B10",
         borderWidth: 1,
         alignSelf: "center",
         textAlign: "center",
+        width: "100%"
 
 
     },

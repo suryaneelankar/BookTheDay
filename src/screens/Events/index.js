@@ -16,6 +16,9 @@ import { Dropdown } from 'react-native-element-dropdown';
 import themevariable from "../../utils/themevariable";
 import Autocomplete from 'react-native-autocomplete-input';
 import IonIcon from 'react-native-vector-icons/Ionicons';
+import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
+import VegIcon from '../../assets/svgs/foodtype/veg.svg';
+import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 
 const Events = () => {
     const navigation = useNavigation();
@@ -145,7 +148,7 @@ const Events = () => {
                 <TouchableOpacity
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
                     style={{ width: Dimensions.get('window').width - 30, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
                         <View style={{ width: '60%', }}>
                             <Text style={{ color: '#101010', fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular" }} >{item?.functionHallName}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
@@ -158,13 +161,17 @@ const Events = () => {
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'row', }}>
-
+                    <View style={{ flexDirection: 'row',marginBottom:10 }}>
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.seatingCapacity} pax</Text>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.bedRooms} Rooms</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10,alignItems:"center"}}>
+
+                            <Text style={{  }}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon/>}</Text>
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG': item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
                         </View>
                     </View>
                 </TouchableOpacity>
