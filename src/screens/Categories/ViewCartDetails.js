@@ -29,6 +29,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
   const [productDetails, setProductDetails] = useState();
   const [productImage, setProductImage] = useState();
   const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
+
   const [getUserAuth, setGetUserAuth] = useState('');
   const [isAadharAvailable, setIsAadharAvailable] = useState();
 
@@ -130,7 +131,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
       endDate: moment(endDate).format('DD MMMM YYYY'),
       numOfDays: NumOfDays,
       totalAmount: calculateTotalPrice(),
-      userMobileNumber: userLoggedInMobileNum
+      userMobileNumber: userLoggedInMobileNum,
     }
     try {
       const bookingResponse = await axios.post(`${BASE_URL}/create-cloth-jewel-booking`, payload,{
@@ -351,7 +352,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: "#FD813B",
     fontFamily: "ManropeRegular",
-    marginHorizontal:10
   },
   address: {
     fontSize: 14,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, Alert, FlatList, Button, Linking, ScrollView } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Alert, FlatList, Button, Linking, ScrollView, Dimensions } from 'react-native';
 import BASE_URL from "../../../apiconfig";
 import axios from "axios";
 import { LocalHostUrl } from "../../../apiconfig";
@@ -21,6 +21,7 @@ import LocationIcon from '../../../assets/vendorIcons/locationIcon.svg';
 import PhoneIcon from '../../../assets/vendorIcons/phoneIcon.svg';
 import AdvPayIcon from '../../../assets/vendorIcons/advPayIcon.svg';
 import FastImage from "react-native-fast-image";
+import { verticalScale } from "../../../utils/scalingMetrics";
 
 const RequestConfirmation = ({ navigation, route }) => {
     const { productId, catEndPoint } = route?.params;
@@ -48,7 +49,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            console.log('before resp::><>', response?.data?.data);
+            console.log('before resp::><>', JSON.stringify(response?.data?.data));
             groupByFilterData(response?.data?.data);
         } catch (error) {
             console.log("categories::::::::::", error);
@@ -73,6 +74,9 @@ const RequestConfirmation = ({ navigation, route }) => {
             let totalAmount = '';
             let bookingStatus = '';
             let bookingId = '';
+            let advanceAmountPaid = 0;
+            let userFullName = '';
+            let userAddress = '';
 
             if (catType === 'functionHalls') {
                 productName = item?.functionHallName;
@@ -83,6 +87,9 @@ const RequestConfirmation = ({ navigation, route }) => {
                 totalAmount = item?.totalAmount;
                 bookingStatus = item?.bookingStatus;
                 bookingId = item?.bookingId;
+                advanceAmountPaid = item?.advanceAmountPaid;
+                userFullName = item?.userFullName;
+                userAddress = item?.userDeliveryLocation
             }
             else if (catType === 'clothJewels') {
                 productName = item?.productName;
@@ -93,6 +100,11 @@ const RequestConfirmation = ({ navigation, route }) => {
                 totalAmount = item?.totalAmount;
                 bookingStatus = item?.bookingStatus;
                 bookingId = item?.bookingId;
+                advanceAmountPaid = item?.advanceAmountPaid;
+                userFullName = item?.userFullName;
+                userAddress = item?.userDeliveryLocation
+
+
             }
             else if (catType === 'caterings') {
                 productName = item?.foodCateringName;
@@ -103,6 +115,10 @@ const RequestConfirmation = ({ navigation, route }) => {
                 totalAmount = item?.totalAmount;
                 bookingStatus = item?.bookingStatus;
                 bookingId = item?.bookingId;
+                advanceAmountPaid = item?.advanceAmountPaid;
+                userFullName = item?.userFullName;
+                userAddress = item?.userDeliveryLocation
+
             }
 
             return {
@@ -118,7 +134,12 @@ const RequestConfirmation = ({ navigation, route }) => {
                 startDate: startDate,
                 endDate: endDate,
                 totalAmount: totalAmount,
-                bookingId: bookingId
+                bookingId: bookingId,
+                advanceAmountPaid: advanceAmountPaid,
+                userFullName: userFullName,
+                userAddress : userAddress
+
+
 
             };
         });
@@ -202,7 +223,7 @@ const RequestConfirmation = ({ navigation, route }) => {
         )
     }
 
-    const RequestConfirmationAcceptOrReject = async (bookingStatus, userMobileNumber,bookingId) => {
+    const RequestConfirmationAcceptOrReject = async (bookingStatus, userMobileNumber, bookingId) => {
         const updatedParams = {
             bookingId: bookingId,
             accepted: true,
@@ -226,15 +247,15 @@ const RequestConfirmation = ({ navigation, route }) => {
         }
     }
 
-    const callConfirmationWithStatus = (alertText, userMobileNumber,bookingId) => {
+    const callConfirmationWithStatus = (alertText, userMobileNumber, bookingId) => {
         if (alertText.includes('accept')) {
-            RequestConfirmationAcceptOrReject('approved', userMobileNumber,bookingId);
+            RequestConfirmationAcceptOrReject('approved', userMobileNumber, bookingId);
         } else {
-            RequestConfirmationAcceptOrReject('rejected', userMobileNumber,bookingId);
+            RequestConfirmationAcceptOrReject('rejected', userMobileNumber, bookingId);
         }
     }
 
-    const showAlert = (alertText, userMobileNumber,bookingId) => {
+    const showAlert = (alertText, userMobileNumber, bookingId) => {
         Alert.alert(
             "Confirmation",
             alertText,
@@ -244,7 +265,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                     onPress: () => console.log("No Pressed"),
                     style: "cancel"
                 },
-                { text: "Yes", onPress: () => callConfirmationWithStatus(alertText, userMobileNumber,bookingId) }
+                { text: "Yes", onPress: () => callConfirmationWithStatus(alertText, userMobileNumber, bookingId) }
             ],
             { cancelable: false }
         );
@@ -272,40 +293,47 @@ const RequestConfirmation = ({ navigation, route }) => {
                             </View>
                         </View>
                     </View>
+                    <View>
+                        <TouchableOpacity
+                            onPress={() => { actionSheetRef.current?.show(), setSelectedItemDetails(item) }}
+                            style={{ bottom: verticalScale(25), left: verticalScale(20) }}>
+                            <Text style={{ color: "#4A4A4A", textDecorationLine: "underline", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular" }}>View Details</Text>
+                        </TouchableOpacity>
 
-                    {item?.bookingStatus == 'requested' ?
-                        <View style={{ alignItems: 'center', alignSelf: 'center' }}>
-                            <TouchableOpacity style={{ alignItems: 'center', borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
-                                onPress={() => { showAlert("Are you sure you want to accept the order?", item?.userMobileNumber,item?.bookingId) }}
-                            >
-                                <AcceptIcon />
-                                <Text style={{ color: "#57A64F", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Accept</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={{ alignItems: 'center', marginTop: 10, borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
-                                onPress={() => { showAlert("Are you sure you want to reject/cancel the order?", item?.userMobileNumber,item?.bookingId) }}
-                            >
-                                <RejectIcon />
-                                <Text style={{ color: "#EF0000", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Reject</Text>
-                            </TouchableOpacity>
-                        </View>
-                        :
-                        <View style={{ alignItems: 'center', alignSelf: 'center' }}>
-                            <TouchableOpacity style={{ alignItems: 'center', borderRadius: 5, padding: 5, height: 30, flexDirection: 'row' }}
-                                onPress={() => { showAlert("Are you sure you want to reject/cancel the order?", item?.userMobileNumber) }}
-                                disabled={true}
-                            >
-                                {item?.bookingStatus == 'rejected' ?
-                                    <RejectIcon /> :
+                        {item?.bookingStatus == 'requested' ?
+                            <View style={{ alignItems: 'center', alignSelf: 'center' }}>
+                                <TouchableOpacity style={{ alignItems: 'center', borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
+                                    onPress={() => { showAlert("Are you sure you want to accept the order?", item?.userMobileNumber, item?.bookingId) }}
+                                >
                                     <AcceptIcon />
-                                }
-                                <Text style={{ color: item?.bookingStatus == 'rejected' ? "#EF0000" : "#57A64F", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", textTransform: 'capitalize' }}>{item?.bookingStatus}</Text>
-                            </TouchableOpacity>
-                        </View>
-                    }
-                    {item?.bookingStatus == 'requested' ?
-                        <Feather style={[styles.icon, { marginHorizontal: 5 }]} name='chevron-right' size={25} color={'black'} />
-                        :
-                        <></>}
+                                    <Text style={{ color: "#57A64F", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Accept</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={{ alignItems: 'center', marginTop: 10, borderRadius: 5, backgroundColor: "#FFF8F0", padding: 5, height: 30, flexDirection: 'row' }}
+                                    onPress={() => { showAlert("Are you sure you want to reject/cancel the order?", item?.userMobileNumber, item?.bookingId) }}
+                                >
+                                    <RejectIcon />
+                                    <Text style={{ color: "#EF0000", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", }}>Reject</Text>
+                                </TouchableOpacity>
+                            </View>
+                            :
+                            <View style={{ alignItems: 'center', alignSelf: 'center' }}>
+                                <TouchableOpacity style={{ alignItems: 'center', borderRadius: 5, padding: 5, height: 30, flexDirection: 'row' }}
+                                    onPress={() => { showAlert("Are you sure you want to reject/cancel the order?", item?.userMobileNumber) }}
+                                    disabled={true}
+                                >
+                                    {item?.bookingStatus == 'rejected' ?
+                                        <RejectIcon /> :
+                                        <AcceptIcon />
+                                    }
+                                    <Text style={{ color: item?.bookingStatus == 'rejected' ? "#EF0000" : "#57A64F", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", textTransform: 'capitalize' }}>{item?.bookingStatus}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        }
+                        {item?.bookingStatus == 'requested' ?
+                            <Feather style={[styles.icon, { marginHorizontal: 5 }]} name='chevron-right' size={25} color={'black'} />
+                            :
+                            <></>}
+                    </View>
                 </TouchableOpacity>
             </View>
         )
@@ -332,7 +360,17 @@ const RequestConfirmation = ({ navigation, route }) => {
 
 
     const renderActionSheetWithProductDetais = () => {
-        console.log('selectedItemDetails is::>>>', selectedItemDetails);
+        console.log('selectedItemDetails is::>>>', JSON.stringify(selectedItemDetails));
+
+        const renderBookedItems = ({ item }) => (
+            <View style={{ backgroundColor: '#FFF8F0', borderRadius: 10, padding: 10,width:"80%",marginVertical:5 }}>
+                <Text style={{ fontWeight: '700', color: '#FD813B',fontSize:12,fontFamily: 'ManropeRegular' }}>{item?.title}</Text>
+                <Text style={{fontWeight: '500',color:"#000000",fontSize:14,fontFamily: 'ManropeRegular' }}>Items:</Text>
+                <Text style={{fontWeight: '700',color:"#000000",fontSize:12,fontFamily: 'ManropeRegular' }}>{item?.items.join(', ')}</Text>
+                <Text  style={{fontWeight: '500', color:"#000000",fontSize:14,fontFamily: 'ManropeRegular' }}>Per Plate Cost: <Text style={{fontWeight: '700', color:"#000000",fontSize:14,fontFamily: 'ManropeRegular' }}> ₹ {item?.perPlateCost}</Text></Text>
+                <Text style={{fontWeight: '500', color:"#000000",fontSize:14,fontFamily: 'ManropeRegular' }}>No. of Plates Ordered:<Text style={{fontWeight: '700', color:"#000000",fontSize:14,fontFamily: 'ManropeRegular' }}> {item?.numOfPlatesOrdered} Plates</Text></Text>
+            </View>
+        );
         return (
             <ActionSheet
                 animated={false}
@@ -342,31 +380,32 @@ const RequestConfirmation = ({ navigation, route }) => {
                 defaultOverlayOpacity={0.5}
                 containerStyle={styles.actionSheetContainer}>
                 <ScrollView>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', padding: 15 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around',marginTop:20 }}>
                         <View>
-                            <Text>{selectedItemDetails?.productName}</Text>
-                            <Text>{selectedItemDetails?.startDate} - {selectedItemDetails?.endDate}</Text>
+                            <Text style={{color:"#000000", fontSize:14, fontWeight:"500",fontFamily: 'ManropeRegular'}}>{selectedItemDetails?.productName}</Text>
+                            <Text style={{color:"#000000", fontSize:14, fontWeight:"500",fontFamily: 'ManropeRegular'}}>{selectedItemDetails?.startDate} - {selectedItemDetails?.endDate}</Text>
                         </View>
                         <View style={{ backgroundColor: '#FFF8F0', borderRadius: 10, padding: 5, width: 80, alignItems: 'center', alignContent: 'center', alignSelf: 'center' }}>
-                            <Text style={{ color: '#FD813B', fontWeight: '700' }}>{selectedItemDetails?.bookingStatus}</Text>
+                            <Text style={{ color: '#FD813B', fontWeight: '700' }}>{selectedItemDetails?.bookingStatus?.charAt(0).toUpperCase() + selectedItemDetails?.bookingStatus?.slice(1)}</Text>
                         </View>
                     </View>
-                    <View style={{ backgroundColor: '#dddddd', height: 1, width: '80%', alignSelf: 'center', marginTop: 0 }} />
-                    <View style={{ padding: 20, marginHorizontal: 38 }}>
-                        <Text style={{ color: 'black', fontFamily: 'ManropeRegular', fontWeight: '900', fontSize: 16 }}>Other Details</Text>
+                    <View style={{ backgroundColor: '#dddddd', height: 1, width: '80%', alignSelf: 'center', marginTop: 20 }} />
+                    <View style={{ padding: 20,width:"90%",alignSelf:"center"}}>
+                        <Text style={{ color: 'black', fontFamily: 'ManropeRegular', fontWeight: '900', fontSize: 16 }}>Customer Details</Text>
                         <View style={styles.detailsViewStyle}>
                             <UserIcon />
-                            <Text style={styles.detailsStyle}>Ashok Reddy</Text>
+                            <Text style={styles.detailsStyle}>{selectedItemDetails?.userFullName}</Text>
                         </View>
-                        <TouchableOpacity style={styles.detailsViewStyle}
-                            onPress={() => openDialPad('+91 9876543210')}
-                        >
-                            <PhoneIcon />
-                            <Text style={styles.detailsStyle}>{selectedItemDetails?.userMobileNumber}</Text>
-                        </TouchableOpacity>
+                        {selectedItemDetails?.advanceAmountPaid !== 0 ?
+                            <TouchableOpacity style={styles.detailsViewStyle}
+                                onPress={() => openDialPad('+91 9876543210')}
+                            >
+                                <PhoneIcon />
+                                <Text style={styles.detailsStyle}>{selectedItemDetails?.userMobileNumber}</Text>
+                            </TouchableOpacity> : null}
                         <TouchableOpacity style={styles.detailsViewStyle} onPress={() => openMap(37.7749, -122.4194)}>
                             <LocationIcon />
-                            <Text style={styles.detailsStyle}>#12, Bachupally, Hyderabad</Text>
+                            <Text style={styles.detailsStyle}>{selectedItemDetails?.userAddress}</Text>
                         </TouchableOpacity>
                         <View style={styles.detailsViewStyle}>
                             <AdvPayIcon />
@@ -376,10 +415,18 @@ const RequestConfirmation = ({ navigation, route }) => {
                             <AdvPayIcon />
                             <Text style={styles.detailsStyle}>Balance Payable: ₹ 4000/-</Text>
                         </View>
-
+                        {selectedItemDetails?.bookingItem ?
                         <View>
-                            <Text >Booked Items</Text>
-                        </View>
+                            <Text style={styles.detailsBookedText}>Booked Items</Text>
+                            <FlatList
+                                data={selectedItemDetails?.bookingItem}
+                                renderItem={renderBookedItems}
+                                keyExtractor={(item) => item?._id}
+                                // horizontal={true}
+                                showsHorizontalScrollIndicator={false}
+                                contentContainerStyle={{ paddingVertical: 10 }}
+                            />
+                        </View> : null}
                     </View>
                 </ScrollView>
             </ActionSheet>
@@ -470,13 +517,23 @@ const styles = StyleSheet.create({
     },
     detailsStyle: {
         fontFamily: 'ManropeRegular',
-        fontWeight: '500',
-        marginHorizontal: 5
+        fontWeight: '400',
+        marginHorizontal: 5,
+        color:"#000000",
+        fontSize:14
+    },
+    detailsBookedText: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: '700',
+        marginHorizontal: 5,
+        color:"#000000",
+        fontSize:16
     },
     detailsViewStyle: {
         flexDirection: 'row',
         padding: 10,
-        right: 15
+        right: 15,
+        alignItems:"center"
     },
     sheetContent: {
         backgroundColor: '#fff',
@@ -486,6 +543,7 @@ const styles = StyleSheet.create({
     actionSheetContainer: {
         backgroundColor: 'white',
         paddingBottom: 20,
+        maxHeight:Dimensions.get('window').height-150,
     },
     iconContainer: {
         margin: 20
