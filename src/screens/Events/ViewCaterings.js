@@ -534,7 +534,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderColor: "#4E7B10",
         borderWidth: 1,
-        alignSelf: "center",
+        // alignSelf: "center",
         textAlign: "center",
         width: "100%"
 

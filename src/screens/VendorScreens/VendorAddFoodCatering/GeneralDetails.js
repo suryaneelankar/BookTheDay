@@ -538,6 +538,7 @@ const GeneralDetails = () => {
 
                         <Text style={styles.textInputlabel}>Discount if any</Text>
                         {discountPercentageList()}
+                        
                         <TextField
                             label='Travel Chargers'
                             placeholder="Please Enter Travel Charges"

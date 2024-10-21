@@ -8,35 +8,22 @@ import { getVendorAuthToken } from '../utils/StoreAuthToken';
 import axios from 'axios';
 import BASE_URL from '../apiconfig';
 
-const FoodMenu = ({ onSaveClick, }) => {
-    const [selectedItems, setSelectedItems] = useState([]); // Ensure this is an array
+const FoodMenu = ({ onSaveClick }) => {
     const [menuList, setMenuList] = useState([]);
     const [perPlateCost, setPerPlatePrice] = useState(''); // State for per plate price
     const [minOrder, setMinOrderMembers] = useState(''); // State for minimum order members
     const [showCustomTextInput, setShowCustomTextInput] = useState(false); // Show/hide custom item input
     const [customItemVal, setCustomItemVal] = useState(''); // State for custom item value
     const [customItems, setCustomItems] = useState([]); // Track added custom items
-    const [title, setcomboTitle] = useState(''); // State for per plate price
-    const [mainCourseItems, setMainCourseItems] = useState([]);
-    const [rotiItems, setRotiItems] = useState([]);
-
-    const foodItems = [
-        { label: 'Pizza', value: 'pizza' },
-        { label: 'Burger', value: 'burger'},
-        { label: 'Pasta', value: 'pasta' },
-        { label: 'Salad', value: 'salad' },
-        { label: 'Sushi', value: 'sushi' },
-        { label: 'Tacos', value: 'tacos' },
-        { label: 'Steak', value: 'steak' },
-        { label: 'Fries', value: 'fries' }
-    ];
+    const [title, setcomboTitle] = useState(''); // Combo title
+    const [foodCategories, setFoodCategories] = useState([]); // Holds categories like Main Course, Roti
+    const [selectedItemsByCategory, setSelectedItemsByCategory] = useState({}); // Track selected items per category
 
     useEffect(() => {
-        getFoodMenuItems()
-    }, [])
+        getFoodMenuItems();
+    }, []);
 
     const getFoodMenuItems = async () => {
-
         const token = await getVendorAuthToken();
         try {
             const response = await axios.get(`${BASE_URL}/getAllFoodItems`, {
@@ -45,49 +32,44 @@ const FoodMenu = ({ onSaveClick, }) => {
                 },
             });
             const foodItemsRes = response?.data?.data;
-            if (foodItemsRes && foodItemsRes?.length > 0) {
-                // Find the main course category and roti category from data
-                const mainCourse = foodItemsRes.find(category => category?.category === "Main Course");
-                const roti = foodItemsRes.find(category => category?.category === "Roti");
-
-                // Store the respective items in state
-                if (mainCourse) {
-                    setMainCourseItems(mainCourse?.items);
-                }
-                if (roti) {
-                    setRotiItems(roti?.items);
-                }
+            if (foodItemsRes && foodItemsRes.length > 0) {
+                setFoodCategories(foodItemsRes); // Store categories and items
             }
-            console.log("FOOD MENU LIST ::::::", JSON.stringify(response?.data))
-
         } catch (error) {
-            console.error('Error fetching function halls:', error);
+            console.error('Error fetching food items:', error);
         }
-    }
+    };
 
     const handleSaveMenu = () => {
         if (!minOrder || !perPlateCost || !title) {
-            Alert.alert("Please fill all Fields");
+            Alert.alert('Please fill all fields');
             return;
         }
+
+        const selectedItems = Object.values(selectedItemsByCategory).flat();
+
         if (selectedItems.length > 0 || customItems.length > 0) {
             const newMenu = {
-                // id: Date.now(), 
                 items: [...selectedItems, ...customItems], // Include both selected and custom items
                 perPlateCost,
                 minOrder,
-                title
+                title,
             };
             setMenuList([...menuList, newMenu]);
-            setSelectedItems([]); // Reset selected items for the next combo
+            setSelectedItemsByCategory({}); // Reset selected items for the next combo
             setCustomItems([]); // Reset custom items for the next combo
             setPerPlatePrice(''); // Reset price
             setMinOrderMembers(''); // Reset members
-            setCustomItemVal(''); // Reset custom item input field
             setcomboTitle('');
             onSaveClick([newMenu]);
         }
+    };
 
+    const handleCategorySelection = (categoryName, items) => {
+        setSelectedItemsByCategory({
+            ...selectedItemsByCategory,
+            [categoryName]: items,
+        });
     };
 
     const handleAddCustomItem = () => {
@@ -99,8 +81,13 @@ const FoodMenu = ({ onSaveClick, }) => {
     };
 
     const handleRemoveItem = (item) => {
-        // Remove from selected food items
-        setSelectedItems(selectedItems.filter((i) => i !== item));
+        // Remove from selected items per category
+        const updatedSelection = { ...selectedItemsByCategory };
+        Object.keys(updatedSelection).forEach((category) => {
+            updatedSelection[category] = updatedSelection[category].filter((i) => i !== item);
+        });
+        setSelectedItemsByCategory(updatedSelection);
+
         // Remove from custom items if applicable
         setCustomItems(customItems.filter((i) => i !== item));
     };
@@ -117,107 +104,35 @@ const FoodMenu = ({ onSaveClick, }) => {
                 keyboardType="default"
             />
 
-            <MultiSelect
-                style={styles.dropdown}
-                data={foodItems}
-                labelField="label"
-                valueField="value"
-                placeholder="Select food items"
-                value={selectedItems} // Make sure this is an array
-                onChange={(item) => {
-                    setSelectedItems(item);
-                }}
-                // confirmSelectItem={true}
-                // confirmUnSelectItem={false}
-                // onConfirmSelectItem={(itemArray) => {
-                //     const selectedItem = itemArray[0]; // Access the first item in the array
-                //     console.log("Item to be confirmed :::::::", selectedItem); // Log item for debugging
+            {foodCategories.map((category) => (
+                <View key={category.category} style={styles.categoryContainer}>
+                    <Text style={styles.subHeading}>Select {category.category}</Text>
 
-                //     return new Promise((resolve) => {
-                //       // Show alert only for adding an item
-                //       if (!selectedItems.includes(selectedItem)) {
-                //         Alert.alert(
-                //           "Add Item",
-                //           `Do you want to add ${selectedItem}?`,  // Display the selected item
-                //           [
-                //             { text: "No", style: "cancel", onPress: () => resolve(false) },
-                //             {
-                //               text: "Yes",
-                //               onPress: () => {
-                //                 resolve(true); // Allow item to be added on "Yes"
-                //                 console.log("Adding item:", selectedItem); // Debug log for added item
-                //               }
-                //             }
-                //           ]
-                //         );
-                //       } else {
-                //         resolve(true); // Automatically resolve for unselecting items
-                //       }
-                //     });
-                //   }}
-                selectedStyle={{ backgroundColor: '#FD813B' }}
-                renderItem={(item) => {
-                    const isSelected = selectedItems.includes(item.value);
-                    return (
-                        <View style={[styles.itemContainer, isSelected && styles.selectedItemContainer]}>
-                            <Text style={[styles.itemText, isSelected && styles.selectedItemText]}>
-                                {item.label}
-                            </Text>
-                        </View>
-                    );
-                }}
-                selectedTextStyle={styles.selectedText}
-                placeholderStyle={styles.placeholderStyle}
-                search
-                searchPlaceholder="Search food..."
-            />
-            <Text style={styles.subHeading}>Select Main Course</Text>
+                    <MultiSelect
+                        style={styles.dropdown}
+                        data={category.items}
+                        labelField="name"
+                        valueField="name"
+                        placeholder={`Select ${category.category}`}
+                        value={selectedItemsByCategory[category.category] || []}
+                        onChange={(items) => handleCategorySelection(category.category, items)}
+                        selectedTextStyle={styles.selectedText}
+                        placeholderStyle={styles.placeholderStyle}
+                        search
+                        searchPlaceholder={`Search ${category.category.toLowerCase()}...`}
+                    />
+                </View>
+            ))}
 
-            <MultiSelect
-                style={styles.dropdown}
-                data={mainCourseItems}
-                labelField="name"
-                valueField="name"
-                placeholder="Select Main course"
-                value={selectedItems} // Make sure this is an array
-                onChange={(item) => {
-                    setSelectedItems(item); // Handle selection as an array
-                }}
-                selectedTextStyle={styles.selectedText}
-                placeholderStyle={styles.placeholderStyle}
-                search
-                searchPlaceholder="Search chicken..."
-            />
-            <Text style={styles.subHeading}>Select Rotis</Text>
-
-            <MultiSelect
-                style={styles.dropdown}
-                data={rotiItems}
-                labelField="name"
-                valueField="name"
-                placeholder="Select Rotis"
-                value={selectedItems} // Make sure this is an array
-                onChange={(item) => {
-                    setSelectedItems(item); // Handle selection as an array
-                }}
-                selectedTextStyle={styles.selectedText}
-                placeholderStyle={styles.placeholderStyle}
-                search
-                searchPlaceholder="Search food..."
-            />
             <View style={styles.selectedItemsContainer}>
-
-                {customItems ?
-                    <>
-                        {customItems.map((item, index) => (
-                            <View key={index} style={styles.selectedItem}>
-                                <Text style={styles.selectedText}>{item}</Text>
-                                <TouchableOpacity onPress={() => handleRemoveItem(item)}>
-                                    <Text style={styles.crossIcon}>✗</Text>
-                                </TouchableOpacity>
-                            </View>
-                        ))}
-                    </> : null}
+                {customItems.map((item, index) => (
+                    <View key={index} style={styles.selectedItem}>
+                        <Text style={styles.selectedText}>{item}</Text>
+                        <TouchableOpacity onPress={() => handleRemoveItem(item)}>
+                            <Text style={styles.crossIcon}>✗</Text>
+                        </TouchableOpacity>
+                    </View>
+                ))}
             </View>
 
             <TextInput
@@ -239,7 +154,7 @@ const FoodMenu = ({ onSaveClick, }) => {
                 <View style={styles.inputContainer}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <TextInput
-                            style={[styles.input, { width: "80%" }]}
+                            style={[styles.input, { width: '80%' }]}
                             value={customItemVal}
                             onChangeText={(text) => setCustomItemVal(text)}
                             placeholder="Add Custom Item"
@@ -261,19 +176,14 @@ const FoodMenu = ({ onSaveClick, }) => {
                 <Text style={styles.customButtonText}>Add Your Customized Item</Text>
             </TouchableOpacity>
 
-
-
-
-
             <TouchableOpacity
-                style={{ marginTop: 10, backgroundColor: "green", alignItems: "center", alignSelf: "center", width: "100%", paddingVertical: 10, borderRadius: 10 }}
-                onPress={handleSaveMenu} disabled={selectedItems.length === 0 && customItems.length === 0} >
-                <Text style={{
-                    color: "white",
-                    fontFamily: 'ManropeRegular',
-                    fontWeight: 'bold',
-                    fontSize: 14
-                }}>Save Combo</Text>
+                style={styles.saveButton}
+                onPress={handleSaveMenu}
+                disabled={
+                    Object.values(selectedItemsByCategory).flat().length === 0 && customItems.length === 0
+                }
+            >
+                <Text style={styles.saveButtonText}>Save Combo</Text>
             </TouchableOpacity>
         </View>
     );
