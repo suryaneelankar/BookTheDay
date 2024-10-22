@@ -64,6 +64,8 @@ import UserAadharUpload from "../screens/KYC/UserAadharUpload";
 import AdminDashboard from "../screens/Admin/adminDashboard";
 import PaymentSuccess from "../screens/PaymentScreens/PaymentSuccess";
 import PaymentFailedScreen from "../screens/PaymentScreens/PaymentFailed";
+import EditAddFoodCatering from "../screens/VendorScreens/VendorAddFoodCatering/EditAddFoodCatering";
+import EditAddFoodCateringGeneral from "../screens/VendorScreens/VendorAddFoodCatering/EditFoodCateringGeneral";
 
 const MainNavigation = () => {
 
@@ -192,6 +194,22 @@ const MainNavigation = () => {
                     component={PaymentFailedScreen}
                     options={{
                         header: () => <NavigationHeader Icon={true} title="PaymentFailed" />,
+                        headerShown: true,
+                    }}
+                />
+                 <Stack.Screen
+                    name="EditAddFoodCatering"
+                    component={EditAddFoodCatering}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Edit Catering Form" />,
+                        headerShown: true,
+                    }}
+                />
+                 <Stack.Screen
+                    name="EditAddFoodCateringGeneral"
+                    component={EditAddFoodCateringGeneral}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Edit Catering Form" />,
                         headerShown: true,
                     }}
                 />

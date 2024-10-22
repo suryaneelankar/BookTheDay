@@ -9,8 +9,16 @@ import DecorVendorImg from '../../assets/vendorIcons/decorVendorImg.svg';
 import CateringVendorImg from '../../assets/vendorIcons/cateringVendorImg.svg';
 import { getVendorAuthToken } from '../../utils/StoreAuthToken';
 import LinearGradient from 'react-native-linear-gradient';
+import { useEffect, useState } from 'react';
+import BASE_URL from '../../apiconfig';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const VendorCategoryScreen = ({ navigation }) => {
+    const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
+    const [profileData, setProfileData] = useState();
+
+
 
     const vendorToken = async () => {
         const token = await getVendorAuthToken();
@@ -21,6 +29,27 @@ const VendorCategoryScreen = ({ navigation }) => {
           console.log('No vendor token found');
         }
       };
+
+      useEffect(()=>{
+        getProfileData();
+      },[]);
+  
+      const getProfileData = async() => {
+          const token = await getVendorAuthToken();
+          try {
+            console.log("vendou num:", vendorLoggedInMobileNum)
+              const response = await axios.get(`${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`,{
+                  headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+              });
+              setProfileData(response?.data?.data);
+          console.log("profile vendor res:::", response?.data?.data?.posts?.length);
+             
+          } catch (error) {
+              console.log("profile::::::::::", error);
+          }
+      }
       
     // vendorToken();
 
@@ -28,18 +57,21 @@ const VendorCategoryScreen = ({ navigation }) => {
         {
             id: 1,
             CatImg: FunctionHallVendorImg,
-            navScreen: 'AddFunctionalHall'
+            navScreen: 'AddFunctionalHall',
+            catType:'functionalHalls'
         },
         {
             id: 1,
             CatImg: ClothVendorImg,
-            navScreen: 'RentOnProducts'
+            navScreen: 'RentOnProducts',
+            catType: 'clothesJewels'
         },
         
         {
             id: 1,
             CatImg: CateringVendorImg,
-            navScreen: 'AddFoodCatering'
+            navScreen: 'AddFoodCatering',
+            catType : 'caterings'
         },
         // {
         //     id: 1,
@@ -67,11 +99,23 @@ const VendorCategoryScreen = ({ navigation }) => {
     const renderItem = ({ item }) => {
         // console.log('item dats is ::>>', item);
         return (
-            <TouchableOpacity style={{ marginVertical:30,alignSelf: 'center' }} onPress={() => { navigation.navigate(item.navScreen) }}>
+            <TouchableOpacity style={{ marginVertical:30,alignSelf: 'center' }} 
+            onPress={() => { 
+                 if(item?.catType == 'caterings'){
+                   if (profileData?.posts?.length > 0){
+                      navigation.navigate('EditAddFoodCateringGeneral')
+                    // navigation.navigate(item?.navScreen)
+                   }else{
+                    navigation.navigate(item?.navScreen)
+                   }
+                 }else{
+                navigation.navigate(item?.navScreen)
+                 }
+              }}>
                 <item.CatImg />
             </TouchableOpacity>
         )
-    }
+    };
 
     return (
         <SafeAreaView style={{flex:1}}>

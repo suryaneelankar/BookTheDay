@@ -113,6 +113,7 @@ const FoodMenu = ({ onSaveClick }) => {
                         data={category.items}
                         labelField="name"
                         valueField="name"
+                        selectedStyle={{ backgroundColor: '#FD813B' }}
                         placeholder={`Select ${category.category}`}
                         value={selectedItemsByCategory[category.category] || []}
                         onChange={(items) => handleCategorySelection(category.category, items)}
@@ -183,7 +184,7 @@ const FoodMenu = ({ onSaveClick }) => {
                     Object.values(selectedItemsByCategory).flat().length === 0 && customItems.length === 0
                 }
             >
-                <Text style={styles.saveButtonText}>Save Combo</Text>
+                <Text style={styles.customButtonText}>Save Combo</Text>
             </TouchableOpacity>
         </View>
     );
@@ -191,7 +192,7 @@ const FoodMenu = ({ onSaveClick }) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#FFF4E1',
+        backgroundColor: '#FFF5E3',
         paddingVertical: 20,
         paddingHorizontal: 10,
         borderRadius: 10
@@ -224,10 +225,8 @@ const styles = StyleSheet.create({
         color: 'black',
     },
     selectedItemText: {
-        color: 'white', // Change text color for selected items
-    },
-    selectedText: {
-        color: 'black', // Default selected text color in the main component
+        color: 'white',
+        backgroundColor:"pink"
     },
     dropdown: {
         height: 50,
@@ -279,7 +278,6 @@ const styles = StyleSheet.create({
     customButton: {
         backgroundColor: '#D2453B',
         padding: 10,
-        borderRadius: 10,
         alignItems: 'center',
         marginTop: 20
     },
@@ -300,6 +298,13 @@ const styles = StyleSheet.create({
     iconButton: {
         marginHorizontal: 5,
         marginTop: 10
+    },
+    saveButton:{
+        backgroundColor:"green",
+        alignItems:"center",
+        paddingHorizontal:10,
+        paddingVertical:10,
+        marginTop:20,
     }
 });
 
