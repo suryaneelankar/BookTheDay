@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, Dimensions, ScrollView } from 'react-native';
 import axios from 'axios';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -12,6 +12,11 @@ import moment from "moment";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import { useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
+import { formatAmount } from "../../utils/GlobalFunctions";
+import ServiceTime from '../../assets/svgs/serviceTime.svg';
+import CalendarIcon from '../../assets/svgs/calendarOrangeIcon.svg';
+import MapMarkIcon from '../../assets/svgs/orangeMapMark.svg';
+
 
 const HallsBookingOverView = ({ route, navigation }) => {
 
@@ -20,6 +25,7 @@ const HallsBookingOverView = ({ route, navigation }) => {
     const [bookingDone, setBookingDone] = useState(false);
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
     const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
+    const userLoggedInName = useSelector((state) => state.userLoggedInName);
     
     useEffect(() => {
         getEventsDetails();
@@ -70,7 +76,7 @@ const HallsBookingOverView = ({ route, navigation }) => {
 
 
     return (
-        <View style={{ flex: 1, alignSelf: 'center', width: '100%', alignItems: 'center' }}>
+        <View style={{ flex: 1, backgroundColor: "white", }}>
 
             {/* <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 20, marginTop: 20, width: '90%' }}>Upcoming Booking, {bookingDetails?.name}</Text> */}
             {bookingDone ?
@@ -85,38 +91,51 @@ const HallsBookingOverView = ({ route, navigation }) => {
                         <Text style={{ color: 'green', fontWeight: '800', fontSize: 13, marginTop: 10, marginHorizontal: 10 }}>We'll get back with in 2 hrs with booking confirmation status.</Text>
                     </View>
                 </View> : null}
+                <ScrollView style={{}}>
 
-            <View style={{ backgroundColor: 'white', borderRadius: 15, padding: 10, marginTop: 20, width: '90%', paddingHorizontal: 18, }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <View>
-                        <Text style={{ color: 'grey' }}>{bookingDetails?.functionHallName}</Text>
-                        <Text style={{ color: 'grey' }}>Address : {bookingDetails?.functionHallAddress?.address}</Text>
-
-
-                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                            <Text style={{ fontWeight: '600', fontSize: 12 }}>Booking Date : </Text>
-                            <Text style={{ fontWeight: '600', fontSize: 13 }}>{bookingDate}</Text>
-                        </View>
-                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                            <Text style={{ fontWeight: '600', fontSize: 12 }}>Booking Time : </Text>
-                            <Text style={{ fontWeight: '600', fontSize: 13 }}>{timeSlot}</Text>
-                        </View>
-                        <Text style={{ color: 'black' }}>Booked for - Rakesh Pandit</Text>
-                    </View>
+                <View style={styles.productContainer}>
                     <FastImage source={{ uri: bookingDetails?.professionalImage?.url.replace('localhost', LocalHostUrl) }}
-                        style={{ width: 70, height: 70, borderRadius: 35 }}
+                        style={styles.productImage}
                         resizeMethod="resize"
                         resizeMode="cover"
                     />
-                </View>
+                        <View style={{marginTop:20}}>
+                            <Text style={styles.productTitle}>{bookingDetails?.functionHallName}</Text>
+                            <Text style={styles.productPrice}><Text style={styles.productPriceperDay}>Advance Amount  </Text>{formatAmount(bookingDetails?.advanceAmount)}</Text>
+                            <View >
+                                <View style={styles.dateContainer}>
+                                    <CalendarIcon />
+                                    <Text style={styles.dateText}>{bookingDate}</Text>
+                                </View>
+                                <View style={styles.dateContainer}>
+                                    <ServiceTime />
+                                    <Text style={styles.dateText}>{timeSlot}</Text>
+                                </View>
+                                <View style={styles.addressContainer}>
+                                    <MapMarkIcon />
+                                    <Text style={styles.addressText}>{bookingDetails?.functionHallAddress?.address}</Text>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
 
+                    {/* <Text style={{ color: 'black' }}>Booked for - {userLoggedInName}</Text> */}
 
+                    <View style={{ backgroundColor: '#dcdcdc', width: '90%', height: 2, alignSelf: 'center', marginVertical: 10 }} />
 
-                <View style={{ backgroundColor: '#dcdcdc', width: '100%', height: 2, alignSelf: 'center', marginTop: 10 }} />
-                <Text style={{ fontWeight: '600', marginTop: 10, fontSize: 18 }}>Total Price : {totalPrice}</Text>
-                <Text style={{ fontWeight: '600', marginTop: 10 }}> Advacnce Amount : {bookingDetails?.advanceAmount}</Text>
+            <View style={{ backgroundColor: 'white', borderRadius: 15, padding: 10,paddingHorizontal: 20, }}>
+               
+                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                            <Text style={{ marginTop: 20, color: 'black', fontSize: 18, fontWeight: "500", fontFamily: 'ManropeRegular', marginVertical: 15 }}>Total Amount</Text>
+                            <Text style={{ marginTop: 20, color: 'black', fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular', marginVertical: 15 }}>{totalPrice}</Text>
+                        </View>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                            <Text style={{ color: 'black', fontSize: 18, fontWeight: "500", fontFamily: 'ManropeRegular', }}>Advacnce Amount</Text>
+                            <Text style={{ color: 'black', fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular', }}>{formatAmount(bookingDetails?.advanceAmount)}</Text>
+                        </View>
+            
             </View>
-
+            </ScrollView>
             <Modal
                 isVisible={thankyouCardVisible}
                 onBackdropPress={() => setThankYouCardVisible(false)}
@@ -205,6 +224,69 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 5,
         elevation: 5,
+    },
+    productContainer: {
+        // flexDirection: 'row',
+        // alignItems: 'center',
+        marginHorizontal:20,
+    },
+    productImage: {
+        // width: Dimensions.get('window').width/1.5,
+        height: Dimensions.get('window').height / 4,
+        borderRadius: 8,
+    },
+    productDetails: {
+        flex: 1,
+    },
+    productTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: "#100D25",
+        fontFamily: "ManropeRegular",
+    },
+    productSubTitle: {
+        fontSize: 14,
+        color: '#000000',
+        fontFamily: "ManropeRegular",
+        fontWeight: "500",
+        marginHorizontal: 10
+    },
+    productPrice: {
+        fontSize: 14,
+        fontWeight: '800',
+        color: '#202020',
+        fontFamily: "ManropeRegular",
+    },
+    dateText: {
+        marginLeft: 10,
+        fontSize: 13,
+        color: '#333333',
+        fontWeight: "600",
+        fontFamily: "ManropeRegular",
+
+    },
+    addressText: {
+        marginLeft: 10,
+        fontSize: 13,
+        color: '#333333',
+        fontWeight: "600",
+        fontFamily: "ManropeRegular",
+    },
+    dateContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 15,
+    },
+    addressContainer: {
+        flexDirection: 'row',
+        marginTop: 15,
+    },
+    productPriceperDay: {
+        fontSize: 12,
+        fontWeight: '400',
+        color: '#202020',
+        fontFamily: "ManropeRegular",
+
     },
     iconContainer: {
         margin: 20

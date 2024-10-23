@@ -77,6 +77,8 @@ const RequestConfirmation = ({ navigation, route }) => {
             let advanceAmountPaid = 0;
             let userFullName = '';
             let userAddress = '';
+            let userDeliveryLocationLatitude = '';
+            let userDeliveryLocationLongitude = '';
 
             if (catType === 'functionHalls') {
                 productName = item?.functionHallName;
@@ -117,7 +119,9 @@ const RequestConfirmation = ({ navigation, route }) => {
                 bookingId = item?.bookingId;
                 advanceAmountPaid = item?.advanceAmountPaid;
                 userFullName = item?.userFullName;
-                userAddress = item?.userDeliveryLocation
+                userAddress = item?.userDeliveryLocation;
+                userLatitude = item?.userDeliveryLocationLatitude;
+                userLongitude = item?.userDeliveryLocationLongitude;
 
             }
 
@@ -137,7 +141,9 @@ const RequestConfirmation = ({ navigation, route }) => {
                 bookingId: bookingId,
                 advanceAmountPaid: advanceAmountPaid,
                 userFullName: userFullName,
-                userAddress : userAddress
+                userAddress : userAddress,
+                userLatitude : userLatitude,
+                userLongitude: userLongitude,
 
 
 
@@ -398,12 +404,12 @@ const RequestConfirmation = ({ navigation, route }) => {
                         </View>
                         {selectedItemDetails?.advanceAmountPaid !== 0 ?
                             <TouchableOpacity style={styles.detailsViewStyle}
-                                onPress={() => openDialPad('+91 9876543210')}
+                                onPress={() => openDialPad(selectedItemDetails?.userMobileNumber)}
                             >
                                 <PhoneIcon />
                                 <Text style={styles.detailsStyle}>{selectedItemDetails?.userMobileNumber}</Text>
                             </TouchableOpacity> : null}
-                        <TouchableOpacity style={styles.detailsViewStyle} onPress={() => openMap(37.7749, -122.4194)}>
+                        <TouchableOpacity style={[styles.detailsViewStyle,{alignItems:"flex-start"}]} onPress={() => openMap(selectedItemDetails?.userLatitude, selectedItemDetails?.userLongitude)}>
                             <LocationIcon />
                             <Text style={styles.detailsStyle}>{selectedItemDetails?.userAddress}</Text>
                         </TouchableOpacity>
@@ -413,7 +419,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                         </View>
                         <View style={styles.detailsViewStyle}>
                             <AdvPayIcon />
-                            <Text style={styles.detailsStyle}>Balance Payable: ₹ 4000/-</Text>
+                            <Text style={styles.detailsStyle}>Balance Payable: ₹ {selectedItemDetails?.advanceAmountPaid}/-</Text>
                         </View>
                         {selectedItemDetails?.bookingItem ?
                         <View>
