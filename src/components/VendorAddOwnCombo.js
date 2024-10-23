@@ -7,6 +7,9 @@ import CrossIconRed from '../assets/vendorIcons/crossIconRed.svg';
 import { getVendorAuthToken } from '../utils/StoreAuthToken';
 import axios from 'axios';
 import BASE_URL from '../apiconfig';
+import VegIcon from '../assets/svgs/foodtype/veg.svg';
+import NonVegIcon from '../assets/svgs/foodtype/NonVeg.svg';
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 const FoodMenu = ({ onSaveClick }) => {
     const [menuList, setMenuList] = useState([]);
@@ -18,6 +21,52 @@ const FoodMenu = ({ onSaveClick }) => {
     const [title, setcomboTitle] = useState(''); // Combo title
     const [foodCategories, setFoodCategories] = useState([]); // Holds categories like Main Course, Roti
     const [selectedItemsByCategory, setSelectedItemsByCategory] = useState({}); // Track selected items per category
+    const [selectedFoodTypes, setSelectedFoodTypes] = useState([]);
+
+    const foodTypes = [
+        { name: 'veg', icon: VegIcon },
+        { name: 'non-veg', icon: NonVegIcon },
+    ]
+
+    const RentalFoodTypeList = () => {
+
+        const onSelectFoodType = (name) => {
+            setSelectedFoodTypes(prevSelected => {
+                if (prevSelected.includes(name)) {
+                    return prevSelected.filter(item => item !== name);
+                } else {
+                    return [...prevSelected, name];
+                }
+            });
+        };
+
+        return (
+            <View style={{ flexDirection: 'row', marginTop: 15 }}>
+                {foodTypes.map((item, index) => {
+                    const IconImage = item?.icon;
+                    const isSelected = selectedFoodTypes.includes(item.name); // Check if the item is selected
+
+                    return (
+                        <TouchableOpacity
+                            key={index}
+                            style={styles.item}
+                            onPress={() => { onSelectFoodType(item?.name) }}
+                        >
+                            <View style={{ borderColor: 'green', borderWidth: 2, width: 20, height: 20, borderRadius: 5 }}>
+                                {isSelected ? (
+                                    <FontAwesome5 style={{ marginHorizontal: 1 }} name={'check'} size={14} color={'green'} />
+                                ) : null}
+                            </View>
+                            <View style={{ flexDirection: 'row', marginHorizontal: 5, alignItems: "center" }}>
+                                <IconImage style={{ marginHorizontal: 2 }} />
+                                <Text style={styles.itemText}>{item.name}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    );
+                })}
+            </View>
+        );
+    };
 
     useEffect(() => {
         getFoodMenuItems();
@@ -80,6 +129,36 @@ const FoodMenu = ({ onSaveClick }) => {
         }
     };
 
+    const filteredCategories = foodCategories.filter(category => {
+        const categoryName = category.category.toLowerCase();
+
+        // Check for veg and non-veg categories
+        const isVegCategory = categoryName.includes('veg') && !categoryName.includes('non-veg');
+        const isNonVegCategory = categoryName.includes('non-veg');
+
+        // If no food type is selected, show only categories not including 'veg' or 'non-veg'
+        if (selectedFoodTypes.length === 0) {
+            return !isVegCategory && !isNonVegCategory; // Show categories that are neither veg nor non-veg
+        }
+
+        // If both 'veg' and 'non-veg' are selected, return all categories
+        if (selectedFoodTypes.includes('veg') && selectedFoodTypes.includes('non-veg')) {
+            return true; // Show all categories
+        }
+
+        // If 'veg' is selected, show veg categories and other categories not including 'non-veg'
+        if (selectedFoodTypes.includes('veg')) {
+            return isVegCategory || (!isNonVegCategory); // Show veg categories and others
+        }
+
+        // If 'non-veg' is selected, show non-veg categories and other categories not including 'veg'
+        if (selectedFoodTypes.includes('non-veg')) {
+            return isNonVegCategory || (!isVegCategory); // Show non-veg categories and others
+        }
+
+        return false;
+    });
+
     const handleRemoveItem = (item) => {
         // Remove from selected items per category
         const updatedSelection = { ...selectedItemsByCategory };
@@ -92,9 +171,28 @@ const FoodMenu = ({ onSaveClick }) => {
         setCustomItems(customItems.filter((i) => i !== item));
     };
 
+    const cleanCategoryName = (categoryName) => {
+        // Check if categoryName is a valid string
+        if (typeof categoryName !== 'string') {
+            console.warn('Invalid category name:', categoryName); // Log a warning if it's not a string
+            return ''; // Return an empty string for invalid input
+        }
+    
+        // Use regular expressions to remove 'veg' or 'non-veg' and surrounding spaces
+        return categoryName
+            .replace(/\s*non-veg\s*/i, '') // Remove 'non-veg' and surrounding spaces
+            .replace(/\s*veg\s*/i, '')      // Remove 'veg' and surrounding spaces
+            .replace(/\bnon-/i, '')         // Remove 'non-' prefix if present
+            .trim();                        // Trim any leading or trailing whitespace
+    };
+    
+    
+
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Select Food Items</Text>
+            {/* <Text style={styles.title}>Select Food Items</Text> */}
+            <Text style={styles.comboTitle}>Select veg/non-veg to add the combos.</Text>
+            {RentalFoodTypeList()}
 
             <TextInput
                 style={styles.input}
@@ -104,9 +202,9 @@ const FoodMenu = ({ onSaveClick }) => {
                 keyboardType="default"
             />
 
-            {foodCategories.map((category) => (
+            {filteredCategories.map((category) => (
                 <View key={category.category} style={styles.categoryContainer}>
-                    <Text style={styles.subHeading}>Select {category.category}</Text>
+                    <Text style={styles.subHeading}>{cleanCategoryName(category?.category)}</Text>
 
                     <MultiSelect
                         style={styles.dropdown}
@@ -193,7 +291,7 @@ const FoodMenu = ({ onSaveClick }) => {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#FFF5E3',
-        paddingVertical: 20,
+        paddingVertical: 10,
         paddingHorizontal: 10,
         borderRadius: 10
         // padding: 20
@@ -203,14 +301,26 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: themevariable.Color_000000,
         fontSize: 15,
-        marginTop: 15
+        marginTop: 5
     },
-    subHeading: {
+    comboTitle: {
         fontFamily: 'ManropeRegular',
         fontWeight: '400',
         color: themevariable.Color_000000,
         fontSize: 15,
+        marginTop: 5
+    },
+    subHeading: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: '700',
+        color: themevariable.Color_000000,
+        fontSize: 15,
         marginTop: 10
+    },
+    item: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 5,
     },
     itemContainer: {
         padding: 10,
@@ -226,7 +336,7 @@ const styles = StyleSheet.create({
     },
     selectedItemText: {
         color: 'white',
-        backgroundColor:"pink"
+        backgroundColor: "pink"
     },
     dropdown: {
         height: 50,
@@ -299,12 +409,12 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
         marginTop: 10
     },
-    saveButton:{
-        backgroundColor:"green",
-        alignItems:"center",
-        paddingHorizontal:10,
-        paddingVertical:10,
-        marginTop:20,
+    saveButton: {
+        backgroundColor: "green",
+        alignItems: "center",
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+        marginTop: 20,
     }
 });
 
