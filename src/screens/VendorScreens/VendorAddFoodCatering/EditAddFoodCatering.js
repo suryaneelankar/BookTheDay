@@ -1,23 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, TextInput, ScrollView, alert, ActivityIndicator, Modal, Button } from 'react-native';
-import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
-import TextField from '../../../commonFields/TextField';
-import SelectField from '../../../commonFields/SelectField';
-import UploadIcon from '../../../assets/svgs/uploadIcon.svg';
-import SelectedUploadIcon from '../../../assets/svgs/selectedUploadIcon.svg';
-import { Dropdown } from 'react-native-element-dropdown';
-import { launchImageLibrary } from 'react-native-image-picker';
 import BASE_URL from '../../../apiconfig';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/Ionicons';
-import VegNonVegIcon from '../../../assets/svgs/foodtype/vegNonveg.svg';
 import VegIcon from '../../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../../assets/svgs/foodtype/NonVeg.svg';
 import { useSelector } from 'react-redux';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
-import LocationPicker from '../../../components/LocationPicker';
-import DetectLocation from '../../../assets/svgs/detectLocation.svg';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import FoodMenu from '../../../components/VendorAddOwnCombo';
 import CustomModal from '../../../components/AlertModal';
@@ -25,38 +15,9 @@ import { useNavigation } from '@react-navigation/native';
 
 const EditAddFoodCatering = () => {
     const [comboModalSuccess, setcomboModalSuccess] = useState(false);
-    const [overTimeCharges, setOverTimeCharges] = useState();
-    const [mainImageUrl, setMainImageUrl] = useState('');
-    const [foodCateringName, setFoodCateringName] = useState('');
-    const [cateringDescription, setCateringDescription] = useState('');
     const navigation = useNavigation();
-
-    const [additionalImages, setAdditionalImages] = useState({
-        additionalImageOne: undefined,
-        additionalImageTwo: undefined,
-        additionalImageThree: undefined,
-        additionalImageFour: undefined
-    });
-    const [cateringAddress, setCateringAddress] = useState('');
-    const [locationLatitude, setLocationLatitude] = useState();
-    const [locationLongitude, setLocationLongitude] = useState();
-    const [locationCountyVal, setLocationCountyVal] = useState();
-
-    const [cateringCity, setCateringCity] = useState('');
-    const [cateringPincode, setCateringPincode] = useState();
-    const [advanceAmount, setAdvanceAmount] = useState();
-    const [discountPercentage, setDiscountPercentage] = useState();
-
-    const [selectedItems, setSelectedItems] = useState({});
-    const [foodMenuItems, setFoodMenuItems] = useState();
-    const [comboPrice, setComboPrice] = useState({});
-    const [minOrderMembers, setMinOrderMembers] = useState({});
-    const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
-    const discountPercentageArr = ['5', '10', '15', '20', '30', '50'];
-    const [selectedDiscountVal, setSelectedDiscountVal] = useState();
     const [loading, setLoading] = useState(false);
-    const [isFoodDropDownCollapsed, setIsFoodDropDownCollapsed] = useState(true);
-    const [selectedFoodType, setSelectedFoodType] = useState('');
+    const [selectedFoodTypes, setSelectedFoodTypes] = useState([]);
 
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
@@ -64,227 +25,57 @@ const EditAddFoodCatering = () => {
     const foodTypes = [
         { name: 'veg', icon: VegIcon },
         { name: 'non-veg', icon: NonVegIcon },
-        { name: 'Both', icon: VegNonVegIcon }
     ]
-
-    useEffect(() => {
-        getFoodMenuItems();
-    }, []);
-
-    const getFoodMenuItems = async () => {
-        const token = await getVendorAuthToken();
-        try {
-            const response = await axios.get(`${BASE_URL}/getAllFoodItems`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-            setFoodMenuItems(response?.data?.data[0]?.foodMenuItems);
-        } catch (error) {
-            console.log("events data error>>::", error);
-        }
-    };
-    const [customisedItems, setCustomisedItems] = useState([]);
-    const [finalCombomenu, setFinalComboMenu] = useState([]);
-
-    const onChangeDescription = (value) => {
-        setCateringDescription(value);
-    }
-
-    const onChangetentHouseName = (value) => {
-        setFoodCateringName(value);
-    }
-
-    const onChangeAdvanceAmount = (value) => {
-        setAdvanceAmount(value);
-    }
-
-    const onChangeCateringAddress = (value) => {
-        setCateringAddress(value);
-    }
-
-    const onChangeOverTimeCharges = (value) => {
-        setOverTimeCharges(value);
-    }
-
-    const onChangetentHouseCity = (value) => {
-        setCateringCity(value);
-    }
-
-    const onChangetentHousePincode = (value) => {
-        setCateringPincode(value);
-    }
-
-    const data = [
-        {
-            id: 0,
-            imageUrl: SelectedUploadIcon,
-        },
-        {
-            id: 1,
-            imageUrl: SelectedUploadIcon,
-        },
-        {
-            id: 2,
-            imageUrl: SelectedUploadIcon,
-        },
-        {
-            id: 3,
-            imageUrl: SelectedUploadIcon,
-        }
-    ]
-
-    const openGalleryOrCamera = async () => {
-        const options = {
-            mediaType: 'photo',
-            maxWidth: 1920,
-            maxHeight: 1920,
-            quality: 1,
-        };
-        launchImageLibrary(options, (response) => {
-            // console.log('Response = ', response);
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.errorCode) {
-                console.log('ImagePicker Error: ', response.errorMessage);
-            } else {
-                setMainImageUrl(response);
-                console.log('image lib resp ::>>', response);
-            }
-        });
-    };
-
-    const openGalleryOrCameraForAdditonalImages = async (index) => {
-        const options = {
-            mediaType: 'photo',
-            maxWidth: 1920,
-            maxHeight: 1920,
-            quality: 1,
-        };
-        launchImageLibrary(options, (response) => {
-            // console.log('Response = ', response);
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.errorCode) {
-                console.log('ImagePicker Error: ', response.errorMessage);
-            } else {
-                if (index == 0) {
-                    setAdditionalImages({ ...additionalImages, additionalImageOne: response });
-                } else if (index == 1) {
-                    setAdditionalImages({ ...additionalImages, additionalImageTwo: response });
-                } else if (index == 2) {
-                    setAdditionalImages({ ...additionalImages, additionalImageThree: response });
-                } else {
-                    setAdditionalImages({ ...additionalImages, additionalImageFour: response });
-                }
-            }
-        });
-    };
 
     const RentalFoodTypeList = () => {
-
-        const toggleCollapse = () => {
-            setIsFoodDropDownCollapsed(!isFoodDropDownCollapsed);
-        };
-
+    
         const onSelectFoodType = (name) => {
-            setSelectedFoodType(name);
-        }
-
-        const renderItem = ({ item }) => {
-            const IconImage = item?.icon;
-            return (
-                <TouchableOpacity style={styles.item} onPress={() => { onSelectFoodType(item?.name) }}>
-                    <View style={{ borderColor: 'green', borderWidth: 2, width: 20, height: 20, borderRadius: 5 }}>
-                        {selectedFoodType === item.name ? <FontAwesome5 style={{ marginHorizontal: 1 }} name={'check'} size={14} color={'green'} /> : null}
-                    </View>
-                    <View style={{ flexDirection: 'row', marginHorizontal: 5, alignItems: "center" }} onPress={() => { }}>
-                        <IconImage style={{ marginHorizontal: 2 }} />
-                        <Text style={styles.itemText}>{item.name}</Text>
-                    </View>
-                </TouchableOpacity>
-            )
-        }
-
+            setSelectedFoodTypes(prevSelected => {
+                if (prevSelected.includes(name)) {
+                    return prevSelected.filter(item => item !== name);
+                } else {
+                    return [...prevSelected, name];
+                }
+            });
+        };
+    
         return (
-            <View style={styles.container}>
-                <TouchableOpacity onPress={toggleCollapse} style={styles.header}>
-                    <Text style={styles.headerText}>Select Food Type</Text>
-                    <Icon name={isFoodDropDownCollapsed ? 'arrow-down' : 'arrow-up'} size={20} />
-                </TouchableOpacity>
-                {!isFoodDropDownCollapsed && (
-                    <View style={styles.itemsContainer}>
-                        <FlatList
-                            data={foodTypes}
-                            keyExtractor={(item, index) => index.toString()}
-                            renderItem={renderItem}
-                        />
-                    </View>
-                )}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
+                {foodTypes.map((item, index) => {
+                    const IconImage = item?.icon;
+                    const isSelected = selectedFoodTypes.includes(item.name); // Check if the item is selected
+    
+                    return (
+                        <TouchableOpacity 
+                            key={index} 
+                            style={styles.item} 
+                            onPress={() => { onSelectFoodType(item?.name) }}
+                        >
+                            <View style={{ borderColor: 'green', borderWidth: 2, width: 20, height: 20, borderRadius: 5 }}>
+                                {isSelected ? (
+                                    <FontAwesome5 style={{ marginHorizontal: 1 }} name={'check'} size={14} color={'green'} />
+                                ) : null}
+                            </View>
+                            <View style={{ flexDirection: 'row', marginHorizontal: 5, alignItems: "center" }}>
+                                <IconImage style={{ marginHorizontal: 2 }} />
+                                <Text style={styles.itemText}>{item.name}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    );
+                })}
             </View>
         );
     };
 
-    const ListItem = ({ item, index }) => {
-
-        return (
-            <TouchableOpacity style={styles.imageContainer} onPress={() => { openGalleryOrCameraForAdditonalImages(index) }}>
-                {additionalImages &&
-                    additionalImages?.additionalImageOne && index == 0 ?
-                    <Image
-                        source={{ uri: additionalImages?.additionalImageOne?.assets[0]?.uri }}
-                        width={Dimensions.get('window').width / 4.8}
-                        height={100}
-                        style={{ borderRadius: 5 }}
-                        resizeMode='cover'
-                    /> :
-                    additionalImages?.additionalImageTwo && index == 1 ?
-                        <Image
-                            source={{ uri: additionalImages?.additionalImageTwo?.assets[0]?.uri }}
-                            width={Dimensions.get('window').width / 4.8}
-                            height={100}
-                            style={{ borderRadius: 5 }}
-                            resizeMode='cover'
-                        />
-                        : additionalImages?.additionalImageThree && index == 2 ?
-                            <Image
-                                source={{ uri: additionalImages?.additionalImageThree?.assets[0]?.uri }}
-                                width={Dimensions.get('window').width / 4.8}
-                                height={100}
-                                style={{ borderRadius: 5 }}
-                                resizeMode='cover'
-                            />
-                            : additionalImages?.additionalImageFour && index == 3 ?
-                                <Image
-                                    source={{ uri: additionalImages?.additionalImageFour?.assets[0]?.uri }}
-                                    width={Dimensions.get('window').width / 4.8}
-                                    height={100}
-                                    style={{ borderRadius: 5 }}
-                                    resizeMode='cover'
-                                />
-                                :
-                                <item.imageUrl style={{}} width={Dimensions.get('window').width / 4.8} height={100} />
-                }
-
-            </TouchableOpacity>
-        )
-    }
-    const transformInput = (input) => {
-        return Object.entries(input).map(([key, value]) => {
-            return {
-                itemName: value[0].itemName || value[0].name,
-                perDayPrice: value[0].perDayPrice || 0
-            };
-        });
-    };
+    const [finalCombomenu, setFinalComboMenu] = useState([]);
 
     const onPressSaveAndPost = async () => {
-        if ( finalCombomenu?.length === 0
+        if (finalCombomenu?.length === 0
         ) {
             Alert.alert('Please fill Mandatory fields');
             return;
         }
-       
+
         finalCombomenu.forEach((obj) => {
             if (obj?.minOrder === 0 && obj?.perPlateCost === 0) {
                 Alert.alert('Please fill Mandatory fields', `Details missing for: ${obj.title}`);
@@ -308,7 +99,7 @@ const EditAddFoodCatering = () => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            
+
             if (response.status === 200) {
                 setLoading(false);
                 console.log('Success', `uploaded successfully`);
@@ -316,11 +107,6 @@ const EditAddFoodCatering = () => {
                     "Confirmation",
                     "Your product posted successfully",
                     [
-                        // {
-                        //     text: "No",
-                        //     onPress: () => console.log("No Pressed"),
-                        //     style: "cancel"
-                        // },
                         { text: "Ok", onPress: () => navigation.goBack() }
                     ],
                     { cancelable: false }
@@ -336,29 +122,6 @@ const EditAddFoodCatering = () => {
         }
     }
 
-    const discountPercentageList = () => {
-
-        const onPressDiscountPercentage = (item) => {
-            setDiscountPercentage(item);
-            setSelectedDiscountVal(item);
-        }
-        return (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ width: '100%' }}>
-                {discountPercentageArr.map((item) => {
-                    const isSelected = item === selectedDiscountVal;
-                    const backgroundColor = isSelected ? '#FFD700' : '#FFF5E3';
-                    return (
-                        <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
-                            onPress={() => onPressDiscountPercentage(item)}
-                        >
-                            <Text>{item} %</Text>
-                        </TouchableOpacity>
-                    )
-                })}
-            </ScrollView>
-        );
-    }
-
     const renderMenuItem = ({ item }) => (
         <View style={{ marginHorizontal: 5, backgroundColor: "white", borderWidth: 1, borderColor: "lightgray", borderRadius: 10, paddingVertical: 10, paddingHorizontal: 10 }}>
             <Text style={{ color: "black", fontSize: 14, fontWeight: "700", fontFamily: 'ManropeRegular' }}>{item.title}</Text>
@@ -370,27 +133,6 @@ const EditAddFoodCatering = () => {
         </View>
     );
 
-
-    const handleOpenLocationPicker = () => {
-        setLocationPickerVisible(true);
-    };
-
-    const handleLocationSelected = (location, address) => {
-        console.log('Selected Location food:', location, address);
-        setLocationCountyVal(location?.subDivisionArea);
-        setLocationLatitude(location?.region?.latitude);
-        setLocationLongitude(location?.region?.longitude);
-
-        setCateringAddress(address);
-        setCateringCity(location?.address?.city);
-        setCateringPincode(location.pinCode);
-        setLocationPickerVisible(false); // Hide the LocationPicker after selection
-    };
-
-    const handleCloseLocationPicker = () => {
-        setLocationPickerVisible(false);
-    };
-
     return (
         <View style={{ flex: 1 }}>
             {loading ? (
@@ -399,6 +141,8 @@ const EditAddFoodCatering = () => {
                 </View>
             ) :
                 <View>
+                    {/* <Text style={styles.labelText}>Food Type</Text> */}
+                    {/* {RentalFoodTypeList()} */}
 
                     <Text style={styles.title}>Add Menu Items</Text>
                     <View style={styles.mainContainer}>
@@ -462,15 +206,15 @@ const styles = StyleSheet.create({
         color: themevariable.Color_000000,
         fontSize: 18,
         marginTop: 10,
-        marginHorizontal:20
+        marginHorizontal: 20
     },
     labelText: {
         fontFamily: 'ManropeRegular',
         fontWeight: 'bold',
         color: themevariable.Color_000000,
         fontSize: 15,
-        marginTop: 20,
-        bottom: 10
+        padding: 10,
+        marginHorizontal: 10
     },
     subTitle: {
         fontFamily: 'ManropeRegular',
@@ -524,9 +268,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     container: {
-        // backgroundColor: '#FFF4E1',
-        // padding: 10,
+        justifyContent: 'space-around',
         borderRadius: 5,
+        flexDirection: 'row'
     },
     header: {
         flexDirection: 'row',
@@ -579,7 +323,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 5,
-        width: "50%"
     },
     icon: {
         marginRight: 10,
