@@ -21,9 +21,10 @@ import DetectLocation from '../../../assets/svgs/detectLocation.svg';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useNavigation } from '@react-navigation/native';
 
-const GeneralDetails = () => {
-    const [BedRooms, setBedRooms] = useState();
+const GeneralDetails = ({isAadharUpdate}) => {
+    console.log("isAadharUpdate value at fomr", isAadharUpdate);
     const navigation = useNavigation();
+    const [BedRooms, setBedRooms] = useState();
     const [foodType, setFoodType] = useState('');
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [functionHallName, setfunctionHallName] = useState('');
@@ -354,9 +355,28 @@ const GeneralDetails = () => {
             if (response.status === 201) {
                 setLoading(false);
                 console.log('Success', `uploaded successfully`);
+                if(isAadharUpdate){
+                    Alert.alert(
+                        "Confirmation",
+                        "Your product posted successfully",
+                        [
+                            // {
+                            //     text: "No",
+                            //     onPress: () => console.log("No Pressed"),
+                            //     style: "cancel"
+                            // },
+                            {
+                                text: "Ok", onPress: () => {
+                                    navigation.goBack()
+                                }
+                            }
+                        ],
+                        { cancelable: false }
+                    );
+                }else{
                 Alert.alert(
                     "Confirmation",
-                    "Your product posted successfully",
+                    "Your product posted successfully, pLease complete KYC Status",
                     [
                         // {
                         //     text: "No",
@@ -365,12 +385,13 @@ const GeneralDetails = () => {
                         // },
                         {
                             text: "Ok", onPress: () => {
-                                // navigation.goBack()
-                            }
+                    navigation.navigate('AadharUpload')
+                }
                         }
                     ],
                     { cancelable: false }
                 );
+            }
             } else {
                 setLoading(false);
                 console.log('Error', 'Failed to upload document');

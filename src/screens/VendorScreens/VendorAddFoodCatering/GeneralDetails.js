@@ -21,8 +21,11 @@ import DetectLocation from '../../../assets/svgs/detectLocation.svg';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import FoodMenu from '../../../components/VendorAddOwnCombo';
 import CustomModal from '../../../components/AlertModal';
+import { useNavigation } from '@react-navigation/native';
 
-const GeneralDetails = () => {
+const GeneralDetails = ({isAadharUpdate}) => {
+    console.log("isAadharUpdate value at fomr", isAadharUpdate);
+    const navigation = useNavigation();
     const [comboModalSuccess, setcomboModalSuccess] = useState(false);
     const [overTimeCharges, setOverTimeCharges] = useState();
     const [mainImageUrl, setMainImageUrl] = useState('');
@@ -359,19 +362,37 @@ const GeneralDetails = () => {
             if (response.status === 201) {
                 setLoading(false);
                 console.log('Success', `uploaded successfully`);
+                if(isAadharUpdate){
+                    Alert.alert(
+                        "Confirmation",
+                        "Your product posted successfully",
+                        [
+                            // {
+                            //     text: "No",
+                            //     onPress: () => console.log("No Pressed"),
+                            //     style: "cancel"
+                            // },
+                            { text: "Ok", onPress: () => navigation.goBack() }
+                        ],
+                        { cancelable: false }
+                    );
+
+                }else{
                 Alert.alert(
                     "Confirmation",
-                    "Your product posted successfully",
+                    "Your product posted successfully, Please complete KYC Status",
                     [
                         // {
                         //     text: "No",
                         //     onPress: () => console.log("No Pressed"),
                         //     style: "cancel"
                         // },
-                        { text: "Ok", onPress: () => console.log("yes pressed") }
+                        { text: "Ok", onPress: () =>  navigation.navigate('AadharUpload')
+                        }
                     ],
                     { cancelable: false }
                 );
+            }
             } else {
                 setLoading(false);
                 console.log('Error', 'Failed to upload document');

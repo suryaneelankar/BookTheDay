@@ -51,9 +51,9 @@ const ViewMyBookings = () => {
     labelColor: '#999999',
     labelSize: 13,
     currentStepLabelColor: '#FD813B',
-    
+
   };
-  
+
   const [currentPosition, setCurrentPosition] = useState(0);
 
 
@@ -110,87 +110,137 @@ const ViewMyBookings = () => {
     }
   };
 
-  const handlePayment = async (advanceAmount) => {
+  const handlePayment = async (advanceAmount, bookingId, catType) => {
     const token = await getUserAuthToken();
-    let initiatePaymentPayload ={
-      orderAmount : advanceAmount,
-      currency : 'INR',
-      userFullName : userLoggedInName,
-      userMobileNumber : userLoggedInMobileNum
+    let initiatePaymentPayload = {
+      orderAmount: advanceAmount,
+      currency: 'INR',
+      userFullName: userLoggedInName,
+      userMobileNumber: userLoggedInMobileNum,
+      bookingId: bookingId,
+      catType: catType
 
     };
 
     try {
-      const response = await axios.post(`${BASE_URL}/user/initiate-payment`, initiatePaymentPayload, {
+      const initiateresponse = await axios.post(`${BASE_URL}/user/initiate-payment`, initiatePaymentPayload, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("initiate payment  RES:::::::::", JSON.stringify(response?.data))
+      console.log("initiate payment  RES:::::::::", JSON.stringify(initiateresponse?.data))
+
+      if (initiateresponse?.data) {
+        try {
+          // Fetch the order details from your backend
+          const response = await fetch(`${BASE_URL}/create-order`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              amount: advanceAmount, // Amount in INR
+              currency: 'INR',
+              receipt: 'receipt#1',
+              userFullName: userLoggedInName,
+              userMobileNumber: userLoggedInMobileNum,
+              bookingId: bookingId,
+              catType: catType
+            })
+          });
+
+          const data = await response.json();
+          console.log('razor pay data is ::>>', data);
+          // Start the Razorpay payment process
+          var options = {
+            description: 'Test Transaction',
+            image: 'https://your-logo-url.com/logo.png',
+            currency: data.currency,
+            key: 'rzp_test_SFQjGVsyEZ2P05', // Your Razorpay Key ID
+            amount: data.amount, // Amount in smallest currency unit
+            order_id: data.orderId, // Order ID returned from backend
+            name: 'Book the day',
+            prefill: {
+              email: 'bookthedaytechnologies@gmail.com',
+              contact: '8297735285',
+              name: 'Surya Neelankar',
+              //   method: 'upi',  // Pre-select UPI as the payment method
+              vpa: ''
+            },
+            theme: { color: '#FFDB7E' }
+          };
+
+          console.log('options is::>>', options);
+
+
+          RazorpayCheckout.open(options)
+            .then(async (paymentData) => {
+              console.log('success resp::>>', paymentData);
+              navigation.navigate('PaymentSuccess');
+              let statusPaymentPayload = {
+                orderId: initiateresponse?.data?.data?.OrderId,
+                paymentStatus: "success",
+                orderAdvanceAmount: advanceAmount,
+                razorpay_order_id: paymentData?.razorpay_order_id,
+                razorpay_payment_id: paymentData?.razorpay_payment_id,
+                razorpay_signature: paymentData?.razorpay_signature
+
+              };
+              try {
+                const response = await axios.patch(`${BASE_URL}/user/update-payment-status`, statusPaymentPayload, {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+
+                });
+                console.log("success payment  RES:::::::::", JSON.stringify(response?.data))
+              } catch (error) {
+                console.log("success Payment error>>::", error);
+              };
+              // Success callback
+              // Alert.alert(`Success: ${paymentData.razorpay_payment_id}`);
+              // Verify the payment on the server-side
+
+              //   verifyPayment(paymentData);
+            })
+            .catch(async (error) => {
+              let failurePaymentPayload = {
+
+                orderId: initiateresponse?.data?.data?.OrderId,
+                paymentStatus: "failed",
+                orderAdvanceAmount: advanceAmount,
+                razorpay_order_id: data?.orderId,
+                razorpay_payment_id: '',
+                razorpay_signature: ''
+
+              };
+
+              try {
+                const response = await axios.patch(`${BASE_URL}/user/update-payment-status`, failurePaymentPayload, {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+
+                });
+                console.log("failure payment  RES:::::::::", JSON.stringify(response?.data))
+              } catch (error) {
+                console.log("failure Payment error>>::", error);
+              };
+              // Failure callback
+              // Alert.alert(`Error: ${error.code} | ${error.description}`);
+              // navigation.navigate('PaymentSuccess');
+              navigation.navigate('PaymentFailed');
+              console.log(error);
+            });
+        } catch (error) {
+          console.error(error);
+          Alert.alert('Error', 'Something went wrong');
+        }
+
+      }
     } catch (error) {
       console.log("Initiate Payment error>>::", error);
     };
-    if (response?.data){
-
-    try {
-      // Fetch the order details from your backend
-      const response = await fetch(`${BASE_URL}/create-order`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          amount: advanceAmount, // Amount in INR
-          currency: 'INR',
-          receipt: 'receipt#1'
-        })
-      });
-
-      const data = await response.json();
-      console.log('razor pay data is ::>>', data);
-      // Start the Razorpay payment process
-      var options = {
-        description: 'Test Transaction',
-        image: 'https://your-logo-url.com/logo.png',
-        currency: data.currency,
-        key: 'rzp_test_SFQjGVsyEZ2P05', // Your Razorpay Key ID
-        amount: data.amount, // Amount in smallest currency unit
-        order_id: data.orderId, // Order ID returned from backend
-        name: 'Book the day',
-        prefill: {
-          email: 'bookthedaytechnologies@gmail.com',
-          contact: '8297735285',
-          name: 'Surya Neelankar',
-          //   method: 'upi',  // Pre-select UPI as the payment method
-          vpa: ''
-        },
-        theme: { color: '#FFDB7E' }
-      };
-
-      console.log('options is::>>', options)
-
-      RazorpayCheckout.open(options)
-        .then((paymentData) => {
-          // Success callback
-          // Alert.alert(`Success: ${paymentData.razorpay_payment_id}`);
-          // Verify the payment on the server-side
-          console.log('success resp::>>', paymentData);
-          
-          navigation.navigate('PaymentSuccess');
-          //   verifyPayment(paymentData);
-        })
-        .catch((error) => {
-          // Failure callback
-          // Alert.alert(`Error: ${error.code} | ${error.description}`);
-          // navigation.navigate('PaymentSuccess');
-          navigation.navigate('PaymentFailed');
-          console.log(error);
-        });
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Something went wrong');
-    }
-  }
   };
 
 
@@ -222,7 +272,7 @@ const ViewMyBookings = () => {
 
         <StepIndicator
           customStyles={customStyles}
-          currentPosition={item?.bookingStatus == 'requested' ? '1' : item?.bookingStatus == 'approved' ? '2': '0'}
+          currentPosition={item?.bookingStatus == 'requested' ? '1' : item?.bookingStatus == 'approved' ? '2' : '0'}
           labels={labels}
           stepCount={3}
         />
@@ -231,14 +281,14 @@ const ViewMyBookings = () => {
         {/* <StepProgress status={item?.bookingStatus} /> */}
 
         <View style={styles.cardFooter}>
-          <Text style={[styles.cardStatus, { borderWidth: 1, borderColor: "gray", paddingHorizontal: 20 ,fontSize:11}]}>
+          <Text style={[styles.cardStatus, { borderWidth: 1, borderColor: "gray", paddingHorizontal: 20, fontSize: 11 }]}>
             NEED HELP?
           </Text>
           <LinearGradient colors={item.bookingStatus === 'approved' ? ['#FE7939', '#FE7939'] : ['#B0B0B0', '#B0B0B0']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.doneButton}>
-            <TouchableOpacity disabled={item.bookingStatus !== 'approved'} onPress={() => { handlePayment(item?.totalAmount) }}>
+            <TouchableOpacity disabled={item.bookingStatus !== 'approved'} onPress={() => { handlePayment(item?.totalAmount, item?.bookingId, item?.catType) }}>
               <Text style={styles.doneButtonText}>Pay Now</Text>
             </TouchableOpacity>
           </LinearGradient>

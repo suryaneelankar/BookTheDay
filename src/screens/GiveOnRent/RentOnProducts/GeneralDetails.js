@@ -12,9 +12,12 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import { Dropdown } from 'react-native-element-dropdown';
+import { useNavigation } from '@react-navigation/native';
 
 
-const GeneralDetails = () => {
+const GeneralDetails = ({isAadharUpdate}) => {
+    console.log("isAadharUpdate value at fomr", isAadharUpdate);
+    const navigation = useNavigation();
     const [productName, setProductName] = useState('');
     const [productBrand, setProductBrand] = useState('');
     const [mainImageUrl, setMainImageUrl] = useState('');
@@ -342,14 +345,25 @@ const GeneralDetails = () => {
             if (response.status === 201) {
                 setLoading(false);
                 console.log('Success', `uploaded successfully`);
+                if(isAadharUpdate){
+                    Alert.alert(
+                        "Confirmation",
+                        "Your product posted successfully",
+                        [
+                            { text: "OK", onPress: () => navigation.goBack() }
+                        ],
+                        { cancelable: false }
+                    );
+                }else{
                 Alert.alert(
                     "Confirmation",
-                    "Your product posted successfully",
+                    "Your product posted successfully, Please complete the KYC status",
                     [
-                        { text: "OK", onPress: () => console.log("yes pressed") }
+                        { text: "OK", onPress: () => navigation.navigate('AadharUpload') }
                     ],
                     { cancelable: false }
                 );
+            }
             } else {
                 setLoading(false);
                 console.log('Error', 'Failed to upload document');

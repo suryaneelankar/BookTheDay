@@ -44,7 +44,7 @@ const VendorCategoryScreen = ({ navigation }) => {
                     },
               });
               setProfileData(response?.data?.data);
-          console.log("profile vendor res:::", response?.data?.data?.posts?.length);
+          console.log("profile vendor res:::", response?.data?.data?.aadharImage?.url);
              
           } catch (error) {
               console.log("profile::::::::::", error);
@@ -103,13 +103,13 @@ const VendorCategoryScreen = ({ navigation }) => {
             onPress={() => { 
                  if(item?.catType == 'caterings'){
                    if (profileData?.posts?.length > 0){
-                      navigation.navigate('EditAddFoodCateringGeneral')
+                      navigation.navigate('EditAddFoodCateringGeneral', {isAadharUpdate : profileData?.aadharImage?.url  ? true : false})
                     // navigation.navigate(item?.navScreen)
                    }else{
-                    navigation.navigate(item?.navScreen)
+                    navigation.navigate(item?.navScreen,{isAadharUpdate : profileData?.aadharImage?.url  ? true : false})
                    }
                  }else{
-                navigation.navigate(item?.navScreen)
+                navigation.navigate(item?.navScreen, {isAadharUpdate : profileData?.aadharImage?.url  ? true : false})
                  }
               }}>
                 <item.CatImg />
