@@ -66,7 +66,7 @@ const CateringsOverView = ({ route, navigation }) => {
             userMobileNumber: userLoggedInMobileNum,
             bookingTime: timeSlot,
             userDeliveryLocation: userLocationFetched?.display_name ? userLocationFetched?.display_name : userLocationFetched?.address,
-            advacnceAmountToPay : bookingDetails?.advanceAmount,
+            advanceAmountToPay : bookingDetails?.advanceAmount,
             userFullName : userLoggedInName,
             userDeliveryLocationLatitude : userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude,
             userDeliveryLocationlongitude : userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude

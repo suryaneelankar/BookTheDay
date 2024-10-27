@@ -11,6 +11,7 @@ import RazorpayCheckout from 'react-native-razorpay';
 import { useNavigation } from '@react-navigation/native';
 import StepProgress from '../../components/StepProgress';
 import StepIndicator from 'react-native-step-indicator';
+import { useSelector } from 'react-redux';
 
 
 
@@ -23,6 +24,9 @@ const ViewMyBookings = () => {
   const [tentHouseBookings, settentHouseBookings] = useState();
   const [getUserAuth, setGetUserAuth] = useState('');
   const navigation = useNavigation();
+  const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
+  const userLoggedInName = useSelector((state) => state.userLoggedInName);
+
 
   const labels = ["Initiated", "Confirmed", "Payment Pending"];
   const customStyles = {
@@ -106,7 +110,28 @@ const ViewMyBookings = () => {
     }
   };
 
-  const handlePayment = async () => {
+  const handlePayment = async (advanceAmount) => {
+    const token = await getUserAuthToken();
+    let initiatePaymentPayload ={
+      orderAmount : advanceAmount,
+      currency : 'INR',
+      userFullName : userLoggedInName,
+      userMobileNumber : userLoggedInMobileNum
+
+    };
+
+    try {
+      const response = await axios.post(`${BASE_URL}/user/initiate-payment`, initiatePaymentPayload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("initiate payment  RES:::::::::", JSON.stringify(response?.data))
+    } catch (error) {
+      console.log("Initiate Payment error>>::", error);
+    };
+    if (response?.data){
+
     try {
       // Fetch the order details from your backend
       const response = await fetch(`${BASE_URL}/create-order`, {
@@ -115,7 +140,7 @@ const ViewMyBookings = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          amount: 1, // Amount in INR
+          amount: advanceAmount, // Amount in INR
           currency: 'INR',
           receipt: 'receipt#1'
         })
@@ -150,6 +175,7 @@ const ViewMyBookings = () => {
           // Alert.alert(`Success: ${paymentData.razorpay_payment_id}`);
           // Verify the payment on the server-side
           console.log('success resp::>>', paymentData);
+          
           navigation.navigate('PaymentSuccess');
           //   verifyPayment(paymentData);
         })
@@ -158,12 +184,13 @@ const ViewMyBookings = () => {
           // Alert.alert(`Error: ${error.code} | ${error.description}`);
           // navigation.navigate('PaymentSuccess');
           navigation.navigate('PaymentFailed');
-          console.error(error);
+          console.log(error);
         });
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Something went wrong');
     }
+  }
   };
 
 
@@ -179,7 +206,7 @@ const ViewMyBookings = () => {
               headers: { Authorization: `Bearer ${getUserAuth}` }
             }} style={styles.cardImage} />
             <View style={{ marginLeft: 15 }}>
-              <Text style={styles.cardTitle}>{item?.catType === 'caterings' ? item?.foodCateringName : item?.catType === 'functionhall' ? item?.functionHallName : item?.productName} </Text>
+              <Text style={styles.cardTitle}>{item?.catType === 'caterings' ? item?.foodCateringName : item?.catType === 'functionHalls' ? item?.functionHallName : item?.productName} </Text>
               <Text style={styles.cardAmount}>{formatAmount(item?.totalAmount)}</Text>
 
               <Text style={styles.startDate}> Start Date: {item?.startDate}</Text>
@@ -195,7 +222,7 @@ const ViewMyBookings = () => {
 
         <StepIndicator
           customStyles={customStyles}
-          currentPosition={item?.bookingStatus == 'requested' ? '1' : item?.bookingStatus == 'approved' ? '2': '1'}
+          currentPosition={item?.bookingStatus == 'requested' ? '1' : item?.bookingStatus == 'approved' ? '2': '0'}
           labels={labels}
           stepCount={3}
         />
@@ -211,7 +238,7 @@ const ViewMyBookings = () => {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.doneButton}>
-            <TouchableOpacity disabled={item.bookingStatus !== 'approved'} onPress={() => { handlePayment() }}>
+            <TouchableOpacity disabled={item.bookingStatus !== 'approved'} onPress={() => { handlePayment(item?.totalAmount) }}>
               <Text style={styles.doneButtonText}>Pay Now</Text>
             </TouchableOpacity>
           </LinearGradient>

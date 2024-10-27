@@ -54,7 +54,11 @@ const HallsBookingOverView = ({ route, navigation }) => {
           endDate: moment(bookingDate, "DD-MM-YYYY").format("DD MMMM YYYY"),
           numOfDays: 1,
           totalAmount: totalPrice.replace(/[^\d]/g, ''),
-          userMobileNumber: userLoggedInMobileNum
+          userMobileNumber: userLoggedInMobileNum,
+          bookingTime: timeSlot,
+          userFullName : userLoggedInName,
+          advanceAmountToPay : bookingDetails?.advanceAmount,
+
         }
         console.log("payload is:::::::", payload);
         try {
@@ -80,7 +84,7 @@ const HallsBookingOverView = ({ route, navigation }) => {
 
             {/* <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 20, marginTop: 20, width: '90%' }}>Upcoming Booking, {bookingDetails?.name}</Text> */}
             {bookingDone ?
-                <View style={{ backgroundColor: '#fdf5e6', borderRadius: 15, padding: 10, marginTop: 20, width: '90%' }}>
+                <View style={{ backgroundColor: '#fdf5e6', borderRadius: 15, padding: 10, marginTop: 20, width: '90%',alignSelf:"center",marginVertical:20 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Icon name="exclamationcircleo" size={18} color="grey" />
                         <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 16, marginHorizontal: 10 }}>Confirmation Pending</Text>
