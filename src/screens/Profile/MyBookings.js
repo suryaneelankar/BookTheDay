@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, ScrollView, Dimensions, Alert } from 'react-native';
 import BASE_URL, { LocalHostUrl } from '../../apiconfig';
 import axios from 'axios';
@@ -8,7 +8,7 @@ import { formatAmount } from '../../utils/GlobalFunctions';
 import { colors } from 'react-native-swiper-flatlist/src/themes';
 import LinearGradient from 'react-native-linear-gradient';
 import RazorpayCheckout from 'react-native-razorpay';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import StepProgress from '../../components/StepProgress';
 import StepIndicator from 'react-native-step-indicator';
 import { useSelector } from 'react-redux';
@@ -18,17 +18,14 @@ import { useSelector } from 'react-redux';
 
 const ViewMyBookings = () => {
   const [myBookings, setMyBookings] = useState();
-  const [decorsBookings, setDecorsBookings] = useState();
   const [cateringBookings, setCateringBookings] = useState();
   const [hallsBookings, setHallsBookings] = useState();
-  const [tentHouseBookings, settentHouseBookings] = useState();
   const [getUserAuth, setGetUserAuth] = useState('');
   const navigation = useNavigation();
   const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
   const userLoggedInName = useSelector((state) => state.userLoggedInName);
 
-
-  const labels = ["Initiated", "Confirmed", "Payment Pending"];
+  const labels = ["Initiated", "Confirmed", "Payment Done"];
   const customStyles = {
     stepIndicatorSize: 25,
     currentStepIndicatorSize: 30,
@@ -45,24 +42,26 @@ const ViewMyBookings = () => {
     stepIndicatorCurrentColor: '#ffffff',
     stepIndicatorLabelFontSize: 13,
     currentStepIndicatorLabelFontSize: 13,
-    stepIndicatorLabelCurrentColor: '#FD813B',
+    stepIndicatorLabelCurrentColor: 'green',
     stepIndicatorLabelFinishedColor: '#ffffff',
     stepIndicatorLabelUnFinishedColor: '#aaaaaa',
-    labelColor: '#999999',
+    labelColor: '#FD813B',
     labelSize: 13,
-    currentStepLabelColor: '#FD813B',
+    currentStepLabelColor: '#333333',
 
   };
 
-  const [currentPosition, setCurrentPosition] = useState(0);
-
-
-
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
     getMyBookings();
     getCateringsBookings();
     getHallsBookings();
-  }, []);
+        // Cleanup function to run when the screen loses focus
+        return () => {
+            console.log('Screen is unfocused');
+        };
+    }, [])
+);
 
   const getMyBookings = async () => {
     const token = await getUserAuthToken();
@@ -110,15 +109,13 @@ const ViewMyBookings = () => {
     }
   };
 
-  const handlePayment = async (advanceAmount, bookingId, catType) => {
+  const handlePayment = async (advanceAmount, bookingId, catType, vendorMobileNumber) => {
     const token = await getUserAuthToken();
     let initiatePaymentPayload = {
       orderAmount: advanceAmount,
       currency: 'INR',
       userFullName: userLoggedInName,
       userMobileNumber: userLoggedInMobileNum,
-      bookingId: bookingId,
-      catType: catType
 
     };
 
@@ -144,8 +141,6 @@ const ViewMyBookings = () => {
               receipt: 'receipt#1',
               userFullName: userLoggedInName,
               userMobileNumber: userLoggedInMobileNum,
-              bookingId: bookingId,
-              catType: catType
             })
           });
 
@@ -183,7 +178,10 @@ const ViewMyBookings = () => {
                 orderAdvanceAmount: advanceAmount,
                 razorpay_order_id: paymentData?.razorpay_order_id,
                 razorpay_payment_id: paymentData?.razorpay_payment_id,
-                razorpay_signature: paymentData?.razorpay_signature
+                razorpay_signature: paymentData?.razorpay_signature,
+                vendorMobileNumber: vendorMobileNumber,
+                bookingId: bookingId,
+                catType: catType
 
               };
               try {
@@ -265,14 +263,14 @@ const ViewMyBookings = () => {
               <Text style={styles.cardSubtitle}>{item.role}</Text>
             </View>
           </View>
-          <Text style={[styles.cardStatus, getStatusStyle(item.bookingStatus)]}>
+          <Text numberOfLines={2} style={[styles.cardStatus, getStatusStyle(item.bookingStatus),{width:75,textAlign:"center"}]}>
             {item.bookingStatus ? item.bookingStatus.charAt(0).toUpperCase() + item.bookingStatus.slice(1) : ''}
           </Text>
         </View>
 
         <StepIndicator
           customStyles={customStyles}
-          currentPosition={item?.bookingStatus == 'requested' ? '1' : item?.bookingStatus == 'approved' ? '2' : '0'}
+          currentPosition={item?.bookingStatus == 'requested' ? '1' : item?.bookingStatus == 'approved' ? '2' :  item?.bookingStatus == 'payment successful' ? '3' : '0'}
           labels={labels}
           stepCount={3}
         />
@@ -288,7 +286,7 @@ const ViewMyBookings = () => {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.doneButton}>
-            <TouchableOpacity disabled={item.bookingStatus !== 'approved'} onPress={() => { handlePayment(item?.totalAmount, item?.bookingId, item?.catType) }}>
+            <TouchableOpacity disabled={item.bookingStatus !== 'approved'} onPress={() => { handlePayment(item?.totalAmount, item?.bookingId, item?.catType , item?.vendorMobileNumber) }}>
               <Text style={styles.doneButtonText}>Pay Now</Text>
             </TouchableOpacity>
           </LinearGradient>
@@ -305,6 +303,8 @@ const ViewMyBookings = () => {
         return { backgroundColor: '#45FE3529', color: "#57A64F" };
       case 'rejected':
         return { backgroundColor: '#FE353529', color: '#EF0000' };
+      case 'payment successful':
+        return { backgroundColor: '#45FE3529', color: "#57A64F" };
       default:
         return { backgroundColor: '#FFD580' };
     }
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
     fontFamily: 'ManropeRegular',
     paddingVertical: 5,
     paddingHorizontal: 10,
-    alignSelf: "flex-start"
+    alignSelf: "flex-start",
   },
   doneButton: {
     borderRadius: 5,

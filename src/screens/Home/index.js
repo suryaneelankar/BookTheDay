@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, Dimensions, FlatList, PermissionsAndroid, Pressable, StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity, Platform, Alert } from 'react-native';
+import { View, Text, Dimensions, FlatList, PermissionsAndroid, Pressable, StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity, Platform, Alert, Modal } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
@@ -43,6 +43,9 @@ import { getUserAuthToken, getVendorAuthToken } from "../../utils/StoreAuthToken
 import { getCurrentLoggedInUserName, getUserLocation, setUserCurrentLocation } from "../../../redux/actions";
 import { useDispatch, useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
+import { isLocationEnabled } from 'react-native-android-location-enabler';
+import { promptForEnableLocationIfNeeded } from 'react-native-android-location-enabler';
+
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
@@ -57,6 +60,8 @@ const HomeDashboard = () => {
     const [newlyAddedProducts, setNewlyAddedProducts] = useState([]);
     const [getUserAuth, setGetUserAuth] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
 
     const bannerImages = [
         { id: '1', image: JewelleryCard },
@@ -98,17 +103,17 @@ const HomeDashboard = () => {
         console.log("usertoklen", token);
     };
 
-    const getProfileData = async() =>{
+    const getProfileData = async () => {
         const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getAllUserLocations/${userLoggedInMobileNumber}`,{
+            const response = await axios.get(`${BASE_URL}/getAllUserLocations/${userLoggedInMobileNumber}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
             dispatch(getCurrentLoggedInUserName(response?.data?.data?.fullName));
             console.log("profile user res:::", response?.data);
-           
+
         } catch (error) {
             console.log("profile::::::::::", error);
             setLoading(false);
@@ -158,6 +163,7 @@ const HomeDashboard = () => {
         getPermissions();
     }, []);
 
+
     const getLocation = async () => {
         GetLocation.getCurrentPosition({
             enableHighAccuracy: true,
@@ -187,7 +193,43 @@ const HomeDashboard = () => {
                 // console.warn(code, message);
             })
 
-    }
+    };
+
+     const handleCheckPressed = async() => {
+        if (Platform.OS === 'android') {
+          const checkEnabled= await isLocationEnabled();
+          console.log('checkEnabled', checkEnabled);
+          if(!checkEnabled){
+          handleEnabledPressed();
+          }else{
+            getLocation();
+          }
+        }
+      };
+
+      const  handleEnabledPressed = async() => {
+        if (Platform.OS === 'android') {
+          try {
+            const enableResult = await promptForEnableLocationIfNeeded();
+            console.log('enableResult', enableResult);
+            // The user has accepted to enable the location services
+            // data can be :
+            //  - "already-enabled" if the location services has been already enabled
+            //  - "enabled" if user has clicked on OK button in the popup
+          } catch (error) {
+            if (error instanceof Error) {
+              console.error(error.message);
+              // The user has not accepted to enable the location services or something went wrong during the process
+              // "err" : { "code" : "ERR00|ERR01|ERR02|ERR03", "message" : "message"}
+              // codes :
+              //  - ERR00 : The user has clicked on Cancel button in the popup
+              //  - ERR01 : If the Settings change are unavailable
+              //  - ERR02 : If the popup has failed to open
+              //  - ERR03 : Internal error
+            }
+          }
+        }
+      };
 
     const getPermissions = async () => {
         try {
@@ -202,7 +244,8 @@ const HomeDashboard = () => {
                 },
             );
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                getLocation()
+                handleCheckPressed();
+                // getLocation()
             } else {
                 Alert.alert("Location permissions denied")
             }
@@ -223,8 +266,8 @@ const HomeDashboard = () => {
         return (
             <View style={{}}>
                 <TouchableOpacity
-                     onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })}
-                    style={{ elevation: 5, width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto',marginEnd:10 }}>
+                    onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })}
+                    style={{ elevation: 5, width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginEnd: 10 }}>
                     <FastImage source={{
                         uri: updatedImgUrl,
                         headers: { Authorization: `Bearer ${getUserAuth}` }
@@ -517,6 +560,25 @@ const HomeDashboard = () => {
                         </TouchableOpacity>
                     </View>
                 </View>
+
+                <Modal transparent={true} visible={isModalVisible} animationType="slide">
+                    <View style={styles.modalBackground}>
+                        <View style={styles.modalContainer}>
+                            <Text style={styles.modalText}>
+                                For a better experience, your device will need to use Location Accuracy
+                            </Text>
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+                                    <Text style={styles.noThanksText}>No, thanks</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={getPermissions}>
+                                    <Text style={styles.turnOnText}>Turn on</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+
             </ScrollView>
         </SafeAreaView>
     )
@@ -760,6 +822,37 @@ const styles = StyleSheet.create({
         width: 1,
         alignSelf: "center"
     },
+    modalBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      },
+      modalContainer: {
+        width: '80%',
+        padding: 20,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        alignItems: 'center',
+      },
+      modalText: {
+        fontSize: 16,
+        textAlign: 'center',
+        marginBottom: 20,
+      },
+      buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+      },
+      noThanksText: {
+        fontSize: 16,
+        color: 'gray',
+      },
+      turnOnText: {
+        fontSize: 16,
+        color: '#1E90FF',
+      },
 });
 
 export default HomeDashboard;
