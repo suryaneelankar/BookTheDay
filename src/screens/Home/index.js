@@ -39,7 +39,7 @@ import CatJewellery from '../../assets/svgs/categories/home_categories_jewellery
 import CatTentHouse from '../../assets/svgs/categories/home_categories_tent_icon.svg';
 import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.svg';
 import ClothesCard from '../../assets/svgs/homeSwippers/home_shirtcard.svg';
-import { getUserAuthToken, getVendorAuthToken } from "../../utils/StoreAuthToken";
+import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import { getCurrentLoggedInUserName, getUserLocation, setUserCurrentLocation } from "../../../redux/actions";
 import { useDispatch, useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
@@ -52,8 +52,6 @@ const HomeDashboard = () => {
     const [address, setAddress] = useState('');
     const userLocationFetched = useSelector((state) => state.userLocation);
     const userLoggedInMobileNumber = useSelector((state) => state.userLoggedInMobileNum);
-
-    // console.log("userlocation dispctahed:::::;;", userLocationFetched)
     const dispatch = useDispatch();
     const [eventsData, setEventsData] = useState([]);
     const [discountProducts, setDiscountProducts] = useState([]);
@@ -62,12 +60,10 @@ const HomeDashboard = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-
     const bannerImages = [
         { id: '1', image: JewelleryCard },
         { id: '2', image: ClothesCard },
     ];
-
 
     const CategoriesData = [
         { name: 'Clothes', image: CatClothes },

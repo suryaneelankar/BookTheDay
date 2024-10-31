@@ -1,14 +1,10 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions, FlatList, Pressable, SafeAreaView, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Image, Dimensions, FlatList, SafeAreaView, ActivityIndicator } from 'react-native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { formatAmount } from '../../utils/GlobalFunctions';
-import SearchIcon from '../../assets/svgs/searchIcon.svg';
-import FilterIcon from '../../assets/svgs/filter.svg';
+import { useNavigation } from '@react-navigation/native';
 import Swiper from "react-native-swiper";
 import LocationMarkIcon from '../../assets/svgs/location.svg';
-import { verticalScale } from "../../utils/scalingMetrics";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
 import { useSelector } from "react-redux";
@@ -22,7 +18,6 @@ import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 const Caterings = () => {
     const navigation = useNavigation();
     const [cateringsData, setCateringsData] = useState([]);
-
     const [getUserAuth, setGetUserAuth] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('Catering');
     const userLocationFetched = useSelector((state) => state.userLocation);
@@ -44,13 +39,10 @@ const Caterings = () => {
     const userLongitude = userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude;
     console.log("latitue long", userLatitude, '+++++++++', userLongitude, userLocationFetched);
 
-    // console.log("user selevcted address is events::::::::", userLocationFetched)
-
     useEffect(() => {
         getAllCaterings(currentPage);
         getAllLocations();
     }, []);
-
 
     const loadMoreCaterings = () => {
         if (hasMore && !loading) {
@@ -255,11 +247,9 @@ const Caterings = () => {
                 </View>
                 <TouchableOpacity
                     onPress={() => {
-                        if (selectedCategory === 'Tent House') {
-                            navigation.navigate('ViewTentHouse', { categoryId: item?._id });
-                        } else if (selectedCategory === 'Catering') {
+                       
                             navigation.navigate('ViewCaterings', { categoryId: item?._id });
-                        }
+                        
                     }} style={{ width: Dimensions.get('window').width - 30, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                         <View style={{ width: '60%', }}>
@@ -272,20 +262,10 @@ const Caterings = () => {
                     </View>
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between',marginTop:10 }}>
-
-                        {/* <View style={{ backgroundColor: item?.available ? "orange" : "orange", flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
-                            <Image source={require('../../assets/available.png')} style={{ width: 15, height: 15 }} />
-                            {item?.available ?
-                                <Text style={{ fontWeight: '600', color: '#4A4A4A', fontSize: 13, marginHorizontal: 5, fontFamily: "ManropeRegular" }}>Available</Text>
-                                :
-                                <Text style={{ fontWeight: '600', color: '#4A4A4A', fontSize: 13, marginHorizontal: 5, fontFamily: "ManropeRegular" }}>Booked</Text>
-                            }
-                        </View> */}
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center",paddingVertical:5 }}>
                             <Text>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
                             <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
                         </View>
-
                     </View>
                 </TouchableOpacity>
             </View>
@@ -301,9 +281,7 @@ const Caterings = () => {
     return (
         <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
             <View style={{ flex: 1 }}>
-
                 <View style={styles.autocompleteContainer}>
-
                     <Autocomplete
                         data={dropdownVisible && filteredData?.length > 0 ? filteredData : []}  // Conditionally hide results based on dropdownVisible
                         value={query}
@@ -359,52 +337,6 @@ const Caterings = () => {
                     }
                     contentContainerStyle={{}}
                 />
-
-                {/* <FlatList
-                    data={cateringsData}
-                    renderItem={renderFoodCaterings}
-                    keyExtractor={(item) => item._id}
-                    onEndReached={loadMoreCaterings}
-                    onEndReachedThreshold={0.5}
-                    ListFooterComponent={() =>
-                        loading ? <ActivityIndicator size="large" color="orange" /> : null
-                    }
-                /> */}
-
-                {/* {!nearByClicked ?
-                    <FlatList
-                        data={cateringsData}
-                        renderItem={renderFoodCaterings}
-                        keyExtractor={(item) => item._id}
-                        onEndReached={loadMoreCaterings} // Fetch more when list ends
-                        onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
-                        ListFooterComponent={() =>
-                            loading ? <ActivityIndicator size="large" color="orange" /> : null
-                        }
-                        ListEmptyComponent={
-                            <View >
-                                <Text>{cateringsData?.length == 0 ? 'No Near By Catering services Available please check in all' : 'No Function halls found'}</Text>
-                            </View>
-                        }
-                    />
-                    :
-                    <FlatList
-                        data={nearByData}
-                        renderItem={renderFoodCaterings}
-                        keyExtractor={(item) => item._id}
-                        onEndReached={loadMoreNearByCaterings} // Fetch more when list ends
-                        onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
-                        ListFooterComponent={() =>
-                            nearByLoading ? <ActivityIndicator size="large" color="orange" /> : null
-                        }
-                        ListEmptyComponent={
-                            <View >
-                                <Text>{nearByData?.length == 0 ? 'No Near By Catering services Available please check in all' : 'No Function halls found'}</Text>
-                            </View>
-                        }
-                    />
-                } */}
-
             </View>
         </SafeAreaView>
     )

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ScrollView } from 'react-native';
 import axios from 'axios';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -81,8 +81,6 @@ const HallsBookingOverView = ({ route, navigation }) => {
 
     return (
         <View style={{ flex: 1, backgroundColor: "white", }}>
-
-            {/* <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 20, marginTop: 20, width: '90%' }}>Upcoming Booking, {bookingDetails?.name}</Text> */}
             {bookingDone ?
                 <View style={{ backgroundColor: '#fdf5e6', borderRadius: 15, padding: 10, marginTop: 20, width: '90%',alignSelf:"center",marginVertical:20 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -122,8 +120,6 @@ const HallsBookingOverView = ({ route, navigation }) => {
                             </View>
                         </View>
                     </View>
-
-                    {/* <Text style={{ color: 'black' }}>Booked for - {userLoggedInName}</Text> */}
 
                     <View style={{ backgroundColor: '#dcdcdc', width: '90%', height: 2, alignSelf: 'center', marginVertical: 10 }} />
 
@@ -165,7 +161,6 @@ const HallsBookingOverView = ({ route, navigation }) => {
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         style={{ width: "55%", padding: 4, }}>
-                        {/* <View style={{borderWidth:4, width:"50%", }}/> */}
                     </LinearGradient>
 
                     <View style={styles.iconContainer}>
@@ -212,9 +207,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#f9f9f9',
 
     },
-    itemText: {
-        fontSize: 16
-    },
     Thankcontainer: {
         marginTop: 30,
         alignItems: 'center',
@@ -239,21 +231,11 @@ const styles = StyleSheet.create({
         height: Dimensions.get('window').height / 4,
         borderRadius: 8,
     },
-    productDetails: {
-        flex: 1,
-    },
     productTitle: {
         fontSize: 16,
         fontWeight: '700',
         color: "#100D25",
         fontFamily: "ManropeRegular",
-    },
-    productSubTitle: {
-        fontSize: 14,
-        color: '#000000',
-        fontFamily: "ManropeRegular",
-        fontWeight: "500",
-        marginHorizontal: 10
     },
     productPrice: {
         fontSize: 14,
@@ -343,13 +325,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
     },
-    trackProgressText: {
-        color: '#FF730D',
-        textDecorationLine: 'underline',
-        fontWeight: "400",
-        fontFamily: "ManropeRegular",
-        fontSize: 12,
-        marginBottom: 30
-    },
+   
 });
 

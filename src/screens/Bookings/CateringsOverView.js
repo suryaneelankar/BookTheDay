@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, FlatList, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Dimensions, ScrollView } from 'react-native';
 import axios from 'axios';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -8,8 +8,6 @@ import BookDatesButton from "../../components/GradientButton";
 import Modal from 'react-native-modal';
 import themevariable from "../../utils/themevariable";
 import LinearGradient from "react-native-linear-gradient";
-import Swiper from "react-native-swiper";
-import moment from "moment";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import { useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
@@ -25,7 +23,6 @@ const CateringsOverView = ({ route, navigation }) => {
     const [bookingDetails, setBookingDetails] = useState([]);
     const [bookingDone, setBookingDone] = useState(false);
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
-
     const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
     const userLocationFetched = useSelector((state) => state.userLocation);
     const userLoggedInName = useSelector((state) => state.userLoggedInName);
@@ -33,7 +30,6 @@ const CateringsOverView = ({ route, navigation }) => {
     useEffect(() => {
         getEventsDetails();
     }, []);
-    console.log("received item::::::::", cateringItems)
 
     const getEventsDetails = async () => {
         const token = await getUserAuthToken();
@@ -89,8 +85,6 @@ const CateringsOverView = ({ route, navigation }) => {
         }
     }
 
-
-    console.log("addeiets:::::", cateringItems)
     return (
         <View style={{ flex: 1, backgroundColor: "white" }}>
 
@@ -105,7 +99,6 @@ const CateringsOverView = ({ route, navigation }) => {
             </View>
             <ScrollView style={{ marginBottom: "20%" }}>
 
-                {/* <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 20, marginTop: 20, width: '90%' }}>Upcoming Booking, {bookingDetails?.name}</Text> */}
                 {bookingDone ?
                     <View style={{ backgroundColor: '#fdf5e6', borderRadius: 15, padding: 10, marginTop: 20, width: '90%',alignSelf:"center" }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -223,7 +216,6 @@ const CateringsOverView = ({ route, navigation }) => {
                             );
                         }}
                     />
-                    {/* <View style={{ backgroundColor: '#FD813B', width: '100%', height: 1, alignSelf: 'center', marginVertical: 10 }} /> */}
 
                     <View>
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
@@ -262,12 +254,10 @@ const CateringsOverView = ({ route, navigation }) => {
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         style={{ width: "55%", padding: 4, }}>
-                        {/* <View style={{borderWidth:4, width:"50%", }}/> */}
                     </LinearGradient>
 
                     <View style={styles.iconContainer}>
                         <View style={styles.iconBackground}>
-                            {/* <Image source={{ uri: 'thumbs_up_icon_url' }} style={styles.icon} /> */}
 
                         </View>
                     </View>
@@ -364,13 +354,6 @@ const styles = StyleSheet.create({
         color: "#100D25",
         fontFamily: "ManropeRegular",
     },
-    productSubTitle: {
-        fontSize: 14,
-        color: '#000000',
-        fontFamily: "ManropeRegular",
-        fontWeight: "500",
-        marginHorizontal: 10
-    },
     productPrice: {
         fontSize: 14,
         fontWeight: '800',
@@ -391,9 +374,6 @@ const styles = StyleSheet.create({
         color: '#202020',
         fontFamily: "ManropeRegular",
 
-    },
-    itemText: {
-        fontSize: 16
     },
     comboText: {
         width: "80%", fontSize: 14,
@@ -446,49 +426,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         position: 'relative',
     },
-    itemContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 16,
-        paddingHorizontal: 5,
-        paddingVertical: 10,
-        borderBottomColor: "#D6D6D6",
-        borderBottomWidth: 1
-        // padding: 16,
-        // borderRadius: 8,
-        // backgroundColor: '#f9f9f9',
-        // elevation: 1,
-    },
-    itemImage: {
-        width: 80,
-        height: 80,
-        borderRadius: 8,
-    },
-    itemDetails: {
-        flex: 1,
-        marginLeft: 10
-    },
-    itemName: {
-        fontSize: 16,
-        fontWeight: '400',
-        color: "#000000",
-        fontFamily: 'ManropeRegular',
-
-    },
-    itemPrice: {
-        fontSize: 13,
-        color: '#000000',
-        fontFamily: 'ManropeRegular',
-        fontWeight: "700",
-        marginTop: 5
-    },
-    itemDescription: {
-        fontSize: 10,
-        color: '#8B8B8B',
-        fontWeight: "400",
-        fontFamily: 'ManropeRegular',
-        marginTop: 5,
-    },
     icon: {
         width: 40,
         height: 40,
@@ -528,13 +465,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
     },
-    trackProgressText: {
-        color: '#FF730D',
-        textDecorationLine: 'underline',
-        fontWeight: "400",
-        fontFamily: "ManropeRegular",
-        fontSize: 12,
-        marginBottom: 30
-    },
+
 });
 

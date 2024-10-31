@@ -23,10 +23,6 @@ export default AddFoodCatering;
 
 const styles=StyleSheet.create({
   root:{
-    // backgroundColor: "#EBEDF3", 
-    // paddingHorizontal: 10
-    // backgroundColor:themevariable.Color_E1E1E2,
-    // backgroundColor:'green',
     flex:1,
   },
   subContainer:{

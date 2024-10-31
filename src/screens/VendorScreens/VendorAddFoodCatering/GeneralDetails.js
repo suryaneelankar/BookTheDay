@@ -3,10 +3,7 @@ import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, 
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
-import SelectField from '../../../commonFields/SelectField';
-import UploadIcon from '../../../assets/svgs/uploadIcon.svg';
 import SelectedUploadIcon from '../../../assets/svgs/selectedUploadIcon.svg';
-import { Dropdown } from 'react-native-element-dropdown';
 import { launchImageLibrary } from 'react-native-image-picker';
 import BASE_URL from '../../../apiconfig';
 import axios from 'axios';
@@ -46,19 +43,13 @@ const GeneralDetails = ({isAadharUpdate}) => {
     const [cateringPincode, setCateringPincode] = useState();
     const [advanceAmount, setAdvanceAmount] = useState();
     const [discountPercentage, setDiscountPercentage] = useState();
-
-    const [selectedItems, setSelectedItems] = useState({});
     const [foodMenuItems, setFoodMenuItems] = useState();
-    const [comboPrice, setComboPrice] = useState({});
-    const [minOrderMembers, setMinOrderMembers] = useState({});
     const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
     const discountPercentageArr = ['5', '10', '15', '20', '30', '50'];
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
     const [loading, setLoading] = useState(false);
     const [isFoodDropDownCollapsed, setIsFoodDropDownCollapsed] = useState(true);
     const [selectedFoodType, setSelectedFoodType] = useState('');
-
-
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
     const foodTypes = [
@@ -84,7 +75,6 @@ const GeneralDetails = ({isAadharUpdate}) => {
             console.log("events data error>>::", error);
         }
     };
-    const [customisedItems, setCustomisedItems] = useState([]);
     const [finalCombomenu, setFinalComboMenu] = useState([]);
 
     const onChangeDescription = (value) => {
@@ -269,14 +259,6 @@ const GeneralDetails = ({isAadharUpdate}) => {
             </TouchableOpacity>
         )
     }
-    const transformInput = (input) => {
-        return Object.entries(input).map(([key, value]) => {
-            return {
-                itemName: value[0].itemName || value[0].name,
-                perDayPrice: value[0].perDayPrice || 0
-            };
-        });
-    };
 
     const onPressSaveAndPost = async () => {
         if (!mainImageUrl || foodCateringName === '' || cateringDescription === '' || cateringCity === '' ||
@@ -367,11 +349,6 @@ const GeneralDetails = ({isAadharUpdate}) => {
                         "Confirmation",
                         "Your product posted successfully",
                         [
-                            // {
-                            //     text: "No",
-                            //     onPress: () => console.log("No Pressed"),
-                            //     style: "cancel"
-                            // },
                             { text: "Ok", onPress: () => navigation.goBack() }
                         ],
                         { cancelable: false }
@@ -382,11 +359,6 @@ const GeneralDetails = ({isAadharUpdate}) => {
                     "Confirmation",
                     "Your product posted successfully, Please complete KYC Status",
                     [
-                        // {
-                        //     text: "No",
-                        //     onPress: () => console.log("No Pressed"),
-                        //     style: "cancel"
-                        // },
                         { text: "Ok", onPress: () =>  navigation.navigate('AadharUpload')
                         }
                     ],

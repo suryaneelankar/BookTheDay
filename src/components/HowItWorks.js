@@ -1,8 +1,5 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import IconBg from '../assets/svgs/howitWorkBg.svg';
-import ProfileIcon from '../assets/svgs/profileRed.svg';
-
 
 const HowItWorks = () => {
   return (

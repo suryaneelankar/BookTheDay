@@ -11,8 +11,6 @@ import BookingOverView from "../screens/Bookings/BookingOverView";
 import ProfileScreen from "../screens/Profile/ProfileScreen";
 import Login from "../screens/Authentication/Login";
 import Register from "../screens/Authentication/Register";
-import ForgotPassword from "../screens/Authentication/ForgotPassword"
-import ResetPassword from "../screens/Authentication/ResetPassword"
 import AboutUs from "../screens/Profile/ProfileSubScreens/AboutUs"
 import ContactUs from "../screens/Profile/ProfileSubScreens/ContactUs";
 import DeleteMyAccount from "../screens/Profile/ProfileSubScreens/DeleteMyAccount";
@@ -26,11 +24,8 @@ import ProfilePolicy from "../screens/Profile/ProfileSubScreens/PrivacyPolicy";
 import ReferAndEarn from "../screens/Profile/ProfileSubScreens/ReferAndEarn";
 import RefundPolicy from "../screens/Profile/ProfileSubScreens/RefundPolicy";
 import TermsAndCondition from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
-import BookingConfirm from "../screens/Bookings/BookingConfirmScreen";
-import ProductScreen from "../screens/Products/ProductScreen";
 import NavigationHeader from "../components/NavigationHeader";
 import ViewHireDetails from "../screens/MyBox/ViewHireDetails";
-import SelectDateTimeScreen from "../screens/MyBox/SelectDateTime";
 import ViewCatDetails from "../screens/Categories/ViewCatDetails";
 import BookingDetailsScreen from "../screens/Categories/ViewCartDetails";
 import RequestConfirmation from "../screens/VendorScreens/VendorDashBoard/RequestConfirmation";
@@ -38,10 +33,7 @@ import ViewProfile from "../screens/Profile/ViewProfile";
 import EditProfile from "../screens/Profile/EditProfile";
 import ViewMyBookings from "../screens/Profile/MyBookings";
 import ViewMyLendings from "../screens/Profile/ViewMyLendings";
-import ViewHireCartDetails from "../screens/MyBox/ViewHireCartDetails";
-import ViewTentHouse from "../screens/Events/ViewTentHouse";
 import RentOnProducts from "../screens/GiveOnRent/RentOnProducts";
-import ViewDecors from "../screens/Events/ViewDecors";
 import HireChefOrDriverForm from "../screens/VendorScreens/VendorHireChefOrDriver/HireChefOrDriverForm";
 import AddTentHouse from "../screens/VendorScreens/VendorAddTentHouse/AddTentHouse";
 import LocationAdded from "../screens/Location/LocationAdded";
@@ -49,7 +41,6 @@ import AddSelectLocation from "../screens/Location/AddSelectLocation";
 import AddFunctionalHall from "../screens/VendorScreens/VendorAddFunctionHalls/AddFunctionalHall";
 import HallsBookingOverView from "../screens/Bookings/HallsBokingOverView";
 import AddDecorations from "../screens/VendorScreens/VendorAddDecorations/AddDecorations";
-import DecorsBookingOverView from "../screens/Bookings/DecorsBookingOverView";
 import ViewCaterings from "../screens/Events/ViewCaterings";
 import AddFoodCatering from "../screens/VendorScreens/VendorAddFoodCatering/AddFoodCatering";
 import LandingScreen from "../screens/LandingScreen";
@@ -253,14 +244,7 @@ const MainNavigation = () => {
                         headerShown: true,
                     }}
                 />
-                <Stack.Screen
-                    name="ViewHireCartDetails"
-                    component={ViewHireCartDetails}
-                    options={{
-                        header: () => <NavigationHeader Icon={true} title="Cart" />,
-                        headerShown: true,
-                    }}
-                />
+               
                 <Stack.Screen
                     name="LocationAdded"
                     component={LocationAdded}
@@ -278,26 +262,10 @@ const MainNavigation = () => {
                     }}
                 />
                 <Stack.Screen
-                    name="ViewTentHouse"
-                    component={ViewTentHouse}
-                    options={{
-                        header: () => <NavigationHeader Icon={true} title="Tent Houses" />,
-                        headerShown: true,
-                    }}
-                />
-                <Stack.Screen
                     name="ViewCaterings"
                     component={ViewCaterings}
                     options={{
                         header: () => <NavigationHeader Icon={true} title="Caterings" />,
-                        headerShown: true,
-                    }}
-                />
-                <Stack.Screen
-                    name="DecorsBookingOverView"
-                    component={DecorsBookingOverView}
-                    options={{
-                        header: () => <NavigationHeader Icon={true} title="Cart" />,
                         headerShown: true,
                     }}
                 />
@@ -307,22 +275,6 @@ const MainNavigation = () => {
                     options={{
                         header: () => <NavigationHeader Icon={true} title="Cart" />,
                         headerShown: true,
-                    }}
-                />
-                <Stack.Screen
-                    name="ViewDecors"
-                    component={ViewDecors}
-                    options={{
-                        header: () => <NavigationHeader Icon={true} title="Decorations" />,
-                        headerShown: true,
-                    }}
-                />
-                <Stack.Screen
-                    name="SelectDateTime"
-                    component={SelectDateTimeScreen}
-                    options={{
-                        header: () => (''),
-                        headerShown: false,
                     }}
                 />
 
@@ -345,14 +297,12 @@ const MainNavigation = () => {
                 <Stack.Screen name="TermsAndConditions" component={TermsAndCondition} options={{ headerShown: true, }} />
                 {/* ############################################################ */}
 
-                <Stack.Screen name="ProductScreen" component={ProductScreen} options={{ headerShown: true, }} />
 
                 <Stack.Screen name="Login" component={Login} options={{ headerShown: true }} />
                 <Stack.Screen name="Register" component={Register} options={{ headerShown: true }} />
                 <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ headerShown: true }} />
                 <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: true }} />
                 <Stack.Screen name="BookingOverView" component={BookingOverView} options={{ headerShown: true }} />
-                <Stack.Screen name="BookingConfirm" component={BookingConfirm} options={{ headerShown: false }} />
 
                 {/* //////////////////////      VENDOR SCREENS     ///////////////////////////////////////////// */}
 

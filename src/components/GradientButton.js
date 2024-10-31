@@ -1,7 +1,7 @@
 import React from "react";
 import {View, Text, TouchableOpacity, StyleSheet, Dimensions} from 'react-native';
 import LinearGradient from "react-native-linear-gradient";
-import { horizontalScale, moderateScale, verticalScale } from "../utils/scalingMetrics";
+import { moderateScale, verticalScale } from "../utils/scalingMetrics";
 import RightArrow from '../assets/svgs/rightSidearrowWhite.svg';
 
 const BookDatesButton = ({ onPress, width, text,padding }) => {

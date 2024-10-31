@@ -15,12 +15,9 @@ const AadharUpload = () => {
     const navigation = useNavigation();
     const [selectedFoodLicenseImage, setSelectedFoodLicenseImage] = useState();
     const [getVendorAuth, setGetVendorAuth] = useState('');
-
-
     const [selectedImage, setSelectedImage] = useState();
     const [profileData, setProfileData] = useState();
     const [isAadharAvailable, setIsAadharAvailable] = useState();
-
 
     useEffect(() => {
         getProfileData();

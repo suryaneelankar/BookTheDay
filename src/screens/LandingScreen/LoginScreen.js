@@ -16,8 +16,6 @@ const LoginScreen = ({ route }) => {
     const navigation = useNavigation();
     const [phoneNumber, setPhoneNumber] = useState('');
     const [password, setPassword] = useState('');
-
-    const [termsAccepted, setTermsAccepted] = useState(false);
     const [authToken, setAuthToken] = useState('');
     const dispatch = useDispatch();
     const selectedMode = useSelector((state) => state.userId);
@@ -153,10 +151,6 @@ const LoginScreen = ({ route }) => {
 
 
                 <View style={styles.checkboxContainer}>
-                    {/* <CheckBox
-          value={termsAccepted}
-          onValueChange={setTermsAccepted}
-        /> */}
                     <Text style={styles.checkboxLabel}>Terms And Conditions</Text>
                 </View>
 

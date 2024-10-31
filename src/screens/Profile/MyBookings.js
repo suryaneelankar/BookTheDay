@@ -9,11 +9,8 @@ import { colors } from 'react-native-swiper-flatlist/src/themes';
 import LinearGradient from 'react-native-linear-gradient';
 import RazorpayCheckout from 'react-native-razorpay';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import StepProgress from '../../components/StepProgress';
 import StepIndicator from 'react-native-step-indicator';
 import { useSelector } from 'react-redux';
-
-
 
 
 const ViewMyBookings = () => {
@@ -276,7 +273,6 @@ const ViewMyBookings = () => {
         />
 
 
-        {/* <StepProgress status={item?.bookingStatus} /> */}
 
         <View style={styles.cardFooter}>
           <Text style={[styles.cardStatus, { borderWidth: 1, borderColor: "gray", paddingHorizontal: 20, fontSize: 11 }]}>

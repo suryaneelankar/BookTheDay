@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Switch, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity,ScrollView } from 'react-native';
 import ProfileIcon from '../../../assets/profilesvgs/profile.svg'
-import DashboardIcon from '../../../assets/profilesvgs/dashboard.svg';
-import LocationIcon from '../../../assets/profilesvgs/GpsFix.svg';
-import NotificationIcon from '../../../assets/profilesvgs/notificationBell.svg';
-import ReferEarn from '../../../assets/profilesvgs/referandEarn.svg';
 import RefundPolicy from '../../../assets/profilesvgs/refundPolicy.svg';
 import TermsConditionIcon from '../../../assets/profilesvgs/termsandCondition.svg';
 import TransactionIcon from '../../../assets/profilesvgs/transactions.svg';
@@ -12,8 +8,6 @@ import AboutUsIcon from '../../../assets/profilesvgs/aboutUs.svg';
 import RightSideIcon from '../../../assets/profilesvgs/Chevron-Right.svg';
 import LinearGradient from 'react-native-linear-gradient';
 import DownArrow from '../../../assets/profilesvgs/blackdownarrow.svg';
-import CopyLinkIcon from '../../../assets/profilesvgs/copyLink.svg';
-import CustomToggle from '../../../components/ProfileToggle';
 import { useNavigation } from '@react-navigation/native';
 import Modal from 'react-native-modal';
 import themevariable from '../../../utils/themevariable';
@@ -21,12 +15,11 @@ import LinkBgm from '../../../assets/profilesvgs/linkBgm.svg';
 import CrossIcon from '../../../assets/profilesvgs/orangeCross.svg';
 import { moderateScale } from '../../../utils/scalingMetrics';
 import LogOutIcon from '../../../assets/svgs/logOutIcon.svg';
-import { getUserAuthToken, getVendorAuthToken } from '../../../utils/StoreAuthToken';
+import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import axios from 'axios';
 import BASE_URL from '../../../apiconfig';
 import { useSelector,useDispatch } from 'react-redux';
 import { getLoginUserId } from '../../../../redux/actions';
-
 
 const VendorProfile = () => {
     const navigation = useNavigation();
@@ -39,13 +32,6 @@ const VendorProfile = () => {
     const [profileData, setProfileData] = useState();
     const dispatch = useDispatch();
 
-    const toggleMyAccount = () => {
-        setIsMyAccountOpen(!isMyAccountOpen);
-        setSelectedMyAccount(!selectedMyAccount)
-    }
-    const toggleMyDashboard = () => {
-        setIsMyDashboardOpen(!isMyDashboardOpen);
-    }
 
     const link = "www.xyz.com";
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);

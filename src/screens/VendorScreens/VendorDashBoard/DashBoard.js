@@ -14,7 +14,6 @@ import PersonThree from '../../../assets/vendorIcons/personThree.svg';
 import themevariable from "../../../utils/themevariable";
 import ListedTimeIcon from '../../../assets/vendorIcons/listedTimeIcon.svg';
 import EditButton from '../../../assets/vendorIcons/editButton.svg';
-import Avatar from "../../../components/NameAvatar";
 import { useSelector } from "react-redux";
 import { getVendorAuthToken } from "../../../utils/StoreAuthToken";
 import { useFocusEffect } from "@react-navigation/native";
@@ -25,14 +24,10 @@ const VendorDashBoardTab = ({ navigation }) => {
 
     const [clothJewelBookingsData, setclothJewelBookingsData] = useState([]);
     const [vendorListing, setVendorListings] = useState([]);
-    const [decorationsBookingsData, setDecorationsBookingsData] = useState([]);
     const [functionHallBookingsData, setFunctionHallBookingsData] = useState([]);
-    const [tentHouseBookingsData, setTentHouseBookingsData] = useState([]);
     const [cateringsBookingsData, setCateringBookingsData] = useState([]);
     const [getVendorAuth, setGetVendorAuth] = useState('');
-
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
-
 
     useFocusEffect(
         useCallback(() => {
@@ -462,48 +457,12 @@ const VendorDashBoardTab = ({ navigation }) => {
         return Object.values(grouped);
     };
 
-    const consolidateDecorationDataByProductId = (data) => {
-        const grouped = data.reduce((acc, item) => {
-            if (!acc[item?.productId]) {
-                acc[item?.productId] = {
-                    productId: item?.productId,
-                    productName: item?.eventOrganiserName,
-                    totalAmount: item?.totalAmount,
-                    professionalImage: item?.professionalImage,
-                    count: 0
-                };
-            }
-            acc[item?.productId].count += 1;
-            return acc;
-        }, {});
-
-        return Object.values(grouped);
-    };
-
     const consolidateFunctionHallsDataByProductId = (data) => {
         const grouped = data.reduce((acc, item) => {
             if (!acc[item?.productId]) {
                 acc[item?.productId] = {
                     productId: item?.productId,
                     productName: item?.functionHallName,
-                    totalAmount: item?.totalAmount,
-                    professionalImage: item?.professionalImage,
-                    count: 0
-                };
-            }
-            acc[item?.productId].count += 1;
-            return acc;
-        }, {});
-
-        return Object.values(grouped);
-    };
-
-    const consolidateTentHouseDataByProductId = (data) => {
-        const grouped = data.reduce((acc, item) => {
-            if (!acc[item?.productId]) {
-                acc[item?.productId] = {
-                    productId: item?.productId,
-                    productName: item?.tentHouseName,
                     totalAmount: item?.totalAmount,
                     professionalImage: item?.professionalImage,
                     count: 0

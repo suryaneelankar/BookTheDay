@@ -4,7 +4,6 @@ import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
 import SelectedUploadIcon from '../../../assets/svgs/selectedUploadIcon.svg';
-import { Dropdown } from 'react-native-element-dropdown';
 import { launchImageLibrary } from 'react-native-image-picker';
 import BASE_URL from '../../../apiconfig';
 import axios from 'axios';
@@ -58,14 +57,6 @@ const GeneralDetails = () => {
 
     const onChangePerDayRentPrice = (value) => {
         setPerDayRentPrice(value);
-    }
-
-    const onChangePerMonthRentPrice = (value) => {
-        setPerMonthRentPrice(value);
-    }
-
-    const onChangeSecurityDepositAmount = (value) => {
-        setSecurityDeposit(value);
     }
 
     const onChangeAdvanceAmount = (value) => {
@@ -359,14 +350,6 @@ const GeneralDetails = () => {
                     keyboardType='default'
                     isRequired={true}
                 />
-                {/* <TextField
-                    label='Per Month Charge (₹/ 30 days)*'
-                    placeholder="Please Enter Monthly Charge"
-                    value={perMonthRentPrice}
-                    onChangeHandler={onChangePerMonthRentPrice}
-                    keyboardType='default'
-                    isRequired={false}
-                /> */}
                 <TextField
                     label='Advance Booking Amount'
                     placeholder="Please Enter Advance Booking Amount"

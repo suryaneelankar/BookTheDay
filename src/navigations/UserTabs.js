@@ -1,32 +1,20 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import { Image, Platform, View, TouchableOpacity, Text, Button } from 'react-native';
-import { useDispatch } from 'react-redux';
-import { getLoginUserId } from '../../redux/actions';
 import HomeDashboard from '../screens/Home';
 import Events from '../screens/Events';
 import Categories from '../screens/Categories';
-import MyBox from '../screens/MyBox';
 import HomeIcon from '../assets/svgs/tabIcons/home.svg';
 import CollectionIcon from '../assets/svgs/tabIcons/collections.svg';
 import FocusedHomeIcon from '../assets/svgs/tabIcons/focusedHome.svg';
 import FocusedCollection from '../assets/svgs/tabIcons/focusedCollection.svg';
 import EventsIcon from '../assets/svgs/tabIcons/events.svg';
 import FocusedEvents from '../assets/svgs/tabIcons/focusedEvents.svg';
-import HireIcon from '../assets/svgs/tabIcons/hire.svg';
-import SwitchIcon from '../assets/svgs/tabIcons/profile.svg';
-import Hire from '../screens/MyBox';
 import NavigationHeader from '../components/NavigationHeader';
-import ViewProfile from '../screens/Profile/ViewProfile';
-import ProfileMainScreen from '../screens/Profile/ProfileScreen';
 import Caterings from '../screens/Caterings';
 
-const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const UserTabs = () => {
-  const dispatch = useDispatch();
 
   return (
     <Tab.Navigator

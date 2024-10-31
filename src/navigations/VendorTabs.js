@@ -1,9 +1,5 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
-import { Image, Platform, View, TouchableOpacity, Text, Button } from 'react-native';
-import { useDispatch } from 'react-redux';
-import { getLoginUserId } from '../../redux/actions';
 import VendorDashBoardTab from '../screens/VendorScreens/VendorDashBoard/DashBoard';
 import VendorCategoryScreen from '../screens/VendorScreens/VendorCatergoryScreen';
 import SwitchIcon from '../assets/svgs/tabIcons/profile.svg';
@@ -14,11 +10,9 @@ import ActiveForm from '../assets/svgs/activeVendorServiceFormIcon.svg';
 import InActiveForm from '../assets/svgs/vendorServiceFormIcon.svg';
 import VendorProfile from '../screens/VendorScreens/VendorProfile';
 
-const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const VendorTabs = () => {
-  const dispatch = useDispatch();
 
   return (
 

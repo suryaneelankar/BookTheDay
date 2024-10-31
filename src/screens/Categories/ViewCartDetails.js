@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions, BackHandler, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Alert } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import EditButton from '../../assets/svgs/categories/editButton.svg';
 import CalendarIcon from '../../assets/svgs/calendarOrangeIcon.svg';
@@ -24,25 +23,14 @@ const BookingDetailsScreen = ({ navigation, route }) => {
 
 
   const userLocationFetched = useSelector((state) => state.userLocation);
-
   const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
   const [productDetails, setProductDetails] = useState();
   const [productImage, setProductImage] = useState();
   const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
-
   const [getUserAuth, setGetUserAuth] = useState('');
   const [isAadharAvailable, setIsAadharAvailable] = useState();
-
-
   const { catId, NumOfDays, isDayOrMonthly, startDate, endDate, monthlyPrice } = route.params;
-  console.log("RECIED PARMS::::::::, ", catId, NumOfDays, isDayOrMonthly, startDate, endDate)
 
-
-  // useEffect(() => {
-  //   getSelectedProductDetails();
-  //   getProfileData();
-
-  // }, []);
   useFocusEffect(
     useCallback(() => {
       getSelectedProductDetails();
@@ -88,19 +76,6 @@ const BookingDetailsScreen = ({ navigation, route }) => {
     }
 }
 
-  // useEffect(() => {
-  //   const backAction = () => {
-  //     navigation.pop(2)
-  //     return true;
-  //   };
-
-  //   const backHandler = BackHandler.addEventListener(
-  //     'hardwareBackPress',
-  //     backAction,
-  //   );
-
-  //   return () => backHandler.remove();
-  // }, []);
 
   const formatDateRange = (startDate, endDate) => {
     const start = moment(startDate).format('DD MMM');
@@ -147,7 +122,6 @@ const BookingDetailsScreen = ({ navigation, route }) => {
     }
   }
 
-  console.log("product iamge :::::::", productImage)
   return (
     <ScrollView style={styles.container}>
       <View style={{ flexDirection: "row", alignItems: "center", }}>
@@ -359,11 +333,6 @@ const styles = StyleSheet.create({
     color: '#000000',
     fontFamily: "ManropeRegular",
     width: "80%"
-  },
-  editIcon: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
   },
   productContainer: {
     flexDirection: 'row',
@@ -594,14 +563,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
-  },
-  trackProgressText: {
-    color: '#FF730D',
-    textDecorationLine: 'underline',
-    fontWeight: "400",
-    fontFamily: "ManropeRegular",
-    fontSize: 12,
-    marginBottom: 30
   },
 });
 

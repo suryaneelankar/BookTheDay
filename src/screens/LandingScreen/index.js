@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
-import SvgUri from 'react-native-svg-uri'; // Use this for handling SVG files
 import CateringIcon from '../../assets/svgs/LandingScreen/cateringDash.svg';
 import Clothes from '../../assets/svgs/LandingScreen/clothesDashboard.svg';
 import DecorationIcon from '../../assets/svgs/LandingScreen/decorationDash.svg';
@@ -11,7 +10,6 @@ import LinearGradient from 'react-native-linear-gradient';
 import GiveOnRentSub from '../../assets/SelectUserOrVendor/GiveOnRentSub.svg';
 import TakeOnRentSubImage from '../../assets/SelectUserOrVendor/takeOnRentSub.svg';
 import { useNavigation } from '@react-navigation/native';
-
 
 const LandingScreen = () => {
 
@@ -27,7 +25,6 @@ const LandingScreen = () => {
     const [selectedId, setSelectedId] = useState(null);
     const navigation = useNavigation();
 
-  
     const data = [
         {
             id: '1',
