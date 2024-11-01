@@ -53,7 +53,6 @@ const ViewDecors = ({ route, navigation }) => {
         { image: require('../../assets/foodAvailable.png'), name: 'Food', status: 'Available' },
         { image: require('../../assets/rooms.png'), name: 'Rooms', status: 'Available' },
         { image: require('../../assets/foodAvailable.png'), name: 'Area Available', status: 'Available' },
-        { image: require('../../assets/acAvailable.jpeg'), name: 'No A/C', status: 'Available' },
         { image: require('../../assets/foodAvailable.png'), name: 'Food', status: 'Available' },
 
     ]
