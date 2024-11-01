@@ -1,27 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Switch, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity,ScrollView } from 'react-native';
 import ProfileIcon from '../../assets/profilesvgs/profile.svg';
 import DashboardIcon from '../../assets/profilesvgs/dashboard.svg';
-import LocationIcon from '../../assets/profilesvgs/GpsFix.svg';
-import NotificationIcon from '../../assets/profilesvgs/notificationBell.svg';
-import ReferEarn from '../../assets/profilesvgs/referandEarn.svg';
 import RefundPolicy from '../../assets/profilesvgs/refundPolicy.svg';
 import TermsConditionIcon from '../../assets/profilesvgs/termsandCondition.svg';
-import TransactionIcon from '../../assets/profilesvgs/transactions.svg';
 import AboutUsIcon from '../../assets/profilesvgs/aboutUs.svg';
 import RightSideIcon from '../../assets/profilesvgs/Chevron-Right.svg';
 import LinearGradient from 'react-native-linear-gradient';
 import DownArrow from '../../assets/profilesvgs/blackdownarrow.svg';
-import ActiveProfile from '../../assets/profilesvgs/profileLight.svg';
-import ActiveDashboard from '../../assets/profilesvgs/dashboardLight.svg';
-import CopyLinkIcon from '../../assets/profilesvgs/copyLink.svg';
-import CustomToggle from '../../components/ProfileToggle';
 import { useNavigation } from '@react-navigation/native';
 import Modal from 'react-native-modal';
 import themevariable from '../../utils/themevariable';
 import LinkBgm from '../../assets/profilesvgs/linkBgm.svg';
 import CrossIcon from '../../assets/profilesvgs/orangeCross.svg';
-import WhiteDashboard from '../../assets/profilesvgs/whiteDashboard.svg';
 import { moderateScale } from '../../utils/scalingMetrics';
 import LogOutIcon from '../../assets/svgs/logOutIcon.svg';
 import { getLoginUserId } from '../../../redux/actions';
@@ -35,21 +26,10 @@ const ProfileMainScreen = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
     const userLoggedInMobileNumber = useSelector((state) => state.userLoggedInMobileNum);
-
-    const [isEnabled, setIsEnabled] = React.useState(false);
     const [isMyAccountOpen, setIsMyAccountOpen] = React.useState(false);
     const [isMyDashboardOpen, setIsMyDashboardOpen] = React.useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [profileData, setProfileData] = useState();
-    const [selectedMyAccount, setSelectedMyAccount] = React.useState(false);
-    const toggleSwitch = () => setIsEnabled(previousState => !previousState);
-    const toggleMyAccount = () => {
-        setIsMyAccountOpen(!isMyAccountOpen);
-        setSelectedMyAccount(!selectedMyAccount)
-    }
-    const toggleMyDashboard = () => {
-        setIsMyDashboardOpen(!isMyDashboardOpen);
-    }
 
     const link = "www.xyz.com";
 
@@ -137,18 +117,7 @@ const ProfileMainScreen = () => {
                         <DropdownItem title="My Lend" navigation={navigation} />
                     </View>
                 )}
-                {/* <MenuItem icon={<ReferEarn />} title="Refer & Earn">
-                    <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.copyLink}>
-                        <CopyLinkIcon />
-                        <Text style={styles.copyLinkText}>Copy Link</Text>
-                    </TouchableOpacity>
-                </MenuItem> */}
-                {/* <MenuItem icon={<TransactionIcon />} title="My Transaction" /> */}
-                {/* <MenuItem onPress={() => navigation.navigate('LocationAdded')} icon={<LocationIcon />} title="Manage Location" /> */}
-                {/* <MenuItem icon={<NotificationIcon />} title="Notification Preferences">
-                   
-                    <CustomToggle value={isEnabled} onValueChange={toggleSwitch} />
-                </MenuItem> */}
+           
                 <MenuItem icon={<AboutUsIcon />} title="About Us" />
                 <MenuItem icon={<TermsConditionIcon />} title="Terms & Condition" />
                 <MenuItem icon={<RefundPolicy />} title="Refund Policy" />

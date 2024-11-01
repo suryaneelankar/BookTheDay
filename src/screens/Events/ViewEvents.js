@@ -3,10 +3,9 @@ import { Text, View, Image, StyleSheet, Dimensions, ScrollView, Button, Touchabl
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import axios from "axios";
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
-import { height, verticalScale, width } from "../../utils/scalingMetrics";
+import {  verticalScale} from "../../utils/scalingMetrics";
 import { Calendar } from 'react-native-calendars';
 import moment from 'moment';
-// import Icon from 'react-native-vector-icons/FontAwesome';
 import MapMarkIcon from '../../assets/svgs/orangeMapMark.svg';
 import CalendarIcon from '../../assets/svgs/calendarOrangeIcon.svg';
 import Modal from 'react-native-modal';
@@ -45,10 +44,7 @@ const ViewEvents = ({ route, navigation }) => {
   const [getUserAuth, setGetUserAuth] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
-
   const { categoryId } = route.params;
-  console.log("CATEID I::::::", categoryId)
-
   const HallDescription = 'Transform your special occasions into unforgettable memories with our exquisite function hall rentals! Whether you are hosting a grand wedding, a lively birthday bash, or a corporate event, our halls offer the perfect blend of elegance and comfort. With spacious layouts, stunning décor, and top-notch amenities, your guests will be impressed from the moment they arrive. Book with us today and let us help you create an event that exceeds all expectations!'
 
   const timeSlots = [
@@ -117,9 +113,6 @@ const ViewEvents = ({ route, navigation }) => {
     }
   }
 
-  console.log("Amenities::::::", amenitiesData);
-
-
   function formatAmount(amount) {
     const amountStr = `${amount}`;
     const [integerPart, decimalPart] = amountStr.split('.');
@@ -178,13 +171,6 @@ const ViewEvents = ({ route, navigation }) => {
       console.log('Number of days:', diffInDays);
     }
   };
-
-
-  const AmenitiesRenderItem = ({ item }) => (
-    <View style={{ alignItems: 'center', marginHorizontal: 15, marginTop: 10 }}>
-      <Text style={{ fontSize: 9.5, color: "#606060", fontWeight: "400", fontFamily: 'ManropeRegular', marginTop: 5 }}>{item?.name}</Text>
-    </View>
-  );
 
   const getIcon = (name) => {
     switch (name) {

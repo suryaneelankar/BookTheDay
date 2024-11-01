@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, TextInput, ScrollView, alert, ActivityIndicator, Modal, Button } from 'react-native';
 import themevariable from '../../../utils/themevariable';
 import BASE_URL from '../../../apiconfig';
 import axios from 'axios';
-import Icon from 'react-native-vector-icons/Ionicons';
 import VegIcon from '../../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../../assets/svgs/foodtype/NonVeg.svg';
 import { useSelector } from 'react-redux';
@@ -18,55 +17,12 @@ const EditAddFoodCatering = () => {
     const navigation = useNavigation();
     const [loading, setLoading] = useState(false);
     const [selectedFoodTypes, setSelectedFoodTypes] = useState([]);
-
-
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
     const foodTypes = [
         { name: 'veg', icon: VegIcon },
         { name: 'non-veg', icon: NonVegIcon },
     ]
-
-    const RentalFoodTypeList = () => {
-    
-        const onSelectFoodType = (name) => {
-            setSelectedFoodTypes(prevSelected => {
-                if (prevSelected.includes(name)) {
-                    return prevSelected.filter(item => item !== name);
-                } else {
-                    return [...prevSelected, name];
-                }
-            });
-        };
-    
-        return (
-            <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-                {foodTypes.map((item, index) => {
-                    const IconImage = item?.icon;
-                    const isSelected = selectedFoodTypes.includes(item.name); // Check if the item is selected
-    
-                    return (
-                        <TouchableOpacity 
-                            key={index} 
-                            style={styles.item} 
-                            onPress={() => { onSelectFoodType(item?.name) }}
-                        >
-                            <View style={{ borderColor: 'green', borderWidth: 2, width: 20, height: 20, borderRadius: 5 }}>
-                                {isSelected ? (
-                                    <FontAwesome5 style={{ marginHorizontal: 1 }} name={'check'} size={14} color={'green'} />
-                                ) : null}
-                            </View>
-                            <View style={{ flexDirection: 'row', marginHorizontal: 5, alignItems: "center" }}>
-                                <IconImage style={{ marginHorizontal: 2 }} />
-                                <Text style={styles.itemText}>{item.name}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    );
-                })}
-            </View>
-        );
-    };
-
     const [finalCombomenu, setFinalComboMenu] = useState([]);
 
     const onPressSaveAndPost = async () => {
@@ -141,8 +97,6 @@ const EditAddFoodCatering = () => {
                 </View>
             ) :
                 <View>
-                    {/* <Text style={styles.labelText}>Food Type</Text> */}
-                    {/* {RentalFoodTypeList()} */}
 
                     <Text style={styles.title}>Add Menu Items</Text>
                     <View style={styles.mainContainer}>

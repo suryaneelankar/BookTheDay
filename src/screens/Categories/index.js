@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Dimensions, ImageBackground, StyleSheet, FlatList, Image, SafeAreaView,ActivityIndicator, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, FlatList, Image, SafeAreaView,ActivityIndicator, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";
 import { horizontalScale, verticalScale, moderateScale } from "../../utils/scalingMetrics";
 import themevariable from "../../utils/themevariable";
 import SearchIcon from '../../assets/svgs/searchIcon.svg';
-import SwipperOne from '../../assets/svgs/homeSwippers/swipperOne.svg';
 import BackButton from '../../assets/svgs/backButton.svg'
 import { formatAmount } from "../../utils/GlobalFunctions";
 import OfferStikcer from '../../assets/svgs/offerSticker.svg';
-import Svg, { Image as SvgImage } from 'react-native-svg';
 import { LinearGradient } from 'react-native-linear-gradient';
-import shirtImg from '../../assets/shirt.png'
 import TrendingNow from "../Products/TrendingNow";
 import HowItWorks from "../Products/HowItWorks";
 import Swiper from 'react-native-swiper';
@@ -21,15 +18,12 @@ import ChainIcon from '../../assets/svgs/jewelleryCategories/chains.svg';
 import BanglesIcon from '../../assets/svgs/jewelleryCategories/banglesCategory.svg';
 import BraceletIcon from '../../assets/svgs/jewelleryCategories/braceletsCategory.svg';
 import RingsIcon from '../../assets/svgs/jewelleryCategories/ringsCategory.svg';
-
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
 
 const Categories = () => {
 
     const navigation = useNavigation();
-    const { width } = Dimensions.get('window');
-    const [categories, setCategories] = useState([]);
     const [discountProducts, setDiscountProducts] = useState([]);
     const [jewelleryCategory, setJewelleryCategory] = useState([]);
     const [productYouMayLike, setProductYouMayLike] = useState([]);
@@ -86,12 +80,6 @@ const Categories = () => {
             const filteredClothesCategories = finalResponseData?.filter(category => category?.categoryType === 'clothes');
             const filteredJewelleryCategories = finalResponseData?.filter(category => category?.categoryType === 'jewels');
             const filteredDiscountItems = finalResponseData?.filter(category => category?.componentType === 'discount');
-
-
-            // const finalResponseData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            // console.log('finalResponseData in cat is::>>>',finalResponseData);
-        
-            // setCategories((prevData) => [...prevData, ...filteredDiscountItems]);
 
             console.log("products u may like::::::", filteredClothesCategories);
             setJewelleryCategory(filteredJewelleryCategories);
@@ -315,42 +303,10 @@ const Categories = () => {
 
 
 const styles = StyleSheet.create({
-    headerContainer: {
-        height: moderateScale(65),
-        width: "100%",
-        paddingVertical: verticalScale(10),
-        borderBottomColor: themevariable.lightgray,
-        borderBottomWidth: moderateScale(1),
-        elevation: 1
-    },
-    searchView: {
-        flexDirection: "row",
-        width: "95%",
-        alignSelf: "center",
-        alignItems: "center",
-        borderRadius: moderateScale(10),
-        borderColor: themevariable.cementgray,
-        backgroundColor: themevariable.cementgray,
-        borderWidth: 1,
-    },
-    productContainer: {
-        margin: 5,
-        width: Dimensions.get('window').width / 2.2,
-    },
-    firstContainer: {
-        backgroundColor: themevariable.Color_FFFFFF,
-        borderRadius: 7,
-        paddingHorizontal: 5,
-        paddingVertical: 8,
-    },
     productName: {
         fontFamily: 'ManropeRegular',
         color: 'black',
         marginHorizontal: 5,
-    },
-    priceContainer: {
-        flexDirection: 'row',
-        marginLeft: 5
     },
     price: {
         color: themevariable.Color_202020,
@@ -366,12 +322,6 @@ const styles = StyleSheet.create({
         textDecorationLine: 'line-through'
 
     },
-    serachIcon: {
-        height: moderateScale(15),
-        width: moderateScale(15),
-        marginLeft: horizontalScale(10),
-        alignSelf: "center"
-    }, 
     strickedoffer: {
         fontSize: 14,
         color: "#FF00006E",
@@ -388,23 +338,6 @@ const styles = StyleSheet.create({
     textInput: {
         marginLeft: verticalScale(15),
         alignSelf: "center"
-    },
-    titleHeader: {
-        color: "black",
-        fontSize: 22,
-        fontWeight: "bold"
-    },
-    text: { fontSize: 12, textAlign: 'center' },
-    card: {
-        marginTop: 10,
-        alignItems: 'center',
-        width: 120,
-    },
-    searchContainer: {
-        marginHorizontal: 20,
-        flexDirection: "row",
-        marginVertical: 10,
-        justifyContent: "space-between"
     },
     searchProduct: {
         height: 45,
@@ -424,25 +357,6 @@ const styles = StyleSheet.create({
     textInput: {
         marginLeft: 10,
         alignSelf: "center"
-    },
-    listcard: {
-        marginTop: 20,
-        width: "90%",
-        borderRadius: 20,
-        backgroundColor: "#ECECEC",
-        alignSelf: "center",
-        alignItems: "center",
-        height: 130, flexDirection: "row", justifyContent: "space-around"
-    },
-    slide: {
-        // flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: "pink",
-    },
-    image: {
-        height: 200,
-        resizeMode: 'cover',
     },
     dot: {
         backgroundColor: '#DCD7FD',

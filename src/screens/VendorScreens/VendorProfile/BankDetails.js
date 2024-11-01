@@ -13,7 +13,6 @@ const BankDetailsScreen = () => {
     const [ifscCode, setIfscCode] = useState('');
     const [upiId, setUpiId] = useState('');
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
-
     const [mobileNumber, setMobileNumber] = useState(vendorLoggedInMobileNum);
 
     const handleSave = async () => {

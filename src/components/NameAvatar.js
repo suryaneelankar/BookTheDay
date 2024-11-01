@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Svg, { Circle, Text as SvgText } from 'react-native-svg';
-import { height, moderateScale } from '../utils/scalingMetrics';
-import BASE_URL, { LocalHostUrl } from '../apiconfig';
+import { LocalHostUrl } from '../apiconfig';
 import FastImage from 'react-native-fast-image';
 
 const Avatar = ({widthDyn,heightDyn,borderRadiusDyn, name, imageUrl }) => {

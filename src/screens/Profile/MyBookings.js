@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, ScrollView, Dimensions, Alert } from 'react-native';
 import BASE_URL, { LocalHostUrl } from '../../apiconfig';
 import axios from 'axios';
@@ -8,23 +8,21 @@ import { formatAmount } from '../../utils/GlobalFunctions';
 import { colors } from 'react-native-swiper-flatlist/src/themes';
 import LinearGradient from 'react-native-linear-gradient';
 import RazorpayCheckout from 'react-native-razorpay';
-import { useNavigation } from '@react-navigation/native';
-import StepProgress from '../../components/StepProgress';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import StepIndicator from 'react-native-step-indicator';
-
-
+import { useSelector } from 'react-redux';
 
 
 const ViewMyBookings = () => {
   const [myBookings, setMyBookings] = useState();
-  const [decorsBookings, setDecorsBookings] = useState();
   const [cateringBookings, setCateringBookings] = useState();
   const [hallsBookings, setHallsBookings] = useState();
-  const [tentHouseBookings, settentHouseBookings] = useState();
   const [getUserAuth, setGetUserAuth] = useState('');
   const navigation = useNavigation();
+  const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
+  const userLoggedInName = useSelector((state) => state.userLoggedInName);
 
-  const labels = ["Initiated", "Confirmed", "Payment Pending"];
+  const labels = ["Initiated", "Confirmed", "Payment Done"];
   const customStyles = {
     stepIndicatorSize: 25,
     currentStepIndicatorSize: 30,
@@ -41,24 +39,26 @@ const ViewMyBookings = () => {
     stepIndicatorCurrentColor: '#ffffff',
     stepIndicatorLabelFontSize: 13,
     currentStepIndicatorLabelFontSize: 13,
-    stepIndicatorLabelCurrentColor: '#FD813B',
+    stepIndicatorLabelCurrentColor: 'green',
     stepIndicatorLabelFinishedColor: '#ffffff',
     stepIndicatorLabelUnFinishedColor: '#aaaaaa',
-    labelColor: '#999999',
+    labelColor: '#FD813B',
     labelSize: 13,
-    currentStepLabelColor: '#FD813B',
-    
+    currentStepLabelColor: '#333333',
+
   };
-  
-  const [currentPosition, setCurrentPosition] = useState(0);
 
-
-
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
     getMyBookings();
     getCateringsBookings();
     getHallsBookings();
-  }, []);
+        // Cleanup function to run when the screen loses focus
+        return () => {
+            console.log('Screen is unfocused');
+        };
+    }, [])
+);
 
   const getMyBookings = async () => {
     const token = await getUserAuthToken();
@@ -106,64 +106,136 @@ const ViewMyBookings = () => {
     }
   };
 
-  const handlePayment = async () => {
+  const handlePayment = async (advanceAmount, bookingId, catType, vendorMobileNumber) => {
+    const token = await getUserAuthToken();
+    let initiatePaymentPayload = {
+      orderAmount: advanceAmount,
+      currency: 'INR',
+      userFullName: userLoggedInName,
+      userMobileNumber: userLoggedInMobileNum,
+
+    };
+
     try {
-      // Fetch the order details from your backend
-      const response = await fetch(`${BASE_URL}/create-order`, {
-        method: 'POST',
+      const initiateresponse = await axios.post(`${BASE_URL}/user/initiate-payment`, initiatePaymentPayload, {
         headers: {
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          amount: 1, // Amount in INR
-          currency: 'INR',
-          receipt: 'receipt#1'
-        })
       });
+      console.log("initiate payment  RES:::::::::", JSON.stringify(initiateresponse?.data))
 
-      const data = await response.json();
-      console.log('razor pay data is ::>>', data);
-      // Start the Razorpay payment process
-      var options = {
-        description: 'Test Transaction',
-        image: 'https://your-logo-url.com/logo.png',
-        currency: data.currency,
-        key: 'rzp_test_SFQjGVsyEZ2P05', // Your Razorpay Key ID
-        amount: data.amount, // Amount in smallest currency unit
-        order_id: data.orderId, // Order ID returned from backend
-        name: 'Book the day',
-        prefill: {
-          email: 'bookthedaytechnologies@gmail.com',
-          contact: '8297735285',
-          name: 'Surya Neelankar',
-          //   method: 'upi',  // Pre-select UPI as the payment method
-          vpa: ''
-        },
-        theme: { color: '#FFDB7E' }
-      };
+      if (initiateresponse?.data) {
+        try {
+          // Fetch the order details from your backend
+          const response = await fetch(`${BASE_URL}/create-order`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              amount: advanceAmount, // Amount in INR
+              currency: 'INR',
+              receipt: 'receipt#1',
+              userFullName: userLoggedInName,
+              userMobileNumber: userLoggedInMobileNum,
+            })
+          });
 
-      console.log('options is::>>', options)
+          const data = await response.json();
+          console.log('razor pay data is ::>>', data);
+          // Start the Razorpay payment process
+          var options = {
+            description: 'Test Transaction',
+            image: 'https://your-logo-url.com/logo.png',
+            currency: data.currency,
+            key: 'rzp_test_SFQjGVsyEZ2P05', // Your Razorpay Key ID
+            amount: data.amount, // Amount in smallest currency unit
+            order_id: data.orderId, // Order ID returned from backend
+            name: 'Book the day',
+            prefill: {
+              email: 'bookthedaytechnologies@gmail.com',
+              contact: '8297735285',
+              name: 'Surya Neelankar',
+              //   method: 'upi',  // Pre-select UPI as the payment method
+              vpa: ''
+            },
+            theme: { color: '#FFDB7E' }
+          };
 
-      RazorpayCheckout.open(options)
-        .then((paymentData) => {
-          // Success callback
-          // Alert.alert(`Success: ${paymentData.razorpay_payment_id}`);
-          // Verify the payment on the server-side
-          console.log('success resp::>>', paymentData);
-          navigation.navigate('PaymentSuccess');
-          //   verifyPayment(paymentData);
-        })
-        .catch((error) => {
-          // Failure callback
-          // Alert.alert(`Error: ${error.code} | ${error.description}`);
-          // navigation.navigate('PaymentSuccess');
-          navigation.navigate('PaymentFailed');
+          console.log('options is::>>', options);
+
+
+          RazorpayCheckout.open(options)
+            .then(async (paymentData) => {
+              console.log('success resp::>>', paymentData);
+              navigation.navigate('PaymentSuccess');
+              let statusPaymentPayload = {
+                orderId: initiateresponse?.data?.data?.OrderId,
+                paymentStatus: "success",
+                orderAdvanceAmount: advanceAmount,
+                razorpay_order_id: paymentData?.razorpay_order_id,
+                razorpay_payment_id: paymentData?.razorpay_payment_id,
+                razorpay_signature: paymentData?.razorpay_signature,
+                vendorMobileNumber: vendorMobileNumber,
+                bookingId: bookingId,
+                catType: catType
+
+              };
+              try {
+                const response = await axios.patch(`${BASE_URL}/user/update-payment-status`, statusPaymentPayload, {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+
+                });
+                console.log("success payment  RES:::::::::", JSON.stringify(response?.data))
+              } catch (error) {
+                console.log("success Payment error>>::", error);
+              };
+              // Success callback
+              // Alert.alert(`Success: ${paymentData.razorpay_payment_id}`);
+              // Verify the payment on the server-side
+
+              //   verifyPayment(paymentData);
+            })
+            .catch(async (error) => {
+              let failurePaymentPayload = {
+
+                orderId: initiateresponse?.data?.data?.OrderId,
+                paymentStatus: "failed",
+                orderAdvanceAmount: advanceAmount,
+                razorpay_order_id: data?.orderId,
+                razorpay_payment_id: '',
+                razorpay_signature: ''
+
+              };
+
+              try {
+                const response = await axios.patch(`${BASE_URL}/user/update-payment-status`, failurePaymentPayload, {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+
+                });
+                console.log("failure payment  RES:::::::::", JSON.stringify(response?.data))
+              } catch (error) {
+                console.log("failure Payment error>>::", error);
+              };
+              // Failure callback
+              // Alert.alert(`Error: ${error.code} | ${error.description}`);
+              // navigation.navigate('PaymentSuccess');
+              navigation.navigate('PaymentFailed');
+              console.log(error);
+            });
+        } catch (error) {
           console.error(error);
-        });
+          Alert.alert('Error', 'Something went wrong');
+        }
+
+      }
     } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Something went wrong');
-    }
+      console.log("Initiate Payment error>>::", error);
+    };
   };
 
 
@@ -179,7 +251,7 @@ const ViewMyBookings = () => {
               headers: { Authorization: `Bearer ${getUserAuth}` }
             }} style={styles.cardImage} />
             <View style={{ marginLeft: 15 }}>
-              <Text style={styles.cardTitle}>{item?.catType === 'caterings' ? item?.foodCateringName : item?.catType === 'functionhall' ? item?.functionHallName : item?.productName} </Text>
+              <Text style={styles.cardTitle}>{item?.catType === 'caterings' ? item?.foodCateringName : item?.catType === 'functionHalls' ? item?.functionHallName : item?.productName} </Text>
               <Text style={styles.cardAmount}>{formatAmount(item?.totalAmount)}</Text>
 
               <Text style={styles.startDate}> Start Date: {item?.startDate}</Text>
@@ -188,30 +260,29 @@ const ViewMyBookings = () => {
               <Text style={styles.cardSubtitle}>{item.role}</Text>
             </View>
           </View>
-          <Text style={[styles.cardStatus, getStatusStyle(item.bookingStatus)]}>
+          <Text numberOfLines={2} style={[styles.cardStatus, getStatusStyle(item.bookingStatus),{width:75,textAlign:"center"}]}>
             {item.bookingStatus ? item.bookingStatus.charAt(0).toUpperCase() + item.bookingStatus.slice(1) : ''}
           </Text>
         </View>
 
         <StepIndicator
           customStyles={customStyles}
-          currentPosition={item?.bookingStatus == 'requested' ? '1' : item?.bookingStatus == 'approved' ? '2': '1'}
+          currentPosition={item?.bookingStatus == 'requested' ? '1' : item?.bookingStatus == 'approved' ? '2' :  item?.bookingStatus == 'payment successful' ? '3' : '0'}
           labels={labels}
           stepCount={3}
         />
 
 
-        {/* <StepProgress status={item?.bookingStatus} /> */}
 
         <View style={styles.cardFooter}>
-          <Text style={[styles.cardStatus, { borderWidth: 1, borderColor: "gray", paddingHorizontal: 20 ,fontSize:11}]}>
+          <Text style={[styles.cardStatus, { borderWidth: 1, borderColor: "gray", paddingHorizontal: 20, fontSize: 11 }]}>
             NEED HELP?
           </Text>
           <LinearGradient colors={item.bookingStatus === 'approved' ? ['#FE7939', '#FE7939'] : ['#B0B0B0', '#B0B0B0']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.doneButton}>
-            <TouchableOpacity disabled={item.bookingStatus !== 'approved'} onPress={() => { handlePayment() }}>
+            <TouchableOpacity disabled={item.bookingStatus !== 'approved'} onPress={() => { handlePayment(item?.totalAmount, item?.bookingId, item?.catType , item?.vendorMobileNumber) }}>
               <Text style={styles.doneButtonText}>Pay Now</Text>
             </TouchableOpacity>
           </LinearGradient>
@@ -228,6 +299,8 @@ const ViewMyBookings = () => {
         return { backgroundColor: '#45FE3529', color: "#57A64F" };
       case 'rejected':
         return { backgroundColor: '#FE353529', color: '#EF0000' };
+      case 'payment successful':
+        return { backgroundColor: '#45FE3529', color: "#57A64F" };
       default:
         return { backgroundColor: '#FFD580' };
     }
@@ -334,7 +407,7 @@ const styles = StyleSheet.create({
     fontFamily: 'ManropeRegular',
     paddingVertical: 5,
     paddingHorizontal: 10,
-    alignSelf: "flex-start"
+    alignSelf: "flex-start",
   },
   doneButton: {
     borderRadius: 5,

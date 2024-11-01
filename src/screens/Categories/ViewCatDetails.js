@@ -1,21 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, SafeAreaView, Image, ScrollView, Alert, TouchableOpacity, Dimensions, StyleSheet, Animated } from "react-native";
-import Avatar from "../../components/NameAvatar";
-import TruestedMarkGray from '../../assets/svgs/trustedMarkGray.svg';
-// import VegNonVegIcon from '../../assets/svgs/vegNonveg.svg';
+import { View, Text, SafeAreaView, ScrollView, Alert, TouchableOpacity, Dimensions, StyleSheet, Animated } from "react-native";
 import { formatAmount } from "../../utils/GlobalFunctions";
-import { HireDetails, PaginationDots } from "../../components/InfoBox";
 import PricingOptions from "../../components/PriceOptions";
 import Swiper from 'react-native-swiper';
-import LinearGradient from "react-native-linear-gradient";
 import BookDatesButton from "../../components/GradientButton";
 import { useNavigation } from "@react-navigation/native";
 import { horizontalScale, moderateScale, verticalScale } from "../../utils/scalingMetrics";
 import themevariable from "../../utils/themevariable";
 import Modal from 'react-native-modal';
 import { Calendar } from "react-native-calendars";
-// import SelectDateTimeScreen from "./SelectDateTime";
-import ClockIcon from '../../assets/svgs/clock.svg';
 import TruestedMarkOrange from '../../assets/svgs/trustedOrange.svg';
 import ProductInfoCard from "../../components/ProductInfoCard";
 import axios from "axios";
@@ -29,7 +22,6 @@ const ViewCatDetails = ({ route }) => {
 
     const [selectedOption, setSelectedOption] = useState('daily');
     const [selectedPrice, setSelectedPrice] = useState(null);
-    // const { width } = Dimensions.get('window').width;
     const [activeIndex, setActiveIndex] = useState(0);
     const navigation = useNavigation();
     const { catId, genderType } = route.params;
@@ -43,8 +35,6 @@ const ViewCatDetails = ({ route }) => {
     });
     const [numberOfDays, setNumberOfDays] = useState(0);
     const [getUserAuth, setGetUserAuth] = useState('');
-
-    console.log('catId is for test::>>',catId,genderType);
 
     const womenSizes = [
         { size: 'XS', bust: 32, waist: 26, hip: 34 },
@@ -121,7 +111,6 @@ const ViewCatDetails = ({ route }) => {
         }
     };
 
-    console.log("numofDAYS IS::::::::::", numberOfDays)
     const getMarkedDates = () => {
         const { startDate, endDate } = selectedRange;
         if (!startDate) {
@@ -215,7 +204,7 @@ const ViewCatDetails = ({ route }) => {
                     <Text style={{ color: "#121212", fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular", }}>Description</Text>
                     <Text style={{ marginBottom: 20, marginTop: 5, color: "#393C47", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>{defaultDescription}</Text>
                     <Text style={{ marginBottom: 20, marginTop: 5, color: "#393C47", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>{jewelleryDetails?.description}</Text>
-                    <ProductInfoCard color={jewelleryDetails?.color} size={jewelleryDetails?.size}/>
+                    <ProductInfoCard color={jewelleryDetails?.color} size={jewelleryDetails?.size} />
                 </View>
 
                 <View style={{ width: '92%', alignSelf: 'center', marginTop: 20 }}>
@@ -369,7 +358,6 @@ const styles = StyleSheet.create({
         width: "90%",
         justifyContent: "space-between",
         marginTop: 15
-
     },
     verticalLine: {
         backgroundColor: "#E4E4E4",

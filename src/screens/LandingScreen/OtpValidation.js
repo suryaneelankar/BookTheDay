@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import BookDatesButton from '../../components/GradientButton';
 import { moderateScale } from '../../utils/scalingMetrics';
-import { useNavigation } from '@react-navigation/native';
 
 const OtpValidation = ({ navigation }) => {
     const [otp, setOtp] = useState(['', '', '', '']);

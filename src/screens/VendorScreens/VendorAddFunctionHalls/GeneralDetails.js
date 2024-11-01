@@ -3,8 +3,6 @@ import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, 
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
-import SelectField from '../../../commonFields/SelectField';
-import UploadIcon from '../../../assets/svgs/uploadIcon.svg';
 import SelectedUploadIcon from '../../../assets/svgs/selectedUploadIcon.svg';
 import { launchImageLibrary } from 'react-native-image-picker';
 import BASE_URL from '../../../apiconfig';
@@ -21,9 +19,10 @@ import DetectLocation from '../../../assets/svgs/detectLocation.svg';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useNavigation } from '@react-navigation/native';
 
-const GeneralDetails = () => {
-    const [BedRooms, setBedRooms] = useState();
+const GeneralDetails = ({isAadharUpdate}) => {
+    console.log("isAadharUpdate value at fomr", isAadharUpdate);
     const navigation = useNavigation();
+    const [BedRooms, setBedRooms] = useState();
     const [foodType, setFoodType] = useState('');
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [functionHallName, setfunctionHallName] = useState('');
@@ -41,9 +40,6 @@ const GeneralDetails = () => {
     const [locationLatitude, setLocationLatitude] = useState();
     const [locationLongitude, setLocationLongitude] = useState();
     const [locationCountyVal, setLocationCountyVal] = useState();
-
-
-
     const [functionHallCity, setfunctionHallCity] = useState('');
     const [functionHallPinCode, setfunctionHallPinCode] = useState();
     const [perDayRentPrice, setPerDayRentPrice] = useState();
@@ -56,7 +52,6 @@ const GeneralDetails = () => {
     const [selectedItemArray, setSelectedItemArray] = useState([]);
     const [itemPrices, setItemPrices] = useState({});
     const [selectedSeatingCapacity, setSelectedSeatingCapacity] = useState('');
-
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
     const discountPercentageArr = ['5', '10', '15', '20', '30', '50'];
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
@@ -80,7 +75,6 @@ const GeneralDetails = () => {
         "Bridal Room": [{ name: 'Bridal Room', icon: 'ios-basket' }],
         "Sound/music license": [{ name: 'Sound/music license', icon: 'ios-volume-high' }]
     });
-    const rows = [];
 
     const foodTypes = [
         { name: 'veg', icon: VegIcon },
@@ -107,16 +101,8 @@ const GeneralDetails = () => {
         { name: 'Kitchen Space' }
     ];
 
-    const onChangePerKMChargePrice = (value) => {
-        setPerKMPrice(value);
-    }
-
     const onChangeBedRooms = (value) => {
         setBedRooms(value);
-    }
-
-    const onChangeFoodType = (value) => {
-        setFoodType(value);
     }
 
     const onChangeDescription = (value) => {
@@ -131,20 +117,8 @@ const GeneralDetails = () => {
         setPerDayRentPrice(value);
     }
 
-    const onChangePerMonthRentPrice = (value) => {
-        setPerMonthRentPrice(value);
-    }
-
-    const onChangeSecurityDepositAmount = (value) => {
-        setSecurityDeposit(value);
-    }
-
     const onChangeAdvanceAmount = (value) => {
         setAdvanceAmount(value);
-    }
-
-    const onChangeDiscountPercentage = (value) => {
-        setDiscountPercentage(value);
     }
 
     const onChangeOverTimeCharges = (value) => {
@@ -354,23 +328,33 @@ const GeneralDetails = () => {
             if (response.status === 201) {
                 setLoading(false);
                 console.log('Success', `uploaded successfully`);
+                if(isAadharUpdate){
+                    Alert.alert(
+                        "Confirmation",
+                        "Your product posted successfully",
+                        [
+                            {
+                                text: "Ok", onPress: () => {
+                                    navigation.goBack()
+                                }
+                            }
+                        ],
+                        { cancelable: false }
+                    );
+                }else{
                 Alert.alert(
                     "Confirmation",
-                    "Your product posted successfully",
+                    "Your product posted successfully, pLease complete KYC Status",
                     [
-                        // {
-                        //     text: "No",
-                        //     onPress: () => console.log("No Pressed"),
-                        //     style: "cancel"
-                        // },
                         {
                             text: "Ok", onPress: () => {
-                                // navigation.goBack()
-                            }
+                    navigation.navigate('AadharUpload')
+                }
                         }
                     ],
                     { cancelable: false }
                 );
+            }
             } else {
                 setLoading(false);
                 console.log('Error', 'Failed to upload document');
@@ -681,14 +665,6 @@ const GeneralDetails = () => {
                             isRequired={true}
                         />
 
-                        {/* <TextField
-                    label='Food Type'
-                    placeholder=""
-                    value={foodType}
-                    onChangeHandler={onChangeFoodType}
-                    keyboardType='default'
-                    isRequired={false}
-                /> */}
                         <Text style={styles.labelText}>Food Type</Text>
                         {RentalFoodTypeList()}
 
@@ -747,14 +723,6 @@ const GeneralDetails = () => {
                             isRequired={true}
                         />
 
-                        {/* <TextField
-                            label='Discount if Any'
-                            placeholder="Please Enter Discount Percentage"
-                            value={discountPercentage}
-                            onChangeHandler={onChangeDiscountPercentage}
-                            keyboardType='number-pad'
-                            isRequired={false}
-                        /> */}
                         <Text style={styles.textInputlabel}>Discount if any</Text>
                         {discountPercentageList()}
                     </View>
@@ -781,15 +749,6 @@ const GeneralDetails = () => {
                             </View>
                         </TouchableOpacity>
 
-
-                        {/* <TextField
-                    label='Address'
-                    placeholder="Please Enter Address"
-                    value={functionHallAddress}
-                    onChangeHandler={onChangefunctionHallAddress}
-                    keyboardType='default'
-                    isRequired={true}
-                /> */}
                         <TextField
                             label='City'
                             placeholder="Please Enter City"
@@ -830,10 +789,8 @@ const styles = StyleSheet.create({
         flex: 1
     },
     detailsContainer: {
-        // backgroundColor: themevariable.Color_FFFFFF,
         backgroundColor: 'red',
         borderRadius: 10,
-
     },
     mainHeading: {
         marginTop: 20,

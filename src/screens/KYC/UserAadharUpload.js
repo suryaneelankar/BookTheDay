@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
 import BookDatesButton from '../../components/GradientButton';
@@ -14,13 +14,9 @@ const UserAadharUpload = () => {
     const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
     const navigation = useNavigation();
     const [getUserAuth, setGetUserAuth] = useState('');
-
-
     const [selectedImage, setSelectedImage] = useState();
     const [profileData, setProfileData] = useState();
     const [isAadharAvailable, setIsAadharAvailable] = useState();
-
-
 
     useEffect(()=>{
         getProfileData();

@@ -10,7 +10,7 @@ const NavigationHeader = ({
   title,
   onPressBack,
 }) => {
-  const { goBack, canGoBack, navigate } = useNavigation();
+  const { goBack} = useNavigation();
 
   const onPressGoBack = () => {
        goBack();
@@ -35,13 +35,10 @@ export default NavigationHeader;
 const styles = StyleSheet.create({
 
   container: {
-    // height: verticalScale(64),
-    // paddingLeft: horizontalScale(10),
     paddingVertical: verticalScale(20),
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: themevariable.Color_FFFFFF,
-    // marginRight:  horizontalScale(40)
   },
   boxShadow: {
     shadowColor: '#000000',
@@ -53,13 +50,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2.54,
     elevation: 3,
   },
-  image: {
-    // height: verticalScale(12),
-    // width: horizontalScale(16),
-    // marginRight: horizontalScale(14),
-  },
   btnContainer: {
-    // height: moderateScale(44),
     width: moderateScale(44),
     alignItems: 'center',
     justifyContent: 'center',

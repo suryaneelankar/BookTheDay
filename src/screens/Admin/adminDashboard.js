@@ -252,11 +252,7 @@ const AdminDashboard = () => {
                 </View>
                 <TouchableOpacity
                     onPress={() => {
-                        if (selectedCategory === 'Tent House') {
-                            navigation.navigate('ViewTentHouse', { categoryId: item?._id });
-                        } else if (selectedCategory === 'Catering') {
-                            navigation.navigate('ViewCaterings', { categoryId: item?._id });
-                        }
+                            navigation.navigate('ViewCaterings', { categoryId: item?._id });       
                     }} style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                         <View style={{ width: '60%', }}>

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, Image, StyleSheet, Dimensions, ScrollView, Button, TouchableOpacity, FlatList, TextInput } from "react-native";
+import { Text, View, Image, StyleSheet, Dimensions, ScrollView, TouchableOpacity, FlatList, TextInput } from "react-native";
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import axios from "axios";
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
-import { verticalScale, moderateScale, horizontalScale } from "../../utils/scalingMetrics";
+import { verticalScale } from "../../utils/scalingMetrics";
 import { Calendar } from 'react-native-calendars';
 import moment from 'moment';
 import MapMarkIcon from '../../assets/svgs/orangeMapMark.svg';
@@ -18,34 +18,21 @@ import CustomModal from "../../components/AlertModal";
 
 const ViewCaterings = ({ route, navigation }) => {
 
-    const { width } = Dimensions.get('window');
     const [eventsDetails, setEventsDetails] = useState([])
     const [subImages, setSubImages] = useState();
     const [foodItemsData, setFoodItemsData] = useState();
-
-    const [selectedStartDate, setSelectedStartDate] = useState('');
-    const [selectedEndDate, setSelectedEndDate] = useState('');
-    const [isCalendarVisible, setCalendarVisible] = useState(false);
     const [noOfDays, setNoOfDays] = useState();
-    const [bookingData, setBookingData] = useState([]);
     const [selectedDate, setSelectedDate] = useState(null);
     const [isVisible, setIsVisible] = useState(false);
     const [isTimeSlotModalVisible, setTimeSlotModalVisible] = useState(false);
     const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-    const [itemQuantities, setItemQuantities] = useState({});
-    const [selectedItems, setSelectedItems] = useState({});
     const [addedItems, setAddedItems] = useState([]);
     const [numPlates, setNumPlates] = useState({});
-    // const [selectedIndex, SetSelectedIndex] = useState();
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [getUserAuth, setGetUserAuth] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
-    const [missingTitle, setMissingTitle] = useState('');
-
-
     const { categoryId } = route.params;
-    console.log("CATEID I::::::", categoryId)
 
     const timeSlots = [
         '12:00 AM',
@@ -173,7 +160,6 @@ const ViewCaterings = ({ route, navigation }) => {
             </View>
         );
     };
-    console.log("numof plates::::::::", numPlates)
 
     const handleAdd = (item) => {
         setAddedItems([...addedItems, item]);
@@ -184,37 +170,6 @@ const ViewCaterings = ({ route, navigation }) => {
         setNumPlates({ ...numPlates, [item.title]: '' });
     };
 
-    const formattedDates = (date) => {
-        const formattedDate = moment(date).format("DD MMM YYYY");
-        return formattedDate;
-    }
-
-    const onDayPress = (day) => {
-        let startedDate;
-        if (!selectedStartDate || selectedEndDate) {
-            startedDate = day?.dateString;
-            const formattedDate = formattedDates(day?.dateString);
-            setSelectedStartDate(day?.dateString);
-            setSelectedEndDate('');
-        } else if (day.dateString < selectedStartDate) {
-            startedDate = day?.dateString;
-            const formattedDate = formattedDates(day?.dateString);
-            setSelectedStartDate(day?.dateString);
-        } else {
-            const formattedDate = formattedDates(day?.dateString);
-            setSelectedEndDate(formattedDate);
-            const endedDate = day?.dateString;
-            const startDate = new Date(selectedStartDate);
-            const endDate = new Date(endedDate);
-            const diffInTime = endDate.getTime() - startDate.getTime();
-            const diffInDays = diffInTime / (1000 * 3600 * 24);
-            setNoOfDays(diffInDays);
-            const formattedStartDate = formattedDates(selectedStartDate);
-            setSelectedStartDate(formattedStartDate);
-        }
-    };
-
-    // console.log("selected dates:::::::::", selectedStartDate, selectedEndDate);
 
     const calculateTotalPrice = (numOfPlates, addedItems) => {
         return addedItems.map(item => {

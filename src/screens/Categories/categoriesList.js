@@ -19,8 +19,6 @@ const CategoriesList = ({ route }) => {
     const [hasMore, setHasMore] = useState(true);
     const [listLoading,setListingLoading] = useState(false);
 
-    // console.log("passed cat type ::::", catType, componentType)
-
     useEffect(() => {
         getCategories(currentPage);
     }, []);
@@ -184,8 +182,6 @@ const CategoriesList = ({ route }) => {
                     />
                 )}
             </View>
-
-
         </SafeAreaView>
     )
 }
@@ -193,17 +189,10 @@ const CategoriesList = ({ route }) => {
 
 const styles = StyleSheet.create({
     headerContainer: {
-        // height: moderateScale(65),
         width: "100%",
         paddingVertical: verticalScale(10),
         alignSelf: "center",
         justifyContent: "center"
-    },
-    status: {
-        fontSize: 10,
-        padding: 4,
-        borderRadius: 5,
-        marginTop: 5
     },
     searchView: {
         flexDirection: "row",
@@ -221,35 +210,9 @@ const styles = StyleSheet.create({
         marginLeft: horizontalScale(10),
         alignSelf: "center"
     },
-    backIcon: {
-        height: moderateScale(25),
-        width: moderateScale(25),
-        marginLeft: horizontalScale(10),
-        alignSelf: "center"
-    },
-    renderImage: {
-        width: "100%",
-        height: moderateScale(220),
-        borderRadius: 10
-    },
     textInput: {
         marginLeft: verticalScale(15),
         alignSelf: "center"
-    },
-    wishListimage: {
-        height: 20,
-        width: 20,
-        marginRight: horizontalScale(5)
-    },
-    titleHeader: {
-        color: "black",
-        fontSize: 22,
-        fontWeight: "bold"
-    },
-    off: {
-        fontSize: 13,
-        color: "#ed890e",
-        fontWeight: "bold"
     },
     strickedoffer: {
         fontSize: 14,
@@ -259,38 +222,7 @@ const styles = StyleSheet.create({
         marginLeft: 4,
         textDecorationLine: 'line-through'
     },
-    text: { fontSize: 12, textAlign: 'center' },
-    priceContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginTop: verticalScale(2)
-    },
-    itemView: {
-        padding: moderateScale(5),
-        alignSelf: "center",
-        width: "50%"
-    },
-    itemHeading: {
-        fontSize: 14,
-        color: "black",
-        fontWeight: "500",
-        width: "85%"
-    },
-    card: {
-        marginTop: 10,
-        alignItems: 'center',
-        width: 120,
-        // backgroundColor:"#f7f5f5"
-    },
-    listcard: {
-        marginTop: 20,
-        width: "90%",
-        borderRadius: 20,
-        backgroundColor: "#ECECEC",
-        alignSelf: "center",
-        alignItems: "center",
-        height: 130, flexDirection: "row", justifyContent: "space-around"
-    },
+
 });
 
 export default CategoriesList;

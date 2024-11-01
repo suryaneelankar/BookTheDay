@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Alert, Button, FlatList, Modal, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import SearchIcon from '../../assets/svgs/searchIcon.svg';
 import { useNavigation } from '@react-navigation/native';
-import LocationPicker from '../../components/LocationPicker';
 import UserLocationPicker from '../../components/userLocationPicker';
-import { useFocusEffect } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
@@ -19,19 +17,12 @@ const LocationAdded = () => {
     const [labelIs, setLabelIs] = useState();
     const [addressList, setAddressList] = useState([]);
     const dispatch = useDispatch();
-
     const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
     const userLocationFetched = useSelector((state) => state.userCurrentLocation);
     console.log("user locations is::::::::::", userLocationFetched);
-    const [userAddresses, setUserAddresses] = useState([]);
     const [selectedAddressId, setSelectedAddressId] = useState('');
     const [selectedAddressVal,setSelectedAddressVal] = useState('');
     const [selectedCurrentAddress,setSelectedCurrentAddress] = useState(false);
-
-
-    const handleOpenLocationPicker = () => {
-        setLocationPickerVisible(true);
-    };
 
     useEffect(() => {
         getUserAddresses();

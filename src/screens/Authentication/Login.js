@@ -5,15 +5,12 @@ import { useNavigation } from '@react-navigation/native';
 
 const Login=()=>{
     const [phoneNumber, setPhoneNumber] = useState('')
-    const [isFocused,setIsFocused] = useState(false)
     const navigation =useNavigation()
     const handlePhoneNumber=(number)=>{
         setPhoneNumber(number)
         console.log("number",number)
     }
-    const handleOnFocus=()=>{
-        setIsFocused(true)
-    }
+  
     return(
         <View style={styles.rootContainer}>
             <Pressable style={styles.skipContainer}>

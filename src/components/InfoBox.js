@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { horizontalScale, moderateScale, verticalScale,TouchableOpacity } from '../utils/scalingMetrics';
-import LinearGradient from 'react-native-linear-gradient';
 
 export const InfoBox = ({ IconComponent, mainText, subText }) => {
   return (
@@ -15,16 +14,6 @@ export const InfoBox = ({ IconComponent, mainText, subText }) => {
   );
 };
 
- export  const HireDetails = ({ mainText, subText }) => {
-  return (
-    <View style={styles.container}>
-      <View style={styles.textContainer}>
-        <Text style={styles.hireText}>{mainText}</Text>
-        <Text style={styles.subText}>{subText}</Text>
-      </View>
-    </View>
-  );
-};
 
 
 

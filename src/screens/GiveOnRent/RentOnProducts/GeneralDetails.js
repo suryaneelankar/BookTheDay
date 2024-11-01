@@ -12,9 +12,12 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import { Dropdown } from 'react-native-element-dropdown';
+import { useNavigation } from '@react-navigation/native';
 
 
-const GeneralDetails = () => {
+const GeneralDetails = ({isAadharUpdate}) => {
+    console.log("isAadharUpdate value at fomr", isAadharUpdate);
+    const navigation = useNavigation();
     const [productName, setProductName] = useState('');
     const [productBrand, setProductBrand] = useState('');
     const [mainImageUrl, setMainImageUrl] = useState('');
@@ -29,33 +32,25 @@ const GeneralDetails = () => {
     const [locationLatitude, setLocationLatitude] = useState();
     const [locationLongitude, setLocationLongitude] = useState();
     const [locationCountyVal, setLocationCountyVal] = useState();
-
-
-
     const [productCity, setProductCity] = useState('');
     const [productPinCode, setProductPinCode] = useState();
     const [perDayRentPrice, setPerDayRentPrice] = useState();
     const [perMonthRentPrice, setPerMonthRentPrice] = useState();
     const [securityDeposit, setSecurityDeposit] = useState();
-    const [available, setAvailable] = useState();
     const [advanceAmount, setAdvanceAmount] = useState();
     const [discountPercentage, setDiscountPercentage] = useState('');
     const discountPercentageArr = ['0', '5', '10', '15', '20', '30', '50'];
-
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
-    const [isSelected, setSelection] = useState(false);
     const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
     const jewelleryTypes = ["rings", "bridal", "chains", "earrings", "bangles", "bracelets"];
     const [jewelleryTypeSelected, setJewelleryTypeSelected] = useState();
     const [jewelleryTypeVal, setJewelleryTypeVal] = useState();
     const [loading, setLoading] = useState(false);
-
     const [selectedOption, setSelectedOption] = useState(null);
     const [genderTypeSelected, setGenderTypeSelected] = useState(null);
     const [selectedColor, setSelectedColor] = useState('');
     const [clothSize, setClothSize] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
-
 
     // Options for radio buttons
     const options = [
@@ -102,8 +97,6 @@ const GeneralDetails = () => {
     };
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
-
-    // console.log('vendorLoggedInMobileNum is ::>>', vendorLoggedInMobileNum);
 
     const onChangeProductName = (value) => {
         setProductName(value);
@@ -326,8 +319,6 @@ const GeneralDetails = () => {
         formData.append('size', clothSize);
         formData.append('color', selectedColor);
 
-
-
         console.log('formdata is ::>>', JSON.stringify(formData));
         const token = await getVendorAuthToken();
         setLoading(true);
@@ -342,14 +333,25 @@ const GeneralDetails = () => {
             if (response.status === 201) {
                 setLoading(false);
                 console.log('Success', `uploaded successfully`);
+                if(isAadharUpdate){
+                    Alert.alert(
+                        "Confirmation",
+                        "Your product posted successfully",
+                        [
+                            { text: "OK", onPress: () => navigation.goBack() }
+                        ],
+                        { cancelable: false }
+                    );
+                }else{
                 Alert.alert(
                     "Confirmation",
-                    "Your product posted successfully",
+                    "Your product posted successfully, Please complete the KYC status",
                     [
-                        { text: "OK", onPress: () => console.log("yes pressed") }
+                        { text: "OK", onPress: () => navigation.navigate('AadharUpload') }
                     ],
                     { cancelable: false }
                 );
+            }
             } else {
                 setLoading(false);
                 console.log('Error', 'Failed to upload document');
@@ -654,8 +656,6 @@ const GeneralDetails = () => {
                             isRequired={true}
                         />
                     </View>
-
-                    {/* <Text style={{ fontFamily: 'InterRegular', color: '#5F6377', fontSize: 15, fontWeight: '600' }}>I Accept Terms and Conditions</Text> */}
                     <TouchableOpacity onPress={() => { onPressSaveAndPost() }} style={{ padding: 10, backgroundColor: '#FFF5E3', alignSelf: 'center', borderRadius: 5, borderColor: '#ECA73C', borderWidth: 2, marginTop: 40, bottom: 20 }}>
                         <Text style={{ color: '#ECA73C' }}> Save & Post </Text>
                     </TouchableOpacity>

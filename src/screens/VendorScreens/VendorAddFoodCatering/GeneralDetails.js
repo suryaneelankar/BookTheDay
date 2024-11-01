@@ -3,10 +3,7 @@ import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, 
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
-import SelectField from '../../../commonFields/SelectField';
-import UploadIcon from '../../../assets/svgs/uploadIcon.svg';
 import SelectedUploadIcon from '../../../assets/svgs/selectedUploadIcon.svg';
-import { Dropdown } from 'react-native-element-dropdown';
 import { launchImageLibrary } from 'react-native-image-picker';
 import BASE_URL from '../../../apiconfig';
 import axios from 'axios';
@@ -21,8 +18,11 @@ import DetectLocation from '../../../assets/svgs/detectLocation.svg';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import FoodMenu from '../../../components/VendorAddOwnCombo';
 import CustomModal from '../../../components/AlertModal';
+import { useNavigation } from '@react-navigation/native';
 
-const GeneralDetails = () => {
+const GeneralDetails = ({isAadharUpdate}) => {
+    console.log("isAadharUpdate value at fomr", isAadharUpdate);
+    const navigation = useNavigation();
     const [comboModalSuccess, setcomboModalSuccess] = useState(false);
     const [overTimeCharges, setOverTimeCharges] = useState();
     const [mainImageUrl, setMainImageUrl] = useState('');
@@ -43,19 +43,13 @@ const GeneralDetails = () => {
     const [cateringPincode, setCateringPincode] = useState();
     const [advanceAmount, setAdvanceAmount] = useState();
     const [discountPercentage, setDiscountPercentage] = useState();
-
-    const [selectedItems, setSelectedItems] = useState({});
     const [foodMenuItems, setFoodMenuItems] = useState();
-    const [comboPrice, setComboPrice] = useState({});
-    const [minOrderMembers, setMinOrderMembers] = useState({});
     const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
     const discountPercentageArr = ['5', '10', '15', '20', '30', '50'];
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
     const [loading, setLoading] = useState(false);
     const [isFoodDropDownCollapsed, setIsFoodDropDownCollapsed] = useState(true);
     const [selectedFoodType, setSelectedFoodType] = useState('');
-
-
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
     const foodTypes = [
@@ -81,7 +75,6 @@ const GeneralDetails = () => {
             console.log("events data error>>::", error);
         }
     };
-    const [customisedItems, setCustomisedItems] = useState([]);
     const [finalCombomenu, setFinalComboMenu] = useState([]);
 
     const onChangeDescription = (value) => {
@@ -266,14 +259,6 @@ const GeneralDetails = () => {
             </TouchableOpacity>
         )
     }
-    const transformInput = (input) => {
-        return Object.entries(input).map(([key, value]) => {
-            return {
-                itemName: value[0].itemName || value[0].name,
-                perDayPrice: value[0].perDayPrice || 0
-            };
-        });
-    };
 
     const onPressSaveAndPost = async () => {
         if (!mainImageUrl || foodCateringName === '' || cateringDescription === '' || cateringCity === '' ||
@@ -359,19 +344,27 @@ const GeneralDetails = () => {
             if (response.status === 201) {
                 setLoading(false);
                 console.log('Success', `uploaded successfully`);
+                if(isAadharUpdate){
+                    Alert.alert(
+                        "Confirmation",
+                        "Your product posted successfully",
+                        [
+                            { text: "Ok", onPress: () => navigation.goBack() }
+                        ],
+                        { cancelable: false }
+                    );
+
+                }else{
                 Alert.alert(
                     "Confirmation",
-                    "Your product posted successfully",
+                    "Your product posted successfully, Please complete KYC Status",
                     [
-                        // {
-                        //     text: "No",
-                        //     onPress: () => console.log("No Pressed"),
-                        //     style: "cancel"
-                        // },
-                        { text: "Ok", onPress: () => console.log("yes pressed") }
+                        { text: "Ok", onPress: () =>  navigation.navigate('AadharUpload')
+                        }
                     ],
                     { cancelable: false }
                 );
+            }
             } else {
                 setLoading(false);
                 console.log('Error', 'Failed to upload document');

@@ -1,18 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions, FlatList, Pressable, SafeAreaView, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, FlatList,  SafeAreaView, ActivityIndicator } from 'react-native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";
 import { useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../utils/GlobalFunctions';
-import SearchIcon from '../../assets/svgs/searchIcon.svg';
-import FilterIcon from '../../assets/svgs/filter.svg';
 import Swiper from "react-native-swiper";
 import LocationMarkIcon from '../../assets/svgs/location.svg';
-import { verticalScale } from "../../utils/scalingMetrics";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
 import { useSelector } from "react-redux";
-import { Dropdown } from 'react-native-element-dropdown';
 import themevariable from "../../utils/themevariable";
 import Autocomplete from 'react-native-autocomplete-input';
 import IonIcon from 'react-native-vector-icons/Ionicons';
@@ -207,9 +203,7 @@ const Events = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
-
             <View style={styles.autocompleteContainer}>
-
                 <Autocomplete
                     data={dropdownVisible && filteredData?.length > 0 ? filteredData : []}  // Conditionally hide results based on dropdownVisible
                     value={query}
@@ -266,7 +260,6 @@ const Events = () => {
                 }
                 contentContainerStyle={{}}
             />
-
         </SafeAreaView>
     )
 }

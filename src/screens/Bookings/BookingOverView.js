@@ -58,10 +58,6 @@ const BookingOverView = ({ route, navigation }) => {
         }
     }
 
-    console.log("rental items:::::::", selectedRentalItems, numberOfDays);
-
-    console.log("bookings items", bookingItems)
-
     const ConfirmBooking = async () => {
         const token = await getUserAuthToken();
 
@@ -94,7 +90,6 @@ const BookingOverView = ({ route, navigation }) => {
     return (
         <View style={{ flex: 1, alignSelf: 'center', width: '100%', alignItems: 'center' }}>
 
-            {/* <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 20, marginTop: 20, width: '90%' }}>Upcoming Booking, {bookingDetails?.name}</Text> */}
             {bookingDone ?
                 <View style={{ backgroundColor: '#fdf5e6', borderRadius: 15, padding: 10, marginTop: 20, width: '90%' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -285,13 +280,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
     },
-    trackProgressText: {
-        color: '#FF730D',
-        textDecorationLine: 'underline',
-        fontWeight: "400",
-        fontFamily: "ManropeRegular",
-        fontSize: 12,
-        marginBottom: 30
-    },
+  
 });
 
