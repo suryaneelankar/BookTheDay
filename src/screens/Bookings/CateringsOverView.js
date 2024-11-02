@@ -65,7 +65,7 @@ const CateringsOverView = ({ route, navigation }) => {
             advanceAmountToPay : bookingDetails?.advanceAmount,
             userFullName : userLoggedInName,
             userDeliveryLocationLatitude : userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude,
-            userDeliveryLocationlongitude : userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
+            userDeliveryLocationLongitude : userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
             
         }
         console.log("payload is:::::::", payload);

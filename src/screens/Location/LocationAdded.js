@@ -128,8 +128,8 @@ const LocationAdded = () => {
         <SafeAreaView style={styles.container}>
 
             <Modal visible={isLocationPickerVisible} animationType="slide">
-                <UserLocationPicker onLocationSelected={handleLocationSelected} />
-                <Button title="Close" onPress={handleCloseLocationPicker} />
+                <UserLocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
+                {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
             </Modal>
 
             <View style={styles.searchProHeader}>
