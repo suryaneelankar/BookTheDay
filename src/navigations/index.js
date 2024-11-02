@@ -41,7 +41,7 @@ import AddSelectLocation from "../screens/Location/AddSelectLocation";
 import AddFunctionalHall from "../screens/VendorScreens/VendorAddFunctionHalls/AddFunctionalHall";
 import HallsBookingOverView from "../screens/Bookings/HallsBokingOverView";
 import AddDecorations from "../screens/VendorScreens/VendorAddDecorations/AddDecorations";
-import ViewCaterings from "../screens/Events/ViewCaterings";
+import ViewCaterings from "../screens/Caterings/ViewCaterings";
 import AddFoodCatering from "../screens/VendorScreens/VendorAddFoodCatering/AddFoodCatering";
 import LandingScreen from "../screens/LandingScreen";
 import CateringsOverView from "../screens/Bookings/CateringsOverView";
@@ -57,6 +57,7 @@ import PaymentSuccess from "../screens/PaymentScreens/PaymentSuccess";
 import PaymentFailedScreen from "../screens/PaymentScreens/PaymentFailed";
 import EditAddFoodCatering from "../screens/VendorScreens/VendorAddFoodCatering/EditAddFoodCatering";
 import EditAddFoodCateringGeneral from "../screens/VendorScreens/VendorAddFoodCatering/EditFoodCateringGeneral";
+import NearByEvents from "../screens/Events/NearByEvents";
 
 const MainNavigation = () => {
 
@@ -277,8 +278,14 @@ const MainNavigation = () => {
                         headerShown: true,
                     }}
                 />
-
-
+                <Stack.Screen
+                    name="NearByEvents"
+                    component={NearByEvents}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Near By Events" />,
+                        headerShown: true,
+                    }}
+                />
 
                 {/* ############### profile Screens ################# */}
                 <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: true }} />
