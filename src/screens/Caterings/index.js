@@ -319,6 +319,9 @@ const Caterings = () => {
                         <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
                         <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Catering Services in Hyderabad</Text>
                     </View>
+                    <TouchableOpacity style={{}} onPress={() => navigation.navigate('NearByFoodCaterings')}>
+                    <Text style={{ marginTop: 15, color: "#333333", fontSize: 12, fontWeight: "600", fontFamily: "ManropeRegular", }}>Sort NearBy</Text>
+                </TouchableOpacity>
                 </View>
 
                 <FlatList

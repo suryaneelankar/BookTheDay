@@ -26,6 +26,9 @@ const NearByEvents = () => {
     const [query, setQuery] = useState('');
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [locationBasedData, setLoactionBasedData] = useState([]);
+    const latitude =  userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude;
+    const longitude = userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
+
 
     useEffect(() => {
         getAllEvents();
@@ -45,6 +48,7 @@ const NearByEvents = () => {
             });
 
             const newFunctionHalls = Array.isArray(response?.data?.data) ? response?.data?.data : [];
+            console.log("neareby loc:::::::;", newFunctionHalls)
             if (response?.data?.data?.length > 0) {
                 setEventsData(newFunctionHalls); // Append new data
             }

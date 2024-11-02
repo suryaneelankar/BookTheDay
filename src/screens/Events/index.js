@@ -242,6 +242,9 @@ const Events = () => {
                     <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
                     <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "400", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Function Halls in Hyderabad</Text>
                 </View>
+                <TouchableOpacity style={{}} onPress={() => navigation.navigate('NearByEvents')}>
+                    <Text style={{ marginTop: 15, color: "#333333", fontSize: 12, fontWeight: "600", fontFamily: "ManropeRegular", }}>Sort NearBy</Text>
+                </TouchableOpacity>
             </View>
 
             <FlatList
