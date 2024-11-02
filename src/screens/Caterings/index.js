@@ -35,8 +35,8 @@ const Caterings = () => {
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [locationBasedData, setLoactionBasedData] = useState([]);
 
-    const userLatitude = userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude;
-    const userLongitude = userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude;
+    const userLatitude = userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude;
+    const userLongitude = userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude;
     console.log("latitue long", userLatitude, '+++++++++', userLongitude, userLocationFetched);
 
     useEffect(() => {

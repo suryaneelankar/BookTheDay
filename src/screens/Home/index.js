@@ -51,6 +51,7 @@ const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
     const [address, setAddress] = useState('');
     const userLocationFetched = useSelector((state) => state.userLocation);
+    console.log("userLocationFetched home :::::", userLocationFetched)
     const userLoggedInMobileNumber = useSelector((state) => state.userLoggedInMobileNum);
     const dispatch = useDispatch();
     const [eventsData, setEventsData] = useState([]);
@@ -161,36 +162,34 @@ const HomeDashboard = () => {
 
 
     const getLocation = async () => {
-        GetLocation.getCurrentPosition({
-            enableHighAccuracy: true,
-            timeout: 60000,
-        })
-            .then(location => {
-                console.log("getting location", location);
-                if (location) {
-                    fetch(
-                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}`
-                    )
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log("address is::::::", data)
-                            setAddress(data?.address);
-                            dispatch(getUserLocation(data));
-                            dispatch(setUserCurrentLocation(data));
-
-                        })
-                        .catch(error => {
-                            console.error(error);
-                        });
+        try {
+            const location = await GetLocation.getCurrentPosition({
+                enableHighAccuracy: true,
+                timeout: 60000,
+            });
+            console.log("getting location", location);
+    
+            if (location) {
+                const apiKey = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo';  // Replace with your Google API key
+                const response = await fetch(
+                    `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=${apiKey}`
+                );
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-            })
-            .catch(error => {
-                const { code, message } = error;
-                // console.warn(code, message);
-            })
-
+    
+                const data = await response.json();
+                console.log("address in home::::::", JSON.stringify(data));
+                setAddress(data?.results[0]?.formatted_address);
+                dispatch(getUserLocation(data?.results[0]));
+                dispatch(setUserCurrentLocation(data?.results[0]));
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
     };
-
+    
      const handleCheckPressed = async() => {
         if (Platform.OS === 'android') {
           const checkEnabled= await isLocationEnabled();
@@ -208,6 +207,7 @@ const HomeDashboard = () => {
           try {
             const enableResult = await promptForEnableLocationIfNeeded();
             console.log('enableResult', enableResult);
+            getLocation();
             // The user has accepted to enable the location services
             // data can be :
             //  - "already-enabled" if the location services has been already enabled
@@ -390,7 +390,7 @@ const HomeDashboard = () => {
                                     <LocationMarkIcon />
                                 </TouchableOpacity>
                                 <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('LocationAdded') }}>
-                                    <Text numberOfLines={1} style={styles.retrievedLoc}>{userLocationFetched?.display_name ? userLocationFetched?.display_name : userLocationFetched?.address}</Text>
+                                    <Text numberOfLines={1} style={styles.retrievedLoc}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address}</Text>
                                     <ArrowDown />
                                 </TouchableOpacity>
                             </View>

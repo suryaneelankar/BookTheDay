@@ -25,7 +25,6 @@ import ReferAndEarn from "../screens/Profile/ProfileSubScreens/ReferAndEarn";
 import RefundPolicy from "../screens/Profile/ProfileSubScreens/RefundPolicy";
 import TermsAndCondition from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
 import NavigationHeader from "../components/NavigationHeader";
-import ViewHireDetails from "../screens/MyBox/ViewHireDetails";
 import ViewCatDetails from "../screens/Categories/ViewCatDetails";
 import BookingDetailsScreen from "../screens/Categories/ViewCartDetails";
 import RequestConfirmation from "../screens/VendorScreens/VendorDashBoard/RequestConfirmation";
@@ -35,12 +34,10 @@ import ViewMyBookings from "../screens/Profile/MyBookings";
 import ViewMyLendings from "../screens/Profile/ViewMyLendings";
 import RentOnProducts from "../screens/GiveOnRent/RentOnProducts";
 import HireChefOrDriverForm from "../screens/VendorScreens/VendorHireChefOrDriver/HireChefOrDriverForm";
-import AddTentHouse from "../screens/VendorScreens/VendorAddTentHouse/AddTentHouse";
 import LocationAdded from "../screens/Location/LocationAdded";
 import AddSelectLocation from "../screens/Location/AddSelectLocation";
 import AddFunctionalHall from "../screens/VendorScreens/VendorAddFunctionHalls/AddFunctionalHall";
 import HallsBookingOverView from "../screens/Bookings/HallsBokingOverView";
-import AddDecorations from "../screens/VendorScreens/VendorAddDecorations/AddDecorations";
 import ViewCaterings from "../screens/Caterings/ViewCaterings";
 import AddFoodCatering from "../screens/VendorScreens/VendorAddFoodCatering/AddFoodCatering";
 import LandingScreen from "../screens/LandingScreen";
@@ -125,14 +122,7 @@ const MainNavigation = () => {
                 }} />
                 <Stack.Screen name="ViewEvents" component={ViewEvents} options={{ headerShown: true }} />
 
-                <Stack.Screen
-                    name="ViewHireDetails"
-                    component={ViewHireDetails}
-                    options={{
-                        header: () => <NavigationHeader Icon={true} title="Hire Professionals" />,
-                        headerShown: true,
-                    }}
-                />
+               
                 <Stack.Screen
                     name="ViewProfile"
                     component={ViewProfile}
@@ -307,8 +297,6 @@ const MainNavigation = () => {
 
                 <Stack.Screen name="Login" component={Login} options={{ headerShown: true }} />
                 <Stack.Screen name="Register" component={Register} options={{ headerShown: true }} />
-                <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ headerShown: true }} />
-                <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerShown: true }} />
                 <Stack.Screen name="BookingOverView" component={BookingOverView} options={{ headerShown: true }} />
 
                 {/* //////////////////////      VENDOR SCREENS     ///////////////////////////////////////////// */}
@@ -322,10 +310,6 @@ const MainNavigation = () => {
                     headerShown: true,
                 }} />
 
-                <Stack.Screen name="AddTentHouse" component={AddTentHouse} options={{
-                    header: () => <NavigationHeader Icon={true} title="Tent House" />,
-                    headerShown: true,
-                }} />
                 {/* AddTentHouse */}
 
                 <Stack.Screen name="RentOnProducts" component={RentOnProducts} options={{ header: () => <NavigationHeader Icon={true} title="Give on Rent" />, headerShown: true }} />
@@ -335,10 +319,7 @@ const MainNavigation = () => {
                     header: () => <NavigationHeader Icon={true} title="Give on Rent" />,
                     headerShown: true,
                 }} />
-                <Stack.Screen name="AddDecorations" component={AddDecorations} options={{
-                    header: () => <NavigationHeader Icon={true} title="Decorations" />,
-                    headerShown: true,
-                }} />
+               
 
                 <Stack.Screen name="AddFoodCatering" component={AddFoodCatering} options={{
                     header: () => <NavigationHeader Icon={true} title="Food Catering" />,

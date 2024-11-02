@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityInd
 import MapView, { Marker } from 'react-native-maps';
 // import Geolocation from '@react-native-community/geolocation';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import GetLocation from 'react-native-get-location'
+import GetLocation from 'react-native-get-location';
 
 const LocationPicker = ({ onLocationSelected }) => {
   const [region, setRegion] = useState(null);
@@ -24,47 +24,56 @@ const LocationPicker = ({ onLocationSelected }) => {
   }, []);
 
   const getLocation = async () => {
-    console.log("iam inside get location")
-    GetLocation.getCurrentPosition({
-      enableHighAccuracy: true,
-      timeout: 60000,
-    })
-      .then(location => {
-        console.log("getting location picker", location);
-        if (location) {
-          let latitude = location?.latitude;
-          let longitude = location?.longitude;
-          setRegion({
-            latitude,
-            longitude,
-            latitudeDelta: 0.015,
-            longitudeDelta: 0.0121,
-          });
-          setSelectedLocation({ latitude, longitude });
-
-          fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}`
-          )
-            .then(response => response.json())
-            .then(data => {
-              setCompleteAddress(data?.display_name)
-              // console.log("address is::::::", data)
-              setAddress(data?.address);
-              setPinCode(data?.address?.postcode);
-
-            })
-            .catch(error => {
-              console.error(error);
-            });
+    console.log("I am inside get location");
+  
+    try {
+      // Get current location
+      const location = await GetLocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 60000,
+    });
+  
+      console.log("Getting location picker*******", location);
+  
+      if (location) {
+        const { latitude, longitude } = location;
+  
+        // Update region and selected location state
+        setRegion({
+          latitude,
+          longitude,
+          latitudeDelta: 0.015,
+          longitudeDelta: 0.0121,
+        });
+        setSelectedLocation({ latitude, longitude });
+  
+        // Fetch address from Google Geocode API
+        const apiKey = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo'; // Replace with your Google API key
+        const response = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=${apiKey}`
+        );
+  
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
-      })
-      .catch(error => {
-        const { code, message } = error;
-        console.log(code, message);
-      })
-
-  }
-
+  
+        const data = await response.json();
+        console.log("Address in home::::::", JSON.stringify(data));
+  
+        // Set address and postal code
+        setCompleteAddress(data?.results[0]?.formatted_address);
+        setAddress(data?.results[0]?.formatted_address);
+  
+        const postalCodeComponent = data?.results[0]?.address_components.find(component =>
+          component.types.includes("postal_code")
+        );
+        setPinCode(postalCodeComponent?.long_name || "Postal code not found");
+      }
+    } catch (error) {
+      console.log("Error:", error.message);
+    }
+  };
+  
   const getPermissions = async () => {
     try {
       const granted = await PermissionsAndroid.request(

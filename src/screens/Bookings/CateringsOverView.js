@@ -61,11 +61,11 @@ const CateringsOverView = ({ route, navigation }) => {
             bookingMenuIds: transformedData,
             userMobileNumber: userLoggedInMobileNum,
             bookingTime: timeSlot,
-            userDeliveryLocation: userLocationFetched?.display_name ? userLocationFetched?.display_name : userLocationFetched?.address,
+            userDeliveryLocation: userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address,
             advanceAmountToPay : bookingDetails?.advanceAmount,
             userFullName : userLoggedInName,
-            userDeliveryLocationLatitude : userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude,
-            userDeliveryLocationlongitude : userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude
+            userDeliveryLocationLatitude : userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude,
+            userDeliveryLocationlongitude : userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
             
         }
         console.log("payload is:::::::", payload);
@@ -91,7 +91,7 @@ const CateringsOverView = ({ route, navigation }) => {
             <View style={styles.section}>
                 <Text style={[styles.sectionTitle, { color: "#202020" }]}>Shipping Address</Text>
                 <View style={{ flexDirection: "row" }}>
-                    <Text numberOfLines={2} style={styles.address}>{userLocationFetched?.display_name ? userLocationFetched?.display_name : userLocationFetched?.address}</Text>
+                    <Text numberOfLines={2} style={styles.address}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address}</Text>
                     <TouchableOpacity onPress={() => { navigation.navigate('LocationAdded') }}>
                         <EditButton />
                     </TouchableOpacity>
