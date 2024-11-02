@@ -15,6 +15,7 @@ import IonIcon from 'react-native-vector-icons/Ionicons';
 import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
 import VegIcon from '../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
+import DistanceIcon from '../../assets/svgs/distanceIcon.svg';
 
 const NearByEvents = () => {
     const navigation = useNavigation();
@@ -48,7 +49,7 @@ const NearByEvents = () => {
             });
 
             const newFunctionHalls = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            console.log("neareby loc:::::::;", newFunctionHalls)
+            console.log("neareby loc events:::::::;", newFunctionHalls)
             if (response?.data?.data?.length > 0) {
                 setEventsData(newFunctionHalls); // Append new data
             }
@@ -156,6 +157,11 @@ const NearByEvents = () => {
 
                             <Text style={{  }}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon/>}</Text>
                             <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG': item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
+                        </View>
+
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 5,paddingVertical:5,marginHorizontal:10 ,alignItems:"center"}}>
+                            <DistanceIcon/>
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>{item?.distance.toFixed(1)}  km</Text>
                         </View>
                     </View>
                 </TouchableOpacity>

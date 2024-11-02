@@ -14,64 +14,32 @@ import OfferStikcer from '../../assets/svgs/offerSticker.svg';
 import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
 import VegIcon from '../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
+import DistanceIcon from '../../assets/svgs/distanceIcon.svg';
 
 const NearByFoodCaterings = () => {
     const navigation = useNavigation();
-    const [cateringsData, setCateringsData] = useState([]);
     const [getUserAuth, setGetUserAuth] = useState('');
     const userLocationFetched = useSelector((state) => state.userLocation);
-    const [loading, setLoading] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
-    const [totalNearByPages, setTotalNearByPages] = useState(0);
-    const [nearByCurrentPage, setNearByCurrentPage] = useState(1);
     const [nearByData, setNearByData] = useState([]);
-    const [hasMoreNearBy, setHasMoreNearBy] = useState(true);
     const [nearByLoading, setNearByLoading] = useState(false);
-    const [nearByClicked, setNearByClicked] = useState(false);
     const [allLocations, setAllLocations] = useState([]);
     const [query, setQuery] = useState('');
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [locationBasedData, setLoactionBasedData] = useState([]);
 
-    const userLatitude = userLocationFetched?.lat ? userLocationFetched?.lat : userLocationFetched?.latitude;
-    const userLongitude = userLocationFetched?.lon ? userLocationFetched?.lon : userLocationFetched?.longitude;
-    console.log("latitue long", userLatitude, '+++++++++', userLongitude, userLocationFetched);
+    const userLatitude =  userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude;
+    const userLongitude = userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
+      console.log("latitue long", userLatitude, '+++++++++', userLongitude, userLocationFetched);
 
     useEffect(() => {
-        getAllCaterings(currentPage);
+        getNearByCaterings()
         getAllLocations();
     }, []);
-
-    const getAllCaterings = async (page = 1) => {
-        setLoading(true);
-        const token = await getUserAuthToken();
-        setGetUserAuth(token);
-        try {
-            const response = await axios.get(`${BASE_URL}/getAllFoodCaterings?page=${page}&limit=10`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            const newCateringsData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            console.log('resp is caterings ::>>>', response?.data?.data);
-            if (response?.data?.data?.length > 0) {
-                setCateringsData((prevData) => [...prevData, ...newCateringsData]); // Append new data
-                setCurrentPage(page);
-            } else {
-                setHasMore(false); // No more data to load
-            }
-        } catch (error) {
-            setLoading(false);
-            console.error('Error fetching food caterings:', error);
-        }
-        setLoading(false);
-    };
 
     const getAllCateringsByLocation = async (value) => {
         console.log("value is :::",value);
         const token = await getUserAuthToken();
+        setNearByLoading(true);
         try {
             const response = await axios.get(`${BASE_URL}/getAllFoodCateringsByLocation/${value}`, {
                 headers: {
@@ -82,10 +50,10 @@ const NearByFoodCaterings = () => {
             console.log("location select res:::::::", response);
             setLoactionBasedData(response?.data?.data);
         } catch (error) {
-            setLoading(false);
+            setNearByLoading(false);
             console.error('Error fetching function halls:', error);
         }
-        setLoading(false);
+        setNearByLoading(false);
     };
 
     const getAllLocations = async () => {
@@ -98,10 +66,8 @@ const NearByFoodCaterings = () => {
             });
             setAllLocations(response?.data?.data);
         } catch (error) {
-            setLoading(false);
             console.error('Error fetching function halls:', error);
         }
-        setLoading(false);
     };
 
     const filteredData = allLocations?.filter(item =>
@@ -126,8 +92,7 @@ const NearByFoodCaterings = () => {
     };
 
 
-    const getNearByCaterings = async (nearByPage) => {
-        setCateringsData([]);
+    const getNearByCaterings = async () => {
         setNearByLoading(true);
         const token = await getUserAuthToken();
         setGetUserAuth(token);
@@ -138,13 +103,10 @@ const NearByFoodCaterings = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-
+            console.log("nearby caterings:::;;;", response?.data?.data)
             const newCaterings = Array.isArray(response?.data?.data) ? response?.data?.data : [];
             if (response?.data?.data?.length > 0) {
                 setNearByData(newCaterings); // Append new data
-                setNearByCurrentPage(nearByPage);
-            } else {
-                setHasMoreNearBy(false); // No more data to load
             }
         } catch (error) {
             setNearByLoading(false);
@@ -223,10 +185,14 @@ const NearByFoodCaterings = () => {
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between',marginTop:10 }}>
+                    <View style={{ flexDirection: 'row',marginTop:10 }}>
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center",paddingVertical:5 }}>
                             <Text>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
                             <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 5,paddingVertical:5,marginHorizontal:10,alignItems:"center" }}>
+                           <DistanceIcon/>
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>{item?.distance.toFixed(1)}  km</Text>
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -236,7 +202,7 @@ const NearByFoodCaterings = () => {
 
     const returnCategoriesCount = () => {
         let count = 0;
-        count = query ? locationBasedData?.length : cateringsData?.length;
+        count = query ? locationBasedData?.length : nearByData?.length;
         return count;
     }
 
@@ -284,20 +250,17 @@ const NearByFoodCaterings = () => {
                 </View>
 
                 <FlatList
-                    data={query ? locationBasedData : cateringsData}
+                    data={query ? locationBasedData : nearByData}
                     renderItem={renderFoodCaterings}
                     keyExtractor={(item) => item?._id}
-                    onEndReached={loadMoreCaterings} // Fetch more when list ends
-                    onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
                     ListFooterComponent={() =>
-                        loading ? <ActivityIndicator size="large" color="orange" /> : null
+                        nearByLoading ? <ActivityIndicator size="large" color="orange" /> : null
                     }
                     ListEmptyComponent={
                         <View >
                             <Text>No Function halls found</Text>
                         </View>
                     }
-                    contentContainerStyle={{}}
                 />
             </View>
         </SafeAreaView>

@@ -55,6 +55,7 @@ import PaymentFailedScreen from "../screens/PaymentScreens/PaymentFailed";
 import EditAddFoodCatering from "../screens/VendorScreens/VendorAddFoodCatering/EditAddFoodCatering";
 import EditAddFoodCateringGeneral from "../screens/VendorScreens/VendorAddFoodCatering/EditFoodCateringGeneral";
 import NearByEvents from "../screens/Events/NearByEvents";
+import NearByFoodCaterings from "../screens/Caterings/NearByFoodCaterings";
 
 const MainNavigation = () => {
 
@@ -273,6 +274,14 @@ const MainNavigation = () => {
                     component={NearByEvents}
                     options={{
                         header: () => <NavigationHeader Icon={true} title="Near By Events" />,
+                        headerShown: true,
+                    }}
+                />
+                 <Stack.Screen
+                    name="NearByFoodCaterings"
+                    component={NearByFoodCaterings}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Near By Caterings" />,
                         headerShown: true,
                     }}
                 />
