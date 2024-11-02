@@ -22,46 +22,55 @@ const UserLocationPicker = ({ onLocationSelected }) => {
   }, []);
 
   const getLocation = async () => {
-    console.log("iam inside get location")
-    GetLocation.getCurrentPosition({
-      enableHighAccuracy: true,
-      timeout: 60000,
-    })
-      .then(location => {
-        console.log("getting location", location);
-        if (location) {
-          let latitude = location?.latitude;
-          let longitude = location?.longitude;
-          setRegion({
-            latitude,
-            longitude,
-            latitudeDelta: 0.015,
-            longitudeDelta: 0.0121,
-          });
-          setSelectedLocation({ latitude, longitude });
-
-          fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.latitude}&lon=${location.longitude}`
-          )
-            .then(response => response.json())
-            .then(data => {
-              setCompleteAddress(data?.display_name)
-              // console.log("address is::::::", data)
-              setAddress(data?.address);
-              setPinCode(data?.address?.postcode);
-
-            })
-            .catch(error => {
-              console.error(error);
-            });
+    console.log("I am inside get location");
+  
+    try {
+      // Get current location
+      const location = await GetLocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 60000,
+    });
+  
+      console.log("Getting location picker user*******", location);
+  
+      if (location) {
+        const { latitude, longitude } = location;
+  
+        // Update region and selected location state
+        setRegion({
+          latitude,
+          longitude,
+          latitudeDelta: 0.015,
+          longitudeDelta: 0.0121,
+        });
+        setSelectedLocation({ latitude, longitude });
+  
+        // Fetch address from Google Geocode API
+        const apiKey = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo'; // Replace with your Google API key
+        const response = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=${apiKey}`
+        );
+  
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
-      })
-      .catch(error => {
-        const { code, message } = error;
-        console.log(code, message);
-      })
-
-  }
+  
+        const data = await response.json();
+        console.log("Address in home::::::", JSON.stringify(data));
+  
+        // Set address and postal code
+        setCompleteAddress(data?.results[0]?.formatted_address);
+        setAddress(data?.results[0]?.formatted_address);
+  
+        const postalCodeComponent = data?.results[0]?.address_components.find(component =>
+          component.types.includes("postal_code")
+        );
+        setPinCode(postalCodeComponent?.long_name || "Postal code not found");
+      }
+    } catch (error) {
+      console.log("Error:", error.message);
+    }
+  };
 
   const getPermissions = async () => {
     try {
@@ -128,37 +137,32 @@ const UserLocationPicker = ({ onLocationSelected }) => {
   //   );
   // }, []);
 
-  const handleMapPress = (event) => {
+  const handleMapPress = async(event) => {
     const { latitude, longitude } = event.nativeEvent.coordinate;
     setSelectedLocation({ latitude, longitude });
-    fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-    )
-      .then(response => response.json())
-      .then(data => {
-        console.log("address is::::::", data);
-        setCompleteAddress(data?.display_name);
-        setAddress(data?.address);
-        setPinCode(data?.address?.postcode);
 
-      })
-      .catch(error => {
-        console.error(error);
-      });
-  };
+    const apiKey = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo'; // Replace with your Google API key
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
+    );
 
-  const handleSaveLocation = () => {
-    if (selectedLocation) {
-      onLocationSelected(selectedLocation);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
+
+    const data = await response.json();
+    console.log("Address in home::::::", JSON.stringify(data));
+
+    // Set address and postal code
+    setCompleteAddress(data?.results[0]?.formatted_address);
+    setAddress(data?.results[0]?.formatted_address);
+
+    const postalCodeComponent = data?.results[0]?.address_components.find(component =>
+      component.types.includes("postal_code")
+    );
+    setPinCode(postalCodeComponent?.long_name || "Postal code not found");
   };
 
-  const handleRegionChangeComplete = (region) => {
-    setRegion(region);
-    // You can also use Google Places API to get the address from coordinates
-    // For now, we just set a dummy address
-    // setAddress(`Address at (${region.latitude}, ${region.longitude})`);
-  };
 
   const saveLocation = () => {
     const locationData = {

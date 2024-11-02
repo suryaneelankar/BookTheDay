@@ -133,7 +133,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: "#202020" }]}>Shipping Address</Text>
         <View style={{ flexDirection: "row" }}>
-        <Text numberOfLines={2} style={styles.address}>{userLocationFetched?.display_name ? userLocationFetched?.display_name : userLocationFetched?.address}</Text>
+        <Text numberOfLines={2} style={styles.address}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address}</Text>
           <TouchableOpacity onPress={() => {navigation.navigate('LocationAdded')}}>
           <EditButton />
           </TouchableOpacity>
