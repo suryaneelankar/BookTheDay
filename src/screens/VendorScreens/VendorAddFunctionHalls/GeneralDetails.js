@@ -374,8 +374,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
         }
 
         <Modal visible={isLocationPickerVisible} animationType="slide">
-            <LocationPicker onLocationSelected={handleLocationSelected} />
-            <Button title="Close" onPress={handleCloseLocationPicker} />
+            <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
+            {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
         </Modal>
         return (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ width: '100%' }}>
@@ -625,8 +625,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
             ) :
                 <View>
                     <Modal visible={isLocationPickerVisible} animationType="slide">
-                        <LocationPicker onLocationSelected={handleLocationSelected} />
-                        <Button title="Close" onPress={handleCloseLocationPicker} />
+                        <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
+                        {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
                     </Modal>
 
 
