@@ -440,8 +440,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
             ) :
                 <View>
                     <Modal visible={isLocationPickerVisible} animationType="slide">
-                        <LocationPicker onLocationSelected={handleLocationSelected} />
-                        <Button title="Close" onPress={handleCloseLocationPicker} />
+                        <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
+                        {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
                     </Modal>
                     <View style={styles.mainContainer}>
                         <ChooseFileField
