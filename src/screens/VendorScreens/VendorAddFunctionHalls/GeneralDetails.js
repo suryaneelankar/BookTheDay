@@ -57,6 +57,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
 
     const [loading, setLoading] = useState(false);
+    const [functionHallAreaInSft, setfunctionHallAreaInSft] = useState();
+
 
     // console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
 
@@ -249,7 +251,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
     }
 
     const onPressSaveAndPost = async () => {
-        if (!mainImageUrl || functionHallName === '' || productDescription === '' || functionHallCity === '' ||
+        if (!mainImageUrl || functionHallName === '' || productDescription === '' || functionHallCity === '' || functionHallAreaInSft === '' ||
             selectedItemArray?.length === 0 || (perDayRentPrice === '' || perDayRentPrice === undefined) || selectedItemArray === '' || (BedRooms === '' || BedRooms === undefined) || functionHallAddress === '' || functionHallPinCode === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '') || (discountPercentage === undefined || discountPercentage === '')
         ) {
             Alert.alert('Please fill Mandatory fields');
@@ -314,6 +316,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
         formData.append('latitude', locationLatitude);
         formData.append('longitude', locationLongitude);
         formData.append('foodType', selectedFoodType);
+        formData.append('functionHallAreaInSft', functionHallAreaInSft)
 
         console.log('formdata is ::>>', formData);
         const token = await getVendorAuthToken();
@@ -689,6 +692,17 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             keyboardType='number-pad'
                             isRequired={true}
                         />
+
+                        {/* <Text style={styles.labelText}>Hall SqFeet</Text> */}
+                        <TextField
+                            label='Hall Area'
+                            placeholder="Enter Sq Feet Area approx."
+                            value={functionHallAreaInSft}
+                            onChangeHandler={(text) => setfunctionHallAreaInSft(text)}
+                            keyboardType='number-pad'
+                            isRequired={true}
+                        />
+
 
                         <Text style={styles.labelText}>Available Hall Amenities</Text>
                         {RentalItemsList()}
