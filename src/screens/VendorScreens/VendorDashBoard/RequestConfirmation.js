@@ -77,8 +77,8 @@ const RequestConfirmation = ({ navigation, route }) => {
             let advanceAmountPaid = 0;
             let userFullName = '';
             let userAddress = '';
-            let userDeliveryLocationLatitude = '';
-            let userDeliveryLocationLongitude = '';
+            let userLatitude = '';
+            let userLongitude = '';
 
             if (catType === 'functionHalls') {
                 productName = item?.functionHallName;
@@ -144,9 +144,6 @@ const RequestConfirmation = ({ navigation, route }) => {
                 userAddress : userAddress,
                 userLatitude : userLatitude,
                 userLongitude: userLongitude,
-
-
-
             };
         });
         // setWholeBookingData(result[`${productId}`]);
@@ -158,7 +155,8 @@ const RequestConfirmation = ({ navigation, route }) => {
     const getProductDetails = async () => {
         console.log('productId is ::>>', productId);
         const token = await getUserAuthToken();
-
+        // const token = await getVendorAuthToken();
+        console.log('${BASE_URL}/${catEndPoint?.productDetailsEndpoint}/${productId} is::>>',`${BASE_URL}/${catEndPoint?.productDetailsEndpoint}/${productId}`);
         try {
             const response = await axios.get(`${BASE_URL}/${catEndPoint?.productDetailsEndpoint}/${productId}`, {
                 headers: {
@@ -176,57 +174,6 @@ const RequestConfirmation = ({ navigation, route }) => {
         const convertedImageUrl = wholeBookingData[0]?.productImage !== undefined ? wholeBookingData[0]?.productImage.replace('localhost', LocalHostUrl) : wholeBookingData[0]?.productImage;
         console.log('convertedImageUrl is::>>', convertedImageUrl);
         return convertedImageUrl;
-    }
-
-    const renderModal = () => {
-        return (
-            <Modal
-                isVisible={isVisible}
-                onBackdropPress={() => setIsVisible(false)}
-                backdropOpacity={0.9}
-                backdropColor={themevariable.Color_000000}
-                hideModalContentWhileAnimating={true}
-                animationOutTiming={500}
-                backdropTransitionInTiming={500}
-                backdropTransitionOutTiming={500}
-                animationInTiming={500}
-                style={{
-                    flex: 1,
-                }}
-                onBackButtonPress={() => {
-                    setIsVisible(false)
-                }}
-                animationOut={'slideOutDown'}
-                animationType={'slideInUp'}
-            >
-                <View style={styles.Thankcontainer}>
-                    <LinearGradient colors={['#D2453B', '#A0153E']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={{ width: "55%", padding: 4, }}>
-                        {/* <View style={{borderWidth:4, width:"50%", }}/> */}
-                    </LinearGradient>
-
-                    <View style={styles.iconContainer}>
-                        <View style={styles.iconBackground}>
-                            {/* <Image source={{ uri: 'thumbs_up_icon_url' }} style={styles.icon} /> */}
-
-                        </View>
-                    </View>
-                    <Text style={styles.title}>Thank You!</Text>
-                    <Text style={styles.description}>Our team will deliver the update to you in less than 2 hours</Text>
-                    <LinearGradient colors={['#D2453B', '#A0153E']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.doneButton}>
-                        <TouchableOpacity onPress={() => setIsVisible(false)}>
-                            <Text style={styles.doneButtonText}>Done</Text>
-                        </TouchableOpacity>
-                    </LinearGradient>
-                </View>
-
-            </Modal>
-        )
     }
 
     const RequestConfirmationAcceptOrReject = async (bookingStatus, userMobileNumber, bookingId) => {
