@@ -7,7 +7,6 @@ import VendorTabs from "./VendorTabs";
 import ViewTrendingDetails from "../screens/Home/ViewTrendingDetails";
 import CategoriesList from "../screens/Categories/categoriesList";
 import ViewEvents from "../screens/Events/ViewEvents";
-import BookingOverView from "../screens/Bookings/BookingOverView";
 import ProfileScreen from "../screens/Profile/ProfileScreen";
 import Login from "../screens/Authentication/Login";
 import Register from "../screens/Authentication/Register";
@@ -306,7 +305,6 @@ const MainNavigation = () => {
 
                 <Stack.Screen name="Login" component={Login} options={{ headerShown: true }} />
                 <Stack.Screen name="Register" component={Register} options={{ headerShown: true }} />
-                <Stack.Screen name="BookingOverView" component={BookingOverView} options={{ headerShown: true }} />
 
                 {/* //////////////////////      VENDOR SCREENS     ///////////////////////////////////////////// */}
 

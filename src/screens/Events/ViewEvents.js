@@ -108,7 +108,7 @@ const ViewEvents = ({ route, navigation }) => {
       setAmenitiesData(amenities);
 
     } catch (error) {
-      console.log("categories::::::::::", error);
+      console.log("events error::::::::::", error);
 
     }
   }

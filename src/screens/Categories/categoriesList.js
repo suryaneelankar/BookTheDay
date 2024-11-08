@@ -70,7 +70,7 @@ const CategoriesList = ({ route }) => {
             setCurrentPage(page);
     
         } catch (error) {
-            console.log("categories::::::::::", error);
+            console.log("categories error::::::::::", error);
         } finally {
             setLoading(false);
             setListingLoading(false); // Set loading to false after data is fetched

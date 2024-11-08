@@ -248,8 +248,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
     const onPressSaveAndPost = async () => {
         console.log('selectedOption os:::>>', selectedOption);
 
-        if (!mainImageUrl || productName === '' || productDescription === '' || productCity === '' ||
-            (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || productPinCode === '' || (securityDeposit === undefined || securityDeposit === '') || (advanceAmount === undefined || advanceAmount === '') || (selectedOption == null)
+        if (!mainImageUrl || productName === '' || productDescription === '' ||
+            (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || (securityDeposit === undefined || securityDeposit === '') || (selectedOption == null)
             || (selectedColor === '' && ((selectedOption !== null 
                 && selectedOption === 'clothes'))) || (clothSize === '' && ((selectedOption !== null 
                     && selectedOption === 'clothes')))
@@ -310,7 +310,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
         formData.append('itemAvailableCity', productCity);
         formData.append('securityDepositAmount', securityDeposit);
         formData.append('vendorMobileNumber', vendorMobileNumber);
-        formData.append('advanceAmount', advanceAmount);
+        // formData.append('advanceAmount', advanceAmount);
         formData.append('discountPercentage', discountPercentage);
         formData.append('county', locationCountyVal);
         formData.append('latitude', locationLatitude);
@@ -601,14 +601,14 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             keyboardType='number-pad'
                             isRequired={true}
                         />
-                        <TextField
+                        {/* <TextField
                             label='Advance Amount'
                             placeholder="Please Enter Advance Amount"
                             value={advanceAmount}
                             onChangeHandler={onChangeAdvanceAmount}
                             keyboardType='number-pad'
                             isRequired={true}
-                        />
+                        /> */}
                         <Text style={styles.textInputlabel}>Discount if any</Text>
                         {discountPercentageList()}
                         {!isNaN(perDayRentPrice - (perDayRentPrice * discountPercentage / 100)) && perDayRentPrice ? (
@@ -645,7 +645,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             value={productCity}
                             onChangeHandler={onChangeCity}
                             keyboardType='default'
-                            isRequired={true}
+                            isRequired={false}
                         />
                         <TextField
                             label='Pin code'
@@ -653,7 +653,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             value={productPinCode}
                             onChangeHandler={onChangePinCode}
                             keyboardType='number-pad'
-                            isRequired={true}
+                            isRequired={false}
                         />
                     </View>
                     <TouchableOpacity onPress={() => { onPressSaveAndPost() }} style={{ padding: 10, backgroundColor: '#FFF5E3', alignSelf: 'center', borderRadius: 5, borderColor: '#ECA73C', borderWidth: 2, marginTop: 40, bottom: 20 }}>

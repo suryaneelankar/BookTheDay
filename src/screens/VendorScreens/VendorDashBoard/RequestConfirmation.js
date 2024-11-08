@@ -52,7 +52,7 @@ const RequestConfirmation = ({ navigation, route }) => {
             console.log('before resp::><>', JSON.stringify(response?.data?.data));
             groupByFilterData(response?.data?.data);
         } catch (error) {
-            console.log("categories::::::::::", error);
+            console.log("booking details error::::::::::", error);
         }
     }
 
@@ -166,7 +166,7 @@ const RequestConfirmation = ({ navigation, route }) => {
             console.log("getClothJewelsById::::::::::", response?.data);
             setProductDetails(response?.data);
         } catch (error) {
-            console.log("categories::::::::::", error);
+            console.log("categories product details::::::::::", error);
         }
     }
 

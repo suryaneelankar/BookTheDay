@@ -161,7 +161,7 @@ const NearByEvents = () => {
 
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 5,paddingVertical:5,marginHorizontal:10 ,alignItems:"center"}}>
                             <DistanceIcon/>
-                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>{item?.distance.toFixed(1)}  km</Text>
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>{item?.distance?.toFixed(1)}  km</Text>
                         </View>
                     </View>
                 </TouchableOpacity>
