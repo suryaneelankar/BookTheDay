@@ -23,6 +23,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
 
 
   const userLocationFetched = useSelector((state) => state.userLocation);
+  const userLoggedInName = useSelector((state) => state.userLoggedInName);
   const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
   const [productDetails, setProductDetails] = useState();
   const [productImage, setProductImage] = useState();
@@ -57,7 +58,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
       const updatedImgUrl = response?.data?.professionalImage?.url !== undefined ? response?.data?.professionalImage?.url.replace('localhost', LocalHostUrl) : response?.data?.professionalImage?.url;
       setProductImage(updatedImgUrl);
     } catch (error) {
-      console.log("categories::::::::::", error);
+      console.log("categories cart::::::::::", error);
     }
   };
 
@@ -107,7 +108,12 @@ const BookingDetailsScreen = ({ navigation, route }) => {
       numOfDays: NumOfDays,
       totalAmount: calculateTotalPrice(),
       userMobileNumber: userLoggedInMobileNum,
+      userDeliveryLocation: userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address,
+      userFullName : userLoggedInName,
+      userDeliveryLocationLatitude : userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude,
+      userDeliveryLocationLongitude : userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
     }
+    console.log("clothesjewels", payload);
     try {
       const bookingResponse = await axios.post(`${BASE_URL}/create-cloth-jewel-booking`, payload,{
         headers: {
@@ -176,10 +182,10 @@ const BookingDetailsScreen = ({ navigation, route }) => {
           <Text style={styles.priceDetailLabel}>Total rent to be paid</Text>
           <Text style={styles.priceDetailValue}>{formatAmount(calculateTotalPrice())}</Text>
         </View>
-        <View style={styles.priceDetailRow}>
+        {/* <View style={styles.priceDetailRow}>
           <Text style={styles.priceDetailLabel}>Delivery charges</Text>
           <Text style={styles.priceDetailValue}>₹ 400</Text>
-        </View>
+        </View> */}
         <View style={{ width: "100%", borderColor: "#D8D8D8", borderWidth: 0.5, marginBottom: 5 }} />
         <View style={styles.priceDetailRow}>
           <View style={{}}>
@@ -197,11 +203,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
         <View style={{ backgroundColor: "white", borderRadius: 10, elevation: 3, paddingHorizontal: 5 }}>
           <View style={styles.priceDetailRow}>
             <Text style={styles.priceDetailLabel}>Security deposit</Text>
-            <Text style={styles.priceDetailValue}>₹ 200</Text>
-          </View>
-          <View style={styles.priceDetailRow}>
-            <Text style={styles.priceDetailLabel}>Platform charges</Text>
-            <Text style={styles.priceDetailValue}>₹ 100</Text>
+            <Text style={styles.priceDetailValue}>{formatAmount(productDetails?.securityDepositAmount)}</Text>
           </View>
           <View style={styles.priceDetailRow}>
             <Text style={styles.priceDetailLabel}>
@@ -217,7 +219,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
           <View style={{ width: "90%", borderColor: "#D8D8D8", borderWidth: 0.5, marginVertical: 5, alignSelf: "center" }} />
           <View style={styles.priceDetailRow}>
             <Text style={styles.priceDetailLabel}>Total Deposit</Text>
-            <Text style={styles.priceDetailValue}>₹ 300</Text>
+            <Text style={styles.priceDetailValue}>{formatAmount(productDetails?.securityDepositAmount)}</Text>
           </View>
         </View>
       </View>
@@ -233,7 +235,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
         </View>
         <View style={styles.footerButtons}>
           <TouchableOpacity onPress={() => ConfirmBooking()} style={[styles.button, {   backgroundColor: "#D2453B" }]}>
-            <Text style={[styles.buttonText, { color: "white" }]}>Confirm Booking | {formatAmount(calculateTotalPrice())}</Text>
+            <Text style={[styles.buttonText, { color: "white" }]}>Confirm Booking | {formatAmount(productDetails?.securityDepositAmount)}</Text>
           </TouchableOpacity>
         </View>
       </View>

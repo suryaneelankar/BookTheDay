@@ -1,317 +1,3 @@
-// const LocationPicker = ({ onLocationSelected }) => {
-//   const [region, setRegion] = useState(null);
-//   const [address, setAddress] = useState('');
-//   const [apartment, setApartment] = useState('');
-//   const [street, setStreet] = useState('');
-//   const [pinCode, setPinCode] = useState('');
-//   const [label, setLabel] = useState('Home');
-//   const [selectedLocation, setSelectedLocation] = useState(null);
-//   const [searchLocation, setSearchLocation] = useState();
-
-//   const [completeAddress, setCompleteAddress] = useState();
-//   const [subDivisionArea, setSubDivisionArea] = useState();
-
-
-//   useEffect(() => {
-//     getPermissions();
-//   }, []);
-
-//   const getLocation = async () => {
-//     console.log("I am inside get location");
-  
-//     try {
-//       // Get current location
-//       const location = await GetLocation.getCurrentPosition({
-//         enableHighAccuracy: true,
-//         timeout: 60000,
-//     });
-  
-//       console.log("Getting location picker*******", location);
-  
-//       if (location) {
-//         const { latitude, longitude } = location;
-  
-//         // Update region and selected location state
-//         setRegion({
-//           latitude,
-//           longitude,
-//           latitudeDelta: 0.015,
-//           longitudeDelta: 0.0121,
-//         });
-//         setSelectedLocation({ latitude, longitude });
-  
-//         // Fetch address from Google Geocode API
-//         const apiKey = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo'; // Replace with your Google API key
-//         const response = await fetch(
-//           `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=${apiKey}`
-//         );
-  
-//         if (!response.ok) {
-//           throw new Error(`HTTP error! Status: ${response.status}`);
-//         }
-  
-//         const data = await response.json();
-//         console.log("Address in home::::::", JSON.stringify(data));
-  
-//         // Set address and postal code
-//         setCompleteAddress(data?.results[0]?.formatted_address);
-//         setAddress(data?.results[0]?.formatted_address);
-  
-//         const postalCodeComponent = data?.results[0]?.address_components.find(component =>
-//           component.types.includes("postal_code")
-//         );
-//         setPinCode(postalCodeComponent?.long_name || "Postal code not found");
-//       }
-//     } catch (error) {
-//       console.log("Error:", error.message);
-//     }
-//   };
-  
-//   const getPermissions = async () => {
-//     try {
-//       const granted = await PermissionsAndroid.request(
-//         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-//         {
-//           title: 'APP location permission',
-//           message: 'App needs location Permissions',
-//           buttonNeutral: 'Ask Me Later',
-//           buttonNegative: 'Cancel',
-//           buttonPositive: 'OK'
-//         },
-//       );
-//       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-//         getLocation()
-//       } else {
-//         Alert.alert("Location persmiion denied")
-//       }
-//     } catch (err) {
-//       // console.warn(err)
-//     }
-//   }
-
-//   // useEffect(() => {
-//   //   Geolocation.getCurrentPosition(
-//   //     (position) => {
-//   //       console.log("position is",position.coords)
-//   //       const { latitude, longitude } = position.coords;
-//   //       setRegion({
-//   //         latitude,
-//   //         longitude,
-//   //         latitudeDelta: 0.015,
-//   //         longitudeDelta: 0.0121,
-//   //       });
-//   //       // setSelectedLocation({ latitude, longitude });
-
-//   //       if(latitude && longitude){
-
-//   //               fetch(
-//   //                   `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-//   //               )
-//   //                   .then(response => response.json())
-//   //                   .then(data => {
-//   //                       console.log("address is::::::", data)
-//   //                       setAddress(data?.address);
-//   //                       setPinCode(data?.address?.postcode);
-
-//   //                   })
-//   //                   .catch(error => {
-//   //                       console.error(error);
-//   //                   });
-
-//   //       }
-//   //     },
-//   //     (error) => {
-//   //       Alert.alert('Error', 'Failed to get current location');
-//   //       console.log("error::::::::", error)
-//   //     },
-//   //     {
-//   //       enableHighAccuracy: true,
-//   //       timeout: 20000, // 20 seconds timeout
-//   //       maximumAge: 1000, // Accept a cached location that is at most 1 second old
-//   //     }
-//   //   );
-//   // }, []);
-
-//   const handleMapPress = (event) => {
-//     const { latitude, longitude } = event.nativeEvent.coordinate;
-//     setSelectedLocation({ latitude, longitude });
-//     fetch(
-//       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-//     )
-//       .then(response => response.json())
-//       .then(data => {
-//         console.log("address is picker comp::::::", data);
-//         setCompleteAddress(data?.display_name);
-//         setAddress(data?.address);
-//         setPinCode(data?.address?.postcode);
-
-//       })
-//       .catch(error => {
-//         console.error(error);
-//       });
-//   };
-
-//   const handleSaveLocation = () => {
-//     if (selectedLocation) {
-//       onLocationSelected(selectedLocation);
-//     }
-//   };
-
-//   const handleRegionChangeComplete = (region) => {
-//     setRegion(region);
-//     // You can also use Google Places API to get the address from coordinates
-//     // For now, we just set a dummy address
-//     // setAddress(`Address at (${region.latitude}, ${region.longitude})`);
-//   };
-
-//   const saveLocation = () => {
-//     const locationData = {
-//       address,
-//       apartment,
-//       street,
-//       pinCode,
-//       label,
-//       region,
-//       subDivisionArea,
-//     };
-//     console.log("passing data::::::", locationData, '+++++++++++++', completeAddress)
-//     onLocationSelected(locationData, completeAddress);
-//   };
-
-//   return (
-//     <View style={styles.container}>
-
-      
-//          <GooglePlacesAutocomplete
-//           placeholder="Search for an address"
-//           fetchDetails={true}
-//           onChangeText={(text) =>{
-//             console.log("test is::::::::::::", text);
-//             setSearchLocation(text);
-
-//           }}
-//           value={searchLocation}
-//           onPress={(data, details = null) => {
-//             // 'details' is provided when fetchDetails = true
-//             const { lat, lng } = details.geometry.location;
-//             console.log("details is:::::::::", data);
-//             setSearchLocation(data?.description);
-//             setSubDivisionArea(data?.structured_formatting?.main_text);
-//             setSelectedLocation({ latitude: lat, longitude: lng });
-//             setRegion({
-//               latitude: lat,
-//               longitude: lng,
-//               latitudeDelta: 0.015,
-//               longitudeDelta: 0.0121,
-//             });
-//             setCompleteAddress(data?.description);
-//             setPinCode(details.address_components.find(ac => ac.types.includes('postal_code'))?.long_name);
-//             setStreet(details.address_components.find(ac => ac.types.includes('route'))?.long_name);
-//           }}
-//           onFail={(err) => {console.log('failed err is :>>',err)}}
-//           query={{
-//             key: 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo',
-//             language: 'en', // language of the results
-//           }}
-//           styles={{
-//             textInput: styles.input,
-//           }}
-//         />
-        
-
-//       {/* {region ?
-//         <MapView
-//           style={styles.map}
-//           //   region={{
-//           //     latitude: 37.78825,
-//           //     longitude: -122.4324,
-//           //     latitudeDelta: 0.015,
-//           //     longitudeDelta: 0.0121,
-//           // }}
-//           region={region}
-//           onPress={handleMapPress}
-//           showsUserLocation={true}
-//           showsMyLocationButton={true}
-
-//         //   onRegionChangeComplete={handleRegionChangeComplete}
-//         >
-//           {selectedLocation && (
-//             <Marker coordinate={selectedLocation} />
-//           )}
-//           {/* <Marker coordinate={region} /> */}
-
-//         {/* </MapView>
-//         :
-//         <ActivityIndicator size={'large'} color={'#FEF7DE'} />
-//       }  */}
-
-
-
-//       <ScrollView style={styles.form}>
-//         <Text style={{ color: "black", marginVertical: 5, paddingHorizontal: 5 }}>Address</Text>
-//         <TextInput
-//           numberOfLines={3}
-//           label={'address'}
-//           style={[styles.input, { height: 100 }]}
-//           value={completeAddress}
-//           placeholder="Address"
-//           editable={true}
-//           multiline={true}
-//         />
-
-//         <Text style={{ color: "black", marginVertical: 5, paddingHorizontal: 5 }}>Appartment</Text>
-//         <TextInput
-//           style={styles.input}
-//           value={apartment}
-//           onChangeText={setApartment}
-//           placeholder="Apartment"
-//         />
-
-      
-
-//         <Text style={{ color: "black", marginVertical: 5, paddingHorizontal: 5, marginTop: 0 }}>Land Mark</Text>
-
-//         <TextInput
-//           style={[styles.input, { marginTop: 0 }]}
-//           value={street}
-//           onChangeText={setStreet}
-//           placeholder="LandMark"
-//         />
-
-//         <Text style={{ color: "black", marginVertical: 5, paddingHorizontal: 5 }}>Pincode</Text>
-
-//         <TextInput
-//           style={styles.input}
-//           value={pinCode}
-//           onChangeText={setPinCode}
-//           keyboardType='number-pad'
-//           placeholder="Pin Code"
-//         />
-//         {/* <View style={styles.labels}>
-//           <TouchableOpacity
-//             style={[styles.label, label === 'Home' && styles.selectedLabel]}
-//             onPress={() => setLabel('Home')}>
-//             <Text>Home</Text>
-//           </TouchableOpacity>
-//           <TouchableOpacity
-//             style={[styles.label, label === 'Office' && styles.selectedLabel]}
-//             onPress={() => setLabel('Office')}>
-//             <Text>Office</Text>
-//           </TouchableOpacity>
-//           <TouchableOpacity
-//             style={[styles.label, label === 'Other' && styles.selectedLabel]}
-//             onPress={() => setLabel('Other')}>
-//             <Text>Other</Text>
-//           </TouchableOpacity>
-//         </View> */}
-//         <TouchableOpacity style={styles.saveButton} onPress={saveLocation}>
-//           <Text style={styles.saveButtonText}>Save Location</Text>
-//         </TouchableOpacity>
-//       </ScrollView>
-//     </View>
-//   );
-// };
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator, PermissionsAndroid, ScrollView } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
@@ -321,6 +7,8 @@ import BookDatesButton from './GradientButton';
 import SaveLocationButton from './SaveLocationButton';
 import Iconleftcircle from 'react-native-vector-icons/AntDesign';
 import { height, width } from '../utils/scalingMetrics';
+import { isLocationEnabled } from 'react-native-android-location-enabler';
+import { promptForEnableLocationIfNeeded } from 'react-native-android-location-enabler';
 
 const UserLocationPicker = ({ onLocationSelected, onBack }) => {
   const [region, setRegion] = useState(null);
@@ -399,12 +87,49 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
         },
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        getLocation();
+        handleCheckPressed();
       } else {
         Alert.alert("Location permission denied");
       }
     } catch (err) {
       console.warn(err);
+    }
+  };
+
+  const handleCheckPressed = async() => {
+    if (Platform.OS === 'android') {
+      const checkEnabled= await isLocationEnabled();
+      console.log('checkEnabled', checkEnabled);
+      if(!checkEnabled){
+      handleEnabledPressed();
+      }else{
+        getLocation();
+      }
+    }
+  };
+
+  const  handleEnabledPressed = async() => {
+    if (Platform.OS === 'android') {
+      try {
+        const enableResult = await promptForEnableLocationIfNeeded();
+        console.log('enableResult', enableResult);
+        getLocation();
+        // The user has accepted to enable the location services
+        // data can be :
+        //  - "already-enabled" if the location services has been already enabled
+        //  - "enabled" if user has clicked on OK button in the popup
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error(error.message);
+          // The user has not accepted to enable the location services or something went wrong during the process
+          // "err" : { "code" : "ERR00|ERR01|ERR02|ERR03", "message" : "message"}
+          // codes :
+          //  - ERR00 : The user has clicked on Cancel button in the popup
+          //  - ERR01 : If the Settings change are unavailable
+          //  - ERR02 : If the popup has failed to open
+          //  - ERR03 : Internal error
+        }
+      }
     }
   };
 
@@ -422,7 +147,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
     }
 
     const data = await response.json();
-    console.log('handle maps rsss::>>',JSON.stringify(data))
+    console.log('handle maps preeesss::>>',JSON.stringify(data))
     setCompleteAddress(data?.results[0]?.formatted_address);
     setAddress(data?.results[0]?.formatted_address);
 
@@ -446,6 +171,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       pinCode,
       label,
       region,
+      subDivisionArea
     };
     onLocationSelected(locationData, completeAddress, label);
   };
@@ -488,6 +214,9 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
           }}
           value={searchLocation}
           onPress={(data, details = null) => {
+            console.log("geocoding loc:::::::", JSON.stringify(data));
+            console.log("geocoding loc details:::::::", JSON.stringify(details));
+
             const { lat, lng } = details.geometry.location;
             setSearchLocation(data?.description);
             setSelectedLocation({ latitude: lat, longitude: lng });

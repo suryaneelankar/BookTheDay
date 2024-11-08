@@ -172,7 +172,7 @@ const ViewMyBookings = () => {
               let statusPaymentPayload = {
                 orderId: initiateresponse?.data?.data?.OrderId,
                 paymentStatus: "success",
-                orderAdvanceAmount: advanceAmount,
+                orderAdvanceAmount:  advanceAmount,
                 razorpay_order_id: paymentData?.razorpay_order_id,
                 razorpay_payment_id: paymentData?.razorpay_payment_id,
                 razorpay_signature: paymentData?.razorpay_signature,
@@ -252,7 +252,7 @@ const ViewMyBookings = () => {
             }} style={styles.cardImage} />
             <View style={{ marginLeft: 15 }}>
               <Text style={styles.cardTitle}>{item?.catType === 'caterings' ? item?.foodCateringName : item?.catType === 'functionHalls' ? item?.functionHallName : item?.productName} </Text>
-              <Text style={styles.cardAmount}>{formatAmount(item?.totalAmount)}</Text>
+              <Text style={styles.cardAmount}>{formatAmount(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount)}</Text>
 
               <Text style={styles.startDate}> Start Date: {item?.startDate}</Text>
               <Text style={styles.startDate}> End Date: {item?.endDate}</Text>
@@ -282,7 +282,7 @@ const ViewMyBookings = () => {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.doneButton}>
-            <TouchableOpacity disabled={item.bookingStatus !== 'approved'} onPress={() => { handlePayment(item?.totalAmount, item?.bookingId, item?.catType , item?.vendorMobileNumber) }}>
+            <TouchableOpacity disabled={item.bookingStatus !== 'approved'} onPress={() => { handlePayment(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount, item?.bookingId, item?.catType , item?.vendorMobileNumber) }}>
               <Text style={styles.doneButtonText}>Pay Now</Text>
             </TouchableOpacity>
           </LinearGradient>

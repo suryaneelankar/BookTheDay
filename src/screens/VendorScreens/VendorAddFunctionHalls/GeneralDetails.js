@@ -251,8 +251,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
     }
 
     const onPressSaveAndPost = async () => {
-        if (!mainImageUrl || functionHallName === '' || productDescription === '' || functionHallCity === '' || functionHallAreaInSft === '' ||
-            selectedItemArray?.length === 0 || (perDayRentPrice === '' || perDayRentPrice === undefined) || selectedItemArray === '' || (BedRooms === '' || BedRooms === undefined) || functionHallAddress === '' || functionHallPinCode === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '') || (discountPercentage === undefined || discountPercentage === '')
+        if (!mainImageUrl || functionHallName === '' || productDescription === ''  || functionHallAreaInSft === '' ||
+            selectedItemArray?.length === 0 || (perDayRentPrice === '' || perDayRentPrice === undefined) || selectedItemArray === '' || (BedRooms === '' || BedRooms === undefined) || functionHallAddress === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '') || (discountPercentage === undefined || discountPercentage === '')
         ) {
             Alert.alert('Please fill Mandatory fields');
             return;
@@ -769,7 +769,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             value={functionHallCity}
                             onChangeHandler={onChangefunctionHallCity}
                             keyboardType='default'
-                            isRequired={true}
+                            isRequired={false}
                         />
                         <TextField
                             label='Pin code'
@@ -777,7 +777,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             value={functionHallPinCode}
                             onChangeHandler={onChangefunctionHallPinCode}
                             keyboardType='number-pad'
-                            isRequired={true}
+                            isRequired={false}
                         />
                     </View>
 

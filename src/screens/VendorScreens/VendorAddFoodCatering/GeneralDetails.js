@@ -81,7 +81,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
         setCateringDescription(value);
     }
 
-    const onChangetentHouseName = (value) => {
+    const onChangeCateringName = (value) => {
         setFoodCateringName(value);
     }
 
@@ -97,11 +97,11 @@ const GeneralDetails = ({isAadharUpdate}) => {
         setOverTimeCharges(value);
     }
 
-    const onChangetentHouseCity = (value) => {
+    const onChangeCateringCity = (value) => {
         setCateringCity(value);
     }
 
-    const onChangetentHousePincode = (value) => {
+    const onChangeCateringPincode = (value) => {
         setCateringPincode(value);
     }
 
@@ -261,8 +261,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
     }
 
     const onPressSaveAndPost = async () => {
-        if (!mainImageUrl || foodCateringName === '' || cateringDescription === '' || cateringCity === '' ||
-            cateringAddress === '' || cateringPincode === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '') || finalCombomenu?.length === 0
+        if (!mainImageUrl || foodCateringName === '' || cateringDescription === '' ||
+            cateringAddress === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '') || finalCombomenu?.length === 0
         ) {
             Alert.alert('Please fill Mandatory fields');
             return;
@@ -471,7 +471,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             label='Catering Name'
                             placeholder="Please Enter Catering Name"
                             value={foodCateringName}
-                            onChangeHandler={onChangetentHouseName}
+                            onChangeHandler={onChangeCateringName}
                             keyboardType='default'
                             isRequired={true}
                         />
@@ -569,17 +569,17 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             label='City'
                             placeholder="Please Enter City"
                             value={cateringCity}
-                            onChangeHandler={onChangetentHouseCity}
+                            onChangeHandler={onChangeCateringCity}
                             keyboardType='default'
-                            isRequired={true}
+                            isRequired={false}
                         />
                         <TextField
                             label='Pin code'
                             placeholder="Please Enter Pin code"
                             value={cateringPincode}
-                            onChangeHandler={onChangetentHousePincode}
+                            onChangeHandler={onChangeCateringPincode}
                             keyboardType='number-pad'
-                            isRequired={true}
+                            isRequired={false}
                         />
                     </View>
 

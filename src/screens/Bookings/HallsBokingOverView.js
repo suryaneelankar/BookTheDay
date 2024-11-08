@@ -42,7 +42,7 @@ const HallsBookingOverView = ({ route, navigation }) => {
             console.log("Halls house over view ::::::::::", JSON.stringify(response?.data));
             setBookingDetails(response?.data)
         } catch (error) {
-            console.log("categories::::::::::", error);
+            console.log("Halls error::::::::::", error);
         }
     }
 

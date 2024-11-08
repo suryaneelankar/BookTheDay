@@ -36,7 +36,7 @@ const ViewTrendingDetails = ({ route }) => {
       // console.log("categories details ::::::::::", response?.data?.data);
       setCategoriesDetails(response?.data?.data)
     } catch (error) {
-      console.log("categories::::::::::", error);
+      console.log("categories trending::::::::::", error);
 
     }
   }
