@@ -11,6 +11,7 @@ import RazorpayCheckout from 'react-native-razorpay';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import StepIndicator from 'react-native-step-indicator';
 import { useSelector } from 'react-redux';
+import PaymentConfirmationModal from '../../components/PaymentConfirmationModal';
 
 
 const ViewMyBookings = () => {
@@ -21,6 +22,8 @@ const ViewMyBookings = () => {
   const navigation = useNavigation();
   const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
   const userLoggedInName = useSelector((state) => state.userLoggedInName);
+  const [selectedObjectedforPayment,setSelectedObjectedforPayment] = useState();
+  const [paymentModal, setPaymentModal] = useState(false);
 
   const labels = ["Initiated", "Confirmed", "Payment Done"];
   const customStyles = {
@@ -252,7 +255,8 @@ const ViewMyBookings = () => {
             }} style={styles.cardImage} />
             <View style={{ marginLeft: 15 }}>
               <Text style={styles.cardTitle}>{item?.catType === 'caterings' ? item?.foodCateringName : item?.catType === 'functionHalls' ? item?.functionHallName : item?.productName} </Text>
-              <Text style={styles.cardAmount}>{formatAmount(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount)}</Text>
+              <Text style={styles.cardBalanceAmount}>Advance Amount {formatAmount(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount)}</Text>
+              <Text style={styles.cardBalanceAmount}>Balance Amount {formatAmount(item?.advanceAmountToPay ? (item?.totalAmount - item?.advanceAmountToPay) : (item?.totalAmount - item?.securityDepositAmount))}</Text>
 
               <Text style={styles.startDate}> Start Date: {item?.startDate}</Text>
               <Text style={styles.startDate}> End Date: {item?.endDate}</Text>
@@ -282,7 +286,9 @@ const ViewMyBookings = () => {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.doneButton}>
-            <TouchableOpacity disabled={item.bookingStatus !== 'approved'} onPress={() => { handlePayment(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount, item?.bookingId, item?.catType , item?.vendorMobileNumber) }}>
+            <TouchableOpacity 
+            disabled={item.bookingStatus !== 'approved'} 
+            onPress={() => {setPaymentModal(true),setSelectedObjectedforPayment(item)}}>
               <Text style={styles.doneButtonText}>Pay Now</Text>
             </TouchableOpacity>
           </LinearGradient>
@@ -335,6 +341,14 @@ const ViewMyBookings = () => {
           renderItem={renderItem}
           keyExtractor={(item) => item?.id}
         />
+
+         <PaymentConfirmationModal
+            visible={paymentModal}
+            message={`Redirecting to Pay Advance Amount ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount)}`}
+            onSubmit={() => [setPaymentModal(false), handlePayment(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount, selectedObjectedforPayment?.bookingId, selectedObjectedforPayment?.catType , selectedObjectedforPayment?.vendorMobileNumber) ]}
+            onClose={() => setPaymentModal(false)}
+          />
+                   
       </ScrollView>
     </SafeAreaView>
   );
@@ -378,6 +392,13 @@ const styles = StyleSheet.create({
   cardAmount: {
     fontSize: 12,
     fontWeight: '700',
+    color: "#333333",
+    fontFamily: 'ManropeRegular',
+    marginVertical: 5
+  },
+  cardBalanceAmount: {
+    fontSize: 12,
+    fontWeight: '500',
     color: "#333333",
     fontFamily: 'ManropeRegular',
     marginVertical: 5
