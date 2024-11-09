@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, Alert, FlatList, Button, Linking, ScrollView, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, FlatList, Button, Linking, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 import BASE_URL from "../../../apiconfig";
 import axios from "axios";
 import { LocalHostUrl } from "../../../apiconfig";
 import DollarIcon from "../../../assets/vendorIcons/dollarIcon.svg";
-import RupeeIcon from "../../../assets/vendorIcons/rupeeIcon.svg";
 import Avatar from "../../../components/NameAvatar";
 import RejectIcon from "../../../assets/vendorIcons/RejectIcon.svg";
 import AcceptIcon from "../../../assets/vendorIcons/AcceptIcon.svg";
+import ApprovedIcon from "../../../assets/vendorIcons/ApprovedIcon.svg";
 import themevariable from "../../../utils/themevariable";
 import LinearGradient from 'react-native-linear-gradient';
 import { formatAmount } from "../../../utils/GlobalFunctions";
@@ -15,7 +15,6 @@ import { useSelector } from "react-redux";
 import { getUserAuthToken, getVendorAuthToken } from "../../../utils/StoreAuthToken";
 import Modal from 'react-native-modal';
 import ActionSheet from 'react-native-actions-sheet';
-import Feather from 'react-native-vector-icons/Feather';
 import UserIcon from '../../../assets/vendorIcons/userIcon.svg';
 import LocationIcon from '../../../assets/vendorIcons/locationIcon.svg';
 import PhoneIcon from '../../../assets/vendorIcons/phoneIcon.svg';
@@ -26,12 +25,12 @@ import { verticalScale } from "../../../utils/scalingMetrics";
 const RequestConfirmation = ({ navigation, route }) => {
     const { productId, catEndPoint } = route?.params;
     const [productDetails, setProductDetails] = useState([]);
-    const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [wholeBookingData, setWholeBookingData] = useState([]);
     const actionSheetRef = useRef(null);
     const [selectedItemDetails, setSelectedItemDetails] = useState([]);
     const [getVendorAuth, setGetVendorAuth] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
@@ -41,6 +40,7 @@ const RequestConfirmation = ({ navigation, route }) => {
     }, [])
 
     const getProductBookingDetails = async () => {
+        setLoading(true);
         const vendorMobileNumber = vendorLoggedInMobileNum;
         const token = await getVendorAuthToken();
         try {
@@ -49,10 +49,12 @@ const RequestConfirmation = ({ navigation, route }) => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            console.log('before resp::><>', JSON.stringify(response?.data?.data));
+            // console.log('before resp::><>', JSON.stringify(response?.data?.data));
             groupByFilterData(response?.data?.data);
+            setLoading(false);
         } catch (error) {
             console.log("booking details error::::::::::", error);
+            setLoading(false);
         }
     }
 
@@ -91,7 +93,9 @@ const RequestConfirmation = ({ navigation, route }) => {
                 bookingId = item?.bookingId;
                 advanceAmountPaid = item?.advanceAmountPaid;
                 userFullName = item?.userFullName;
-                userAddress = item?.userDeliveryLocation
+                userAddress = item?.userDeliveryLocation;
+                userLatitude = item?.userDeliveryLocationLatitude;
+                userLongitude = item?.userDeliveryLocationLongitude;
             }
             else if (catType === 'clothJewels') {
                 productName = item?.productName;
@@ -105,7 +109,8 @@ const RequestConfirmation = ({ navigation, route }) => {
                 advanceAmountPaid = item?.advanceAmountPaid;
                 userFullName = item?.userFullName;
                 userAddress = item?.userDeliveryLocation
-
+                userLatitude = item?.userDeliveryLocationLatitude;
+                userLongitude = item?.userDeliveryLocationLongitude;
 
             }
             else if (catType === 'caterings') {
@@ -141,8 +146,8 @@ const RequestConfirmation = ({ navigation, route }) => {
                 bookingId: bookingId,
                 advanceAmountPaid: advanceAmountPaid,
                 userFullName: userFullName,
-                userAddress : userAddress,
-                userLatitude : userLatitude,
+                userAddress: userAddress,
+                userLatitude: userLatitude,
                 userLongitude: userLongitude,
             };
         });
@@ -153,19 +158,19 @@ const RequestConfirmation = ({ navigation, route }) => {
 
 
     const getProductDetails = async () => {
-        console.log('productId is ::>>', productId);
+        setLoading(true);
         const token = await getUserAuthToken();
-        // const token = await getVendorAuthToken();
-        console.log('${BASE_URL}/${catEndPoint?.productDetailsEndpoint}/${productId} is::>>',`${BASE_URL}/${catEndPoint?.productDetailsEndpoint}/${productId}`);
         try {
             const response = await axios.get(`${BASE_URL}/${catEndPoint?.productDetailsEndpoint}/${productId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            console.log("getClothJewelsById::::::::::", response?.data);
+            // console.log("getClothJewelsById::::::::::", response?.data);
             setProductDetails(response?.data);
+            setLoading(false);
         } catch (error) {
+            setLoading(false);
             console.log("categories product details::::::::::", error);
         }
     }
@@ -225,18 +230,16 @@ const RequestConfirmation = ({ navigation, route }) => {
     };
 
     const renderItem = ({ item }) => {
-
-
         return (
-            <View onPress={() => { }} style={{ borderRadius: 10, backgroundColor: item?.bookingStatus == 'rejected' || item?.bookingStatus == 'approved' ? '#dddddd' : 'white', marginHorizontal: 15, marginTop: 10, paddingHorizontal: 10, paddingVertical: 10 }}>
+            <View onPress={() => { }} style={{ borderRadius: 10, backgroundColor: item?.bookingStatus == 'rejected' || item?.bookingStatus == 'approved' ? 'white' : 'white', marginHorizontal: 15, marginTop: 10, paddingHorizontal: 10, paddingVertical: 10 }}>
                 <TouchableOpacity style={{ flexDirection: "row", alignItems: 'center' }}
                     onPress={() => { actionSheetRef.current?.show(), setSelectedItemDetails(item) }}
                 >
-                    <Avatar widthDyn={61} heightDyn={61} borderRadiusDyn={8} name={'Surya Neelankar'} imageUrl={''} />
+                    <Avatar widthDyn={61} heightDyn={61} borderRadiusDyn={8} name={item?.userFullName ? item?.userFullName : ''} imageUrl={''} token={getVendorAuth} />
                     <View style={{ marginLeft: 10, width: "50%" }}>
                         <Text style={{ marginTop: 5, color: "#101010", fontSize: 14, fontWeight: "500", fontFamily: "ManropeRegular", }}>{item?.productName}</Text>
                         <View style={{ marginTop: 5 }}>
-                            <Text style={{ color: "#1A1E25", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular" }}>Banglore, KA</Text>
+                            <Text numberOfLines={1} style={{ color: "#1A1E25", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular" }}>{item?.userAddress}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
                                 <DollarIcon style={{}} />
                                 <Text style={{ color: "#4A4A4A", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", marginHorizontal: 5 }}>{formatAmount(item?.totalAmount)}</Text>
@@ -276,16 +279,14 @@ const RequestConfirmation = ({ navigation, route }) => {
                                 >
                                     {item?.bookingStatus == 'rejected' ?
                                         <RejectIcon /> :
-                                        <AcceptIcon />
+                                        item?.bookingStatus == 'approved' ?
+                                            <ApprovedIcon /> :
+                                            <AcceptIcon />
                                     }
-                                    <Text style={{ color: item?.bookingStatus == 'rejected' ? "#EF0000" : "#57A64F", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", textTransform: 'capitalize' }}>{item?.bookingStatus}</Text>
+                                    <Text numberOfLines={2} style={{ width: 70, height: 30, textAlignVertical: "center", color: item?.bookingStatus == 'rejected' ? "#EF0000" : item?.bookingStatus == 'approved' ? "orange" : "#57A64F", marginHorizontal: 5, fontSize: 12, fontWeight: "700", fontFamily: "ManropeRegular", textTransform: 'capitalize' }}>{item?.bookingStatus}</Text>
                                 </TouchableOpacity>
                             </View>
                         }
-                        {item?.bookingStatus == 'requested' ?
-                            <Feather style={[styles.icon, { marginHorizontal: 5 }]} name='chevron-right' size={25} color={'black'} />
-                            :
-                            <></>}
                     </View>
                 </TouchableOpacity>
             </View>
@@ -311,145 +312,183 @@ const RequestConfirmation = ({ navigation, route }) => {
         Linking.openURL(url);
     };
 
-
     const renderActionSheetWithProductDetais = () => {
-        console.log('selectedItemDetails is::>>>', JSON.stringify(selectedItemDetails));
 
         const renderBookedItems = ({ item }) => (
-            <View style={{ backgroundColor: '#FFF8F0', borderRadius: 10, padding: 10,width:"80%",marginVertical:5 }}>
-                <Text style={{ fontWeight: '700', color: '#FD813B',fontSize:12,fontFamily: 'ManropeRegular' }}>{item?.title}</Text>
-                <Text style={{fontWeight: '500',color:"#000000",fontSize:14,fontFamily: 'ManropeRegular' }}>Items:</Text>
-                <Text style={{fontWeight: '700',color:"#000000",fontSize:12,fontFamily: 'ManropeRegular' }}>{item?.items.join(', ')}</Text>
-                <Text  style={{fontWeight: '500', color:"#000000",fontSize:14,fontFamily: 'ManropeRegular' }}>Per Plate Cost: <Text style={{fontWeight: '700', color:"#000000",fontSize:14,fontFamily: 'ManropeRegular' }}> ₹ {item?.perPlateCost}</Text></Text>
-                <Text style={{fontWeight: '500', color:"#000000",fontSize:14,fontFamily: 'ManropeRegular' }}>No. of Plates Ordered:<Text style={{fontWeight: '700', color:"#000000",fontSize:14,fontFamily: 'ManropeRegular' }}> {item?.numOfPlatesOrdered} Plates</Text></Text>
+            <View style={styles.bookedItemContainer}>
+                <Text style={styles.bookedItemTitle}>{item?.title}</Text>
+
+                <View style={{ marginTop: 10 }}>
+                    <Text style={styles.bookedItemLabel}>Combo Items:</Text>
+                    <Text style={styles.bookedItemList}>{item?.items.join(', ')}</Text>
+                </View>
+
+                <View style={styles.bookedItemContent}>
+                    <Text style={styles.bookedItemLabel}>Per Plate Cost:</Text>
+                    <Text style={styles.bookedItemValue}>{formatAmount(item?.perPlateCost)}/-</Text>
+                </View>
+
+                <View style={styles.bookedItemContent}>
+                    <Text style={styles.bookedItemLabel}>No. of Plates Ordered:</Text>
+                    <Text style={styles.bookedItemValue}>{item?.numOfPlatesOrdered} Plates</Text>
+                </View>
             </View>
         );
+
         return (
             <ActionSheet
-                animated={false}
                 ref={actionSheetRef}
                 statusBarTranslucent
-                closeOnPressBack={true}
+                closeOnPressBack
                 defaultOverlayOpacity={0.5}
-                containerStyle={styles.actionSheetContainer}>
-                <ScrollView>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-around',marginTop:20 }}>
-                        <View>
-                            <Text style={{color:"#000000", fontSize:14, fontWeight:"500",fontFamily: 'ManropeRegular'}}>{selectedItemDetails?.productName}</Text>
-                            <Text style={{color:"#000000", fontSize:14, fontWeight:"500",fontFamily: 'ManropeRegular'}}>{selectedItemDetails?.startDate} - {selectedItemDetails?.endDate}</Text>
-                        </View>
-                        <View style={{ backgroundColor: '#FFF8F0', borderRadius: 10, padding: 5, width: 80, alignItems: 'center', alignContent: 'center', alignSelf: 'center' }}>
-                            <Text style={{ color: '#FD813B', fontWeight: '700' }}>{selectedItemDetails?.bookingStatus?.charAt(0).toUpperCase() + selectedItemDetails?.bookingStatus?.slice(1)}</Text>
-                        </View>
+                height={Dimensions.get("window").height - 64}
+                containerStyle={styles.actionSheetContainer}
+                // animationType=
+            >
+                <View style={styles.headerContainer}>
+                    <View>
+                        <Text style={styles.productNameText}>{selectedItemDetails?.productName}</Text>
+                        <Text style={styles.productDateText}>
+                            {selectedItemDetails?.startDate} - {selectedItemDetails?.endDate}
+                        </Text>
                     </View>
-                    <View style={{ backgroundColor: '#dddddd', height: 1, width: '80%', alignSelf: 'center', marginTop: 20 }} />
-                    <View style={{ padding: 20,width:"90%",alignSelf:"center"}}>
-                        <Text style={{ color: 'black', fontFamily: 'ManropeRegular', fontWeight: '900', fontSize: 16 }}>Customer Details</Text>
+                    <View style={[styles.bookingStatusContainer, {
+                        backgroundColor:
+                            selectedItemDetails?.bookingStatus === "approved" ? "orange" :
+                                selectedItemDetails?.bookingStatus === "rejected" ? "red" :
+                                    selectedItemDetails?.bookingStatus === "payment successful" ? "green" :
+                                        "black"
+                    }]}>
+                        <Text
+                            style={[
+                                styles.bookingStatusText,
+                                {
+                                    textTransform: "capitalize",
+                                    color: "white",
+                                    textAlignVertical:"center"
+                                }
+                            ]}
+                        >
+                            {selectedItemDetails?.bookingStatus}
+                        </Text>
+                    </View>
+                </View>
+                <View style={styles.divider} />
+
+                <ScrollView>
+                    <View style={styles.contentContainer}>
+                        <Text style={styles.sectionTitle}>Customer Details</Text>
                         <View style={styles.detailsViewStyle}>
                             <UserIcon />
                             <Text style={styles.detailsStyle}>{selectedItemDetails?.userFullName}</Text>
                         </View>
-                        {selectedItemDetails?.advanceAmountPaid !== 0 ?
-                            <TouchableOpacity style={styles.detailsViewStyle}
-                                onPress={() => openDialPad(selectedItemDetails?.userMobileNumber)}
-                            >
+                        {selectedItemDetails?.advanceAmountPaid !== 0 && (
+                            <TouchableOpacity style={styles.detailsViewStyle} onPress={() => openDialPad(selectedItemDetails?.userMobileNumber)}>
                                 <PhoneIcon />
-                                <Text style={styles.detailsStyle}>{selectedItemDetails?.userMobileNumber}</Text>
-                            </TouchableOpacity> : null}
-                        <TouchableOpacity style={[styles.detailsViewStyle,{alignItems:"flex-start"}]} onPress={() => openMap(selectedItemDetails?.userLatitude, selectedItemDetails?.userLongitude)}>
+                                <Text style={[styles.phoneNumDetailStyle, { textDecorationLine: "underline" }]}>{selectedItemDetails?.userMobileNumber}</Text>
+                            </TouchableOpacity>
+                        )}
+                        {selectedItemDetails?.advanceAmountPaid !== 0 && (
+                        <TouchableOpacity style={[styles.detailsViewStyle, { alignItems: "flex-start" }]} onPress={() => openMap(selectedItemDetails?.userLatitude, selectedItemDetails?.userLongitude)}>
                             <LocationIcon />
-                            <Text style={styles.detailsStyle}>{selectedItemDetails?.userAddress}</Text>
+                            <Text style={[styles.phoneNumDetailStyle, { textDecorationLine: "underline" }]}>{selectedItemDetails?.userAddress}</Text>
                         </TouchableOpacity>
+                        )}
                         <View style={styles.detailsViewStyle}>
                             <AdvPayIcon />
-                            <Text style={styles.detailsStyle}>Advance Paid: ₹ {selectedItemDetails?.advanceAmountPaid}/-</Text>
+                            <Text style={styles.detailsStyle}>Advance Paid: {formatAmount(selectedItemDetails?.advanceAmountPaid)}/-</Text>
                         </View>
                         <View style={styles.detailsViewStyle}>
                             <AdvPayIcon />
-                            <Text style={styles.detailsStyle}>Balance Payable: ₹ {selectedItemDetails?.advanceAmountPaid}/-</Text>
+                            <Text style={styles.detailsStyle}>Balance Payable: {formatAmount(selectedItemDetails?.totalAmount - selectedItemDetails?.advanceAmountPaid)}/-</Text>
                         </View>
-                        {selectedItemDetails?.bookingItem ?
-                        <View>
-                            <Text style={styles.detailsBookedText}>Booked Items</Text>
-                            <FlatList
-                                data={selectedItemDetails?.bookingItem}
-                                renderItem={renderBookedItems}
-                                keyExtractor={(item) => item?._id}
-                                // horizontal={true}
-                                showsHorizontalScrollIndicator={false}
-                                contentContainerStyle={{ paddingVertical: 10 }}
-                            />
-                        </View> : null}
+
+                        {selectedItemDetails?.bookingItem && (
+                            <View>
+                                <Text style={styles.detailsBookedText}>Booked Items</Text>
+                                <FlatList
+                                    data={selectedItemDetails?.bookingItem}
+                                    renderItem={renderBookedItems}
+                                    keyExtractor={(item) => item?._id}
+                                    showsHorizontalScrollIndicator={false}
+                                    contentContainerStyle={styles.flatListContainer}
+                                />
+                            </View>
+                        )}
                     </View>
                 </ScrollView>
             </ActionSheet>
-        )
-    }
-
+        );
+    };
 
     return (
         <View style={{ flex: 1 }}>
 
-            <Modal
-                isVisible={isVisible}
-                onBackdropPress={() => setIsVisible(false)}
-                backdropOpacity={0.9}
-                backdropColor={themevariable.Color_000000}
-                hideModalContentWhileAnimating={true}
-                animationOutTiming={500}
-                backdropTransitionInTiming={500}
-                backdropTransitionOutTiming={500}
-                animationInTiming={500}
-                style={{
-                    flex: 1,
-                }}
-                onBackButtonPress={() => {
-                    setIsVisible(false)
-                }}
-                animationOut={'slideOutDown'}
-                animationType={'slideInUp'}
-            >
-                <View style={styles.Thankcontainer}>
-                    <LinearGradient colors={['#D2453B', '#A0153E']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={{ width: "55%", padding: 4, }}>
-                        {/* <View style={{borderWidth:4, width:"50%", }}/> */}
-                    </LinearGradient>
+            {!loading ?
+                <>
+                    <Modal
+                        isVisible={isVisible}
+                        onBackdropPress={() => setIsVisible(false)}
+                        backdropOpacity={0.9}
+                        backdropColor={themevariable.Color_000000}
+                        hideModalContentWhileAnimating={true}
+                        animationOutTiming={500}
+                        backdropTransitionInTiming={500}
+                        backdropTransitionOutTiming={500}
+                        animationInTiming={500}
+                        style={{
+                            flex: 1,
+                        }}
+                        onBackButtonPress={() => {
+                            setIsVisible(false)
+                        }}
+                        animationOut={'slideOutDown'}
+                        animationType={'slideInUp'}
+                    >
+                        <View style={styles.Thankcontainer}>
+                            <LinearGradient colors={['#D2453B', '#A0153E']}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={{ width: "55%", padding: 4, }}>
+                                {/* <View style={{borderWidth:4, width:"50%", }}/> */}
+                            </LinearGradient>
 
-                    <View style={styles.iconContainer}>
-                        <View style={styles.iconBackground}>
-                            {/* <Image source={{ uri: 'thumbs_up_icon_url' }} style={styles.icon} /> */}
-
+                            <View style={styles.iconContainer}>
+                                <View style={styles.iconBackground}>
+                                </View>
+                            </View>
+                            <Text style={styles.title}>Thank You!</Text>
+                            <Text style={styles.description}>Our team will deliver the update to you in less than 2 hours</Text>
+                            <LinearGradient colors={['#D2453B', '#A0153E']}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={styles.doneButton}>
+                                <TouchableOpacity onPress={() => setIsVisible(false)}>
+                                    <Text style={styles.doneButtonText}>Done</Text>
+                                </TouchableOpacity>
+                            </LinearGradient>
                         </View>
-                    </View>
-                    <Text style={styles.title}>Thank You!</Text>
-                    <Text style={styles.description}>Our team will deliver the update to you in less than 2 hours</Text>
-                    <LinearGradient colors={['#D2453B', '#A0153E']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.doneButton}>
-                        <TouchableOpacity onPress={() => setIsVisible(false)}>
-                            <Text style={styles.doneButtonText}>Done</Text>
-                        </TouchableOpacity>
-                    </LinearGradient>
-                </View>
 
-            </Modal>
-            <FastImage source={{
-                uri: convertUrlToIp(),
-                headers: { Authorization: `Bearer ${getVendorAuth}` }
-            }} style={{ width: '90%', alignSelf: 'center', height: 200, borderRadius: 10 }}
-            />
-            <Text style={{ color: '#121212', width: '90%', alignSelf: 'center', fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 16, marginTop: 10 }}>Product Availability</Text>
+                    </Modal>
+                    <FastImage source={{
+                        uri: convertUrlToIp(),
+                        headers: { Authorization: `Bearer ${getVendorAuth}` }
+                    }} style={{ width: '90%', alignSelf: 'center', height: 200, borderRadius: 10 }}
+                    />
+                    <Text style={{ color: '#121212', width: '90%', alignSelf: 'center', fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 16, marginTop: 10 }}>Product Availability</Text>
 
-            <Text style={{ color: '#969696', width: '90%', alignSelf: 'center', fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 16, marginTop: 10 }}>Product Details</Text>
+                    <Text style={{ color: '#969696', width: '90%', alignSelf: 'center', fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 16, marginTop: 10 }}>Product Details</Text>
 
-            {renderActionSheetWithProductDetais()}
-            <FlatList
-                data={wholeBookingData}
-                renderItem={renderItem}
-            />
+                    {renderActionSheetWithProductDetais()}
+                    <FlatList
+                        data={wholeBookingData}
+                        renderItem={renderItem}
+                    />
+                </>
+                :
+                <ActivityIndicator size="large" color="orange" />
+            }
+
         </View>
     )
 }
@@ -472,21 +511,29 @@ const styles = StyleSheet.create({
         fontFamily: 'ManropeRegular',
         fontWeight: '400',
         marginHorizontal: 5,
-        color:"#000000",
-        fontSize:14
+        color: "#000000",
+        fontSize: 14,
+    },
+    phoneNumDetailStyle: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: '400',
+        marginHorizontal: 5,
+        color: "#000000",
+        fontSize: 14,
+        textDecorationLine: "underline"
     },
     detailsBookedText: {
         fontFamily: 'ManropeRegular',
         fontWeight: '700',
         marginHorizontal: 5,
-        color:"#000000",
-        fontSize:16
+        color: "#000000",
+        fontSize: 16
     },
     detailsViewStyle: {
         flexDirection: 'row',
         padding: 10,
         right: 15,
-        alignItems:"center"
+        alignItems: "center"
     },
     sheetContent: {
         backgroundColor: '#fff',
@@ -496,7 +543,7 @@ const styles = StyleSheet.create({
     actionSheetContainer: {
         backgroundColor: 'white',
         paddingBottom: 20,
-        maxHeight:Dimensions.get('window').height-150,
+        height: Dimensions.get('window').height - 100,
     },
     iconContainer: {
         margin: 20
@@ -574,6 +621,166 @@ const styles = StyleSheet.create({
         marginBottom: 30
     },
 
+
+    bookedItemContainer: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        padding: 16,
+        marginVertical: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 4, // For Android shadow
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+    },
+    bookedItemTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333333',
+        marginBottom: 8,
+    },
+    bookedItemContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    bookedItemLabel: {
+        fontSize: 14,
+        color: '#666666',
+        fontWeight: '500',
+        fontFamily: 'ManropeRegular',
+    },
+    bookedItemList: {
+        fontSize: 14,
+        color: 'green',
+        fontWeight: '600',
+        fontFamily: 'ManropeRegular',
+    },
+    bookedItemValue: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#333333',
+        fontFamily: 'ManropeRegular',
+    },
+    boldText: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#333333',
+    },
+
+
+
+    actionSheetContainer: {
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+    },
+    headerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 20,
+    },
+    productNameText: {
+        color: "#000000",
+        fontSize: 14,
+        fontWeight: "500",
+        fontFamily: 'ManropeRegular',
+    },
+    productDateText: {
+        color: "#000000",
+        fontSize: 14,
+        fontWeight: "500",
+        fontFamily: 'ManropeRegular',
+    },
+    bookingStatusContainer: {
+        borderRadius: 10,
+        padding: 10,
+        alignItems: 'center',
+        alignSelf:"center",
+    },
+    bookingStatusText: {
+        fontWeight: '700',
+    },
+    divider: {
+        backgroundColor: '#dddddd',
+        height: 1,
+        width: '90%',
+        alignSelf: 'center',
+        // marginVertical: 20,
+    },
+    contentContainer: {
+        padding: 20,
+        width: "90%",
+        alignSelf: "center",
+    },
+    sectionTitle: {
+        color: 'black',
+        fontFamily: 'ManropeRegular',
+        fontWeight: '900',
+        fontSize: 16,
+    },
+    detailsViewStyle: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 5,
+    },
+    detailsStyle: {
+        color: '#000000',
+        fontFamily: 'ManropeRegular',
+        fontSize: 14,
+        fontWeight: '500',
+        marginLeft: 10,
+    },
+    phoneNumDetailStyle: {
+        color: '#000000',
+        fontFamily: 'ManropeRegular',
+        fontSize: 14,
+        fontWeight: '500',
+        marginLeft: 10,
+    },
+    detailsBookedText: {
+        color: '#000000',
+        fontFamily: 'ManropeRegular',
+        fontWeight: '900',
+        fontSize: 16,
+        marginTop: 20,
+    },
+    flatListContainer: {
+        paddingVertical: 10,
+    },
+    bookedItemContainer: {
+        backgroundColor: '#FFF8F0',
+        borderRadius: 10,
+        padding: 10,
+        width: "100%",
+        marginVertical: 5,
+    },
+    bookedItemTitle: {
+        fontWeight: '700',
+        color: 'black',
+        fontSize: 14,
+        fontFamily: 'ManropeRegular',
+    },
+    bookedItemSubtitle: {
+        fontWeight: '500',
+        color: "#000000",
+        fontSize: 14,
+        fontFamily: 'ManropeRegular',
+    },
+    bookedItemList: {
+        fontWeight: '700',
+        color: "#FE8235",
+        fontSize: 12,
+        fontFamily: 'ManropeRegular',
+    },
+    boldText: {
+        fontWeight: '700',
+        color: "#000000",
+        fontSize: 14,
+        fontFamily: 'ManropeRegular',
+    },
 });
 
 export default RequestConfirmation;

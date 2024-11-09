@@ -4,7 +4,7 @@ import Svg, { Circle, Text as SvgText } from 'react-native-svg';
 import { LocalHostUrl } from '../apiconfig';
 import FastImage from 'react-native-fast-image';
 
-const Avatar = ({widthDyn,heightDyn,borderRadiusDyn, name, imageUrl }) => {
+const Avatar = ({widthDyn,heightDyn,borderRadiusDyn, name, imageUrl, token }) => {
   const getInitials = (name) => {
     const nameParts = name.split(' ');
     const firstNameInitial = nameParts[0] ? nameParts[0][0] : '';
@@ -18,7 +18,7 @@ const updatedImgUrl = imageUrl !== undefined ? imageUrl.replace('localhost', Loc
   return (
     <View style={[styles.container,{width:widthDyn, height:heightDyn, borderRadius:borderRadiusDyn}]}>
       {updatedImgUrl ? (
-        <FastImage source={{ uri: updatedImgUrl }} style={[styles.image, { width: widthDyn, height: heightDyn, borderRadius: borderRadiusDyn }]} />
+        <FastImage source={{ uri: updatedImgUrl,headers: { Authorization: `Bearer ${token}` } }} style={[styles.image, { width: widthDyn, height: heightDyn, borderRadius: borderRadiusDyn }]} />
       ) : (
         <Svg height="100" width="100">
           <Circle cx="50" cy="50" r="50" fill="orange" />
@@ -26,7 +26,7 @@ const updatedImgUrl = imageUrl !== undefined ? imageUrl.replace('localhost', Loc
             x="50"
             y="55"
             fontSize="21"
-            fill="#BD7928"
+            fill="white"
             textAnchor="middle"
           >
             {initials}
