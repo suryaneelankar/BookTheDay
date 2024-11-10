@@ -58,7 +58,6 @@ const HallsBookingOverView = ({ route, navigation }) => {
           bookingTime: timeSlot,
           userFullName : userLoggedInName,
           advanceAmountToPay : bookingDetails?.advanceAmount,
-
         }
         console.log("payload is:::::::", payload);
         try {

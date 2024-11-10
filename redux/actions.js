@@ -41,3 +41,8 @@ export const setUserCurrentLocation = location => ({
     type: STORE_USER_CURRENT_LOCATION,
     payload: location
 })
+
+export const setVendorLoggedInName = name => ({
+    type: GET_LOGGED_IN_VENDOR_NAME,
+    payload: name
+})
