@@ -108,9 +108,9 @@ const VendorProfile = () => {
                     onPress={() => navigation.navigate("MyTransactions")} 
                 />
 
-                <MenuItem icon={<AboutUsIcon />} title="About Us" />
-                <MenuItem icon={<TermsConditionIcon />} title="Terms & Condition" />
-                <MenuItem icon={<RefundPolicy />} title="Refund Policy" />
+                <MenuItem icon={<AboutUsIcon />} title="About Us"  onPress={() => navigation.navigate('AboutUsScreen')}/>
+                <MenuItem icon={<TermsConditionIcon />} title="Terms & Condition"  onPress={() => navigation.navigate('VendorTermsAndCond')}/>
+                <MenuItem icon={<RefundPolicy />} title="Refund Policy"  onPress={ () => navigation.navigate('VendorRefundPolicy')}/>
                 <MenuItem icon={<LogOutIcon />} title="Log Out"
                     onPress={() => {
                         [

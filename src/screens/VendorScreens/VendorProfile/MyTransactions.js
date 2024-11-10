@@ -39,7 +39,10 @@ const MyTransactions = () => {
         }
     }
 
-    const TransactionItem = ({ date, orderId, amount, paymentStatus }) => (
+    const TransactionItem = ({ date, orderId, amount, paymentStatus }) =>{
+        
+       return(
+        paymentStatus === 'success' ?
         <View style={styles.transactionItem}>
             <OrderIcon style={styles.orderIcon} />
             <View style={styles.transactionDetails}>
@@ -56,10 +59,11 @@ const MyTransactions = () => {
                     { color: paymentStatus === "success" ? '#1BB003' : '#E64A19' }
                 ]}
             >
-                {paymentStatus === "success" ? formatAmount(`+${amount.toFixed(2)}`) : `-${formatAmount(amount.toFixed(2))}`}
+              {formatAmount(`+${amount.toFixed(2)}`)}
             </Text>
         </View>
-    );
+         : null
+    )};
 
     return (
         <View style={styles.container}>

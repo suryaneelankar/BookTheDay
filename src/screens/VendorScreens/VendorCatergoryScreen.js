@@ -5,12 +5,13 @@ import ClothVendorImg from '../../assets/vendorIcons/clothVendorImg.svg';
 import CateringVendorImg from '../../assets/vendorIcons/cateringVendorImg.svg';
 import { getVendorAuthToken } from '../../utils/StoreAuthToken';
 import LinearGradient from 'react-native-linear-gradient';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import BASE_URL from '../../apiconfig';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { getCurrentVendorLoggedInUserName } from '../../../redux/actions';
 import { useDispatch } from 'react-redux';
+import { useFocusEffect } from '@react-navigation/native';
 
 const VendorCategoryScreen = ({ navigation }) => {
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
@@ -20,6 +21,16 @@ const VendorCategoryScreen = ({ navigation }) => {
       useEffect(()=>{
         getProfileData();
       },[]);
+
+      useFocusEffect(
+        useCallback(() => {
+            getProfileData();
+            // Cleanup function to run when the screen loses focus
+            return () => {
+                console.log('Screen is unfocused');
+            };
+        }, [])
+    );
   
       const getProfileData = async() => {
           const token = await getVendorAuthToken();

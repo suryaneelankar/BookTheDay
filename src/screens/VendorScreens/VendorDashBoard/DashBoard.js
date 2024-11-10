@@ -568,9 +568,11 @@ const VendorDashBoardTab = ({ navigation }) => {
                                     ItemSeparatorComponent={ItemSeparator}
                                 />
                             </>
-                            : null}
+                            : null} 
                     </View>
+                    {vendorListing?.length > 0 ?
                     <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: 20 }}>All Listed Products</Text>
+                    : null}
                     <FlatList
                         data={vendorListing}
                         renderItem={renderVendorList}

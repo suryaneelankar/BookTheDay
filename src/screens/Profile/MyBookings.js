@@ -109,14 +109,15 @@ const ViewMyBookings = () => {
     }
   };
 
-  const handlePayment = async (advanceAmount, bookingId, catType, vendorMobileNumber) => {
+  const handlePayment = async (advanceAmount, bookingId, catType, vendorMobileNumber, productName) => {
     const token = await getUserAuthToken();
     let initiatePaymentPayload = {
       orderAmount: advanceAmount,
       currency: 'INR',
       userFullName: userLoggedInName,
       userMobileNumber: userLoggedInMobileNum,
-      vendorMobileNumber: vendorMobileNumber
+      vendorMobileNumber: vendorMobileNumber,
+      productName : productName
     };
 
     try {
@@ -345,7 +346,7 @@ const ViewMyBookings = () => {
          <PaymentConfirmationModal
             visible={paymentModal}
             message={`Redirecting to Pay Advance Amount ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount)}`}
-            onSubmit={() => [setPaymentModal(false), handlePayment(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount, selectedObjectedforPayment?.bookingId, selectedObjectedforPayment?.catType , selectedObjectedforPayment?.vendorMobileNumber) ]}
+            onSubmit={() => [setPaymentModal(false), handlePayment(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount, selectedObjectedforPayment?.bookingId, selectedObjectedforPayment?.catType , selectedObjectedforPayment?.vendorMobileNumber,selectedObjectedforPayment?.catType === 'caterings' ? selectedObjectedforPayment?.foodCateringName : selectedObjectedforPayment?.catType === 'functionHalls' ? selectedObjectedforPayment?.functionHallName : selectedObjectedforPayment?.productName) ]}
             onClose={() => setPaymentModal(false)}
           />
                    

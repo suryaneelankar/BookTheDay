@@ -248,7 +248,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
     const onPressSaveAndPost = async () => {
         console.log('selectedOption os:::>>', selectedOption);
 
-        if (!mainImageUrl || productName === '' || productDescription === '' ||
+        if (!mainImageUrl || productName === '' || productDescription === '' || productPinCode === '' ||
             (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || (securityDeposit === undefined || securityDeposit === '') || (selectedOption == null)
             || (selectedColor === '' && ((selectedOption !== null 
                 && selectedOption === 'clothes'))) || (clothSize === '' && ((selectedOption !== null 

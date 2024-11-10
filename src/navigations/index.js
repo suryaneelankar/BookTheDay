@@ -56,6 +56,10 @@ import EditAddFoodCateringGeneral from "../screens/VendorScreens/VendorAddFoodCa
 import NearByEvents from "../screens/Events/NearByEvents";
 import NearByFoodCaterings from "../screens/Caterings/NearByFoodCaterings";
 import MyTransactions from "../screens/VendorScreens/VendorProfile/MyTransactions";
+import AboutUsScreen from "../screens/VendorScreens/VendorProfile/VendorAboutus";
+import VendorTersmAndCond from "../screens/VendorScreens/VendorProfile/VendorTermsAndCond";
+import VendorTermsAndCond from "../screens/VendorScreens/VendorProfile/VendorTermsAndCond";
+import VendorRefundPolicy from "../screens/VendorScreens/VendorProfile/VendorRefundPolicy";
 
 const MainNavigation = () => {
 
@@ -290,6 +294,30 @@ const MainNavigation = () => {
                     component={NearByFoodCaterings}
                     options={{
                         header: () => <NavigationHeader Icon={true} title="Near By Caterings" />,
+                        headerShown: true,
+                    }}
+                />
+                 <Stack.Screen
+                    name="AboutUsScreen"
+                    component={AboutUsScreen}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="About Us" />,
+                        headerShown: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="VendorTermsAndCond"
+                    component={VendorTermsAndCond}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Terms and Conditions" />,
+                        headerShown: true,
+                    }}
+                />
+                 <Stack.Screen
+                    name="VendorRefundPolicy"
+                    component={VendorRefundPolicy}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title="Refund Policy" />,
                         headerShown: true,
                     }}
                 />

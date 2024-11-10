@@ -252,7 +252,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
 
     const onPressSaveAndPost = async () => {
         if (!mainImageUrl || functionHallName === '' || productDescription === ''  || functionHallAreaInSft === '' ||
-            selectedItemArray?.length === 0 || (perDayRentPrice === '' || perDayRentPrice === undefined) || selectedItemArray === '' || (BedRooms === '' || BedRooms === undefined) || functionHallAddress === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '') || (discountPercentage === undefined || discountPercentage === '')
+            selectedItemArray?.length === 0 || (perDayRentPrice === '' || perDayRentPrice === undefined) || selectedItemArray === '' || (BedRooms === '' || BedRooms === undefined) || functionHallAddress === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '')
         ) {
             Alert.alert('Please fill Mandatory fields');
             return;
@@ -328,6 +328,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
+            console.log("booking response:", response);
             if (response.status === 201) {
                 setLoading(false);
                 console.log('Success', `uploaded successfully`);
@@ -347,7 +348,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                 }else{
                 Alert.alert(
                     "Confirmation",
-                    "Your product posted successfully, pLease complete KYC Status",
+                    "Your product posted successfully, Please complete KYC Status",
                     [
                         {
                             text: "Ok", onPress: () => {

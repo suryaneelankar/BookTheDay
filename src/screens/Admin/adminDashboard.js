@@ -19,6 +19,8 @@ const AdminDashboard = () => {
     const [clothJewelsData, setClothJewelsData] = useState([]);
     const userLocationFetched = useSelector((state) => state.userLocation);
     const [getVendorAuth, setGetVendorAuth] = useState('');
+    const [vendorKycdetails, setVendorKycdetails] = useState([]);
+
 
     useEffect(() => {
         getAllEvents();
@@ -44,10 +46,11 @@ const AdminDashboard = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-           
+
             const vendorsAllData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
             const onHoldKYCStatusVendors = vendorsAllData?.filter((vendor) => vendor.kycStatus === "onhold");
-            console.log('resp is in admin  vendorAadharData ::>>>', vendorsAllData);
+            setVendorKycdetails(onHoldKYCStatusVendors)
+            console.log('resp is in admin  vendorAadharData ::>>>', JSON.stringify(onHoldKYCStatusVendors));
         } catch (error) {
             console.error('Error fetching vendorAadharData :', error);
         }
@@ -62,7 +65,7 @@ const AdminDashboard = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-           
+
             const vendorAadharData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
             console.log('resp is in admin  vendorAadharData ::>>>', vendorAadharData);
         } catch (error) {
@@ -140,7 +143,7 @@ const AdminDashboard = () => {
         }
         console.log("toggle payloa d:;", payload);
 
-        
+
         let Model;
         switch (catType) {
             case 'functionhall':
@@ -155,7 +158,7 @@ const AdminDashboard = () => {
             default:
                 return res.status(400).send({ message: 'Invalid model type' });
         }
-        
+
         try {
             const response = await axios.patch(`${BASE_URL}/${Model}`, payload, {
                 headers: {
@@ -225,7 +228,7 @@ const AdminDashboard = () => {
                     >
                         {imageUrls.map((itemData, index) => (
                             <TouchableOpacity style={styles.slide} key={index}
-                                onPress={() => {}}
+                                onPress={() => { }}
                             >
                                 <FastImage source={{
                                     uri: itemData,
@@ -236,7 +239,7 @@ const AdminDashboard = () => {
                     </Swiper>
                 </View>
                 <TouchableOpacity
-                    onPress={() => {}}
+                    onPress={() => { }}
                     style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                         <View style={{ width: '60%', }}>
@@ -284,7 +287,7 @@ const AdminDashboard = () => {
                     >
                         {imageUrls.map((itemData, index) => (
                             <TouchableOpacity style={styles.slide} key={index}
-                                onPress={() => {}}
+                                onPress={() => { }}
                             >
                                 <FastImage source={{
                                     uri: itemData,
@@ -295,7 +298,7 @@ const AdminDashboard = () => {
                     </Swiper>
                 </View>
                 <TouchableOpacity
-                    onPress={() => { }} 
+                    onPress={() => { }}
                     style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                         <View style={{ width: '60%', }}>
@@ -340,7 +343,7 @@ const AdminDashboard = () => {
                     >
                         {imageUrls.map((itemData, index) => (
                             <TouchableOpacity style={styles.slide} key={index}
-                                onPress={() => {}}
+                                onPress={() => { }}
                             >
                                 <FastImage source={{
                                     uri: itemData,
@@ -351,7 +354,7 @@ const AdminDashboard = () => {
                     </Swiper>
                 </View>
                 <TouchableOpacity
-                    onPress={() => {}}
+                    onPress={() => { }}
                     style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                         <View style={{ width: '60%', }}>
@@ -387,6 +390,77 @@ const AdminDashboard = () => {
                 </TouchableOpacity>
             </View>
         )
+    };
+
+    const renderVendorAadhar = ({ item }) => (
+        <View style={styles.vendorContainer}>
+            <View style={{flexDirection:"row", justifyContent:"space-between"}}>
+                <View >
+            <Text style={styles.vendorName}>{item.fullName}</Text>
+            <Text style={styles.vendorDetails}>Email: {item.email}</Text>
+            <Text style={styles.vendorDetails}>Mobile: {item.mobileNumber}</Text>
+            <Text style={styles.vendorDetails}>Role: {item.role}</Text>
+            <Text style={styles.vendorDetails}>KYC Status: {item.kycStatus}</Text>
+            </View>
+            {/* <Image source={{ uri: item?.aadharImage?.url?.replace('localhost', LocalHostUrl)  }} style={styles.aadharImage} /> */}
+            <FastImage
+             source={{
+             uri: item?.aadharImage?.url?.replace('localhost', LocalHostUrl),
+             headers: { Authorization: `Bearer ${getVendorAuth}` }
+             }} style={styles.aadharImage} />
+             </View>
+
+       <View style={styles.buttonContainer}>
+       <TouchableOpacity onPress={() => confirmStatusChange('reject', item?.mobileNumber)} style={styles.rejectButton}>
+          <Text style={styles.buttonText}>REJECT</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => confirmStatusChange('accept', item?.mobileNumber)} style={styles.acceptButton}>
+          <Text style={styles.buttonText}>ACCEPT</Text>
+        </TouchableOpacity>
+       
+      </View>
+           
+        </View>
+    );
+
+    const confirmStatusChange = (action, mobileNumber) => {
+        Alert.alert(
+          `Confirm ${action === 'accept' ? 'Acceptance' : 'Rejection'}`,
+          `Are you sure you want to ${action} this user?`,
+          [
+            {
+              text: "Cancel",
+              style: "cancel",
+            },
+            {
+              text: "Yes",
+              onPress: () => UpdateKycStatus(action, mobileNumber),
+            },
+          ]
+        );
+      };
+
+    const UpdateKycStatus = async(status, mobileNumber) =>{
+        const token = await getVendorAuthToken();
+        try {
+        let payload={
+            kycStatus: status,
+            vendorMobileNumber: mobileNumber
+            }
+  
+            const response = await axios.patch(`${BASE_URL}/vendor/vendorAadharVerify`, payload,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log('resp is Kyc status:>>>', JSON.stringify(response));
+            if (response?.status == 200) {
+                getAllVendors(); // Append new data
+            }
+        } catch (error) {
+            console.error('Error patching kyc details:', error);
+        }
+
     }
 
 
@@ -406,7 +480,13 @@ const AdminDashboard = () => {
                 </View>
 
             </View>
-            <ScrollView>
+            <ScrollView >
+
+                <FlatList
+                    data={vendorKycdetails}
+                    renderItem={renderVendorAadhar}
+                    keyExtractor={(vendor) => vendor?._id}
+                />
 
                 <FlatList
                     data={eventsData}
@@ -516,6 +596,68 @@ const styles = StyleSheet.create({
         color: "#ed890e",
         fontWeight: "bold"
     },
+    vendorContainer: {
+        marginBottom: 10,
+        paddingHorizontal: 15,
+        backgroundColor: '#f9f9f9',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        marginHorizontal:10,
+        paddingVertical:10
+      },
+      vendorName: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 5,
+      },
+      vendorDetails: {
+        fontSize: 14,
+        color: '#555',
+      },
+      aadharImage: {
+        width: 100,
+        height: 100,
+        marginVertical: 10,
+        borderRadius: 5,
+      },
+      sectionTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        marginTop: 10,
+        marginBottom: 5,
+      },
+      postContainer: {
+        padding: 10,
+        backgroundColor: '#e3f2fd',
+        borderRadius: 5,
+        marginRight: 10,
+      },
+      postText: {
+        fontSize: 12,
+        color: '#333',
+      },
+      buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginTop: 10,
+      },
+      acceptButton: {
+        backgroundColor: '#4CAF50',
+        paddingVertical: 8,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+      },
+      rejectButton: {
+        backgroundColor: '#f44336',
+        paddingVertical: 8,
+        paddingHorizontal: 20,
+        borderRadius: 5,
+      },
+      buttonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+      },
 })
 
 export default AdminDashboard;
