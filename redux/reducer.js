@@ -6,7 +6,9 @@ const initialState = {
     userLocation:'',
     userLoggedInMobileNum: '',
     userCurrentLocation: '',
-    userLoggedInName: ''
+    userLoggedInName: '',
+    vendorLoggedInName: ''
+
 }
 export const commonReducer = (state = initialState, action) => {
     switch (action.type) {
@@ -42,6 +44,11 @@ export const commonReducer = (state = initialState, action) => {
                         ...state,
                         userLoggedInName: action.payload
                 }
+                case 'GET_LOGGED_IN_VENDOR_USER_NAME':
+                    return {
+                            ...state,
+                            vendorLoggedInName: action.payload
+                    }
             case 'STORE_USER_CURRENT_LOCATION' :
                 return {
                     ...state,

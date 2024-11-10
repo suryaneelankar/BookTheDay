@@ -9,10 +9,13 @@ import { useEffect, useState } from 'react';
 import BASE_URL from '../../apiconfig';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+import { getCurrentVendorLoggedInUserName } from '../../../redux/actions';
+import { useDispatch } from 'react-redux';
 
 const VendorCategoryScreen = ({ navigation }) => {
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
     const [profileData, setProfileData] = useState();
+    const dispatch = useDispatch();
 
       useEffect(()=>{
         getProfileData();
@@ -28,6 +31,8 @@ const VendorCategoryScreen = ({ navigation }) => {
                     },
               });
               setProfileData(response?.data?.data);
+              dispatch(getCurrentVendorLoggedInUserName(response?.data?.data?.fullName));
+
           console.log("profile vendor res:::", response?.data?.data?.aadharImage?.url);
              
           } catch (error) {

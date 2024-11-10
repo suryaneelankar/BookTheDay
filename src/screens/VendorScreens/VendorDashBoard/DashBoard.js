@@ -28,6 +28,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     const [cateringsBookingsData, setCateringBookingsData] = useState([]);
     const [getVendorAuth, setGetVendorAuth] = useState('');
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
+    const vendorLoggedInName = useSelector((state) => state.vendorLoggedInName);
 
     useFocusEffect(
         useCallback(() => {
@@ -505,8 +506,8 @@ const VendorDashBoardTab = ({ navigation }) => {
                 <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'white' }}>
                     <ProfileIcon style={{}} />
                     <View>
-                        <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular' }}>Hi, Surya Neelankar</Text>
-                        <Text style={{ fontFamily: 'LeagueSpartanRegular' }}>+91 8297735285</Text>
+                        <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular', textTransform:"capitalize" }}>Hi, {vendorLoggedInName}</Text>
+                        <Text style={{ fontFamily: 'LeagueSpartanRegular' }}>+91 {vendorLoggedInMobileNum}</Text>
                     </View>
                     <TouchableOpacity onPress={() => navigation.navigate('AdminDashboard')}>
                         <ProfileIcon />
