@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, SafeAreaView, Image, ScrollView, Alert, TouchableOpacity, Dimensions, StyleSheet, Animated, FlatList } from "react-native";
 import ProfileIcon from '../../../assets/vendorIcons/profileIcon.svg'
 import LinearGradient from "react-native-linear-gradient";
-import shirtImg from '../../../assets/shirt.png';
 import axios from "axios";
 import BASE_URL from "../../../apiconfig";
 import { LocalHostUrl } from "../../../apiconfig";
@@ -27,17 +26,16 @@ const VendorDashBoardTab = ({ navigation }) => {
     const [functionHallBookingsData, setFunctionHallBookingsData] = useState([]);
     const [cateringsBookingsData, setCateringBookingsData] = useState([]);
     const [getVendorAuth, setGetVendorAuth] = useState('');
+    const [totalEarnings, setTotalEarnings] = useState(0);
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
     useFocusEffect(
         useCallback(() => {
             // Code to run when the screen is focused
+            getTotalVendorEarnings();
             getVendorClothJewelBookings();
-            // getVendorDecorationBookings();
             getVendorFunctionHallBookings();
-            // getVendorTentHouseBookings();
             getVendorFoodCateringBookings();
-            getAllEvents();
 
             getVendorListings();
 
@@ -47,6 +45,23 @@ const VendorDashBoardTab = ({ navigation }) => {
             };
         }, [])
     );
+
+    const getTotalVendorEarnings = async () => {
+        const vendorMobileNumber = vendorLoggedInMobileNum;
+        const token = await getVendorAuthToken();
+        setGetVendorAuth(token);
+        try {
+            const response = await axios.get(`${BASE_URL}/getPaymentsByVendorMobileNumber/${vendorMobileNumber}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            // console.log('response getTotalVendorEarnings is ::>>', response?.data);
+            setTotalEarnings(response?.data?.totalEarnings);
+        } catch (error) {
+            console.log("getTotalVendorEarnings error::::::::::", error);
+        }
+    }
 
     const allCatProductDetailEndpoints = {
         clothjewels: {
@@ -113,27 +128,6 @@ const VendorDashBoardTab = ({ navigation }) => {
         }
     }
 
-
-    const getAllEvents = async (page) => {
-        const token = await getVendorAuthToken();
-        try {
-            const response = await axios.get(`${BASE_URL}/getAllFunctionHalls?page=${page}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            
-
-            const newFunctionHalls = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            console.log('resp is in vendor function halls::>>>', newFunctionHalls);
-            if (response?.data?.data?.length > 0) {
-
-            }
-        } catch (error) {
-            console.error('Error fetching function halls:', error);
-        }
-    }
-
     const getVendorClothJewelBookings = async () => {
         const vendorMobileNumber = vendorLoggedInMobileNum;
         const token = await getVendorAuthToken();
@@ -144,7 +138,9 @@ const VendorDashBoardTab = ({ navigation }) => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            const output = consolidateByProductId(response?.data?.data);
+            const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
+            const output = consolidateByProductId(activeBookings);
+            // const output = consolidateByProductId(response?.data?.data);
             // console.log('output is ::>>', output);
             setclothJewelBookingsData(output)
         } catch (error) {
@@ -162,7 +158,10 @@ const VendorDashBoardTab = ({ navigation }) => {
                 },
             });
             // console.log('resp getVendorFunctionHallBookings ::>>', response?.data?.data);
-            const outputData = consolidateFunctionHallsDataByProductId(response?.data?.data);
+            // Filter bookings where isActiveBooking is true
+            const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
+            const outputData = consolidateFunctionHallsDataByProductId(activeBookings);
+            // const outputData = consolidateFunctionHallsDataByProductId(response?.data?.data);
             setFunctionHallBookingsData(outputData);
 
         } catch (error) {
@@ -180,7 +179,9 @@ const VendorDashBoardTab = ({ navigation }) => {
                 },
             });
             // console.log('resp foodcateringBookings ::>>', response?.data?.data);
-            const outputData = consolidateFoodCateringDataByProductId(response?.data?.data);
+            const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
+            const outputData = consolidateFoodCateringDataByProductId(activeBookings);
+            // const outputData = consolidateFoodCateringDataByProductId(response?.data?.data);
             setCateringBookingsData(outputData);
 
         } catch (error) {
@@ -506,19 +507,18 @@ const VendorDashBoardTab = ({ navigation }) => {
                     <ProfileIcon style={{}} />
                     <View>
                         <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular' }}>Hi, Surya Neelankar</Text>
-                        <Text style={{ fontFamily: 'LeagueSpartanRegular' }}>+91 8297735285</Text>
+                        <Text style={{ fontFamily: 'LeagueSpartanRegular' }}>+91 {vendorLoggedInMobileNum}</Text>
                     </View>
                     <TouchableOpacity onPress={() => navigation.navigate('AdminDashboard')}>
                         <ProfileIcon />
                     </TouchableOpacity>
                 </View>
 
-
                 <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF3CD', '#FFDB7E']} style={{ width: '90%', alignSelf: 'center', padding: 20, borderRadius: 10, marginTop: 20 }}>
                     <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
                         <View>
                             <Text style={{ color: '#1A1F36', fontSize: 14, fontWeight: 700, color: '#1A1F36' }}>Total Earnings</Text>
-                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 40, color: '#1A1F36', }}>₹4,500</Text>
+                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 40, color: '#1A1F36', }}>{formatAmount(totalEarnings)}</Text>
                         </View>
                         <View style={{ width: 2, height: '100%', backgroundColor: '#F9CD4F' }} />
                         <View>

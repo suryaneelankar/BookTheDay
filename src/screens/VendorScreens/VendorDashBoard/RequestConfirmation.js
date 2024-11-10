@@ -35,7 +35,7 @@ const RequestConfirmation = ({ navigation, route }) => {
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
     useEffect(() => {
-        getProductDetails();
+        // getProductDetails();
         getProductBookingDetails();
     }, [])
 
@@ -50,7 +50,9 @@ const RequestConfirmation = ({ navigation, route }) => {
                 },
             });
             // console.log('before resp::><>', JSON.stringify(response?.data?.data));
-            groupByFilterData(response?.data?.data);
+            const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
+            groupByFilterData(activeBookings);
+            // groupByFilterData(response?.data?.data);
             setLoading(false);
         } catch (error) {
             console.log("booking details error::::::::::", error);
@@ -176,10 +178,20 @@ const RequestConfirmation = ({ navigation, route }) => {
     }
 
     const convertUrlToIp = () => {
-        const convertedImageUrl = wholeBookingData[0]?.productImage !== undefined ? wholeBookingData[0]?.productImage.replace('localhost', LocalHostUrl) : wholeBookingData[0]?.productImage;
-        console.log('convertedImageUrl is::>>', convertedImageUrl);
-        return convertedImageUrl;
+        console.log('wholeBookingData is::>>>>', wholeBookingData);
+        
+        // Check if wholeBookingData is an array and has at least one item
+        if (Array.isArray(wholeBookingData) && wholeBookingData.length > 0) {
+            const convertedImageUrl = wholeBookingData[0]?.productImage !== undefined 
+                ? wholeBookingData[0]?.productImage.replace('localhost', LocalHostUrl) 
+                : wholeBookingData[0]?.productImage;
+            console.log('convertedImageUrl is::>>', convertedImageUrl);
+            return convertedImageUrl;
+        } else {
+            return null;
+        }
     }
+    
 
     const RequestConfirmationAcceptOrReject = async (bookingStatus, userMobileNumber, bookingId) => {
         const updatedParams = {

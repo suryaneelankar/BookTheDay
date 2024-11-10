@@ -116,7 +116,7 @@ const ViewMyBookings = () => {
       currency: 'INR',
       userFullName: userLoggedInName,
       userMobileNumber: userLoggedInMobileNum,
-
+      vendorMobileNumber: vendorMobileNumber
     };
 
     try {

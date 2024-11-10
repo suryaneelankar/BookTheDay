@@ -181,7 +181,7 @@ const AdminDashboard = () => {
                     >
                         {imageUrls.map((itemData, index) => (
                             <TouchableOpacity style={styles.slide} key={index}
-                                onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
+                                onPress={() => {}}
                             >
                                 <FastImage source={{
                                     uri: itemData,
@@ -192,7 +192,7 @@ const AdminDashboard = () => {
                     </Swiper>
                 </View>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
+                    onPress={() => {}}
                     style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                         <View style={{ width: '60%', }}>
@@ -240,7 +240,7 @@ const AdminDashboard = () => {
                     >
                         {imageUrls.map((itemData, index) => (
                             <TouchableOpacity style={styles.slide} key={index}
-                                onPress={() => navigation.navigate('ViewCaterings', { categoryId: item?._id })}
+                                onPress={() => {}}
                             >
                                 <FastImage source={{
                                     uri: itemData,
@@ -251,9 +251,8 @@ const AdminDashboard = () => {
                     </Swiper>
                 </View>
                 <TouchableOpacity
-                    onPress={() => {
-                            navigation.navigate('ViewCaterings', { categoryId: item?._id });       
-                    }} style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
+                    onPress={() => { }} 
+                    style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                         <View style={{ width: '60%', }}>
                             <Text style={{ color: 'black', fontSize: 17, fontWeight: "700", fontFamily: "ManropeRegular" }} >{item?.foodCateringName}</Text>
@@ -297,7 +296,7 @@ const AdminDashboard = () => {
                     >
                         {imageUrls.map((itemData, index) => (
                             <TouchableOpacity style={styles.slide} key={index}
-                                onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
+                                onPress={() => {}}
                             >
                                 <FastImage source={{
                                     uri: itemData,
@@ -308,7 +307,7 @@ const AdminDashboard = () => {
                     </Swiper>
                 </View>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
+                    onPress={() => {}}
                     style={{ width: Dimensions.get('window').width - 50, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                         <View style={{ width: '60%', }}>

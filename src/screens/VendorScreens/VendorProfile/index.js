@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity,ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import ProfileIcon from '../../../assets/profilesvgs/profile.svg'
 import RefundPolicy from '../../../assets/profilesvgs/refundPolicy.svg';
 import TermsConditionIcon from '../../../assets/profilesvgs/termsandCondition.svg';
@@ -18,7 +18,7 @@ import LogOutIcon from '../../../assets/svgs/logOutIcon.svg';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import axios from 'axios';
 import BASE_URL from '../../../apiconfig';
-import { useSelector,useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { getLoginUserId } from '../../../../redux/actions';
 
 const VendorProfile = () => {
@@ -36,26 +36,26 @@ const VendorProfile = () => {
     const link = "www.xyz.com";
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
-    useEffect(()=>{
+    useEffect(() => {
         getProfileData();
-      },[]);
-  
-      const getProfileData = async() =>{
-          const token = await getVendorAuthToken();
-          try {
+    }, []);
+
+    const getProfileData = async () => {
+        const token = await getVendorAuthToken();
+        try {
             console.log("vendou num:", vendorLoggedInMobileNum)
-              const response = await axios.get(`${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`,{
-                  headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-              });
-              setProfileData(response?.data?.data);
-          console.log("profile vendor res:::", response?.data?.data?.aadharImage);
-             
-          } catch (error) {
-              console.log("profile::::::::::", error);
-          }
-      }
+            const response = await axios.get(`${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setProfileData(response?.data?.data);
+            console.log("profile vendor res:::", response?.data?.data?.aadharImage);
+
+        } catch (error) {
+            console.log("profile::::::::::", error);
+        }
+    }
 
     const shareLink = async (platform) => {
         try {
@@ -91,7 +91,7 @@ const VendorProfile = () => {
             </View>
 
             <ScrollView style={styles.menuContainer} showsVerticalScrollIndicator={false}>
-        
+
                 <MenuItem
                     icon={<ProfileIcon />}
                     title="My KYC"
@@ -102,17 +102,22 @@ const VendorProfile = () => {
                     title="Update Bank Account"
                     onPress={() => navigation.navigate('BankDetailsScreen')}
                 />
-              
-                <MenuItem icon={<TransactionIcon />} title="My Transaction" />
-              
+                <MenuItem 
+                    icon={<TransactionIcon />} 
+                    title="My Transaction" 
+                    onPress={() => navigation.navigate("MyTransactions")} 
+                />
+
                 <MenuItem icon={<AboutUsIcon />} title="About Us" />
                 <MenuItem icon={<TermsConditionIcon />} title="Terms & Condition" />
                 <MenuItem icon={<RefundPolicy />} title="Refund Policy" />
                 <MenuItem icon={<LogOutIcon />} title="Log Out"
-                onPress={() => {[
-                    dispatch(getLoginUserId('')),
-                    navigation.navigate('LandingScreen')
-                ]}}  />
+                    onPress={() => {
+                        [
+                            dispatch(getLoginUserId('')),
+                            navigation.navigate('LandingScreen')
+                        ]
+                    }} />
 
             </ScrollView>
 
@@ -129,7 +134,7 @@ const VendorProfile = () => {
                 style={{
                     // flex: 1,
                     position: "absolute",
-                    bottom: 0, 
+                    bottom: 0,
                     // backgroundColor: "pink",
                     alignSelf: "center", width: "100%"
                 }}
@@ -147,7 +152,7 @@ const VendorProfile = () => {
                         >
                             <CrossIcon />
                         </TouchableOpacity>
-                        <LinkBgm style={{backgroundColor:"pink"}} />
+                        <LinkBgm style={{ backgroundColor: "pink" }} />
                         <Text style={styles.modalText}>Link Copied</Text>
                         <Text style={styles.modalDescription}>B2B Team link is copied to your clipboard. Now you can share with others</Text>
                         <View style={styles.linkContainer}>
@@ -156,16 +161,16 @@ const VendorProfile = () => {
                                 value={link}
                                 editable={false}
                             />
-                              <LinearGradient colors={['#D2453B', '#A0153E']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={{height:"100%",}}
-            // style={styles.saveButton}
-            >
-                <TouchableOpacity  onPress={() => ('')}>
-                    <Text style={{color:"#F4F4F6"}}>Save</Text>
-                </TouchableOpacity>
-                </LinearGradient>
+                            <LinearGradient colors={['#D2453B', '#A0153E']}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={{ height: "100%", }}
+                            // style={styles.saveButton}
+                            >
+                                <TouchableOpacity onPress={() => ('')}>
+                                    <Text style={{ color: "#F4F4F6" }}>Save</Text>
+                                </TouchableOpacity>
+                            </LinearGradient>
                             {/* <Text style={styles.copiedText}>Copied!</Text> */}
                         </View>
                         <Text style={styles.shareText}>Share the link through</Text>
@@ -338,7 +343,7 @@ const styles = StyleSheet.create({
 
     },
     modalView: {
-        marginHorizontal:10,
+        marginHorizontal: 10,
         // margin: 20,
         backgroundColor: 'white',
         borderTopLeftRadius: 20,
@@ -362,7 +367,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 20,
         fontWeight: '800',
-        color:"#000000",
+        color: "#000000",
         fontFamily: "ManropeRegular",
 
     },
@@ -372,24 +377,24 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: '#000000',
         fontFamily: "ManropeRegular",
-        fontWeight:"400",
-        marginTop:moderateScale(15),
-        marginHorizontal:15
+        fontWeight: "400",
+        marginTop: moderateScale(15),
+        marginHorizontal: 15
     },
     linkContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop:moderateScale(25),
-        borderColor:"#D2453B", borderWidth:1,
-           borderTopLeftRadius:8,
-           borderBottomLeftRadius:8,
+        marginTop: moderateScale(25),
+        borderColor: "#D2453B", borderWidth: 1,
+        borderTopLeftRadius: 8,
+        borderBottomLeftRadius: 8,
         marginBottom: 20,
-       
+
     },
     linkText: {
-    //    borderColor:"#D2453B", borderWidth:1,
-    //    borderTopLeftRadius:8,
-    //    borderBottomLeftRadius:8,
+        //    borderColor:"#D2453B", borderWidth:1,
+        //    borderTopLeftRadius:8,
+        //    borderBottomLeftRadius:8,
         padding: 5,
         width: '70%',
     },
