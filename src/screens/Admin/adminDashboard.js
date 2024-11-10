@@ -8,7 +8,6 @@ import SearchIcon from '../../assets/svgs/searchIcon.svg';
 import FilterIcon from '../../assets/svgs/filter.svg';
 import Swiper from "react-native-swiper";
 import LocationMarkIcon from '../../assets/svgs/location.svg';
-import { verticalScale } from "../../utils/scalingMetrics";
 import { getUserAuthToken, getVendorAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
 import { useSelector } from "react-redux";
@@ -25,7 +24,51 @@ const AdminDashboard = () => {
         getAllEvents();
         getAllFoodCaterings();
         getAllClothJewels();
+        verifyVendorAadhar();
+        getAllVendors();
     }, [])
+
+
+
+    // /vendor/vendorAadharVerify
+
+    // patch API 
+    //  payload ==>  kycStatus & vendorMobileNumber
+
+    const getAllVendors = async () => {
+        const token = await getVendorAuthToken();
+        setGetVendorAuth(token);
+        try {
+            const response = await axios.get(`${BASE_URL}/vendor/getAllVendors`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+           
+            const vendorsAllData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
+            const onHoldKYCStatusVendors = vendorsAllData?.filter((vendor) => vendor.kycStatus === "onhold");
+            console.log('resp is in admin  vendorAadharData ::>>>', vendorsAllData);
+        } catch (error) {
+            console.error('Error fetching vendorAadharData :', error);
+        }
+    }
+
+    const verifyVendorAadhar = async () => {
+        const token = await getVendorAuthToken();
+        setGetVendorAuth(token);
+        try {
+            const response = await axios.get(`${BASE_URL}/vendor/vendorAadharVerify`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+           
+            const vendorAadharData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
+            console.log('resp is in admin  vendorAadharData ::>>>', vendorAadharData);
+        } catch (error) {
+            console.error('Error fetching vendorAadharData :', error);
+        }
+    }
 
     const getAllEvents = async () => {
         const token = await getVendorAuthToken();
@@ -38,8 +81,9 @@ const AdminDashboard = () => {
             });
             console.log('resp is in admin function halls::>>>', response);
             const newFunctionHalls = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            if (response?.data?.data?.length > 0) {
-                setEventsData(newFunctionHalls); // Append new data
+            const onHoldItems = newFunctionHalls?.filter((booking) => booking.verificationStatus === "onHold");
+            if (newFunctionHalls?.length > 0) {
+                setEventsData(onHoldItems); // Append new data
             }
         } catch (error) {
             console.error('Error fetching function halls:', error);
@@ -47,7 +91,6 @@ const AdminDashboard = () => {
     }
 
     const getAllFoodCaterings = async () => {
-        // getAllAdminFoodCaterings
         const token = await getVendorAuthToken();
         try {
             const response = await axios.get(`${BASE_URL}/getAllAdminFoodCaterings`, {
@@ -57,8 +100,9 @@ const AdminDashboard = () => {
             });
             console.log('resp is in admin function halls::>>>', response);
             const foodCaterings = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            if (response?.data?.data?.length > 0) {
-                setFoodCateringsData(foodCaterings); // Append new data
+            const onHoldItems = foodCaterings?.filter((booking) => booking.verificationStatus === "onHold");
+            if (foodCaterings?.length > 0) {
+                setFoodCateringsData(onHoldItems); // Append new data
             }
         } catch (error) {
             console.error('Error fetching function halls:', error);
@@ -67,7 +111,6 @@ const AdminDashboard = () => {
 
     // getAllAdminClothJewels
     const getAllClothJewels = async () => {
-        // getAllAdminFoodCaterings
         const token = await getVendorAuthToken();
         try {
             const response = await axios.get(`${BASE_URL}/getAllAdminClothJewels`, {
@@ -77,8 +120,9 @@ const AdminDashboard = () => {
             });
             console.log('resp is in admin function halls::>>>', response);
             const allClothJewels = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            if (response?.data?.data?.length > 0) {
-                setClothJewelsData(allClothJewels); // Append new data
+            const onHoldItems = allClothJewels?.filter((booking) => booking.verificationStatus === "onHold");
+            if (allClothJewels?.length > 0) {
+                setClothJewelsData(onHoldItems); // Append new data
             }
         } catch (error) {
             console.error('Error fetching function halls:', error);
@@ -354,17 +398,6 @@ const AdminDashboard = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
-            <View style={{ backgroundColor: "white" }}>
-                <View style={styles.searchProduct}>
-                    <View style={styles.searchProHeader}>
-                        <SearchIcon style={{ marginLeft: verticalScale(20) }} />
-                        <TextInput
-                            placeholder="Search fashion"
-                            style={styles.textInput} />
-                        <FilterIcon />
-                    </View>
-                </View>
-            </View>
 
             <View style={{ marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
                 <View>
