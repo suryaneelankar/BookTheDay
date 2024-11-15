@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { View, Text, Dimensions, FlatList, PermissionsAndroid, Pressable, StyleSheet, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity, Platform, Alert, Modal } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";
 import GetLocation from 'react-native-get-location'
@@ -45,7 +45,9 @@ import { useDispatch, useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
 import { isLocationEnabled } from 'react-native-android-location-enabler';
 import { promptForEnableLocationIfNeeded } from 'react-native-android-location-enabler';
-
+import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
+import VegIcon from '../../assets/svgs/foodtype/veg.svg';
+import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
@@ -55,6 +57,8 @@ const HomeDashboard = () => {
     const userLoggedInMobileNumber = useSelector((state) => state.userLoggedInMobileNum);
     const dispatch = useDispatch();
     const [eventsData, setEventsData] = useState([]);
+    const [cateringsData, setCateringsData] = useState([]);
+
     const [discountProducts, setDiscountProducts] = useState([]);
     const [newlyAddedProducts, setNewlyAddedProducts] = useState([]);
     const [getUserAuth, setGetUserAuth] = useState('');
@@ -87,13 +91,28 @@ const HomeDashboard = () => {
         { id: '9', Component: TrendingNecklace, name: 'chains' },
         { id: '10', Component: TrendingBracelet, name: 'bracelets' },
     ];
-    useEffect(() => {
-        // getPermissions();
-        getCategories();
-        getAllEvents(currentPage);
-        getUserAuthTokenRes();
-        getProfileData();
-    }, []);
+    // useEffect(() => {
+    //     // getPermissions();
+    //     getCategories();
+    //     getAllEvents(currentPage);
+    //     getUserAuthTokenRes();
+    //     getProfileData();
+    //     getAllCaterings(currentPage);
+    // }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            getCategories();
+            getAllEvents(currentPage);
+            getUserAuthTokenRes();
+            getProfileData();
+            getAllCaterings(currentPage);
+            // Cleanup function to run when the screen loses focus
+            return () => {
+                console.log('Screen is unfocused');
+            };
+        }, [])
+    );
 
     const getUserAuthTokenRes = async () => {
         const token = await getUserAuthToken();
@@ -130,6 +149,25 @@ const HomeDashboard = () => {
             setEventsData(response?.data?.data)
         } catch (error) {
             console.log("events data error>>::", error);
+        }
+    };
+
+    const getAllCaterings = async (page) => {
+        const token = await getUserAuthToken();
+        setGetUserAuth(token);
+        try {
+            const response = await axios.get(`${BASE_URL}/getAllFoodCaterings?page=${page}&limit=10`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const newCateringsData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
+            console.log('resp is caterings ::>>>', JSON.stringify(response?.data?.data));
+                setCateringsData(response?.data?.data);
+           
+        } catch (error) {
+            console.error('Error fetching food caterings:', error);
         }
     };
 
@@ -308,27 +346,65 @@ const HomeDashboard = () => {
                             <Text style={{ fontWeight: '700', color: themevariable.Color_B46609, fontSize: 18, fontFamily: 'InterBold' }}>{formatAmount(item?.rentPricePerDay)}/day</Text>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignSelf: 'center', alignItems: 'center' }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                                <FontAwesome name={"map-marker"} color={themevariable.Color_777777} size={20} style={{}} />
-                                <Text style={{ fontWeight: '500', marginHorizontal: 5, color: themevariable.Color_777777, fontSize: 13, marginTop: 5, fontFamily: 'InterBold', bottom: 3 }}>{item?.functionHallAddress?.address}</Text>
+                            <View style={{ flexDirection: 'row', }}>
+                                <FontAwesome name={"map-marker"} color={themevariable.Color_777777} size={20} style={{marginTop:5}} />
+                                <Text  style={{ fontWeight: '500', marginHorizontal: 5, color: themevariable.Color_777777, fontSize: 13, marginTop: 5, fontFamily: 'InterBold', bottom: 3 }}>{item?.functionHallAddress?.address}</Text>
                             </View>
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "60%", marginTop: 10, padding: 5, marginBottom: 5 }}>
+                    <View style={{ flexDirection: 'row',marginTop:10,marginHorizontal:10 }}>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
+                            <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.seatingCapacity} pax</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
+                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.bedRooms} Rooms</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10,alignItems:"center"}}>
 
-                        <View style={{ backgroundColor: item?.available ? "#dcfcf0" : themevariable.Color_FFF8DF, flexDirection: 'row', alignSelf: "center", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 }}>
-                            <Image source={require('../../assets/available.png')} style={{ width: 15, height: 15 }} />
-                            {item?.available ?
-                                <Text style={{ fontWeight: '600', color: 'black', fontSize: 12, marginHorizontal: 5, fontFamily: 'InterBold' }}>Available</Text>
-                                :
-                                <Text style={{ fontWeight: '600', color: themevariable.Color_EB772F, fontSize: 12, marginHorizontal: 5, fontFamily: 'InterBold' }}>Booked</Text>
-                            }
+                            <Text style={{  }}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon/>}</Text>
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG': item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: themevariable.Color_FFF8DF }}>
-                            <Image source={require('../../assets/people.png')} style={{ width: 25, height: 25 }} />
-                            <Text style={{ marginHorizontal: 2, fontFamily: 'InterRegular', fontWeight: '600' }}> {item?.seatingCapacity}</Text>
+                    </View>
+                </TouchableOpacity>
+            </View>
+        )
+    };
+
+    const renderCaterings = ({ item }) => {
+
+        const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+        return (
+            <View style={{}}>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('ViewCaterings', { categoryId: item?._id })}
+                    style={{ marginBottom: 5, elevation: 5, backgroundColor: "white", width: Dimensions.get('window').width / 1.3, alignSelf: 'center', borderRadius: 8, marginHorizontal: 16, marginTop: 15, height: 'auto' }}>
+                    <FastImage source={{
+                        uri: updatedImgUrl,
+                        headers: { Authorization: `Bearer ${getUserAuth}` }
+                    }}
+                        style={{ borderRadius: 8, width: '95%', padding: 90, alignSelf: "center", marginTop: 8 }}
+                    />
+                    <View style={{ marginTop: 15, justifyContent: 'space-between', }}>
+
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignSelf: 'center', alignItems: 'center' }}>
+                            <Text style={{ fontWeight: '700', color: '#131313', fontSize: 16, fontFamily: 'InterBold', width: '48%' }}>{item?.foodCateringName}</Text>
                         </View>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignSelf: 'center', alignItems: 'center' }}>
+                            <View style={{ flexDirection: 'row', }}>
+                                <FontAwesome name={"map-marker"} color={themevariable.Color_777777} size={20} style={{marginTop:5}} />
+                                <Text style={{ fontWeight: '500', marginHorizontal: 5, color: themevariable.Color_777777, fontSize: 13, marginTop: 5, fontFamily: 'InterBold', bottom: 3 }}>{item?.foodCateringAddress?.address}</Text>
+                            </View>
+                        </View>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "60%", padding: 5, marginBottom: 5 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between',marginTop:5}}>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center",paddingVertical:5 }}>
+                            <Text>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
+                        </View>
+                    </View>
 
                     </View>
                 </TouchableOpacity>
@@ -433,6 +509,9 @@ const HomeDashboard = () => {
                                         }
                                     }}
                                 >
+                                    {/* <Image
+                                    source={item?.image} 
+                                    style={{width:"90%", height:"100%", alignSelf:"center"}}/> */}
                                     <SvgComponent
                                         width="90%"
                                         height="100%"
@@ -522,6 +601,8 @@ const HomeDashboard = () => {
                         />
                     </View> : null}
 
+                    {eventsData?.length > 0 ?
+                    <>
                 <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: horizontalScale(20) }}>
                     <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
                     <TouchableOpacity onPress={() => navigation.navigate('Events')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
@@ -537,7 +618,26 @@ const HomeDashboard = () => {
                     keyExtractor={(item) => item?._id}
                     showsHorizontalScrollIndicator={false}
                 />
+                </> : null}
 
+                {cateringsData?.length > 0 ? 
+                <>
+                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: horizontalScale(20) }}>
+                    <Text style={styles.onDemandTextStyle}>Food Caterings</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('Caterings')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                        <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
+                        <RightArrowIcon width={25} height={25} />
+                    </TouchableOpacity>
+                </View>
+
+                <FlatList
+                    data={cateringsData}
+                    renderItem={renderCaterings}
+                    horizontal
+                    keyExtractor={(item) => item?._id}
+                    showsHorizontalScrollIndicator={false}
+                />
+                </> : null}
 
 
                 <View style={{

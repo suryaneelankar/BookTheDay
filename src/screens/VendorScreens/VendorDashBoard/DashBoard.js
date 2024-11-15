@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, SafeAreaView, Image, ScrollView, Alert, TouchableOpacity, Dimensions, StyleSheet, Animated, FlatList } from "react-native";
+import { View, Text, SafeAreaView, Image, ScrollView, Alert, TouchableOpacity, Dimensions, StyleSheet, Animated, FlatList, Switch } from "react-native";
 import ProfileIcon from '../../../assets/vendorIcons/profileIcon.svg'
 import LinearGradient from "react-native-linear-gradient";
 import axios from "axios";
@@ -228,7 +228,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     const showAvailabilityConfirmation = (catType, postId, toggleAvailable) => {
         Alert.alert(
             "Confirmation",
-            "Are you sure you want to make this available?",
+            "Are you sure you want to make the change in product availability?",
             [
                 {
                     text: "Cancel",
@@ -298,11 +298,11 @@ const VendorDashBoardTab = ({ navigation }) => {
 
     const renderVendorList = async ({ item }) => {
         const token = await getVendorAuthToken();
-
+ 
         const convertedImageUrl = item?.productImage !== undefined ? item?.productImage.replace('localhost', LocalHostUrl) : item?.productImage;
         return (
             <TouchableOpacity
-                style={{ opacity: item?.available === true ? 1 : 0.5, backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10 }}
+                style={{ opacity: item?.available === true ? 1 : 0.5, backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10, }}
             >
                 <View style={{ marginTop: 5, width: '100%', marginHorizontal: 5 }}>
 
@@ -314,15 +314,25 @@ const VendorDashBoardTab = ({ navigation }) => {
                         }}
                     />
                     <Text style={styles.productName}>{capitalizeFirstLetters(item?.productName)}</Text>
-                    <Text style={{ backgroundColor: "pink" }}>{item?.available ? 'available' : 'notAvai'}</Text>
+                    <View style={{flexDirection:"row",justifyContent:"space-between",marginHorizontal:5}}>
+                        <Text style={[styles.productListedName, { color: item?.available ? '#57A64F' : '#EF0000', backgroundColor: item?.available ? '#45FE3529' : '#FE353529' }]}>{item?.available ? 'Listed' : 'Not Listed'}</Text>
+                        <Switch
+                            trackColor={{ false: '#EF0000', true: '#e8e46b' }}
+                            thumbColor={item?.available ? '#ECA73C' : '#ECA73C'}
+                            ios_backgroundColor="#3e3e3e"
+                            onValueChange={() => showAvailabilityConfirmation(item?.catType, item?.particularPostId, item?.available)}
+                            value={item?.available}
+                        />
+                    </View>
+
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, justifyContent: 'space-between', width: '90%', bottom: 5 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 }}>
                             <ListedTimeIcon />
                             <Text style={styles.price}>{formatDate(item?.createdAt)}</Text>
                         </View>
-                        <TouchableOpacity onPress={() => { showAvailabilityConfirmation(item?.catType, item?.particularPostId, item?.available) }}>
+                        {/* <TouchableOpacity onPress={() => { showAvailabilityConfirmation(item?.catType, item?.particularPostId, item?.available) }}>
                             <EditButton />
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                         <TouchableOpacity onPress={() => { showConfirmationAlert(item?._id, item?.particularPostId) }}>
                             <DeleteIcon />
                         </TouchableOpacity>
@@ -502,12 +512,12 @@ const VendorDashBoardTab = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1 }}>
+            <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFF7E7']} style={{ flex: 1 }}>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'white' }}>
                     <ProfileIcon style={{}} />
                     <View>
-                        <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular', textTransform:"capitalize" }}>Hi, {vendorLoggedInName}</Text>
+                        <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular', textTransform: "capitalize" }}>Hi, {vendorLoggedInName}</Text>
                         <Text style={{ fontFamily: 'LeagueSpartanRegular' }}>+91 {vendorLoggedInMobileNum}</Text>
                     </View>
                     <TouchableOpacity onPress={() => navigation.navigate('AdminDashboard')}>
@@ -568,15 +578,15 @@ const VendorDashBoardTab = ({ navigation }) => {
                                     ItemSeparatorComponent={ItemSeparator}
                                 />
                             </>
-                            : null} 
+                            : null}
                     </View>
                     {vendorListing?.length > 0 ?
-                    <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: 20 }}>All Listed Products</Text>
-                    : null}
+                        <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: 20 }}>All Listed Products</Text>
+                        : null}
                     <FlatList
                         data={vendorListing}
                         renderItem={renderVendorList}
-                        contentContainerStyle={{ borderRadius: 15, margin: 10, paddingBottom: 40 }}
+                        contentContainerStyle={{ borderRadius: 15, margin: 10, paddingBottom: 50 }}
                         numColumns={2}
                     />
                 </ScrollView>
@@ -611,6 +621,15 @@ const styles = StyleSheet.create({
         color: '#202020',
         width: '90%',
         margin: 5
+    },
+    productListedName: {
+        fontFamily: 'ManropeRegular',
+        fontSize: 14,
+        color: '#202020',
+        textAlign: "left",
+        justifyContent: "flex-start",
+        padding: 5,
+        borderRadius:5
     },
     price: {
         color: themevariable.Color_202020,

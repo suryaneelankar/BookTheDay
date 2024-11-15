@@ -418,8 +418,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
     const handleLocationSelected = (location, address) => {
         console.log('Selected Location food:', location, address);
         setLocationCountyVal(location?.subDivisionArea);
-        setLocationLatitude(location?.region?.latitude);
-        setLocationLongitude(location?.region?.longitude);
+        setLocationLatitude(location?.region?.latitude || 17.4021);
+        setLocationLongitude(location?.region?.longitude || 78.4840);
 
         setCateringAddress(address);
         setCateringCity(location?.address?.city);

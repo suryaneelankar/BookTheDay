@@ -257,9 +257,9 @@ const NearByFoodCaterings = () => {
                         nearByLoading ? <ActivityIndicator size="large" color="orange" /> : null
                     }
                     ListEmptyComponent={
-                        <View >
-                            <Text>No Function halls found</Text>
-                        </View>
+                        <View style={{alignItems:"center", alignSelf:"center", justifyContent:"center"}}>
+                    <Text style={{color:"#333333", fontSize:14, fontWeight:"400",fontFamily: 'ManropeRegular',}}>No Caterings found</Text>
+                       </View>
                     }
                 />
             </View>
