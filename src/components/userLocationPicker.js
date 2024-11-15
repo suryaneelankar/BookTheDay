@@ -237,11 +237,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   autocompleteContainer: {
-    position: 'absolute',
+    // position: 'absolute',
     top: 10,
     width: '95%',
     alignSelf: 'center',
-    zIndex: 1,
+    // zIndex: 1,
     flexDirection: "row",
     // alignItems:"center"
   },
@@ -324,14 +324,14 @@ const styles = StyleSheet.create({
     fontFamily: 'ManropeRegular',
   },
   backButton: {
-    position: "static",
+    // position: "static",
     // top: 20,
     // left: 20,
     // backgroundColor: 'rgba(0, 0, 0, 0.5)',
     // padding: 5,
     backgroundColor: "black",
     borderRadius: 20,
-    // zIndex: 2,
+    zIndex: 1000,
   },
   backButtonText: {
     color: '#fff',

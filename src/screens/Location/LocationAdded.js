@@ -127,10 +127,10 @@ const LocationAdded = () => {
     return (
         <SafeAreaView style={styles.container}>
 
-            <Modal visible={isLocationPickerVisible} animationType="slide">
-                <UserLocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
+            {/* <Modal visible={isLocationPickerVisible} animationType="slide"> */}
+                {/* <UserLocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/> */}
                 {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
-            </Modal>
+            {/* </Modal> */}
 
             <View style={styles.searchProHeader}>
                 <TouchableOpacity onPress={() => setLocationPickerVisible(true)} style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 10 }}>
