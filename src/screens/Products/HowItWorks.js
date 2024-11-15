@@ -6,32 +6,33 @@ import DetailsCardIcon from '../../assets/svgs/detailsCardIcon.svg'
 import { LinearGradient } from "react-native-linear-gradient"
 import themevariable from "../../utils/themevariable"
 
-const Data=[
+const Data = [
     {
-        id:0,
-        header:'Select Your Product',
-        text:'Your EcoFlex host will use it to identify you at pickup.',
-        icon:UserIcon
+        id: 0,
+        header: 'Select Your Product',
+        text: 'Choose from our exclusive collection of jewelry and clothing for your special day.',
+        icon: UserIcon
     },
     {
-        id:1,
-        header:'Book your date & time',
-        text:'We’ll send you a verification code to help secure your account',
-        icon:TickIcon
+        id: 1,
+        header: 'Book your date & time',
+        text: 'Schedule the rental date and time to secure your selected items.',
+        icon: TickIcon
     },
     {
-        id:2,
-        header:'Receive Chef contact details',
-        text:'You must have a valid driver’s license to book on EcoFlex.',
-        icon:DetailsCardIcon,
+        id: 2,
+        header: 'Receive Rental Confirmation',
+        text: 'Get confirmation and rental details for your jewelry and clothing.',
+        icon: DetailsCardIcon
     },
     {
-        id:3,
-        header:'Have Chef in your Home',
-        text:'You won’t be charged until you book your trip.',
-        icon:HatIcon
+        id: 3,
+        header: 'Enjoy Your Special Day',
+        text: 'Wear the rented jewelry and clothes and make your event memorable.',
+        icon: HatIcon
     },
-]
+];
+
 
 const Item =({item})=>{
     return(
@@ -51,7 +52,7 @@ const HowItWorks=()=>{
         <View style={styles.rootContainer}>
         <View style={styles.topContainer}>
             <Text style={styles.worksText}>How it Works?</Text>
-            <Text style={styles.simpleText}>Simple 3 steps</Text>
+            <Text style={styles.simpleText}>Simple 4 steps</Text>
         </View>
         <FlatList
             data={Data}

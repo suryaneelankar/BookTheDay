@@ -315,8 +315,10 @@ const ViewMyBookings = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-
+      {(myBookings?.length > 0 || cateringBookings?.length > 0 || hallsBookings?.length > 0) ?
       <ScrollView style={{ flex: 1 }}>
+        {myBookings?.length > 0 ?
+        <>
         <Text style={{ marginTop: 20, marginBottom: 5, marginHorizontal: 15, color: "#000000", fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular' }}>
           Clothes jewellery bookings
         </Text>
@@ -325,7 +327,10 @@ const ViewMyBookings = () => {
           renderItem={renderItem}
           keyExtractor={(item) => item?.id}
         />
+        </> : null}
 
+        {cateringBookings?.length > 0 ?
+        <>
         <Text style={{ marginTop: 20, marginBottom: 5, marginHorizontal: 15, color: "#000000", fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular' }}>
           Food Catering bookings
         </Text>
@@ -334,6 +339,10 @@ const ViewMyBookings = () => {
           renderItem={renderItem}
           keyExtractor={(item) => item?.id}
         />
+        </> : null}
+
+        {hallsBookings?.length > 0 ?
+        <>
         <Text style={{ marginTop: 20, marginBottom: 5, marginHorizontal: 15, color: "#000000", fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular' }}>
           Halls bookings
         </Text>
@@ -342,6 +351,7 @@ const ViewMyBookings = () => {
           renderItem={renderItem}
           keyExtractor={(item) => item?.id}
         />
+        </> : null}
 
          <PaymentConfirmationModal
             visible={paymentModal}
@@ -351,6 +361,11 @@ const ViewMyBookings = () => {
           />
                    
       </ScrollView>
+      : 
+      <View style={{alignSelf:"center", alignItems:"center"}}>
+        <Text style={{color:"#333333", fontSize:14, fontWeight:"500",fontFamily: 'ManropeRegular',marginTop:50}}>No Booking initiated yet</Text>
+      </View>
+      }
     </SafeAreaView>
   );
 };

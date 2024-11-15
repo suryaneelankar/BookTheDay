@@ -248,7 +248,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
     const onPressSaveAndPost = async () => {
         console.log('selectedOption os:::>>', selectedOption);
 
-        if (!mainImageUrl || productName === '' || productDescription === '' || productPinCode === '' ||
+        if (!mainImageUrl || productName === '' || productDescription === '' ||
             (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || (securityDeposit === undefined || securityDeposit === '') || (selectedOption == null)
             || (selectedColor === '' && ((selectedOption !== null 
                 && selectedOption === 'clothes'))) || (clothSize === '' && ((selectedOption !== null 
@@ -370,8 +370,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
     const handleLocationSelected = (location, address) => {
         console.log('Selected Location products:', location, address);
         setLocationCountyVal(location?.subDivisionArea);
-        setLocationLatitude(location?.region?.latitude);
-        setLocationLongitude(location?.region?.longitude);
+        setLocationLatitude(location?.region?.latitude || 17.4021);
+        setLocationLongitude(location?.region?.longitude || 78.4840);
         setProductAddress(address);
         setProductCity(location?.address?.city);
         setProductPinCode(location.pinCode);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image, Dimensions, FlatList, SafeAreaView, ActivityIndicator } from 'react-native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";
@@ -34,6 +34,7 @@ const Caterings = () => {
     const [query, setQuery] = useState('');
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [locationBasedData, setLoactionBasedData] = useState([]);
+
 
     const userLatitude = userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude;
     const userLongitude = userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude;
@@ -320,7 +321,7 @@ const Caterings = () => {
                         <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Catering Services in Hyderabad</Text>
                     </View>
                     <TouchableOpacity style={{}} onPress={() => navigation.navigate('NearByFoodCaterings')}>
-                    <Text style={{ marginTop: 15, color: "#333333", fontSize: 12, fontWeight: "600", fontFamily: "ManropeRegular", }}>Sort NearBy</Text>
+                    <Text style={{ backgroundColor:"#FF990066",marginTop: 15, color: "#333333", fontSize: 12, fontWeight: "600", fontFamily: "ManropeRegular",paddingHorizontal:7,paddingVertical:5,borderRadius:5 }}>Sort NearBy</Text>
                 </TouchableOpacity>
                 </View>
 
@@ -334,9 +335,9 @@ const Caterings = () => {
                         loading ? <ActivityIndicator size="large" color="orange" /> : null
                     }
                     ListEmptyComponent={
-                        <View >
-                            <Text>No Function halls found</Text>
-                        </View>
+                        <View style={{alignItems:"center", alignSelf:"center", justifyContent:"center"}}>
+                        <Text style={{color:"#333333", fontSize:14, fontWeight:"400",fontFamily: 'ManropeRegular',}}>No Caterings found</Text>
+                    </View>
                     }
                     contentContainerStyle={{}}
                 />

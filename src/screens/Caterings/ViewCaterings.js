@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Text, View, Image, StyleSheet, Dimensions, ScrollView, TouchableOpacity, FlatList, TextInput } from "react-native";
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import axios from "axios";
@@ -15,6 +15,8 @@ import BookDatesButton from "../../components/GradientButton";
 import ServiceTime from '../../assets/svgs/serviceTime.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import CustomModal from "../../components/AlertModal";
+import ActionSheet from 'react-native-actions-sheet';
+
 
 const ViewCaterings = ({ route, navigation }) => {
 
@@ -33,6 +35,9 @@ const ViewCaterings = ({ route, navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
     const { categoryId } = route.params;
+    const actionSheetRef = useRef(null);
+    const [foodComboSelected,setFoodComboSelected] =  useState()
+
 
     const timeSlots = [
         '12:00 AM',
@@ -163,6 +168,9 @@ const ViewCaterings = ({ route, navigation }) => {
 
     const handleAdd = (item) => {
         setAddedItems([...addedItems, item]);
+        actionSheetRef.current?.show();
+        setFoodComboSelected(item);
+
     };
 
     const handleDelete = (item) => {
@@ -188,6 +196,51 @@ const ViewCaterings = ({ route, navigation }) => {
     };
     const itemsWithTotalPrice = calculateTotalPrice(numPlates, addedItems);
     const grandTotal = calculateGrandTotal(itemsWithTotalPrice);
+
+    const renderActionSheetWithProductDetais = () => {
+
+        return (
+            <ActionSheet
+                ref={actionSheetRef}
+                statusBarTranslucent
+                closeOnPressBack
+                defaultOverlayOpacity={0.5}
+                height={Dimensions.get("window").height-20}
+                containerStyle={styles.actionSheetContainer}
+                // animationType=
+            >
+                <View style={{}}>
+                <Image style={{ height: 200, borderTopLeftRadius:10, borderTopRightRadius:10}} source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/9/96/Lunch_Meals.jpg' }} />
+                <View style={{paddingHorizontal:20,marginTop:10,flexDirection:"row",justifyContent:"space-between"}}>
+                    <View style={{width:"50%"}}>
+                <Text style={{ color: "#100D25", fontSize: 18, fontWeight:"800", fontFamily: 'ManropeRegular' }}>{foodComboSelected?.title}</Text>
+                <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5,fontWeight:"700" }}>{formatAmount(foodComboSelected?.perPlateCost)}</Text>
+                <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5 ,fontWeight:"700"}}>Min order: {foodComboSelected?.minOrder}</Text>
+                    </View>
+                <TouchableOpacity
+                            onPress={() => actionSheetRef.current?.hide()}
+                            style={{ borderRadius: 10, backgroundColor: "#F1F1F1",height:verticalScale(35)}}
+                        >
+                            <Text style={styles.addText}>{'ADD'}</Text>
+                        </TouchableOpacity>
+                </View> 
+                 <View style={{paddingHorizontal:20}}>
+                        <Text style={{ fontSize: 12, color: "#333333", marginTop: 5 ,fontWeight:"700",marginBottom:5,marginTop:20}}>Enter No.of Plates</Text>
+                        <TextInput
+                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2,marginBottom:15 }}
+                            placeholder="Enter number of plates"
+                            keyboardType='phone-pad'
+                            value={numPlates[foodComboSelected?.title] || ''}
+                            onChangeText={(text) => setNumPlates({ ...numPlates, [foodComboSelected?.title]: text })}
+                        />
+                </View>
+            
+                </View>
+                <View style={styles.divider} />
+
+            </ActionSheet>
+        );
+    };
 
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -299,6 +352,8 @@ const ViewCaterings = ({ route, navigation }) => {
                     </View>
 
                 </View>
+
+                {renderActionSheetWithProductDetais()}
 
                 <Modal
                     isVisible={isVisible}
@@ -493,7 +548,6 @@ const styles = StyleSheet.create({
         textAlign: "center",
         width: "100%"
 
-
     },
     listcard: {
         marginTop: 10,
@@ -568,6 +622,18 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         fontFamily: 'ManropeRegular',
 
+    },
+    actionSheetContainer: {
+        backgroundColor: 'white',
+        paddingBottom: 20,
+        height: Dimensions.get('window').height- 350,
+        borderTopRightRadius:10,
+        borderTopLeftRadius:10
+    },
+    headerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 20,
     },
 });
 

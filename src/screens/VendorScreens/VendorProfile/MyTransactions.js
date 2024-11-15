@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native';
 import OrderIcon from "../../../assets/OrderIcon.svg";
 import BASE_URL from '../../../apiconfig';
 import { useSelector } from 'react-redux';
@@ -77,6 +77,11 @@ const MyTransactions = () => {
                         amount={item.orderAmount}
                         paymentStatus={item.paymentStatus}
                     />
+                )}
+                ListEmptyComponent={() =>(
+                    <View style={{flex:1, alignSelf:"center",justifyContent:"center", height:Dimensions.get('window').height-100,width:"100%",alignItems:"center"}}>
+                        <Text>No transactions are found</Text>
+                        </View>
                 )}
             />
         </View>

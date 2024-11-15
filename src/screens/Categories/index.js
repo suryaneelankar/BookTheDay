@@ -276,7 +276,8 @@ const Categories = () => {
                         />
                 </View>
 
-
+                {limitedData?.length > 0 ?
+                <>
                 <View style={{ marginHorizontal: 20, flexDirection: "row", justifyContent: "space-between", marginTop: 25, marginBottom: 5 }}>
                     <Text style={{ fontFamily: "ManropeRegular", fontWeight: "700", fontSize: 16, color: '#202020' }}>Products You May Like</Text>
                     <TouchableOpacity onPress={() => navigation.navigate('CategoriesList', { catType: 'clothes' })} style={styles.sellAllContainer}>
@@ -284,7 +285,6 @@ const Categories = () => {
                         <BackButton width={20} height={20} style={styles.backButton} />
                     </TouchableOpacity>
                 </View>
-
                 <FlatList
                     data={limitedData}
                     numColumns={2}
@@ -292,6 +292,8 @@ const Categories = () => {
                     renderItem={renderClothesCat} 
                     
                     />
+                    </> : null}
+                
                  {discountProducts?.length ?
                 <TrendingNow data={discountProducts} textHeader={'Trending Now'} token={getUserAuth} />
                  : null }

@@ -607,8 +607,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
         console.log('Selected Location halls:', location, "+++++++++", address);
         setfunctionHallAddress(address);
         setLocationCountyVal(location?.subDivisionArea);
-        setLocationLatitude(location?.region?.latitude);
-        setLocationLongitude(location?.region?.longitude);
+        setLocationLatitude(location?.region?.latitude || 17.4021);
+        setLocationLongitude(location?.region?.longitude || 78.4840);
         setfunctionHallCity(location?.address?.city);
         setfunctionHallPinCode(location.pinCode);
         setLocationPickerVisible(false); // Hide the LocationPicker after selection

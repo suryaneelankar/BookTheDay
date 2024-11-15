@@ -245,8 +245,8 @@ const NearByEvents = () => {
                     loading ? <ActivityIndicator size="large" color="orange" /> : null
                 }
                 ListEmptyComponent={
-                    <View >
-                        <Text>No Function halls found</Text>
+                    <View style={{alignItems:"center", alignSelf:"center", justifyContent:"center"}}>
+                    <Text style={{color:"#333333", fontSize:14, fontWeight:"400",fontFamily: 'ManropeRegular',}}>No Function halls found</Text>
                     </View>
                 }
             />

@@ -243,7 +243,7 @@ const Events = () => {
                     <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "400", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Function Halls in Hyderabad</Text>
                 </View>
                 <TouchableOpacity style={{}} onPress={() => navigation.navigate('NearByEvents')}>
-                    <Text style={{ marginTop: 15, color: "#333333", fontSize: 12, fontWeight: "600", fontFamily: "ManropeRegular", }}>Sort NearBy</Text>
+                    <Text style={{ backgroundColor:"#FF990066",marginTop: 15, color: "#333333", fontSize: 12, fontWeight: "600", fontFamily: "ManropeRegular",paddingHorizontal:7,paddingVertical:5,borderRadius:5 }}>Sort NearBy</Text>
                 </TouchableOpacity>
             </View>
 
@@ -257,8 +257,8 @@ const Events = () => {
                     loading ? <ActivityIndicator size="large" color="orange" /> : null
                 }
                 ListEmptyComponent={
-                    <View >
-                        <Text>No Function halls found</Text>
+                    <View style={{alignItems:"center", alignSelf:"center", justifyContent:"center"}}>
+                        <Text style={{color:"#333333", fontSize:14, fontWeight:"400",fontFamily: 'ManropeRegular',}}>No Function halls found</Text>
                     </View>
                 }
                 contentContainerStyle={{}}
