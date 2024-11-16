@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator, PermissionsAndroid, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, FlatList, ActivityIndicator, PermissionsAndroid, ScrollView } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import GetLocation from 'react-native-get-location';
-import BookDatesButton from './GradientButton';
 import SaveLocationButton from './SaveLocationButton';
 import Iconleftcircle from 'react-native-vector-icons/AntDesign';
-import { height, width } from '../utils/scalingMetrics';
 import { isLocationEnabled } from 'react-native-android-location-enabler';
 import { promptForEnableLocationIfNeeded } from 'react-native-android-location-enabler';
 
@@ -18,7 +16,10 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
   const [pinCode, setPinCode] = useState('');
   const [label, setLabel] = useState('Home');
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [onSelectLoc,setOnSelectLoc] = useState(false);
   const [searchLocation, setSearchLocation] = useState();
+
+  const [places, setPlaces] = useState([]);
 
   const [completeAddress, setCompleteAddress] = useState();
   const [subDivisionArea, setSubDivisionArea] = useState();
@@ -55,7 +56,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
         }
 
         const data = await response.json();
-        console.log('data sub div is:::>>>',JSON.stringify(data));
+        // console.log('data sub div is:::>>>', JSON.stringify(data));
         setCompleteAddress(data?.results[0]?.formatted_address);
         setAddress(data?.results[0]?.formatted_address);
 
@@ -96,19 +97,50 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
     }
   };
 
-  const handleCheckPressed = async() => {
+  const [searchText, setSearchText] = useState('');
+
+  // Function to fetch places from Google Places API
+  const fetchPlaces = async (text) => {
+    const apiKey = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo'; // Replace with your API key
+    const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${text}&key=${apiKey}&language=en`;
+
+    try {
+      const response = await fetch(url);
+      const result = await response.json();
+
+      console.log('result is::>>', JSON.stringify(result));
+
+      if (result?.predictions) {
+        setPlaces(result?.predictions);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Call fetchPlaces whenever the text changes
+  const handleSearch = (text) => {
+    setSearchText(text);
+    if (text.length > 2) {
+      fetchPlaces(text);
+    } else {
+      setPlaces([]); // Clear results if text length is <= 1
+    }
+  };
+
+  const handleCheckPressed = async () => {
     if (Platform.OS === 'android') {
-      const checkEnabled= await isLocationEnabled();
+      const checkEnabled = await isLocationEnabled();
       console.log('checkEnabled', checkEnabled);
-      if(!checkEnabled){
-      handleEnabledPressed();
-      }else{
+      if (!checkEnabled) {
+        handleEnabledPressed();
+      } else {
         getLocation();
       }
     }
   };
 
-  const  handleEnabledPressed = async() => {
+  const handleEnabledPressed = async () => {
     if (Platform.OS === 'android') {
       try {
         const enableResult = await promptForEnableLocationIfNeeded();
@@ -147,7 +179,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
     }
 
     const data = await response.json();
-    console.log('handle maps preeesss::>>',JSON.stringify(data))
+    // console.log('handle maps preeesss::>>', JSON.stringify(data))
     setCompleteAddress(data?.results[0]?.formatted_address);
     setAddress(data?.results[0]?.formatted_address);
 
@@ -176,112 +208,124 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
     onLocationSelected(locationData, completeAddress, label);
   };
 
+  const fetchPlaceDetails = async (placeId) => {
+    const apiKey = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo';
+    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${apiKey}`;
+
+    try {
+      const response = await fetch(url);
+      const result = await response.json();
+
+      if (result.result) {
+        console.log('result.result is::>>>',result.result)
+        const { lat, lng } = result.result.geometry.location;
+        setSelectedLocation({ latitude: lat, longitude: lng });
+        const name  = result?.result?.name ? `${result?.result?.name}, ` : "";
+        setCompleteAddress(`${name}${result?.result?.formatted_address}`);
+        setRegion({
+          latitude: lat,
+          longitude: lng,
+          latitudeDelta: 0.015,
+          longitudeDelta: 0.0121,
+        });
+        // alert(`Latitude: ${lat}, Longitude: ${lng}`); // Display or store this data as needed
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <View style={styles.container}>
+      {/* {console.log('places is::>>',places)} */}
 
 
-
-      {region ? (
-        <MapView
-          style={styles.map}
-          region={region}
-          onPress={handleMapPress}
-          showsUserLocation={true}
-          showsMyLocationButton={false}
-        >
-          {selectedLocation && (
-            <Marker coordinate={selectedLocation} />
-          )}
-        </MapView>
-      ) : (
-        <ActivityIndicator size="large" color="orange" />
-      )}
-
-      <View style={styles.autocompleteContainer}>
-
-
-        <View style={{ marginTop: 10 }}>
-          <TouchableOpacity onPress={() => onBack()}>
-            <Iconleftcircle name='leftcircle' color={'#494a49'} size={33} />
-          </TouchableOpacity>
-        </View>
-
-        <GooglePlacesAutocomplete
-          placeholder="Search for an address"
-          fetchDetails={true}
-          onChangeText={(text) => {
-            setSearchLocation(text);
-          }}
-          value={searchLocation}
-          onPress={(data, details = null) => {
-            console.log("geocoding loc:::::::", JSON.stringify(data));
-            console.log("geocoding loc details:::::::", JSON.stringify(details));
-
-            const { lat, lng } = details.geometry.location;
-            setSearchLocation(data?.description);
-            setSelectedLocation({ latitude: lat, longitude: lng });
-            setRegion({
-              latitude: lat,
-              longitude: lng,
-              latitudeDelta: 0.015,
-              longitudeDelta: 0.0121,
-            });
-            setCompleteAddress(data?.description);
-            setPinCode(details.address_components.find(ac => ac.types.includes('postal_code'))?.long_name);
-            setStreet(details.address_components.find(ac => ac.types.includes('route'))?.long_name);
-          }}
-          onFail={(err) => { console.log('Failed to fetch places:', err); }}
-          query={{
-            key: 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo',
-            language: 'en',
-          }}
-          styles={{
-            // container: styles.autocompleteContainer,
-            textInput: styles.searchInput,
-          }}
+      <View style={{ marginTop: 10, flexDirection: "row", alignSelf: "center" }}>
+        <TouchableOpacity onPress={() => onBack()}>
+          <Iconleftcircle name='leftcircle' color={'#494a49'} size={33} />
+        </TouchableOpacity>
+        <TextInput
+          placeholder="Enter Location"
+          value={searchText}
+          onChangeText={handleSearch}
+          style={styles.locationInput}
+          onFocus={() => setOnSelectLoc(false)}
         />
       </View>
 
+      {console.log('!selectedLocation is::>>',!selectedLocation)}
 
-      <ScrollView style={styles.form}>
-        <Text style={[styles.labelText, { marginTop: 20 }]}>Address</Text>
-        <TextInput
-          numberOfLines={3}
-          label="address"
-          style={[styles.input, { height: 100 }]}
-          value={completeAddress}
-          placeholder="Address"
-          editable={true}
-          multiline={true}
-        />
+      {onSelectLoc ?
+        <>
 
-        <Text style={[styles.labelText, { marginTop: 20 }]}>Pincode</Text>
-        <TextInput
-          style={styles.input}
-          value={pinCode}
-          onChangeText={setPinCode}
-          placeholder="Pin Code"
-        />
-
-        <View style={styles.labels}>
-          {['Home', 'Office', 'Other'].map((type) => (
-            <TouchableOpacity
-              key={type}
-              style={[styles.label, label === type && styles.selectedLabel]}
-              onPress={() => setLabel(type)}
+          {region ? (
+            <MapView
+              style={styles.map}
+              region={region}
+              onPress={handleMapPress}
+              showsUserLocation={true}
+              showsMyLocationButton={false}
             >
-              <Text style={styles.labelAsText}>{type}</Text>
+              {selectedLocation && (
+                <Marker coordinate={selectedLocation} />
+              )}
+            </MapView>
+          ) : (
+            <ActivityIndicator size="large" color="orange" />
+          )}
+
+
+          <ScrollView style={styles.form}>
+            <Text style={[styles.labelText, { marginTop: 20 }]}>Address</Text>
+            <TextInput
+              numberOfLines={3}
+              label="address"
+              style={[styles.input, { height: 100 }]}
+              value={completeAddress}
+              placeholder="Address"
+              editable={true}
+              multiline={true}
+            />
+
+            <Text style={[styles.labelText, { marginTop: 20 }]}>Pincode</Text>
+            <TextInput
+              style={styles.input}
+              value={pinCode}
+              onChangeText={setPinCode}
+              placeholder="Pin Code"
+            />
+
+            <View style={styles.labels}>
+              {['Home', 'Office', 'Other'].map((type) => (
+                <TouchableOpacity
+                  key={type}
+                  style={[styles.label, label === type && styles.selectedLabel]}
+                  onPress={() => setLabel(type)}
+                >
+                  <Text style={styles.labelAsText}>{type}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+
+            <SaveLocationButton
+              onPress={() => saveLocation()}
+              text={'Save Location'}
+              padding={10}
+            />
+          </ScrollView>
+        </>
+
+        :
+        <FlatList
+          data={places}
+          keyExtractor={(item) => item.place_id}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.listItem} onPress={() => {setOnSelectLoc(true),setSearchText(item.description),fetchPlaceDetails(item.place_id)}}>
+              <Text style={styles.placeText}>{item.description}</Text>
             </TouchableOpacity>
-          ))}
-        </View>
-
-
-        <SaveLocationButton
-          onPress={() => saveLocation()}
-          text={'Save Location'}
-          padding={10}
-        />
-      </ScrollView>
+          )}
+        />}
     </View>
   );
 };
@@ -291,7 +335,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   map: {
-    flex: 1,
+    // flex: 1,
+    height: 200,
   },
   autocompleteContainer: {
     position: 'absolute',
@@ -300,29 +345,47 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     zIndex: 1,
     flexDirection: "row",
-    // alignItems:"center"
+    alignItems: "center"
+  },
+  listItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderColor: '#ddd',
+  },
+  placeText: {
+    fontSize: 16,
+    color: '#333',
   },
   form: {
     flex: 1,
     paddingHorizontal: 20,
-    backgroundColor: '#fff',
     bottom: 0
   },
   input: {
-    height: 50,
-    // borderColor: '#ccc',
-    // borderWidth: 1,
-    // marginBottom: 15,
+    height: 90,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 15,
     paddingHorizontal: 10,
     borderRadius: 8,
     backgroundColor: "#F0F5FA",
+  },
+  locationInput: {
+    height: 50,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 15,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    backgroundColor: "#F0F5FA",
+    width: "90%"
   },
   searchInput: {
     height: 50,
     borderColor: '#3e423e',
     borderWidth: 0.5,
-    // borderWidth: 1,
-    // marginBottom: 15,
+    borderWidth: 1,
+    marginBottom: 15,
     paddingHorizontal: 10,
     backgroundColor: "#e3e6e4",
     marginHorizontal: 5
@@ -381,7 +444,7 @@ const styles = StyleSheet.create({
     fontFamily: 'ManropeRegular',
   },
   backButton: {
-    position: "static",
+    // position: "static",
     // top: 20,
     // left: 20,
     // backgroundColor: 'rgba(0, 0, 0, 0.5)',
