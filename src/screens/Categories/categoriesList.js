@@ -175,7 +175,7 @@ const CategoriesList = ({ route }) => {
                             listLoading ? <ActivityIndicator size="large" color="orange" /> : null
                         }
                         ListEmptyComponent={
-                            <View >
+                            <View style={{flex:1,alignSelf:"center",height: Dimensions.get("window").height-250,justifyContent:"center"}}>
                               <Text>No Products Available</Text>
                             </View>
                           }
