@@ -445,9 +445,9 @@ const GeneralDetails = ({isAadharUpdate}) => {
                     </Modal>
                     <View style={styles.mainContainer}>
                         <ChooseFileField
-                            label={'Tent House Image'}
+                            label={'Catering Image'}
                             isRequired={true}
-                            placeholder={'Add Tent House Image'}
+                            placeholder={'Add Catering Image'}
                             onPressChooseFile={openGalleryOrCamera}
                         />
                         {mainImageUrl ?
@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 10,
-        backgroundColor: '#FFD7B5',
+        backgroundColor: '#FFF7E7',
         borderRadius: 5,
     },
     headerText: {

@@ -290,7 +290,7 @@ const FoodMenu = ({ onSaveClick }) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#FFF5E3',
+        // backgroundColor: '#FFF5E3',
         paddingVertical: 10,
         paddingHorizontal: 10,
         borderRadius: 10
@@ -321,6 +321,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 5,
+        paddingHorizontal:5
     },
     itemContainer: {
         padding: 10,

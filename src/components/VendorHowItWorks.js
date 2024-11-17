@@ -63,6 +63,7 @@ export default VendorHowItWorks;
 const styles = StyleSheet.create({
     rootContainer: {
         marginHorizontal: 20,
+        marginBottom:40
     },
     howItWorksHeader: {
         color: themevariable.Color_333333,

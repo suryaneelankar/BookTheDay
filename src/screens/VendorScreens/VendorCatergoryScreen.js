@@ -12,6 +12,8 @@ import axios from 'axios';
 import { getVendorAuthToken } from '../../utils/StoreAuthToken';
 import BASE_URL from '../../apiconfig';
 import VendorHowItWorks from '../../components/VendorHowItWorks';
+import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.svg';
+import RightSideIcon from '../../assets/profilesvgs/Chevron-Right.svg';
 
 const VendorCategoryScreen = ({ navigation }) => {
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
@@ -83,7 +85,12 @@ const VendorCategoryScreen = ({ navigation }) => {
     const renderItem = ({ item }) => (
         <TouchableOpacity
             style={styles.categoryCard}
-            onPress={() => navigation.navigate(item.navScreen)}
+            onPress={() => { 
+                const targetScreen = item.catType === 'caterings' && profileData?.posts?.some(post => post?.postModel === "Catering")
+                    ? 'EditAddFoodCateringGeneral'
+                    : item.navScreen;
+                navigation.navigate(targetScreen, { isAadharUpdate: profileData?.aadharImage?.url ? true : false });
+            }}
         >
             <LinearGradient colors={['#FFF5E1', '#FFE2BA']} style={styles.iconContainer}>
                 <item.CatImg width={50} height={50} />
@@ -92,6 +99,7 @@ const VendorCategoryScreen = ({ navigation }) => {
                 <Text style={styles.categoryTitle}>{item.title}</Text>
                 <Text style={styles.categoryDescription}>{item.description}</Text>
             </View>
+            <RightSideIcon/>
         </TouchableOpacity>
     );
 
@@ -100,15 +108,16 @@ const VendorCategoryScreen = ({ navigation }) => {
             <LinearGradient
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0, y: 1 }}
-                colors={['#FFFFFF', '#F9F9F9']}
+                colors={['#FFF7E7', '#FFF7E7']}
                 style={styles.background}
             >
                 {/* Header */}
-                <Text style={styles.header}>Vendor Dashboard</Text>
 
                 {/* Bookings Overview */}
+                <View style={{marginTop:15,alignSelf:"center"}}>
+                <JewelleryCard />
+                </View>
                 <View style={styles.bookingsOverview}>
-                    <Text style={styles.sectionTitle}>Bookings Overview</Text>
                     <View style={styles.overviewCards}>
                         <View style={styles.overviewCard}>
                             <Text style={styles.overviewCount}>{bookingsOverview.total}</Text>
@@ -152,7 +161,6 @@ const VendorCategoryScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F8F9FA',
     },
     background: {
         flex: 1,
@@ -166,12 +174,14 @@ const styles = StyleSheet.create({
         marginVertical: 20,
     },
     bookingsOverview: {
-        marginBottom: 20,
+        marginTop:25,
+        marginBottom:20
     },
     sectionTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#34495E',
+        color: '#333333',
+        fontFamily: 'ManropeRegular',
         marginBottom: 10,
     },
     overviewCards: {
@@ -190,19 +200,28 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 2,
+        alignSelf:"center",
+        height:100
     },
     overviewCount: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#3498DB',
+        color: '#FD813B',
     },
     overviewLabel: {
         fontSize: 14,
-        color: '#7F8C8D',
+        color: '#333333',
+        textAlign:"center",
+        fontFamily: 'ManropeRegular',
     },
     listContainer: {
         paddingBottom: 20,
     },
+//     #FFC19A – Slightly lighter
+// #FFD3B6 – Medium light
+// #FFE3D0 – Softer light
+// #FFF0E4 – Very light pastel
+// #FFF8F2 – Extremely light (almost white)
     categoryCard: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -230,20 +249,24 @@ const styles = StyleSheet.create({
     categoryTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#34495E',
+        color: '#333333',
         marginBottom: 5,
     },
     categoryDescription: {
         fontSize: 14,
-        color: '#7F8C8D',
+        color: '#333333',
     },
     quickTips: {
-        marginVertical: 20,
+        // marginVertical: 20,
+        marginHorizontal:20
     },
     tip: {
         fontSize: 14,
-        color: '#7F8C8D',
+        color: '#333333',
         marginBottom: 5,
+        fontFamily: 'ManropeRegular',
+        marginHorizontal:10
+
     },
 });
 
