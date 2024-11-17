@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal, Button, TextInput, ScrollView, ActivityIndicator } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal, TextInput, ScrollView, ActivityIndicator } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
@@ -23,7 +23,6 @@ const GeneralDetails = ({isAadharUpdate}) => {
     console.log("isAadharUpdate value at fomr", isAadharUpdate);
     const navigation = useNavigation();
     const [BedRooms, setBedRooms] = useState();
-    const [foodType, setFoodType] = useState('');
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [functionHallName, setfunctionHallName] = useState('');
     const [productDescription, setProductDescription] = useState('');
@@ -43,9 +42,6 @@ const GeneralDetails = ({isAadharUpdate}) => {
     const [functionHallCity, setfunctionHallCity] = useState('');
     const [functionHallPinCode, setfunctionHallPinCode] = useState();
     const [perDayRentPrice, setPerDayRentPrice] = useState();
-    const [perKMPrice, setPerKMPrice] = useState();
-    const [perMonthRentPrice, setPerMonthRentPrice] = useState();
-    const [securityDeposit, setSecurityDeposit] = useState();
     const [advanceAmount, setAdvanceAmount] = useState();
     const [discountPercentage, setDiscountPercentage] = useState();
     const [overTimeCharges, setOverTimeCharges] = useState();
@@ -58,9 +54,6 @@ const GeneralDetails = ({isAadharUpdate}) => {
 
     const [loading, setLoading] = useState(false);
     const [functionHallAreaInSft, setfunctionHallAreaInSft] = useState();
-
-
-    // console.log('vendorLoggedInMobileNum is ::>>',vendorLoggedInMobileNum);
 
     const [rentalItemPricingDetails, setRentalItemPricingDetails] = useState({
         "Tables with basic covers": [{ "itemName": "Tables with basic covers", "perDayPrice": 0 }],

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, TextInput, ScrollView, alert, ActivityIndicator, Modal, Button } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, TextInput, ScrollView, ActivityIndicator, Modal } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
@@ -21,7 +21,6 @@ import CustomModal from '../../../components/AlertModal';
 import { useNavigation } from '@react-navigation/native';
 
 const GeneralDetails = ({isAadharUpdate}) => {
-    console.log("isAadharUpdate value at fomr", isAadharUpdate);
     const navigation = useNavigation();
     const [comboModalSuccess, setcomboModalSuccess] = useState(false);
     const [overTimeCharges, setOverTimeCharges] = useState();
@@ -400,12 +399,12 @@ const GeneralDetails = ({isAadharUpdate}) => {
     }
 
     const renderMenuItem = ({ item }) => (
-        <View style={{ marginHorizontal: 5, backgroundColor: "white", borderWidth: 1, borderColor: "lightgray", borderRadius: 10, paddingVertical: 10, paddingHorizontal: 10 }}>
-            <Text style={{ color: "black", fontSize: 14, fontWeight: "700", fontFamily: 'ManropeRegular' }}>{item.title}</Text>
-            <Text style={{ marginTop: 5, color: "black", fontSize: 10, fontWeight: "200", fontFamily: 'ManropeRegular' }}>Combo Includes</Text>
-            <Text style={{ marginTop: 2, color: "black", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', width: "60%" }}>{item.items.join(', ')}</Text>
-            <Text style={{ marginTop: 5, color: "#FE8235", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular' }}>Per Plate Price: {item.perPlateCost}</Text>
-            <Text style={{ marginTop: 5, color: "#FE8235", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular' }}>Min Order: {item.minOrder}</Text>
+        <View style={styles.combocontainer}>
+            <Text style={styles.combotitle}>{item.title}</Text>
+            <Text style={styles.combosubtitle}>Combo Includes</Text>
+            <Text style={styles.combotitle}>{item.items.join(', ')}</Text>
+            <Text style={styles.comboprice}>Per Plate Price: {item.perPlateCost}</Text>
+            <Text style={styles.combominOrder}>Min Order: {item.minOrder}</Text>
 
         </View>
     );
@@ -434,7 +433,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
     return (
         <View style={{ flex: 1 }}>
             {loading ? (
-                <View style={{ alignSelf: 'center', flex: 1, width: '100%', height: Dimensions.get('window').height, justifyContent: 'center' }}>
+                <View style={styles.container}>
                     <ActivityIndicator size="large" color="orange" />
                 </View>
             ) :
@@ -506,7 +505,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
 
                     {finalCombomenu?.length > 0 ?
                         <View style={styles.mainContainer}>
-                            <Text style={{ color: "black", fontSize: 14, fontWeight: "500", marginBottom: 5, marginHorizontal: 8 }}>Added Combos</Text>
+                            <Text style={styles.addedComboText}>Added Combos</Text>
                             <FlatList
                                 data={finalCombomenu.filter(item => item.items?.length > 0)}
                                 renderItem={renderMenuItem}
@@ -555,7 +554,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                                     value={cateringAddress}
                                     placeholder="Please Enter Address"
                                     keyboardType={'default'}
-                                    style={{ height: '100%', textAlignVertical: 'top', padding: 10 }}
+                                    style={styles.addressTextInput}
                                     multiline={true}
                                     numberOfLines={4}
                                 />
@@ -597,6 +596,13 @@ const GeneralDetails = ({isAadharUpdate}) => {
 export default GeneralDetails
 
 const styles = StyleSheet.create({
+    container:{ 
+        alignSelf: 'center',
+         flex: 1,
+          width: '100%',
+           height: Dimensions.get('window').height,
+            justifyContent: 'center' 
+        },
     mainContainer: {
         backgroundColor: themevariable.Color_FFFFFF,
         paddingVertical: 20,
@@ -604,12 +610,6 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         marginTop: 15,
         flex: 1
-    },
-    detailsContainer: {
-        // backgroundColor: themevariable.Color_FFFFFF,
-        backgroundColor: 'red',
-        borderRadius: 10,
-
     },
     title: {
         fontFamily: 'ManropeRegular',
@@ -633,23 +633,9 @@ const styles = StyleSheet.create({
         marginTop: 7,
         marginBottom: 10,
     },
-    image: {
-        // marginLeft: 15,
-        // marginRight: 7,
-        // marginTop: 5,
-        // backgroundColor:'red'
-    },
     imageContainer: {
         alignSelf: 'center',
 
-    },
-    dropdown: {
-        height: 50,
-        width: 350,
-        borderWidth: 1,
-        marginTop: 10,
-        borderColor: themevariable.Color_C8C8C6,
-        paddingHorizontal: 12,
     },
     icon: {
         marginRight: 5,
@@ -662,20 +648,6 @@ const styles = StyleSheet.create({
         zIndex: 999,
         paddingHorizontal: 8,
         fontSize: 14,
-    },
-    placeholderStyle: {
-        fontSize: 16,
-    },
-    selectedTextStyle: {
-        fontSize: 16,
-    },
-    iconStyle: {
-        width: 20,
-        height: 20,
-    },
-    inputSearchStyle: {
-        height: 40,
-        fontSize: 16,
     },
     container: {
         // backgroundColor: '#FFF4E1',
@@ -694,38 +666,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    amenitiesContainer: {
-        flex: 1,
-        padding: 10,
-    },
-    itemContainer: {
-        flexDirection: 'row',
-        margin: 5,
-        alignItems: 'center',
-        backgroundColor: '#FFF5E3',
-        padding: 10,
-        borderRadius: 5
-    },
-    itemButton: {
-        // padding: 10,
-        borderRadius: 10,
-    },
-    itemText: {
-        marginHorizontal: 5,
-    },
-    input: {
-        borderWidth: 1,
-        marginTop: 10,
-        borderColor: themevariable.Color_C8C8C6,
-        paddingHorizontal: 12,
-        borderRadius: 5,
-        flex: 1,
-    },
-    inputContainer: {
-        // flexDirection: 'row',
-        // alignItems: 'center',
-        marginBottom: 10,
-    },
     itemsContainer: {
         marginTop: 10,
     },
@@ -734,9 +674,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 5,
         width: "50%"
-    },
-    icon: {
-        marginRight: 10,
     },
     itemText: {
         fontSize: 14,
@@ -755,5 +692,61 @@ const styles = StyleSheet.create({
         borderColor: themevariable.Color_C8C8C6,
         // paddingHorizontal:12,
         borderRadius: 5,
-    }
+    },
+    addedComboText:{ 
+        color: "black", 
+        fontSize: 14, 
+        fontWeight: "500",
+         marginBottom: 5, 
+         marginHorizontal: 8 
+    },
+    addressTextInput:{ 
+        height: '100%', 
+        textAlignVertical: 'top', 
+        padding: 10 
+    },
+    combocontainer: {
+        marginHorizontal: 5,
+        backgroundColor: 'white',
+        borderWidth: 1,
+        borderColor: 'lightgray',
+        borderRadius: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+    },
+    combotitle: {
+        color: 'black',
+        fontSize: 14,
+        fontWeight: '700',
+        fontFamily: 'ManropeRegular',
+    },
+    combosubtitle: {
+        marginTop: 5,
+        color: 'black',
+        fontSize: 10,
+        fontWeight: '200',
+        fontFamily: 'ManropeRegular',
+    },
+    comboitems: {
+        marginTop: 2,
+        color: 'black',
+        fontSize: 12,
+        fontWeight: '400',
+        fontFamily: 'ManropeRegular',
+        width: '60%',
+    },
+    comboprice: {
+        marginTop: 5,
+        color: '#FE8235',
+        fontSize: 12,
+        fontWeight: '400',
+        fontFamily: 'ManropeRegular',
+    },
+    combominOrder: {
+        marginTop: 5,
+        color: '#FE8235',
+        fontSize: 12,
+        fontWeight: '400',
+        fontFamily: 'ManropeRegular',
+    },
 })
