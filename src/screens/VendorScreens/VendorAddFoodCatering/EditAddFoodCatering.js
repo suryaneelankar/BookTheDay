@@ -1,13 +1,10 @@
-import {  useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, TextInput, ScrollView, alert, ActivityIndicator, Modal, Button } from 'react-native';
+import { useState } from 'react';
+import { Text, View, StyleSheet, FlatList, Dimensions, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import themevariable from '../../../utils/themevariable';
 import BASE_URL from '../../../apiconfig';
 import axios from 'axios';
-import VegIcon from '../../../assets/svgs/foodtype/veg.svg';
-import NonVegIcon from '../../../assets/svgs/foodtype/NonVeg.svg';
 import { useSelector } from 'react-redux';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
-import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import FoodMenu from '../../../components/VendorAddOwnCombo';
 import CustomModal from '../../../components/AlertModal';
 import { useNavigation } from '@react-navigation/native';
@@ -16,18 +13,11 @@ const EditAddFoodCatering = () => {
     const [comboModalSuccess, setcomboModalSuccess] = useState(false);
     const navigation = useNavigation();
     const [loading, setLoading] = useState(false);
-    const [selectedFoodTypes, setSelectedFoodTypes] = useState([]);
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
-
-    const foodTypes = [
-        { name: 'veg', icon: VegIcon },
-        { name: 'non-veg', icon: NonVegIcon },
-    ]
     const [finalCombomenu, setFinalComboMenu] = useState([]);
 
     const onPressSaveAndPost = async () => {
-        if (finalCombomenu?.length === 0
-        ) {
+        if (finalCombomenu?.length === 0) {
             Alert.alert('Please fill Mandatory fields');
             return;
         }
@@ -39,12 +29,10 @@ const EditAddFoodCatering = () => {
             }
         });
 
-
         const vendorMobileNumber = vendorLoggedInMobileNum;
         let payload = {
             newFoodItems: finalCombomenu,
-            vendorMobileNumber: vendorMobileNumber
-
+            vendorMobileNumber: vendorMobileNumber,
         };
         const token = await getVendorAuthToken();
         console.log("payload is::::::", JSON.stringify(payload));
@@ -62,9 +50,7 @@ const EditAddFoodCatering = () => {
                 Alert.alert(
                     "Confirmation",
                     "Your product posted successfully",
-                    [
-                        { text: "Ok", onPress: () => navigation.goBack() }
-                    ],
+                    [{ text: "Ok", onPress: () => navigation.goBack() }],
                     { cancelable: false }
                 );
             } else {
@@ -76,35 +62,34 @@ const EditAddFoodCatering = () => {
             setLoading(false);
             console.log('Error', 'Failed to upload document');
         }
-    }
+    };
 
     const renderMenuItem = ({ item }) => (
-        <View style={{ marginHorizontal: 5, backgroundColor: "white", borderWidth: 1, borderColor: "lightgray", borderRadius: 10, paddingVertical: 10, paddingHorizontal: 10 }}>
-            <Text style={{ color: "black", fontSize: 14, fontWeight: "700", fontFamily: 'ManropeRegular' }}>{item.title}</Text>
-            <Text style={{ marginTop: 5, color: "black", fontSize: 10, fontWeight: "200", fontFamily: 'ManropeRegular' }}>Combo Includes</Text>
-            <Text style={{ marginTop: 2, color: "black", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', width: "60%" }}>{item.items.join(', ')}</Text>
-            <Text style={{ marginTop: 5, color: "#FE8235", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular' }}>Per Plate Price: {item.perPlateCost}</Text>
-            <Text style={{ marginTop: 5, color: "#FE8235", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular' }}>Min Order: {item.minOrder}</Text>
-
+        <View style={styles.menuItemContainer}>
+            <Text style={styles.menuTitle}>{item.title}</Text>
+            <Text style={styles.menuSubtitle}>Combo Includes</Text>
+            <Text style={styles.menuItems}>{item.items.join(', ')}</Text>
+            <Text style={styles.menuPrice}>Per Plate Price: {item.perPlateCost}</Text>
+            <Text style={styles.menuOrder}>Min Order: {item.minOrder}</Text>
         </View>
     );
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={styles.container}>
             {loading ? (
-                <View style={{ alignSelf: 'center', flex: 1, width: '100%', height: Dimensions.get('window').height, justifyContent: 'center' }}>
+                <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="orange" />
                 </View>
-            ) :
+            ) : (
                 <View>
-
                     <Text style={styles.title}>Add Menu Items</Text>
                     <View style={styles.mainContainer}>
-                        <FoodMenu onSaveClick={(menuItems) => {
-                            setcomboModalSuccess(true);
-                            setFinalComboMenu(prevMenu => [...prevMenu, ...menuItems]);
-
-                        }} />
+                        <FoodMenu
+                            onSaveClick={(menuItems) => {
+                                setcomboModalSuccess(true);
+                                setFinalComboMenu((prevMenu) => [...prevMenu, ...menuItems]);
+                            }}
+                        />
                     </View>
 
                     <CustomModal
@@ -113,46 +98,48 @@ const EditAddFoodCatering = () => {
                         onClose={() => setcomboModalSuccess(false)}
                     />
 
-                    {finalCombomenu?.length > 0 ?
+                    {finalCombomenu?.length > 0 && (
                         <View style={styles.mainContainer}>
-                            <Text style={{ color: "black", fontSize: 14, fontWeight: "500", marginBottom: 5, marginHorizontal: 8 }}>Added Combos</Text>
+                            <Text style={styles.addedCombosTitle}>Added Combos</Text>
                             <FlatList
-                                data={finalCombomenu.filter(item => item.items?.length > 0)}
+                                data={finalCombomenu.filter((item) => item.items?.length > 0)}
                                 renderItem={renderMenuItem}
                                 keyExtractor={(item, index) => index.toString()}
                                 horizontal
                                 showsHorizontalScrollIndicator={false}
                             />
-                        </View> :
-                        null}
+                        </View>
+                    )}
 
-                    <TouchableOpacity onPress={() => { onPressSaveAndPost() }} style={{ padding: 10, backgroundColor: '#FFF5E3', alignSelf: 'center', borderRadius: 5, borderColor: '#ECA73C', borderWidth: 2, marginTop: 40, bottom: 20 }}>
-                        <Text style={{ color: '#ECA73C' }}> Save & Post </Text>
+                    <TouchableOpacity onPress={onPressSaveAndPost} style={styles.saveButton}>
+                        <Text style={styles.saveButtonText}> Save & Post </Text>
                     </TouchableOpacity>
-
                 </View>
-            }
-
+            )}
         </View>
-    )
-}
+    );
+};
 
-export default EditAddFoodCatering
+export default EditAddFoodCatering;
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    loadingContainer: {
+        alignSelf: 'center',
+        flex: 1,
+        width: '100%',
+        height: Dimensions.get('window').height,
+        justifyContent: 'center',
+    },
     mainContainer: {
         backgroundColor: themevariable.Color_FFFFFF,
         paddingVertical: 20,
         paddingHorizontal: 10,
         borderRadius: 6,
         marginTop: 15,
-        flex: 1
-    },
-    detailsContainer: {
-        // backgroundColor: themevariable.Color_FFFFFF,
-        backgroundColor: 'red',
-        borderRadius: 10,
-
+        flex: 1,
     },
     title: {
         fontFamily: 'ManropeRegular',
@@ -160,143 +147,70 @@ const styles = StyleSheet.create({
         color: themevariable.Color_000000,
         fontSize: 18,
         marginTop: 10,
-        marginHorizontal: 20
+        marginHorizontal: 20,
     },
-    labelText: {
-        fontFamily: 'ManropeRegular',
-        fontWeight: 'bold',
-        color: themevariable.Color_000000,
-        fontSize: 15,
-        padding: 10,
-        marginHorizontal: 10
-    },
-    subTitle: {
-        fontFamily: 'ManropeRegular',
-        color: themevariable.Color_000000,
-        fontSize: 13,
-        marginTop: 7,
-        marginBottom: 10,
-    },
-    image: {
-        // marginLeft: 15,
-        // marginRight: 7,
-        // marginTop: 5,
-        // backgroundColor:'red'
-    },
-    imageContainer: {
-        alignSelf: 'center',
-
-    },
-    dropdown: {
-        height: 50,
-        width: 350,
-        borderWidth: 1,
-        marginTop: 10,
-        borderColor: themevariable.Color_C8C8C6,
-        paddingHorizontal: 12,
-    },
-    icon: {
-        marginRight: 5,
-    },
-    label: {
-        position: 'absolute',
-        backgroundColor: 'white',
-        left: 22,
-        top: 8,
-        zIndex: 999,
-        paddingHorizontal: 8,
+    addedCombosTitle: {
+        color: "black",
         fontSize: 14,
+        fontWeight: "500",
+        marginBottom: 5,
+        marginHorizontal: 8,
     },
-    placeholderStyle: {
-        fontSize: 16,
-    },
-    selectedTextStyle: {
-        fontSize: 16,
-    },
-    iconStyle: {
-        width: 20,
-        height: 20,
-    },
-    inputSearchStyle: {
-        height: 40,
-        fontSize: 16,
-    },
-    container: {
-        justifyContent: 'space-around',
-        borderRadius: 5,
-        flexDirection: 'row'
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 10,
-        backgroundColor: '#FFD7B5',
-        borderRadius: 5,
-    },
-    headerText: {
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    amenitiesContainer: {
-        flex: 1,
-        padding: 10,
-    },
-    itemContainer: {
-        flexDirection: 'row',
-        margin: 5,
-        alignItems: 'center',
-        backgroundColor: '#FFF5E3',
-        padding: 10,
-        borderRadius: 5
-    },
-    itemButton: {
-        // padding: 10,
-        borderRadius: 10,
-    },
-    itemText: {
+    menuItemContainer: {
         marginHorizontal: 5,
-    },
-    input: {
+        backgroundColor: "white",
         borderWidth: 1,
-        marginTop: 10,
-        borderColor: themevariable.Color_C8C8C6,
-        paddingHorizontal: 12,
-        borderRadius: 5,
-        flex: 1,
+        borderColor: "lightgray",
+        borderRadius: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
     },
-    inputContainer: {
-        // flexDirection: 'row',
-        // alignItems: 'center',
-        marginBottom: 10,
-    },
-    itemsContainer: {
-        marginTop: 10,
-    },
-    item: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 5,
-    },
-    icon: {
-        marginRight: 10,
-    },
-    itemText: {
+    menuTitle: {
+        color: "black",
         fontSize: 14,
-        marginHorizontal: 10
-    },
-    textInputlabel: {
+        fontWeight: "700",
         fontFamily: 'ManropeRegular',
-        fontWeight: 'bold',
-        color: themevariable.Color_000000,
-        fontSize: 15,
-        marginTop: 15
     },
-    textTnputView: {
-        borderWidth: 1,
-        marginTop: 10,
-        borderColor: themevariable.Color_C8C8C6,
-        // paddingHorizontal:12,
+    menuSubtitle: {
+        marginTop: 5,
+        color: "black",
+        fontSize: 10,
+        fontWeight: "200",
+        fontFamily: 'ManropeRegular',
+    },
+    menuItems: {
+        marginTop: 2,
+        color: "black",
+        fontSize: 12,
+        fontWeight: "400",
+        fontFamily: 'ManropeRegular',
+        width: "60%",
+    },
+    menuPrice: {
+        marginTop: 5,
+        color: "#FE8235",
+        fontSize: 12,
+        fontWeight: "400",
+        fontFamily: 'ManropeRegular',
+    },
+    menuOrder: {
+        marginTop: 5,
+        color: "#FE8235",
+        fontSize: 12,
+        fontWeight: "400",
+        fontFamily: 'ManropeRegular',
+    },
+    saveButton: {
+        padding: 10,
+        backgroundColor: '#FFF5E3',
+        alignSelf: 'center',
         borderRadius: 5,
-    }
-})
+        borderColor: '#ECA73C',
+        borderWidth: 2,
+        marginTop: 40,
+        marginBottom: 20,
+    },
+    saveButtonText: {
+        color: '#ECA73C',
+    },
+});
