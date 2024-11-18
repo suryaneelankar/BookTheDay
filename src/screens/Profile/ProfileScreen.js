@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
 import axios from 'axios';
 import BASE_URL from '../../apiconfig';
+import ProfileDefaultIcon from 'react-native-vector-icons/EvilIcons';
 
 
 const ProfileMainScreen = () => {
@@ -78,10 +79,11 @@ const ProfileMainScreen = () => {
         <LinearGradient start={{ x: 1, y: 0 }} end={{ x: 1, y: 1 }} colors={['#FFF3CD', '#FFDB7E', '#FFDB7E', '#FFDB7E']} style={{ flex: 1 }}>
             <View style={styles.profileContainer}>
                 <View style={styles.profileImageContainer}>
-                    <Image
+                    <ProfileDefaultIcon name='user' size={90}/>
+                    {/* <Image
                         source={{ uri: 'https://via.placeholder.com/150' }} // Placeholder image, replace with your image source
                         style={styles.profileImage}
-                    />
+                    /> */}
                 </View>
                 <Text style={styles.profileName}>{profileData?.fullName}</Text>
                 <Text style={styles.profileEmail}>{profileData?.email}</Text>
@@ -260,7 +262,6 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 10,

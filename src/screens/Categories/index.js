@@ -182,9 +182,9 @@ const Categories = () => {
         const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
 
         return (
-            <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })} style={{ backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10 }}>
-                <View style={{ marginTop: 5, width: '100%', marginHorizontal: 5 }}>
-                    <FastImage style={{ width: '95%', height: 200, borderRadius: 10 }} source={{ uri: updatedImgUrl,
+            <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })} style={{ backgroundColor: 'white', marginTop: 10, width: 160, marginHorizontal: 5, borderRadius: 10 }}>
+                <View style={{ marginTop: 5, width: '100%' }}>
+                    <FastImage style={{ width: 150, height: 200, borderRadius: 10,alignSelf:"center" }} source={{ uri: updatedImgUrl,
                         headers:{Authorization : `Bearer ${getUserAuth}`}
                      }}  />
                     <Text style={styles.productName}>{capitalizeFirstLetters(item?.productName)}</Text>
@@ -243,7 +243,7 @@ const Categories = () => {
                         horizontal
                         showsHorizontalScrollIndicator={false}
                         data={categoryFilterList}
-                        contentContainerStyle={{ marginHorizontal: 20, marginTop: 15 }}
+                        contentContainerStyle={{ paddingHorizontal:15, marginTop: 15 }}
                         renderItem={renderFilterBox} 
                         // onEndReached={loadMoreClothJewels} // Fetch more when list ends
                         onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
@@ -288,7 +288,7 @@ const Categories = () => {
                 <FlatList
                     data={limitedData}
                     numColumns={2}
-                    contentContainerStyle={{ alignSelf: "center", marginHorizontal: 10 }}
+                    contentContainerStyle={{marginHorizontal: 20 }}
                     renderItem={renderClothesCat} 
                     
                     />
@@ -309,6 +309,7 @@ const styles = StyleSheet.create({
         fontFamily: 'ManropeRegular',
         color: 'black',
         marginHorizontal: 5,
+        marginTop:5
     },
     price: {
         color: themevariable.Color_202020,

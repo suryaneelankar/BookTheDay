@@ -92,8 +92,13 @@ const ViewCaterings = ({ route, navigation }) => {
             });
             // console.log("catering view details ::::::::::", JSON.stringify(response?.data));
             setEventsDetails(response?.data);
+            const professionalImageUrl = convertLocalhostUrls(response?.data?.professionalImage?.url);
 
-            const imageUrls = response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
+            const imageUrls = [
+                professionalImageUrl, // Add professional image as the first image
+                ...response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image?.url))
+            ];
+
             setSubImages(imageUrls);
             setFoodItemsData(response?.data?.foodItems);
         } catch (error) {
@@ -148,6 +153,7 @@ const ViewCaterings = ({ route, navigation }) => {
                             style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2,marginBottom:15 }}
                             placeholder="Enter number of plates"
                             keyboardType='phone-pad'
+                            editable={false}
                             value={numPlates[item.title] || ''}
                             onChangeText={(text) => setNumPlates({ ...numPlates, [item.title]: text })}
                         />
@@ -387,7 +393,7 @@ const ViewCaterings = ({ route, navigation }) => {
                             headerStyle={{ backgroundColor: '#FDEEBC' }}
                             markedDates={{ [selectedDate]: { selected: true, marked: true, selectedColor: '#ED5065' } }}
                             markingType="single"
-                            minDate={moment().format('DD-MM-YYYY')} // Disable past dates
+                            minDate={moment().format('YYYY-MM-DD')} // Disable past dates
                             theme={{
                                 arrowColor: 'black',
                                 todayTextColor: '#ED5065',

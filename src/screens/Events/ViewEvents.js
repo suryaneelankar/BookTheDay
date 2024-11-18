@@ -98,7 +98,14 @@ const ViewEvents = ({ route, navigation }) => {
         },
       });
       setEventsDetails(response?.data);
-      const imageUrls = response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
+
+        const professionalImageUrl = convertLocalhostUrls(response?.data?.professionalImage?.url);
+
+            const imageUrls = [
+                professionalImageUrl, // Add professional image as the first image
+                ...response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image?.url))
+            ];
+      
       setSubImages(imageUrls);
       console.log("hall amenities", JSON.stringify(response?.data))
       const amenities = response?.data?.hallAmenities[0].split(',').map((item, index) => ({
@@ -377,7 +384,7 @@ const ViewEvents = ({ route, navigation }) => {
               headerStyle={{ backgroundColor: '#FDEEBC' }}
               markedDates={{ [selectedDate]: { selected: true, marked: true, selectedColor: '#ED5065' } }}
               markingType="single"
-              minDate={moment().format('DD-MM-YYYY')} // Disable past dates
+              minDate={moment().format('YYYY-MM-DD')} // Disable past dates
               theme={{
                 arrowColor: 'black',
                 todayTextColor: '#ED5065',

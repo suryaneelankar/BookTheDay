@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Alert, Button, FlatList, Modal, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import SearchIcon from '../../assets/svgs/searchIcon.svg';
 import { useNavigation } from '@react-navigation/native';
-import UserLocationPicker from '../../components/userLocationPicker';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
 import BASE_URL from '../../apiconfig';
 import { useDispatch } from 'react-redux';
 import { getUserLocation } from '../../../redux/actions';
+import UserLocationPicker from '../../components/userLocationPicker';
 
 const LocationAdded = () => {
     const navigation = useNavigation();
@@ -127,10 +127,10 @@ const LocationAdded = () => {
     return (
         <SafeAreaView style={styles.container}>
 
-            {/* <Modal visible={isLocationPickerVisible} animationType="slide"> */}
-                {/* <UserLocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/> */}
+            <Modal visible={isLocationPickerVisible} animationType="slide">
+                <UserLocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
                 {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
-            {/* </Modal> */}
+            </Modal>
 
             <View style={styles.searchProHeader}>
                 <TouchableOpacity onPress={() => setLocationPickerVisible(true)} style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 10 }}>
@@ -143,7 +143,8 @@ const LocationAdded = () => {
                         // value={userAddress}
                         numberOfLines={4}
                         multiline={true}
-                    // onChangeText={(text) => [setLocationPickerVisible(true)]}
+                        onFocus={ () => setLocationPickerVisible(true)}
+                    //   onChangeText={(text) => [setLocationPickerVisible(true)]}
 
                     />
                 </TouchableOpacity>
@@ -153,7 +154,7 @@ const LocationAdded = () => {
             onPress={() => {setSelectedAddressVal(userLocationFetched),setSelectedCurrentAddress(true)}}>
                 <View style={styles.locationTextContainer}>
                     <Text style={styles.locationText}>Use Current Location</Text>
-                    <Text style={styles.addressText}>{userLocationFetched?.display_name}</Text>
+                    <Text style={styles.addressText}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address}</Text>
                 </View>
             </TouchableOpacity>
 

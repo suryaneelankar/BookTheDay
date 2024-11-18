@@ -132,7 +132,7 @@ const HomeDashboard = () => {
 
         } catch (error) {
             console.log("profile::::::::::", error);
-            setLoading(false);
+            // setLoading(false);
         }
     }
 
@@ -445,11 +445,17 @@ const HomeDashboard = () => {
     }
 
     const handlePress = (name) => {
+        console.log("name is::::::", name);
         if (name === 'Clothes') {
             navigation.navigate('CategoriesList', { catType: 'clothes' });
         } else if (name === 'Jewellery') {
             navigation.navigate('CategoriesList', { catType: 'jewels' });
+        }else if (name === 'Halls') {
+            navigation.navigate('Events');
+        }else if (name === 'Catering') {
+            navigation.navigate('Caterings');
         }
+        
         // Add other conditions for different categories if needed
     };
 
