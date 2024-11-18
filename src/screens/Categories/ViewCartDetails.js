@@ -61,7 +61,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
       console.log("categories cart::::::::::", error);
     }
   };
-
+console.log("endadate:", endDate)
   const getProfileData = async() => {
     const token = await getUserAuthToken();
     try {
@@ -104,7 +104,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
     const payload = {
       productId: catId,
       startDate: moment(startDate).format('DD MMMM YYYY'),
-      endDate: moment(endDate).format('DD MMMM YYYY'),
+      endDate: endDate ? moment(endDate).format('DD MMMM YYYY') : moment(startDate).format('DD MMMM YYYY'),
       numOfDays: NumOfDays,
       totalAmount: calculateTotalPrice(),
       userMobileNumber: userLoggedInMobileNum,
@@ -161,7 +161,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
             <View style={styles.dateContainer}>
               <CalendarIcon />
               {/* <Icon name="calendar-outline" size={14} color="#FFB156" /> */}
-              <Text style={styles.dateText}>{formatDateRange(startDate, endDate)}</Text>
+              <Text style={styles.dateText}>{formatDateRange(startDate, endDate ? endDate : startDate)}</Text>
             </View>
           </View>
         </View>

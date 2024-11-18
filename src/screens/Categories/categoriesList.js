@@ -13,7 +13,7 @@ import FastImage from "react-native-fast-image";
 const CategoriesList = ({ route }) => {
     const { catType,componentType } = route.params;
     const [categories, setCategories] = useState([]);
-    const [loading, setLoading] = useState(true); // Add loading state
+    const [loading, setLoading] = useState(false); // Add loading state
     const [getUserAuth, setGetUserAuth] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -23,6 +23,7 @@ const CategoriesList = ({ route }) => {
         getCategories(currentPage);
     }, []);
     const getCategories = async (page) => {
+        setLoading(true);
         setListingLoading(true);
         console.log('page num is ::>>>', page);
         const token = await getUserAuthToken();
@@ -34,9 +35,10 @@ const CategoriesList = ({ route }) => {
                 },
             });
             const finalResponseData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-    
+            setLoading(false);
+            setListingLoading(false);
             // If there's no data on this page, stop pagination
-            if (finalResponseData.length === 0) {
+            if (finalResponseData?.length === 0) {
                 setHasMore(false);
                 setListingLoading(false);
                 return;
@@ -70,6 +72,8 @@ const CategoriesList = ({ route }) => {
             setCurrentPage(page);
     
         } catch (error) {
+            setLoading(false);
+            setListingLoading(false);
             console.log("categories error::::::::::", error);
         } finally {
             setLoading(false);
@@ -127,7 +131,7 @@ const CategoriesList = ({ route }) => {
                                 <Text style={styles.strickedoffer}>{formatAmount(strikethroughPrice)}</Text>
                                 : null}
                         </View>
-                        <TouchableOpacity style={{ width: "100%", borderColor: "#D0433C", borderWidth: 1, borderRadius: 5, alignSelf: "center", alignItems: "center", padding: 5, marginVertical: 10 }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id,genderType: item?.genderType })} style={{ width: "100%", borderColor: "#D0433C", borderWidth: 1, borderRadius: 5, alignSelf: "center", alignItems: "center", padding: 5, marginVertical: 10 }}>
                             <Text style={{ color: "#D0433C", fontSize: 12, fontWeight: "700", fontFamily: 'ManropeRegular' }}>{item?.available ? 'Rent Now' : 'Not Available'}</Text>
                         </TouchableOpacity>
                     </View>
@@ -160,9 +164,7 @@ const CategoriesList = ({ route }) => {
 
             <View style={{ marginBottom: "10%" }}>
                 <Text style={{alignSelf:'center'}}>{categories?.length} products</Text>
-                {loading ? (
-                    <ActivityIndicator size="large" color={themevariable.Color_202020} style={{ marginTop: 20 }} />
-                ) : (
+               
                     <FlatList
                         numColumns={2}
                         showsVerticalScrollIndicator={false}
@@ -180,7 +182,6 @@ const CategoriesList = ({ route }) => {
                             </View>
                           }
                     />
-                )}
             </View>
         </SafeAreaView>
     )

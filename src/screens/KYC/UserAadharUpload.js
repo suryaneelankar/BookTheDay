@@ -58,20 +58,21 @@ const UserAadharUpload = () => {
             });
         } else {
             launchImageLibrary(options, (response) => {
-                if (response.assets) {
+                if (response?.assets) {
                     console.log("gallery response:::;", response.assets)
                     if(isEdit==='edit'){
                         setIsAadharAvailable(response?.assets[0]?.uri);
                         setSelectedImage(response);
                     }else{
                     setSelectedImage(response);
+                    setIsAadharAvailable(true);
                     }
                 }
             });
         }
     };
 
-    const onSubmitCallUser = async() =>{
+    const onSubmitCallUser = async() => {
 
         if(!selectedImage){
             Alert.alert('Please upload Aadhar Image')
@@ -123,7 +124,7 @@ const UserAadharUpload = () => {
             <View style={styles.uploadBox}>
                 {isAadharAvailable ? (
                     <View style={{ flex: 1, flexDirection: "row" }}>
-                        {isAadharAvailable ?
+                        {isAadharAvailable && !selectedImage ?
                         // <></>
                         <FastImage 
                         source={{ uri: isAadharAvailable,

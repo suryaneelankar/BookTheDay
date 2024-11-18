@@ -119,7 +119,12 @@ const NearByFoodCaterings = () => {
         const convertLocalhostUrls = (url) => {
             return url.replace("localhost", LocalHostUrl);
         };
-        const imageUrls = item?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
+        const professionalImageUrl = convertLocalhostUrls(item?.professionalImage?.url);
+
+        const imageUrls = [
+            professionalImageUrl, // Add professional image as the first image
+            ...item?.additionalImages.flat().map(image => convertLocalhostUrls(image?.url))
+        ];
         return (
             <View style={{ borderRadius: 20, marginHorizontal: 20, marginBottom: 5, elevation: -10 }}>
                 <View style={[styles.container]}>
@@ -214,7 +219,7 @@ const NearByFoodCaterings = () => {
                         data={dropdownVisible && filteredData?.length > 0 ? filteredData : []}  // Conditionally hide results based on dropdownVisible
                         value={query}
                         onChangeText={handleQueryChange}  // Handle query changes
-                        placeholder="Seach Location..."
+                        placeholder="Search Location..."
                         flatListProps={{
                             keyExtractor: (item) => item?._id.toString(),
                             renderItem: ({ item }) => (
@@ -224,7 +229,7 @@ const NearByFoodCaterings = () => {
                             ),
                         }}
                         inputContainerStyle={{
-                            borderRadius: 35,
+                            borderRadius: 15,
                             height: 50,
                             width: "90%",
                             alignSelf: "center",

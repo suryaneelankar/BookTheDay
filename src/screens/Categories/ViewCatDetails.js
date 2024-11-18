@@ -75,15 +75,23 @@ const ViewCatDetails = ({ route }) => {
             console.log("categories each ::::::::::", JSON.stringify(response?.data));
             setJewelleryDetails(response?.data)
 
-            const photos = response?.data?.additionalImages.flat().map(image => ({
-                uri: image.url.replace('localhost', LocalHostUrl),  // Replace 'localhost' with '192.168.1.8'
-            }));
+            const convertLocalhostUrls = (url) => {
+                return url.replace("localhost", LocalHostUrl);
+            };
+            const professionalImageUrl = convertLocalhostUrls(response?.data?.professionalImage?.url);
+            const photos = [
+                { uri: professionalImageUrl }, // Add professional image as the first image
+                ...response?.data?.additionalImages.flat().map(image => ({
+                    uri: convertLocalhostUrls(image?.url)
+                }))
+            ];
             setSpecificAdditionImages(photos);
 
         } catch (error) {
             console.log("categories::::::::::", error);
         }
     }
+    console.log("photos is::::::", specifcadditionalImages)
 
     const onDayPress = (day) => {
         const { startDate, endDate } = selectedRange;
@@ -190,8 +198,9 @@ const ViewCatDetails = ({ route }) => {
                     </View>
 
                     <View style={{ marginBottom: 20, marginHorizontal: 20, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                        {jewelleryDetails?.categoryType !== 'jewels' ?
                         <Text style={{ color: "#9095A6", fontSize: 14, fontWeight: "500", fontFamily: "ManropeRegular", }}>Size : {jewelleryDetails?.size}</Text>
-
+                         : null}
                         <View style={{ flexDirection: "row", backgroundColor: "#FFF8F0", paddingVertical: 5, paddingHorizontal: 10, borderRadius: 10 }}>
                             <TruestedMarkOrange />
                             <Text style={{ marginLeft: 5, color: "#FD813B", fontSize: 11, fontWeight: "800", fontFamily: "ManropeRegular", }}>Trusted Lender</Text>
@@ -204,8 +213,12 @@ const ViewCatDetails = ({ route }) => {
                     <Text style={{ color: "#121212", fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular", }}>Description</Text>
                     <Text style={{ marginBottom: 20, marginTop: 5, color: "#393C47", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>{defaultDescription}</Text>
                     <Text style={{ marginBottom: 20, marginTop: 5, color: "#393C47", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>{jewelleryDetails?.description}</Text>
+                    {jewelleryDetails?.categoryType !== 'jewels' ?
                     <ProductInfoCard color={jewelleryDetails?.color} size={jewelleryDetails?.size} />
-                </View>
+                     : null}
+                    </View>
+
+                    {jewelleryDetails?.categoryType !== 'jewels' ?
 
                 <View style={{ width: '92%', alignSelf: 'center', marginTop: 20 }}>
                     <View style={styles.headerRow}>
@@ -224,7 +237,7 @@ const ViewCatDetails = ({ route }) => {
                             {genderType == 'womens' && <Text style={styles.cellText}>{item.hip}</Text>}
                         </View>
                     ))}
-                </View>
+                </View> : null}
                 <View style={{ marginTop: 10, marginBottom: 20 }}>
                     <PricingOptions
                         onSelect={handleSelect}

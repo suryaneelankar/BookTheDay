@@ -52,7 +52,6 @@ const HowItWorks=()=>{
         <View style={styles.rootContainer}>
         <View style={styles.topContainer}>
             <Text style={styles.worksText}>How it Works?</Text>
-            <Text style={styles.simpleText}>Simple 4 steps</Text>
         </View>
         <FlatList
             data={Data}
