@@ -403,8 +403,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
             <Text style={styles.combotitle}>{item.title}</Text>
             <Text style={styles.combosubtitle}>Combo Includes</Text>
             <Text style={styles.combotitle}>{item.items.join(', ')}</Text>
-            <Text style={styles.comboprice}>Per Plate Price: {item.perPlateCost}</Text>
-            <Text style={styles.combominOrder}>Min Order: {item.minOrder}</Text>
+            <Text style={styles.comboprice}>Per Plate Price: <Text style={styles.combopriceValue}>{item.perPlateCost}</Text></Text>
+            <Text style={styles.combominOrder}>Min Order: <Text style={styles.combopriceValue}>{item.minOrder}</Text></Text>
 
         </View>
     );
@@ -713,6 +713,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingVertical: 10,
         paddingHorizontal: 10,
+        width:Dimensions.get('window').width - 150
     },
     combotitle: {
         color: 'black',
@@ -739,6 +740,13 @@ const styles = StyleSheet.create({
         marginTop: 5,
         color: '#FE8235',
         fontSize: 12,
+        fontWeight: '400',
+        fontFamily: 'ManropeRegular',
+    },
+    combopriceValue: {
+        marginTop: 5,
+        color: '#FE8235',
+        fontSize: 14,
         fontWeight: '400',
         fontFamily: 'ManropeRegular',
     },
