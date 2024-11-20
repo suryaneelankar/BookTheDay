@@ -63,11 +63,6 @@ const VendorRefundPolicy = ({ navigation }) => {
             <Text style={styles.paragraph}>
                 Thank you for choosing Book The Day. We’re committed to providing the best experience for your special day, and we’re here to support you in case of any changes to your plans.
             </Text>
-
-            <Button
-                title="Back to Home"
-                onPress={() => navigation.goBack()}
-            />
         </ScrollView>
     );
 };
