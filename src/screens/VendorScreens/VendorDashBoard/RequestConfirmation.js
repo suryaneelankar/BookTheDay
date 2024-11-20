@@ -324,6 +324,8 @@ const RequestConfirmation = ({ navigation, route }) => {
         Linking.openURL(url);
     };
 
+    
+
     const renderActionSheetWithProductDetais = () => {
 
         const renderBookedItems = ({ item }) => (
@@ -347,6 +349,20 @@ const RequestConfirmation = ({ navigation, route }) => {
             </View>
         );
 
+        const formatDate = (dateString) => {
+            console.log("datestring", dateString)
+            if (!dateString) return "Invalid Date"; // Handle undefined or empty date
+        
+            const date = new Date(dateString);
+            if (isNaN(date)) return "Invalid Date"; // Handle invalid date formats
+        
+            const day = date.getDate().toString().padStart(2, '0'); // Two-digit day
+            const month = date.toLocaleString('default', { month: 'short' }); // Short month name
+            const year = date.getFullYear().toString().slice(-2); // Last two digits of the year
+        
+            return `${day}-${month}-${year}`;
+        };
+
         return (
             <ActionSheet
                 ref={actionSheetRef}
@@ -361,6 +377,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                     <View>
                         <Text style={styles.productNameText}>{selectedItemDetails?.productName}</Text>
                         <Text style={styles.productDateText}>
+                            {/* {formatDate(selectedItemDetails?.startDate)} - {formatDate(selectedItemDetails?.endDate)} */}
                             {selectedItemDetails?.startDate} - {selectedItemDetails?.endDate}
                         </Text>
                     </View>
@@ -371,13 +388,14 @@ const RequestConfirmation = ({ navigation, route }) => {
                                     selectedItemDetails?.bookingStatus === "payment successful" ? "green" :
                                         "black"
                     }]}>
-                        <Text
+                        <Text  numberOfLines={2}
                             style={[
                                 styles.bookingStatusText,
                                 {
                                     textTransform: "capitalize",
                                     color: "white",
-                                    textAlignVertical:"center"
+                                    textAlignVertical:"center",
+                                    width:"50%"
                                 }
                             ]}
                         >

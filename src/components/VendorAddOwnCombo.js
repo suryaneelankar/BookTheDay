@@ -177,7 +177,7 @@ const FoodMenu = ({ onSaveClick }) => {
             console.warn('Invalid category name:', categoryName); // Log a warning if it's not a string
             return ''; // Return an empty string for invalid input
         }
-    
+
         // Use regular expressions to remove 'veg' or 'non-veg' and surrounding spaces
         return categoryName
             .replace(/\s*non-veg\s*/i, '') // Remove 'non-veg' and surrounding spaces
@@ -185,14 +185,18 @@ const FoodMenu = ({ onSaveClick }) => {
             .replace(/\bnon-/i, '')         // Remove 'non-' prefix if present
             .trim();                        // Trim any leading or trailing whitespace
     };
-    
-    
+
+
 
     return (
         <View style={styles.container}>
             {/* <Text style={styles.title}>Select Food Items</Text> */}
             <Text style={styles.comboTitle}>Select veg/non-veg to add the combos.</Text>
             {RentalFoodTypeList()}
+
+            <Text style={[styles.label,{marginTop:15}]}>
+                Combo Name <Text style={styles.asterisk}>*</Text>
+            </Text>
 
             <TextInput
                 style={styles.input}
@@ -234,6 +238,10 @@ const FoodMenu = ({ onSaveClick }) => {
                 ))}
             </View>
 
+            <Text style={styles.label}>
+                Per Plate Cost <Text style={styles.asterisk}>*</Text>
+            </Text>
+
             <TextInput
                 style={styles.input}
                 placeholder="Enter per plate Combo price"
@@ -241,6 +249,11 @@ const FoodMenu = ({ onSaveClick }) => {
                 onChangeText={setPerPlatePrice}
                 keyboardType="numeric"
             />
+
+            <Text style={[styles.label,{marginTop:10}]}>
+               Minimum Orders <Text style={styles.asterisk}>*</Text>
+            </Text>
+
             <TextInput
                 style={styles.input}
                 placeholder="Enter min Order members"
@@ -321,7 +334,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 5,
-        paddingHorizontal:5
+        paddingHorizontal: 5
     },
     itemContainer: {
         padding: 10,
@@ -416,7 +429,17 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingVertical: 10,
         marginTop: 20,
-    }
+    },
+    label: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+        fontFamily: 'ManropeRegular',
+        marginTop: 5
+    },
+    asterisk: {
+        color: 'red',
+    },
 });
 
 export default FoodMenu;
