@@ -39,49 +39,49 @@ const MyTransactions = () => {
         }
     }
 
-    const TransactionItem = ({ date, orderId, amount, paymentStatus }) =>{
-        
-       return(
-        paymentStatus === 'success' ?
-        <View style={styles.transactionItem}>
-            <OrderIcon style={styles.orderIcon} />
-            <View style={styles.transactionDetails}>
-                <Text style={styles.transactionDate}>
-                    {date ? formatDateToDMY(date) : "Date Unavailable"}
-                </Text>
-                <Text style={styles.transactionOrderId}>
-                    Order {orderId || "N/A"}
+    const TransactionItem = ({ item }) => {
+        if (!item) return null; // Ensure item is valid
+
+        return item?.paymentStatus === "success" ? (
+            <View style={styles.transactionItemContainer}>
+                  <Text style={[styles.transactionOrderId,{color:"#666666",marginBottom:10}]}>
+                        Order Id: {item?.OrderId || "N/A"}
+                    </Text>
+            <View style={styles.transactionItem}>
+                <OrderIcon style={styles.orderIcon} />
+                <View style={styles.transactionDetails}>
+                    <Text  style={styles.transactionOrderId}>{item?.productName}</Text>
+                    <Text style={styles.transactionDate}>
+                        {item?.createdAt ? formatDateToDMY(item?.createdAt) : "Date Unavailable"}
+                    </Text>
+                    <Text style={styles.transactionOrderId}>Booked by: {item?.userFullName}</Text>
+                    {/* <Text style={styles.transactionOrderId}>User Mobile.No: {item?.userMobileNumber}</Text> */}
+                </View>
+                <Text
+                    style={[
+                        styles.transactionAmount,
+                        { color: item?.paymentStatus === "success" ? "#1BB003" : "#E64A19" },
+                    ]}
+                >
+                    {formatAmount(`+${item?.orderAmount?.toFixed(2)}`)}
                 </Text>
             </View>
-            <Text
-                style={[
-                    styles.transactionAmount,
-                    { color: paymentStatus === "success" ? '#1BB003' : '#E64A19' }
-                ]}
-            >
-              {formatAmount(`+${amount.toFixed(2)}`)}
-            </Text>
-        </View>
-         : null
-    )};
+           
+            </View>
+        ) : null;
+    };
+
 
     return (
         <View style={styles.container}>
             <FlatList
-                data={transactionsData}
-                keyExtractor={(item) => item._id || Math.random().toString()}
-                renderItem={({ item }) => (
-                    <TransactionItem
-                        date={item.createdAt}
-                        orderId={item.OrderId}
-                        amount={item.orderAmount}
-                        paymentStatus={item.paymentStatus}
-                    />
-                )}
-                ListEmptyComponent={() =>(
-                    <View style={{flex:1, alignSelf:"center",justifyContent:"center", height:Dimensions.get('window').height-100,width:"100%",alignItems:"center"}}>
+                data={transactionsData.filter((item) => item.paymentStatus === 'success')}
+                keyExtractor={(item) => item?._id || Math.random().toString()}
+                renderItem={({ item }) => <TransactionItem item={item} />}
+                ListEmptyComponent={() => (
+                    <View style={{ flex: 1, alignSelf: "center", justifyContent: "center", height: Dimensions.get('window').height - 100, width: "100%", alignItems: "center" }}>
                         <Text>No transactions are found</Text>
-                        </View>
+                    </View>
                 )}
             />
         </View>
@@ -97,7 +97,19 @@ const styles = StyleSheet.create({
     },
     transactionItem: {
         flexDirection: 'row',
-        alignItems: 'center',
+        marginBottom:10
+        // alignItems: 'center',
+        // backgroundColor: '#FFF4CD',
+        // borderRadius: 8,
+        // padding: 16,
+        // marginBottom: 12,
+        // shadowColor: "#000",
+        // shadowOffset: { width: 0, height: 2 },
+        // shadowOpacity: 0.1,
+        // shadowRadius: 4,
+        // elevation: 3,
+    },
+    transactionItemContainer: {
         backgroundColor: '#FFF4CD',
         borderRadius: 8,
         padding: 16,
