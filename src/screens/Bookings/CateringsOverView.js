@@ -15,7 +15,7 @@ import EditButton from '../../assets/svgs/categories/editButton.svg';
 import CalendarIcon from '../../assets/svgs/calendarOrangeIcon.svg';
 import { formatAmount } from "../../utils/GlobalFunctions";
 import ServiceTime from '../../assets/svgs/serviceTime.svg';
-
+import ThumsUpIcon from '../../assets/svgs/thumsupIcon.svg';
 
 const CateringsOverView = ({ route, navigation }) => {
 
@@ -62,11 +62,11 @@ const CateringsOverView = ({ route, navigation }) => {
             userMobileNumber: userLoggedInMobileNum,
             bookingTime: timeSlot,
             userDeliveryLocation: userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address,
-            advanceAmountToPay : bookingDetails?.advanceAmount,
-            userFullName : userLoggedInName,
-            userDeliveryLocationLatitude : userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude,
-            userDeliveryLocationLongitude : userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
-            
+            advanceAmountToPay: bookingDetails?.advanceAmount,
+            userFullName: userLoggedInName,
+            userDeliveryLocationLatitude: userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude,
+            userDeliveryLocationLongitude: userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
+
         }
         console.log("payload is:::::::", payload);
         try {
@@ -100,7 +100,7 @@ const CateringsOverView = ({ route, navigation }) => {
             <ScrollView style={{ marginBottom: "20%" }}>
 
                 {bookingDone ?
-                    <View style={{ backgroundColor: '#fdf5e6', borderRadius: 15, padding: 10, marginTop: 20, width: '90%',alignSelf:"center" }}>
+                    <View style={{ backgroundColor: '#fdf5e6', borderRadius: 15, padding: 10, marginTop: 20, width: '90%', alignSelf: "center" }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <Icon name="exclamationcircleo" size={18} color="grey" />
                             <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 16, marginHorizontal: 10 }}>Confirmation Pending</Text>
@@ -255,20 +255,18 @@ const CateringsOverView = ({ route, navigation }) => {
                         end={{ x: 1, y: 0 }}
                         style={{ width: "55%", padding: 4, }}>
                     </LinearGradient>
-
-                    <View style={styles.iconContainer}>
-                        <View style={styles.iconBackground}>
-
-                        </View>
+                    <View style={{ height: 120 }}>
+                        <ThumsUpIcon />
                     </View>
                     <Text style={styles.title}>Thank You!</Text>
                     <Text style={styles.subtitle}>Your Booking Initiated.</Text>
                     <Text style={styles.description}>Our team will update to you in less than 2 hours</Text>
+                    <Text style={styles.description}>*Once booking approved please do the payment to confirm your booking.</Text>
                     <LinearGradient colors={['#D2453B', '#A0153E']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         style={styles.doneButton}>
-                        <TouchableOpacity onPress={() => [setThankYouCardVisible(false), setBookingDone(true)]}>
+                        <TouchableOpacity onPress={() => [setThankYouCardVisible(false), setBookingDone(true), navigation.navigate('Home')]}>
                             <Text style={styles.doneButtonText}>Done</Text>
                         </TouchableOpacity>
                     </LinearGradient>

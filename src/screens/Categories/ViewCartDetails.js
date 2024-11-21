@@ -36,23 +36,23 @@ const BookingDetailsScreen = ({ navigation, route }) => {
     useCallback(() => {
       getSelectedProductDetails();
       getProfileData();
-        // Cleanup function to run when the screen loses focus
-        return () => {
-            console.log('Screen is unfocused');
-        };
+      // Cleanup function to run when the screen loses focus
+      return () => {
+        console.log('Screen is unfocused');
+      };
     }, [])
-);
+  );
 
   const getSelectedProductDetails = async () => {
     console.log("IAM CALLING INSIDE CART")
     const token = await getUserAuthToken();
     setGetUserAuth(token);
     try {
-      const response = await axios.get(`${BASE_URL}/getClothJewelsById/${catId}`,{
+      const response = await axios.get(`${BASE_URL}/getClothJewelsById/${catId}`, {
         headers: {
-            Authorization: `Bearer ${token}`,
-          },
-    });
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log(" selected product::::::::::", JSON.stringify(response?.data));
       setProductDetails(response?.data);
       const updatedImgUrl = response?.data?.professionalImage?.url !== undefined ? response?.data?.professionalImage?.url.replace('localhost', LocalHostUrl) : response?.data?.professionalImage?.url;
@@ -61,21 +61,21 @@ const BookingDetailsScreen = ({ navigation, route }) => {
       console.log("categories cart::::::::::", error);
     }
   };
-console.log("endadate:", endDate)
-  const getProfileData = async() => {
+  console.log("endadate:", endDate)
+  const getProfileData = async () => {
     const token = await getUserAuthToken();
     try {
       console.log("vendou num:", userLoggedInMobileNum)
-      const response = await axios.get(`${BASE_URL}/getAllUserLocations/${userLoggedInMobileNum}`,{
-          headers: {
-                Authorization: `Bearer ${token}`,
-              },
-        });
-        setIsAadharAvailable( response?.data?.data?.aadharImage?.url ? true : false);
+      const response = await axios.get(`${BASE_URL}/getAllUserLocations/${userLoggedInMobileNum}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setIsAadharAvailable(response?.data?.data?.aadharImage?.url ? true : false);
     } catch (error) {
-        console.log("profile::::::::::", error);
+      console.log("profile::::::::::", error);
     }
-}
+  }
 
 
   const formatDateRange = (startDate, endDate) => {
@@ -97,7 +97,7 @@ console.log("endadate:", endDate)
 
   const ConfirmBooking = async () => {
     const token = await getUserAuthToken();
-    if(!isAadharAvailable){
+    if (!isAadharAvailable) {
       Alert.alert("Please Upload Aadhar Image");
       return;
     }
@@ -109,17 +109,17 @@ console.log("endadate:", endDate)
       totalAmount: calculateTotalPrice(),
       userMobileNumber: userLoggedInMobileNum,
       userDeliveryLocation: userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address,
-      userFullName : userLoggedInName,
-      userDeliveryLocationLatitude : userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude,
-      userDeliveryLocationLongitude : userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
+      userFullName: userLoggedInName,
+      userDeliveryLocationLatitude: userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude,
+      userDeliveryLocationLongitude: userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
     }
     console.log("clothesjewels", payload);
     try {
-      const bookingResponse = await axios.post(`${BASE_URL}/create-cloth-jewel-booking`, payload,{
+      const bookingResponse = await axios.post(`${BASE_URL}/create-cloth-jewel-booking`, payload, {
         headers: {
-            Authorization: `Bearer ${token}`,
-          },
-    });
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (bookingResponse?.status === 201) {
         setThankYouCardVisible(true)
       }
@@ -139,23 +139,24 @@ console.log("endadate:", endDate)
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: "#202020" }]}>Shipping Address</Text>
         <View style={{ flexDirection: "row" }}>
-        <Text numberOfLines={2} style={styles.address}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address}</Text>
-          <TouchableOpacity onPress={() => {navigation.navigate('LocationAdded')}}>
-          <EditButton />
+          <Text numberOfLines={2} style={styles.address}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address}</Text>
+          <TouchableOpacity onPress={() => { navigation.navigate('LocationAdded') }}>
+            <EditButton />
           </TouchableOpacity>
         </View>
       </View>
 
       <View style={[styles.imgsection]}>
         <View style={styles.productContainer}>
-          <FastImage source={{ uri: productImage,
-            headers:{Authorization : `Bearer ${getUserAuth}`}
-           }} style={styles.productImage}/>
+          <FastImage source={{
+            uri: productImage,
+            headers: { Authorization: `Bearer ${getUserAuth}` }
+          }} style={styles.productImage} />
           <View style={styles.productDetails}>
             <Text style={styles.productTitle}>{productDetails?.productName}</Text>
-            <View style={{flexDirection:'row',alignItems:'center',marginTop:5}}>
-            <View style={[styles.colorCircle,{ backgroundColor: productDetails?.color,borderRadius: 10 }]} />
-            <Text style={styles.productSubTitle}>Size: {productDetails?.size}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+              <View style={[styles.colorCircle, { backgroundColor: productDetails?.color, borderRadius: 10 }]} />
+              <Text style={styles.productSubTitle}>Size: {productDetails?.size}</Text>
             </View>
             <Text style={styles.productPrice}>{formatAmount(productDetails?.rentPricePerDay)}<Text style={styles.productPriceperDay}>/day</Text></Text>
             <View style={styles.dateContainer}>
@@ -207,13 +208,13 @@ console.log("endadate:", endDate)
           </View>
           <View style={styles.priceDetailRow}>
             <Text style={styles.priceDetailLabel}>
-            Aadhar Proof <Text style={{color:"red", fontSize:18}}>*</Text>
+              Aadhar Proof <Text style={{ color: "red", fontSize: 18 }}>*</Text>
             </Text>
-            {isAadharAvailable ? 
-            <CheckMark/> :
-            <TouchableOpacity onPress={() => {navigation.navigate('UserAadharUpload')}}>
-              <Text style={{color:"#FD813B", fontSize:14, fontWeight:"700", fontFamily: "ManropeRegular",}}>UPLOAD</Text>
-            </TouchableOpacity>
+            {isAadharAvailable ?
+              <CheckMark /> :
+              <TouchableOpacity onPress={() => { navigation.navigate('UserAadharUpload') }}>
+                <Text style={{ color: "#FD813B", fontSize: 14, fontWeight: "700", fontFamily: "ManropeRegular", }}>UPLOAD</Text>
+              </TouchableOpacity>
             }
           </View>
           <View style={{ width: "90%", borderColor: "#D8D8D8", borderWidth: 0.5, marginVertical: 5, alignSelf: "center" }} />
@@ -234,7 +235,7 @@ console.log("endadate:", endDate)
           <Text style={styles.footerNote} >Security Deposit confirms your order 90%</Text>
         </View>
         <View style={styles.footerButtons}>
-          <TouchableOpacity onPress={() => ConfirmBooking()} style={[styles.button, {   backgroundColor: "#D2453B" }]}>
+          <TouchableOpacity onPress={() => ConfirmBooking()} style={[styles.button, { backgroundColor: "#D2453B" }]}>
             <Text style={[styles.buttonText, { color: "white" }]}>Confirm Booking | {formatAmount(productDetails?.securityDepositAmount)}</Text>
           </TouchableOpacity>
         </View>
@@ -267,17 +268,19 @@ console.log("endadate:", endDate)
             style={{ width: "55%", }}>
             {/* <View style={{borderWidth:4, width:"50%", }}/> */}
           </LinearGradient>
-
-           <ThumsUpIcon/>
+          <View style={{ height: 120 }}>
+            <ThumsUpIcon />
+          </View>
           <Text style={styles.title}>Thank You!</Text>
           <Text style={styles.subtitle}>Your Booking Initiated.</Text>
           <Text style={styles.description}>Our team will deliver the update to you in less than 2 hours</Text>
+          <Text style={styles.description}>*Once booking approved please do the payment to confirm your booking.</Text>
           <LinearGradient colors={['#D2453B', '#A0153E']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.doneButton}>
             <TouchableOpacity onPress={() => [setThankYouCardVisible(false),
-              navigation.navigate('Categories')
+            navigation.navigate('Categories')
             ]}>
               <Text style={styles.doneButtonText}>Done</Text>
             </TouchableOpacity>
@@ -360,7 +363,7 @@ const styles = StyleSheet.create({
     color: '#000000',
     fontFamily: "ManropeRegular",
     fontWeight: "500",
-    marginHorizontal:10
+    marginHorizontal: 10
     // marginTop: 2,
 
   },
@@ -462,7 +465,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginHorizontal: 20,
     paddingVertical: 15,
-    alignSelf:"center",
+    alignSelf: "center",
   },
   button: {
     alignItems: 'center',
@@ -470,7 +473,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "#D2453B",
     borderWidth: 1,
-    width:"95%"
+    width: "95%"
 
   },
   payLaterButton: {

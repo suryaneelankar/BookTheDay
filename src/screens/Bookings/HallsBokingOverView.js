@@ -16,7 +16,7 @@ import { formatAmount } from "../../utils/GlobalFunctions";
 import ServiceTime from '../../assets/svgs/serviceTime.svg';
 import CalendarIcon from '../../assets/svgs/calendarOrangeIcon.svg';
 import MapMarkIcon from '../../assets/svgs/orangeMapMark.svg';
-
+import ThumsUpIcon from '../../assets/svgs/thumsupIcon.svg';
 
 const HallsBookingOverView = ({ route, navigation }) => {
 
@@ -26,7 +26,7 @@ const HallsBookingOverView = ({ route, navigation }) => {
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
     const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
     const userLoggedInName = useSelector((state) => state.userLoggedInName);
-    
+
     useEffect(() => {
         getEventsDetails();
     }, []);
@@ -34,10 +34,10 @@ const HallsBookingOverView = ({ route, navigation }) => {
     const getEventsDetails = async () => {
         const token = await getUserAuthToken();
         try {
-            const response = await axios.get(`${BASE_URL}/getFunctionHallDetailsById/${categoryId}`,{
+            const response = await axios.get(`${BASE_URL}/getFunctionHallDetailsById/${categoryId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
             console.log("Halls house over view ::::::::::", JSON.stringify(response?.data));
             setBookingDetails(response?.data)
@@ -46,42 +46,42 @@ const HallsBookingOverView = ({ route, navigation }) => {
         }
     }
 
-    const ConfirmBooking = async () => {  
+    const ConfirmBooking = async () => {
         const token = await getUserAuthToken();
         const payload = {
-          productId: categoryId,
-          startDate: moment(bookingDate, "DD-MM-YYYY").format("DD MMMM YYYY"),
-          endDate: moment(bookingDate, "DD-MM-YYYY").format("DD MMMM YYYY"),
-          numOfDays: 1,
-          totalAmount: totalPrice.replace(/[^\d]/g, ''),
-          userMobileNumber: userLoggedInMobileNum,
-          bookingTime: timeSlot,
-          userFullName : userLoggedInName,
-          advanceAmountToPay : bookingDetails?.advanceAmount,
+            productId: categoryId,
+            startDate: moment(bookingDate, "DD-MM-YYYY").format("DD MMMM YYYY"),
+            endDate: moment(bookingDate, "DD-MM-YYYY").format("DD MMMM YYYY"),
+            numOfDays: 1,
+            totalAmount: totalPrice.replace(/[^\d]/g, ''),
+            userMobileNumber: userLoggedInMobileNum,
+            bookingTime: timeSlot,
+            userFullName: userLoggedInName,
+            advanceAmountToPay: bookingDetails?.advanceAmount,
         }
         console.log("payload is:::::::", payload);
         try {
-          const bookingResponse = await axios.post(`${BASE_URL}/create-function-hall-booking`, payload,{
-            headers: {
-                Authorization: `Bearer ${token}`,
-              },
-        });
-           console.log("booking res:::::::::", bookingResponse);
-          if (bookingResponse?.status === 201) {
-            setThankYouCardVisible(true);
+            const bookingResponse = await axios.post(`${BASE_URL}/create-function-hall-booking`, payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log("booking res:::::::::", bookingResponse);
+            if (bookingResponse?.status === 201) {
+                setThankYouCardVisible(true);
 
-          }
+            }
         } catch (error) {
-          console.error("Error during function hall booking:", error);
+            console.error("Error during function hall booking:", error);
         }
-      }
-    
+    }
+
 
 
     return (
         <View style={{ flex: 1, backgroundColor: "white", }}>
             {bookingDone ?
-                <View style={{ backgroundColor: '#fdf5e6', borderRadius: 15, padding: 10, marginTop: 20, width: '90%',alignSelf:"center",marginVertical:20 }}>
+                <View style={{ backgroundColor: '#fdf5e6', borderRadius: 15, padding: 10, marginTop: 20, width: '90%', alignSelf: "center", marginVertical: 20 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Icon name="exclamationcircleo" size={18} color="grey" />
                         <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 16, marginHorizontal: 10 }}>Confirmation Pending</Text>
@@ -92,7 +92,7 @@ const HallsBookingOverView = ({ route, navigation }) => {
                         <Text style={{ color: 'green', fontWeight: '800', fontSize: 13, marginTop: 10, marginHorizontal: 10 }}>We'll get back with in 2 hrs with booking confirmation status.</Text>
                     </View>
                 </View> : null}
-                <ScrollView style={{}}>
+            <ScrollView style={{}}>
 
                 <View style={styles.productContainer}>
                     <FastImage source={{ uri: bookingDetails?.professionalImage?.url.replace('localhost', LocalHostUrl) }}
@@ -100,40 +100,40 @@ const HallsBookingOverView = ({ route, navigation }) => {
                         resizeMethod="resize"
                         resizeMode="cover"
                     />
-                        <View style={{marginTop:20}}>
-                            <Text style={styles.productTitle}>{bookingDetails?.functionHallName}</Text>
-                            <Text style={styles.productPrice}><Text style={styles.productPriceperDay}>Advance Amount  </Text>{formatAmount(bookingDetails?.advanceAmount)}</Text>
-                            <View >
-                                <View style={styles.dateContainer}>
-                                    <CalendarIcon />
-                                    <Text style={styles.dateText}>{bookingDate}</Text>
-                                </View>
-                                <View style={styles.dateContainer}>
-                                    <ServiceTime />
-                                    <Text style={styles.dateText}>{timeSlot}</Text>
-                                </View>
-                                <View style={styles.addressContainer}>
-                                    <MapMarkIcon />
-                                    <Text style={styles.addressText}>{bookingDetails?.functionHallAddress?.address}</Text>
-                                </View>
+                    <View style={{ marginTop: 20 }}>
+                        <Text style={styles.productTitle}>{bookingDetails?.functionHallName}</Text>
+                        <Text style={styles.productPrice}><Text style={styles.productPriceperDay}>Advance Amount  </Text>{formatAmount(bookingDetails?.advanceAmount)}</Text>
+                        <View >
+                            <View style={styles.dateContainer}>
+                                <CalendarIcon />
+                                <Text style={styles.dateText}>{bookingDate}</Text>
+                            </View>
+                            <View style={styles.dateContainer}>
+                                <ServiceTime />
+                                <Text style={styles.dateText}>{timeSlot}</Text>
+                            </View>
+                            <View style={styles.addressContainer}>
+                                <MapMarkIcon />
+                                <Text style={styles.addressText}>{bookingDetails?.functionHallAddress?.address}</Text>
                             </View>
                         </View>
                     </View>
+                </View>
 
-                    <View style={{ backgroundColor: '#dcdcdc', width: '90%', height: 2, alignSelf: 'center', marginVertical: 10 }} />
+                <View style={{ backgroundColor: '#dcdcdc', width: '90%', height: 2, alignSelf: 'center', marginVertical: 10 }} />
 
-            <View style={{ backgroundColor: 'white', borderRadius: 15, padding: 10,paddingHorizontal: 20, }}>
-               
-                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                            <Text style={{ marginTop: 20, color: 'black', fontSize: 18, fontWeight: "500", fontFamily: 'ManropeRegular', marginVertical: 15 }}>Total Amount</Text>
-                            <Text style={{ marginTop: 20, color: 'black', fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular', marginVertical: 15 }}>{totalPrice}</Text>
-                        </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                            <Text style={{ color: 'black', fontSize: 18, fontWeight: "500", fontFamily: 'ManropeRegular', }}>Advacnce Amount</Text>
-                            <Text style={{ color: 'black', fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular', }}>{formatAmount(bookingDetails?.advanceAmount)}</Text>
-                        </View>
-            
-            </View>
+                <View style={{ backgroundColor: 'white', borderRadius: 15, padding: 10, paddingHorizontal: 20, }}>
+
+                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <Text style={{ marginTop: 20, color: 'black', fontSize: 18, fontWeight: "500", fontFamily: 'ManropeRegular', marginVertical: 15 }}>Total Amount</Text>
+                        <Text style={{ marginTop: 20, color: 'black', fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular', marginVertical: 15 }}>{totalPrice}</Text>
+                    </View>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                        <Text style={{ color: 'black', fontSize: 18, fontWeight: "500", fontFamily: 'ManropeRegular', }}>Advacnce Amount</Text>
+                        <Text style={{ color: 'black', fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular', }}>{formatAmount(bookingDetails?.advanceAmount)}</Text>
+                    </View>
+
+                </View>
             </ScrollView>
             <Modal
                 isVisible={thankyouCardVisible}
@@ -161,21 +161,18 @@ const HallsBookingOverView = ({ route, navigation }) => {
                         end={{ x: 1, y: 0 }}
                         style={{ width: "55%", padding: 4, }}>
                     </LinearGradient>
-
-                    <View style={styles.iconContainer}>
-                        <View style={styles.iconBackground}>
-                            {/* <Image source={{ uri: 'thumbs_up_icon_url' }} style={styles.icon} /> */}
-
-                        </View>
+                    <View style={{ height: 120 }}>
+                        <ThumsUpIcon />
                     </View>
                     <Text style={styles.title}>Thank You!</Text>
                     <Text style={styles.subtitle}>Your Booking Initiated.</Text>
                     <Text style={styles.description}>Our team will update to you in less than 2 hours</Text>
+                    <Text style={styles.description}>*Once booking approved please do the payment to confirm your booking.</Text>
                     <LinearGradient colors={['#D2453B', '#A0153E']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         style={styles.doneButton}>
-                        <TouchableOpacity onPress={() => [setThankYouCardVisible(false), setBookingDone(true)]}>
+                        <TouchableOpacity onPress={() => [setThankYouCardVisible(false), setBookingDone(true), navigation.navigate('Home')]}>
                             <Text style={styles.doneButtonText}>Done</Text>
                         </TouchableOpacity>
                     </LinearGradient>
@@ -185,11 +182,11 @@ const HallsBookingOverView = ({ route, navigation }) => {
 
             <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
                 {!bookingDone ?
-                <BookDatesButton
-                    onPress={() => ConfirmBooking()}
-                    text={'Confirm Booking'}
-                    padding={10}
-                /> : null}
+                    <BookDatesButton
+                        onPress={() => ConfirmBooking()}
+                        text={'Confirm Booking'}
+                        padding={10}
+                    /> : null}
             </View>
         </View>
     )
@@ -223,7 +220,7 @@ const styles = StyleSheet.create({
     productContainer: {
         // flexDirection: 'row',
         // alignItems: 'center',
-        marginHorizontal:20,
+        marginHorizontal: 20,
     },
     productImage: {
         // width: Dimensions.get('window').width/1.5,
@@ -324,6 +321,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
     },
-   
+
 });
 
