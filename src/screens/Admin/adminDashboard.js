@@ -52,7 +52,7 @@ const AdminDashboard = () => {
             setVendorKycdetails(onHoldKYCStatusVendors)
             console.log('resp is in admin  vendorAadharData ::>>>', JSON.stringify(onHoldKYCStatusVendors));
         } catch (error) {
-            console.error('Error fetching vendorAadharData :', error);
+            console.error('Error fetching getAllVendors :', error);
         }
     }
 

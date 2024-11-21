@@ -251,7 +251,7 @@ const Categories = () => {
                             loading ? <ActivityIndicator size="large" color="orange" /> : null
                         }
                         ListEmptyComponent={
-                            <View >
+                            <View style={{flex:1,alignSelf:"center"}}>
                               <Text>No Products Available</Text>
                             </View>
                           }
@@ -270,7 +270,7 @@ const Categories = () => {
                         }
                         ListEmptyComponent={
                             <View >
-                              <Text style={{marginHorizontal:15,textAlign:"center",fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular'}}>Currently No Products Available</Text>
+                              <Text style={{marginHorizontal:15,textAlign:"center",fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular'}}>No Products Available</Text>
                             </View>
                           }
                         />

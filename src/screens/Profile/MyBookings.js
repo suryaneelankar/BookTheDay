@@ -194,7 +194,7 @@ const ViewMyBookings = () => {
                 });
                 console.log("success payment  RES:::::::::", JSON.stringify(response?.data))
               } catch (error) {
-                console.log("success Payment error>>::", error);
+                console.log("Payment error>>::", error);
               };
               // Success callback
               // Alert.alert(`Success: ${paymentData.razorpay_payment_id}`);

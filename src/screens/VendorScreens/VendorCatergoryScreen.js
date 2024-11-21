@@ -45,94 +45,21 @@ const VendorCategoryScreen = ({ navigation }) => {
     );
 
     useEffect(() => {
-        // Combine data
         const combinedData = [...functionHallBookingsData, ...cateringsBookingsData, ...clothJewelBookingsData];
-    
-        // Calculate totalBookings
-        const totalBookingsCount = combinedData.reduce((total, item) => total + item?.count, 0);
-        setTotalBookings(totalBookingsCount);
-    
-        // Calculate completed bookings
-        const completedCount = combinedData
-          .filter(
-            (item) =>
-              item?.bookingStatus === "approved" ||
-              item?.bookingStatus === "payment successful"
-          )
-          .reduce((total, item) => total + item.count, 0);
 
-          const pendingCount = combinedData
-          .filter(
-            (item) =>
-              item?.bookingStatus === "requested"
-          )
-          .reduce((total, item) => total + item?.count, 0);
-    
-        setCompleted(completedCount);
-        setPending(pendingCount);
-      }, [functionHallBookingsData, cateringsBookingsData, clothJewelBookingsData]);
+        setTotalBookings(combinedData?.length);
 
-    const consolidateByProductId = (data) => {
-        const grouped = data.reduce((acc, item) => {
-            if (!acc[item?.productId]) {
-                acc[item?.productId] = {
-                    productId: item?.productId,
-                    productName: item?.productName,
-                    perDayPrice: item?.perDayPrice,
-                    professionalImage: item?.professionalImage,
-                    bookingStatus: item?.bookingStatus,
-                    count: 0
-                };
-            }
-            acc[item?.productId].count += 1;
-            return acc;
-        }, {});
+        const completedCount = combinedData.filter(item => item?.bookingStatus === "approved" || item?.bookingStatus === "payment successful");
 
-        return Object.values(grouped);
-    };
+        const pendingCount = combinedData.filter(booking => booking?.bookingStatus === 'requested');
 
-    const consolidateFunctionHallsDataByProductId = (data) => {
-        const grouped = data.reduce((acc, item) => {
-            if (!acc[item?.productId]) {
-                acc[item?.productId] = {
-                    productId: item?.productId,
-                    productName: item?.functionHallName,
-                    totalAmount: item?.totalAmount,
-                    professionalImage: item?.professionalImage,
-                    bookingStatus: item?.bookingStatus,
-                    count: 0
-                };
-            }
-            acc[item?.productId].count += 1;
-            return acc;
-        }, {});
-
-        return Object.values(grouped);
-    };
-
-    const consolidateFoodCateringDataByProductId = (data) => {
-        const grouped = data.reduce((acc, item) => {
-            if (!acc[item?.productId]) {
-                acc[item?.productId] = {
-                    productId: item?.productId,
-                    productName: item?.foodCateringName,
-                    totalAmount: item?.totalAmount,
-                    professionalImage: item?.professionalImage,
-                    bookingStatus: item?.bookingStatus,
-                    count: 0
-                };
-            }
-            acc[item?.productId].count += 1;
-            return acc;
-        }, {});
-
-        return Object.values(grouped);
-    };
+        setCompleted(completedCount?.length);
+        setPending(pendingCount?.length);
+    }, [functionHallBookingsData, cateringsBookingsData, clothJewelBookingsData]);
 
     const getVendorClothJewelBookings = async () => {
         const vendorMobileNumber = vendorLoggedInMobileNum;
         const token = await getVendorAuthToken();
-        // setGetVendorAuth(token);
         try {
             const response = await axios.get(`${BASE_URL}/clothJewelBookingsGotForVendor/${vendorMobileNumber}`, {
                 headers: {
@@ -140,10 +67,7 @@ const VendorCategoryScreen = ({ navigation }) => {
                 },
             });
             const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
-            const output = consolidateByProductId(activeBookings);
-            // const output = consolidateByProductId(response?.data?.data);
-            // console.log('output is ::>>', output);
-            setclothJewelBookingsData(output)
+            setclothJewelBookingsData(activeBookings);
         } catch (error) {
             console.log("clothJewelBookingsGotForVendor error::::::::::", error);
         }
@@ -158,12 +82,8 @@ const VendorCategoryScreen = ({ navigation }) => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            // console.log('resp getVendorFunctionHallBookings ::>>', response?.data?.data);
-            // Filter bookings where isActiveBooking is true
             const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
-            const outputData = consolidateFunctionHallsDataByProductId(activeBookings);
-            // const outputData = consolidateFunctionHallsDataByProductId(response?.data?.data);
-            setFunctionHallBookingsData(outputData);
+            setFunctionHallBookingsData(activeBookings);
 
         } catch (error) {
             console.log("functionHallBookingsGotForVendor error::::::::::", error);
@@ -181,9 +101,9 @@ const VendorCategoryScreen = ({ navigation }) => {
             });
             // console.log('resp foodcateringBookings ::>>', response?.data?.data);
             const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
-            const outputData = consolidateFoodCateringDataByProductId(activeBookings);
+            // const outputData = consolidateFoodCateringDataByProductId(activeBookings);
             // const outputData = consolidateFoodCateringDataByProductId(response?.data?.data);
-            setCateringBookingsData(outputData);
+            setCateringBookingsData(activeBookings);
 
         } catch (error) {
             console.log("foodCateringBookingsGotForVendor error::::::::::", error);
@@ -243,7 +163,7 @@ const VendorCategoryScreen = ({ navigation }) => {
     const renderItem = ({ item }) => (
         <TouchableOpacity
             style={styles.categoryCard}
-            onPress={() => { 
+            onPress={() => {
                 const targetScreen = item.catType === 'caterings' && profileData?.posts?.some(post => post?.postModel === "Catering")
                     ? 'EditAddFoodCateringGeneral'
                     : item.navScreen;
@@ -257,7 +177,7 @@ const VendorCategoryScreen = ({ navigation }) => {
                 <Text style={styles.categoryTitle}>{item.title}</Text>
                 <Text style={styles.categoryDescription}>{item.description}</Text>
             </View>
-            <RightSideIcon/>
+            <RightSideIcon />
         </TouchableOpacity>
     );
 
@@ -272,8 +192,8 @@ const VendorCategoryScreen = ({ navigation }) => {
                 {/* Header */}
 
                 {/* Bookings Overview */}
-                <View style={{marginTop:15,alignSelf:"center"}}>
-                <JewelleryCard />
+                <View style={{ marginTop: 15, alignSelf: "center" }}>
+                    <JewelleryCard />
                 </View>
                 <View style={styles.bookingsOverview}>
                     <View style={styles.overviewCards}>
@@ -332,8 +252,8 @@ const styles = StyleSheet.create({
         marginVertical: 20,
     },
     bookingsOverview: {
-        marginTop:25,
-        marginBottom:20
+        marginTop: 25,
+        marginBottom: 20
     },
     sectionTitle: {
         fontSize: 20,
@@ -358,8 +278,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 2,
-        alignSelf:"center",
-        height:100
+        alignSelf: "center",
+        height: 100
     },
     overviewCount: {
         fontSize: 28,
@@ -369,17 +289,17 @@ const styles = StyleSheet.create({
     overviewLabel: {
         fontSize: 14,
         color: '#333333',
-        textAlign:"center",
+        textAlign: "center",
         fontFamily: 'ManropeRegular',
     },
     listContainer: {
         paddingBottom: 20,
     },
-//     #FFC19A – Slightly lighter
-// #FFD3B6 – Medium light
-// #FFE3D0 – Softer light
-// #FFF0E4 – Very light pastel
-// #FFF8F2 – Extremely light (almost white)
+    //     #FFC19A – Slightly lighter
+    // #FFD3B6 – Medium light
+    // #FFE3D0 – Softer light
+    // #FFF0E4 – Very light pastel
+    // #FFF8F2 – Extremely light (almost white)
     categoryCard: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -416,14 +336,14 @@ const styles = StyleSheet.create({
     },
     quickTips: {
         // marginVertical: 20,
-        marginHorizontal:20
+        marginHorizontal: 20
     },
     tip: {
         fontSize: 14,
         color: '#333333',
         marginBottom: 5,
         fontFamily: 'ManropeRegular',
-        marginHorizontal:10
+        marginHorizontal: 10
 
     },
 });
