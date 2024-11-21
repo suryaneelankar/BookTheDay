@@ -17,21 +17,179 @@ import RightSideIcon from '../../assets/profilesvgs/Chevron-Right.svg';
 
 const VendorCategoryScreen = ({ navigation }) => {
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
+    const [clothJewelBookingsData, setclothJewelBookingsData] = useState([]);
+    const [functionHallBookingsData, setFunctionHallBookingsData] = useState([]);
+    const [cateringsBookingsData, setCateringBookingsData] = useState([]);
     const [profileData, setProfileData] = useState();
     const [bookingsOverview, setBookingsOverview] = useState({
         total: 0,
         pending: 0,
         completed: 0,
     });
+    const [totalBookings, setTotalBookings] = useState(0);
+    const [completed, setCompleted] = useState(0);
+    const [pending, setPending] = useState(0);
+
+
     const dispatch = useDispatch();
 
     useFocusEffect(
         useCallback(() => {
             getProfileData();
             fetchBookingsOverview();
+            getVendorClothJewelBookings();
+            getVendorFunctionHallBookings();
+            getVendorFoodCateringBookings();
             return () => console.log('Screen is unfocused');
         }, [])
     );
+
+    useEffect(() => {
+        // Combine data
+        const combinedData = [...functionHallBookingsData, ...cateringsBookingsData, ...clothJewelBookingsData];
+    
+        // Calculate totalBookings
+        const totalBookingsCount = combinedData.reduce((total, item) => total + item?.count, 0);
+        setTotalBookings(totalBookingsCount);
+    
+        // Calculate completed bookings
+        const completedCount = combinedData
+          .filter(
+            (item) =>
+              item?.bookingStatus === "approved" ||
+              item?.bookingStatus === "payment successful"
+          )
+          .reduce((total, item) => total + item.count, 0);
+
+          const pendingCount = combinedData
+          .filter(
+            (item) =>
+              item?.bookingStatus === "requested"
+          )
+          .reduce((total, item) => total + item?.count, 0);
+    
+        setCompleted(completedCount);
+        setPending(pendingCount);
+      }, [functionHallBookingsData, cateringsBookingsData, clothJewelBookingsData]);
+
+    const consolidateByProductId = (data) => {
+        const grouped = data.reduce((acc, item) => {
+            if (!acc[item?.productId]) {
+                acc[item?.productId] = {
+                    productId: item?.productId,
+                    productName: item?.productName,
+                    perDayPrice: item?.perDayPrice,
+                    professionalImage: item?.professionalImage,
+                    bookingStatus: item?.bookingStatus,
+                    count: 0
+                };
+            }
+            acc[item?.productId].count += 1;
+            return acc;
+        }, {});
+
+        return Object.values(grouped);
+    };
+
+    const consolidateFunctionHallsDataByProductId = (data) => {
+        const grouped = data.reduce((acc, item) => {
+            if (!acc[item?.productId]) {
+                acc[item?.productId] = {
+                    productId: item?.productId,
+                    productName: item?.functionHallName,
+                    totalAmount: item?.totalAmount,
+                    professionalImage: item?.professionalImage,
+                    bookingStatus: item?.bookingStatus,
+                    count: 0
+                };
+            }
+            acc[item?.productId].count += 1;
+            return acc;
+        }, {});
+
+        return Object.values(grouped);
+    };
+
+    const consolidateFoodCateringDataByProductId = (data) => {
+        const grouped = data.reduce((acc, item) => {
+            if (!acc[item?.productId]) {
+                acc[item?.productId] = {
+                    productId: item?.productId,
+                    productName: item?.foodCateringName,
+                    totalAmount: item?.totalAmount,
+                    professionalImage: item?.professionalImage,
+                    bookingStatus: item?.bookingStatus,
+                    count: 0
+                };
+            }
+            acc[item?.productId].count += 1;
+            return acc;
+        }, {});
+
+        return Object.values(grouped);
+    };
+
+    const getVendorClothJewelBookings = async () => {
+        const vendorMobileNumber = vendorLoggedInMobileNum;
+        const token = await getVendorAuthToken();
+        // setGetVendorAuth(token);
+        try {
+            const response = await axios.get(`${BASE_URL}/clothJewelBookingsGotForVendor/${vendorMobileNumber}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
+            const output = consolidateByProductId(activeBookings);
+            // const output = consolidateByProductId(response?.data?.data);
+            // console.log('output is ::>>', output);
+            setclothJewelBookingsData(output)
+        } catch (error) {
+            console.log("clothJewelBookingsGotForVendor error::::::::::", error);
+        }
+    };
+
+    const getVendorFunctionHallBookings = async () => {
+        const vendorMobileNumber = vendorLoggedInMobileNum;
+        const token = await getVendorAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/functionHallBookingsGotForVendor/${vendorMobileNumber}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            // console.log('resp getVendorFunctionHallBookings ::>>', response?.data?.data);
+            // Filter bookings where isActiveBooking is true
+            const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
+            const outputData = consolidateFunctionHallsDataByProductId(activeBookings);
+            // const outputData = consolidateFunctionHallsDataByProductId(response?.data?.data);
+            setFunctionHallBookingsData(outputData);
+
+        } catch (error) {
+            console.log("functionHallBookingsGotForVendor error::::::::::", error);
+        }
+    };
+
+    const getVendorFoodCateringBookings = async () => {
+        const vendorMobileNumber = vendorLoggedInMobileNum;
+        const token = await getVendorAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/foodCateringBookingsGotForVendor/${vendorMobileNumber}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            // console.log('resp foodcateringBookings ::>>', response?.data?.data);
+            const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
+            const outputData = consolidateFoodCateringDataByProductId(activeBookings);
+            // const outputData = consolidateFoodCateringDataByProductId(response?.data?.data);
+            setCateringBookingsData(outputData);
+
+        } catch (error) {
+            console.log("foodCateringBookingsGotForVendor error::::::::::", error);
+        }
+    };
+
 
     const getProfileData = async () => {
         const token = await getVendorAuthToken();
@@ -120,15 +278,15 @@ const VendorCategoryScreen = ({ navigation }) => {
                 <View style={styles.bookingsOverview}>
                     <View style={styles.overviewCards}>
                         <View style={styles.overviewCard}>
-                            <Text style={styles.overviewCount}>{bookingsOverview.total}</Text>
+                            <Text style={styles.overviewCount}>{totalBookings}</Text>
                             <Text style={styles.overviewLabel}>Total Bookings</Text>
                         </View>
                         <View style={styles.overviewCard}>
-                            <Text style={styles.overviewCount}>{bookingsOverview.pending}</Text>
+                            <Text style={styles.overviewCount}>{pending}</Text>
                             <Text style={styles.overviewLabel}>Pending</Text>
                         </View>
                         <View style={styles.overviewCard}>
-                            <Text style={styles.overviewCount}>{bookingsOverview.completed}</Text>
+                            <Text style={styles.overviewCount}>{completed}</Text>
                             <Text style={styles.overviewLabel}>Completed</Text>
                         </View>
                     </View>
