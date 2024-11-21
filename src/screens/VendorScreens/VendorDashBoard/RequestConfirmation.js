@@ -21,6 +21,7 @@ import PhoneIcon from '../../../assets/vendorIcons/phoneIcon.svg';
 import AdvPayIcon from '../../../assets/vendorIcons/advPayIcon.svg';
 import FastImage from "react-native-fast-image";
 import { verticalScale } from "../../../utils/scalingMetrics";
+import ThumsUpIcon from '../../../assets/svgs/thumsupIcon.svg';
 
 const RequestConfirmation = ({ navigation, route }) => {
     const { productId, catEndPoint } = route?.params;
@@ -179,11 +180,11 @@ const RequestConfirmation = ({ navigation, route }) => {
 
     const convertUrlToIp = () => {
         console.log('wholeBookingData is::>>>>', wholeBookingData);
-        
+
         // Check if wholeBookingData is an array and has at least one item
         if (Array.isArray(wholeBookingData) && wholeBookingData.length > 0) {
-            const convertedImageUrl = wholeBookingData[0]?.productImage !== undefined 
-                ? wholeBookingData[0]?.productImage.replace('localhost', LocalHostUrl) 
+            const convertedImageUrl = wholeBookingData[0]?.productImage !== undefined
+                ? wholeBookingData[0]?.productImage.replace('localhost', LocalHostUrl)
                 : wholeBookingData[0]?.productImage;
             console.log('convertedImageUrl is::>>', convertedImageUrl);
             return convertedImageUrl;
@@ -191,7 +192,7 @@ const RequestConfirmation = ({ navigation, route }) => {
             return null;
         }
     }
-    
+
 
     const RequestConfirmationAcceptOrReject = async (bookingStatus, userMobileNumber, bookingId) => {
         const updatedParams = {
@@ -324,7 +325,7 @@ const RequestConfirmation = ({ navigation, route }) => {
         Linking.openURL(url);
     };
 
-    
+
 
     const renderActionSheetWithProductDetais = () => {
 
@@ -352,14 +353,14 @@ const RequestConfirmation = ({ navigation, route }) => {
         const formatDate = (dateString) => {
             console.log("datestring", dateString)
             if (!dateString) return "Invalid Date"; // Handle undefined or empty date
-        
+
             const date = new Date(dateString);
             if (isNaN(date)) return "Invalid Date"; // Handle invalid date formats
-        
+
             const day = date.getDate().toString().padStart(2, '0'); // Two-digit day
             const month = date.toLocaleString('default', { month: 'short' }); // Short month name
             const year = date.getFullYear().toString().slice(-2); // Last two digits of the year
-        
+
             return `${day}-${month}-${year}`;
         };
 
@@ -371,37 +372,41 @@ const RequestConfirmation = ({ navigation, route }) => {
                 defaultOverlayOpacity={0.5}
                 height={Dimensions.get("window").height - 64}
                 containerStyle={styles.actionSheetContainer}
-                // animationType=
+            // animationType=
             >
                 <View style={styles.headerContainer}>
                     <View>
-                        <Text style={styles.productNameText}>{selectedItemDetails?.productName}</Text>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%",alignSelf:"center",alignItems:"center" }}>
+                            <Text style={styles.productNameText}>{selectedItemDetails?.productName}</Text>
+                            <View style={[styles.bookingStatusContainer, {
+                                backgroundColor:
+                                    selectedItemDetails?.bookingStatus === "approved" ? "orange" :
+                                        selectedItemDetails?.bookingStatus === "rejected" ? "red" :
+                                            selectedItemDetails?.bookingStatus === "payment successful" ? "green" :
+                                                "orange"
+                            }]}>
+                                <Text
+                                    style={[
+                                        styles.bookingStatusText,
+                                        {
+                                            textTransform: "capitalize",
+                                            color: "white",
+                                            textAlignVertical: "center",
+                                            // width:"50%"
+                                        }
+                                    ]}
+                                >
+                                    {selectedItemDetails?.bookingStatus}
+                                </Text>
+                            </View>
+                        </View>
+
                         <Text style={styles.productDateText}>
                             {/* {formatDate(selectedItemDetails?.startDate)} - {formatDate(selectedItemDetails?.endDate)} */}
                             {selectedItemDetails?.startDate} - {selectedItemDetails?.endDate}
                         </Text>
                     </View>
-                    <View style={[styles.bookingStatusContainer, {
-                        backgroundColor:
-                            selectedItemDetails?.bookingStatus === "approved" ? "orange" :
-                                selectedItemDetails?.bookingStatus === "rejected" ? "red" :
-                                    selectedItemDetails?.bookingStatus === "payment successful" ? "green" :
-                                        "black"
-                    }]}>
-                        <Text  numberOfLines={2}
-                            style={[
-                                styles.bookingStatusText,
-                                {
-                                    textTransform: "capitalize",
-                                    color: "white",
-                                    textAlignVertical:"center",
-                                    width:"50%"
-                                }
-                            ]}
-                        >
-                            {selectedItemDetails?.bookingStatus}
-                        </Text>
-                    </View>
+
                 </View>
                 <View style={styles.divider} />
 
@@ -419,10 +424,10 @@ const RequestConfirmation = ({ navigation, route }) => {
                             </TouchableOpacity>
                         )}
                         {selectedItemDetails?.advanceAmountPaid !== 0 && (
-                        <TouchableOpacity style={[styles.detailsViewStyle, { alignItems: "flex-start" }]} onPress={() => openMap(selectedItemDetails?.userLatitude, selectedItemDetails?.userLongitude)}>
-                            <LocationIcon />
-                            <Text style={[styles.phoneNumDetailStyle, { textDecorationLine: "underline" }]}>{selectedItemDetails?.userAddress}</Text>
-                        </TouchableOpacity>
+                            <TouchableOpacity style={[styles.detailsViewStyle, { alignItems: "flex-start" }]} onPress={() => openMap(selectedItemDetails?.userLatitude, selectedItemDetails?.userLongitude)}>
+                                <LocationIcon />
+                                <Text style={[styles.phoneNumDetailStyle, { textDecorationLine: "underline" }]}>{selectedItemDetails?.userAddress}</Text>
+                            </TouchableOpacity>
                         )}
                         <View style={styles.detailsViewStyle}>
                             <AdvPayIcon />
@@ -482,13 +487,11 @@ const RequestConfirmation = ({ navigation, route }) => {
                                 style={{ width: "55%", padding: 4, }}>
                                 {/* <View style={{borderWidth:4, width:"50%", }}/> */}
                             </LinearGradient>
-
-                            <View style={styles.iconContainer}>
-                                <View style={styles.iconBackground}>
-                                </View>
+                            <View style={{ height: 120 }}>
+                                <ThumsUpIcon />
                             </View>
                             <Text style={styles.title}>Thank You!</Text>
-                            <Text style={styles.description}>Our team will deliver the update to you in less than 2 hours</Text>
+                            <Text style={styles.description}>Our team will update the information to the customer and will get back in 2 hours</Text>
                             <LinearGradient colors={['#D2453B', '#A0153E']}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 0 }}
@@ -726,9 +729,10 @@ const styles = StyleSheet.create({
     },
     bookingStatusContainer: {
         borderRadius: 10,
-        padding: 10,
+        padding: 15,
+        paddingVertical: 5,
         alignItems: 'center',
-        alignSelf:"center",
+        alignSelf: "center",
     },
     bookingStatusText: {
         fontWeight: '700',
