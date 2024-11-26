@@ -8,8 +8,6 @@ import ViewTrendingDetails from "../screens/Home/ViewTrendingDetails";
 import CategoriesList from "../screens/Categories/categoriesList";
 import ViewEvents from "../screens/Events/ViewEvents";
 import ProfileScreen from "../screens/Profile/ProfileScreen";
-import Login from "../screens/Authentication/Login";
-import Register from "../screens/Authentication/Register";
 import AboutUs from "../screens/Profile/ProfileSubScreens/AboutUs"
 import ContactUs from "../screens/Profile/ProfileSubScreens/ContactUs";
 import DeleteMyAccount from "../screens/Profile/ProfileSubScreens/DeleteMyAccount";
@@ -32,7 +30,6 @@ import EditProfile from "../screens/Profile/EditProfile";
 import ViewMyBookings from "../screens/Profile/MyBookings";
 import ViewMyLendings from "../screens/Profile/ViewMyLendings";
 import RentOnProducts from "../screens/GiveOnRent/RentOnProducts";
-import HireChefOrDriverForm from "../screens/VendorScreens/VendorHireChefOrDriver/HireChefOrDriverForm";
 import LocationAdded from "../screens/Location/LocationAdded";
 import AddSelectLocation from "../screens/Location/AddSelectLocation";
 import AddFunctionalHall from "../screens/VendorScreens/VendorAddFunctionHalls/AddFunctionalHall";
@@ -340,8 +337,6 @@ const MainNavigation = () => {
                 {/* ############################################################ */}
 
 
-                <Stack.Screen name="Login" component={Login} options={{ headerShown: true }} />
-                <Stack.Screen name="Register" component={Register} options={{ headerShown: true }} />
 
                 {/* //////////////////////      VENDOR SCREENS     ///////////////////////////////////////////// */}
 
@@ -349,10 +344,7 @@ const MainNavigation = () => {
                     header: () => <NavigationHeader Icon={true} title="Request Details" />,
                     headerShown: true,
                 }} />
-                <Stack.Screen name="HireChefOrDriverForm" component={HireChefOrDriverForm} options={{
-                    header: () => <NavigationHeader Icon={true} title="Hire Driver" />,
-                    headerShown: true,
-                }} />
+               
 
                 {/* AddTentHouse */}
 

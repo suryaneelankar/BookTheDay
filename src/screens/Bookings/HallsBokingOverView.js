@@ -80,18 +80,23 @@ const HallsBookingOverView = ({ route, navigation }) => {
 
     return (
         <View style={{ flex: 1, backgroundColor: "white", }}>
-            {bookingDone ?
-                <View style={{ backgroundColor: '#fdf5e6', borderRadius: 15, padding: 10, marginTop: 20, width: '90%', alignSelf: "center", marginVertical: 20 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            {bookingDone ? (
+                <View style={styles.bookingContainer}>
+                    <View style={styles.rowAlignCenter}>
                         <Icon name="exclamationcircleo" size={18} color="grey" />
-                        <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 16, marginHorizontal: 10 }}>Confirmation Pending</Text>
+                        <Text style={styles.pendingText}>Confirmation Pending</Text>
                     </View>
-                    <Text style={{ color: 'black', fontWeight: '400', fontSize: 13, marginTop: 15 }}>We're waiting for {bookingDetails?.title} to confirm your booking request.</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={styles.waitingText}>
+                        We're waiting for {bookingDetails?.title} to confirm your booking request.
+                    </Text>
+                    <View style={styles.rowAlignCenter}>
                         <IonIcon name="time-sharp" size={18} color="green" />
-                        <Text style={{ color: 'green', fontWeight: '800', fontSize: 13, marginTop: 10, marginHorizontal: 10 }}>We'll get back with in 2 hrs with booking confirmation status.</Text>
+                        <Text style={styles.timeText}>
+                            We'll get back within 2 hrs with booking confirmation status.
+                        </Text>
                     </View>
-                </View> : null}
+                </View>
+            ) : null}
             <ScrollView style={{}}>
 
                 <View style={styles.productContainer}>
@@ -120,19 +125,17 @@ const HallsBookingOverView = ({ route, navigation }) => {
                     </View>
                 </View>
 
-                <View style={{ backgroundColor: '#dcdcdc', width: '90%', height: 2, alignSelf: 'center', marginVertical: 10 }} />
+                <View style={styles.separator} />
 
-                <View style={{ backgroundColor: 'white', borderRadius: 15, padding: 10, paddingHorizontal: 20, }}>
-
-                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                        <Text style={{ marginTop: 20, color: 'black', fontSize: 18, fontWeight: "500", fontFamily: 'ManropeRegular', marginVertical: 15 }}>Total Amount</Text>
-                        <Text style={{ marginTop: 20, color: 'black', fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular', marginVertical: 15 }}>{totalPrice}</Text>
+                <View style={styles.detailsContainer}>
+                    <View style={styles.rowSpaceBetween}>
+                        <Text style={[styles.detailsText, styles.detailsTitle]}>Total Amount</Text>
+                        <Text style={[styles.detailsText, styles.detailsAmount]}>{totalPrice}</Text>
                     </View>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                        <Text style={{ color: 'black', fontSize: 18, fontWeight: "500", fontFamily: 'ManropeRegular', }}>Advacnce Amount</Text>
-                        <Text style={{ color: 'black', fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular', }}>{formatAmount(bookingDetails?.advanceAmount)}</Text>
+                    <View style={styles.rowSpaceBetween}>
+                        <Text style={styles.detailsText}>Advance Amount</Text>
+                        <Text style={styles.detailsAmount}>{formatAmount(bookingDetails?.advanceAmount)}</Text>
                     </View>
-
                 </View>
             </ScrollView>
             <Modal
@@ -320,6 +323,68 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
         textAlign: 'center',
+    },
+    separator: {
+        backgroundColor: '#dcdcdc',
+        width: '90%',
+        height: 2,
+        alignSelf: 'center',
+        marginVertical: 10,
+    },
+    detailsContainer: {
+        backgroundColor: 'white',
+        borderRadius: 15,
+        padding: 10,
+        paddingHorizontal: 20,
+    },
+    rowSpaceBetween: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+    },
+    detailsText: {
+        color: 'black',
+        fontSize: 18,
+        fontWeight: "500",
+        fontFamily: 'ManropeRegular',
+    },
+    detailsTitle: {
+        marginTop: 20,
+        marginVertical: 15,
+    },
+    detailsAmount: {
+        fontWeight: "700",
+    },
+    bookingContainer: {
+        backgroundColor: '#fdf5e6',
+        borderRadius: 15,
+        padding: 10,
+        marginTop: 20,
+        width: '90%',
+        alignSelf: 'center',
+        marginVertical: 20,
+    },
+    rowAlignCenter: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    pendingText: {
+        color: 'black',
+        fontWeight: 'bold',
+        fontSize: 16,
+        marginHorizontal: 10,
+    },
+    waitingText: {
+        color: 'black',
+        fontWeight: '400',
+        fontSize: 13,
+        marginTop: 15,
+    },
+    timeText: {
+        color: 'green',
+        fontWeight: '800',
+        fontSize: 13,
+        marginTop: 10,
+        marginHorizontal: 10,
     },
 
 });

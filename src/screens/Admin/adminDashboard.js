@@ -1,14 +1,12 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Dimensions, FlatList, Alert, SafeAreaView, ActivityIndicator, ScrollView } from 'react-native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";
 import { useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../utils/GlobalFunctions';
-import SearchIcon from '../../assets/svgs/searchIcon.svg';
-import FilterIcon from '../../assets/svgs/filter.svg';
 import Swiper from "react-native-swiper";
 import LocationMarkIcon from '../../assets/svgs/location.svg';
-import { getUserAuthToken, getVendorAuthToken } from "../../utils/StoreAuthToken";
+import { getVendorAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
 import { useSelector } from "react-redux";
 

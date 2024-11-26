@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Dimensions, ImageBackground, StyleSheet, FlatList, Image, SafeAreaView, ScrollView, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, FlatList, Image, SafeAreaView, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";

@@ -99,18 +99,23 @@ const CateringsOverView = ({ route, navigation }) => {
             </View>
             <ScrollView style={{ marginBottom: "20%" }}>
 
-                {bookingDone ?
-                    <View style={{ backgroundColor: '#fdf5e6', borderRadius: 15, padding: 10, marginTop: 20, width: '90%', alignSelf: "center" }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Icon name="exclamationcircleo" size={18} color="grey" />
-                            <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 16, marginHorizontal: 10 }}>Confirmation Pending</Text>
-                        </View>
-                        <Text style={{ color: 'black', fontWeight: '400', fontSize: 13, marginTop: 15 }}>We're waiting for {bookingDetails?.title} to confirm your booking request.</Text>
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <IonIcon name="time-sharp" size={18} color="green" />
-                            <Text style={{ color: 'green', fontWeight: '800', fontSize: 13, marginTop: 10, marginHorizontal: 10 }}>We'll get back with in 2 hrs with booking confirmation status.</Text>
-                        </View>
-                    </View> : null}
+                {bookingDone ? (
+                <View style={styles.bookingContainer}>
+                    <View style={styles.bookingrow}>
+                        <Icon name="exclamationcircleo" size={18} color="grey" />
+                        <Text style={styles.bookingheading}>Confirmation Pending</Text>
+                    </View>
+                    <Text style={styles.bookingmessage}>
+                        We're waiting for {bookingDetails?.title} to confirm your booking request.
+                    </Text>
+                    <View style={styles.bookingrow}>
+                        <IonIcon name="time-sharp" size={18} color="green" />
+                        <Text style={styles.bookingtimeMessage}>
+                            We'll get back within 2 hrs with booking confirmation status.
+                        </Text>
+                    </View>
+                </View>
+                ) : null}
 
                 <View style={styles.imgsection}>
                     <View style={styles.productContainer}>
@@ -218,13 +223,15 @@ const CateringsOverView = ({ route, navigation }) => {
                     />
 
                     <View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                            <Text style={{ marginTop: 20, color: 'black', fontSize: 18, fontWeight: "500", fontFamily: 'ManropeRegular', marginVertical: 15 }}>Total Amount</Text>
-                            <Text style={{ marginTop: 20, color: 'black', fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular', marginVertical: 15 }}>{totalPrice}</Text>
+                        <View style={styles.row}>
+                            <Text style={[styles.text, styles.label]}>Total Amount</Text>
+                            <Text style={[styles.text, styles.value]}>{totalPrice}</Text>
                         </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                            <Text style={{ color: 'black', fontSize: 18, fontWeight: "500", fontFamily: 'ManropeRegular', }}>Advacnce Amount</Text>
-                            <Text style={{ color: 'black', fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular', }}>{bookingDetails?.advanceAmount}</Text>
+                        <View style={styles.row}>
+                            <Text style={[styles.text, styles.label]}>Advance Amount</Text>
+                            <Text style={[styles.text, styles.value]}>
+                                {bookingDetails?.advanceAmount}
+                            </Text>
                         </View>
                     </View>
                 </View>
@@ -412,18 +419,6 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 5,
     },
-    iconContainer: {
-        margin: 20
-    },
-    iconBackground: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        backgroundColor: '#FFD700',
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'relative',
-    },
     icon: {
         width: 40,
         height: 40,
@@ -463,6 +458,53 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
     },
+    row: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginVertical: 15,
+    },
+    text: {
+        color: "black",
+        fontSize: 18,
+        fontFamily: "ManropeRegular",
+    },
+    label: {
+        fontWeight: "500",
+    },
+    value: {
+        fontWeight: "700",
+    },
+    bookingContainer: {
+        backgroundColor: "#fdf5e6",
+        borderRadius: 15,
+        padding: 10,
+        marginTop: 20,
+        width: "90%",
+        alignSelf: "center",
+      },
+      bookingrow: {
+        flexDirection: "row",
+        alignItems: "center",
+      },
+      bookingheading: {
+        color: "black",
+        fontWeight: "bold",
+        fontSize: 16,
+        marginHorizontal: 10,
+      },
+      bookingmessage: {
+        color: "black",
+        fontWeight: "400",
+        fontSize: 13,
+        marginTop: 15,
+      },
+      bookingtimeMessage: {
+        color: "green",
+        fontWeight: "800",
+        fontSize: 13,
+        marginTop: 10,
+        marginHorizontal: 10,
+      },
 
 });
 

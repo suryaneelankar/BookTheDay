@@ -5,7 +5,7 @@ import PricingOptions from "../../components/PriceOptions";
 import Swiper from 'react-native-swiper';
 import BookDatesButton from "../../components/GradientButton";
 import { useNavigation } from "@react-navigation/native";
-import { horizontalScale, moderateScale, verticalScale } from "../../utils/scalingMetrics";
+import { horizontalScale, moderateScale, verticalScale, width } from "../../utils/scalingMetrics";
 import themevariable from "../../utils/themevariable";
 import Modal from 'react-native-modal';
 import { Calendar } from "react-native-calendars";
@@ -17,6 +17,8 @@ import LeftArrow from '../../assets/svgs/leftarrowWhite.svg';
 import moment from "moment";
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
+import SwiperFlatList from "react-native-swiper-flatlist";
+import { Image } from "react-native-svg";
 
 const ViewCatDetails = ({ route }) => {
 
@@ -175,12 +177,41 @@ const ViewCatDetails = ({ route }) => {
             <ScrollView style={{ marginBottom: '15%' }}>
                 <View style={{ backgroundColor: "white", }}>
 
-                    <Swiper
+                    <SwiperFlatList
+                        index={0}
+                        paginationDefaultColor="white"
+                        paginationActiveColor="#FF6347"
+                        showPagination={true}
+                        paginationStyle={{bottom:"20%" }}
+                        paginationStyleItem={{ alignSelf: 'center' }}
+                        paginationStyleItemInactive={{ width: 7, height: 7 }}
+                        paginationStyleItemActive={{ width: 10, height: 10 }}
+                        data={specifcadditionalImages} // Replace this with your actual data array
+                        style={{ flex: 1, alignSelf: "center" }}
+                        renderItem={({ item }) => (
+                            <View style={[{ width: Dimensions.get('window').width, height: 300 }]}>
+                               
+                                <FastImage
+                                    resizeMode="contain"
+                                    source={{
+                                        uri: item?.uri, // Make sure this points to the right data
+                                        headers: { Authorization: `Bearer ${getUserAuth}` }
+                                    }}
+                                    style={[styles.image, { }]}
+                                />
+                            </View>
+                        )}
+                    />
+
+                    {/* <Swiper
                         style={styles.wrapper}
                         loop={false}
+                        index={activeIndex}
                         onIndexChanged={(index) => setActiveIndex(index)}
                         dotStyle={styles.dot}
                         activeDotStyle={styles.activeDot}
+                        paginationStyle={{ bottom: 10 }} // Adjust the position of the dots if needed
+                        showsPagination={true}
                     >
                         {specifcadditionalImages.map((item, index) => (
                             <View style={styles.slide} key={index}>
@@ -190,7 +221,7 @@ const ViewCatDetails = ({ route }) => {
                                 }} style={[styles.image, { width: '90%' }]} />
                             </View>
                         ))}
-                    </Swiper>
+                    </Swiper> */}
 
                     <View style={{ marginHorizontal: 20, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                         <Text style={{ color: "#100D25", fontSize: 20, fontWeight: "700", fontFamily: "ManropeRegular", }}>{jewelleryDetails?.productName}</Text>
@@ -199,8 +230,8 @@ const ViewCatDetails = ({ route }) => {
 
                     <View style={{ marginBottom: 20, marginHorizontal: 20, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                         {jewelleryDetails?.categoryType !== 'jewels' ?
-                        <Text style={{ color: "#9095A6", fontSize: 14, fontWeight: "500", fontFamily: "ManropeRegular", }}>Size : {jewelleryDetails?.size}</Text>
-                         : null}
+                            <Text style={{ color: "#9095A6", fontSize: 14, fontWeight: "500", fontFamily: "ManropeRegular", }}>Size : {jewelleryDetails?.size}</Text>
+                            : null}
                         <View style={{ flexDirection: "row", backgroundColor: "#FFF8F0", paddingVertical: 5, paddingHorizontal: 10, borderRadius: 10 }}>
                             <TruestedMarkOrange />
                             <Text style={{ marginLeft: 5, color: "#FD813B", fontSize: 11, fontWeight: "800", fontFamily: "ManropeRegular", }}>Trusted Lender</Text>
@@ -214,30 +245,30 @@ const ViewCatDetails = ({ route }) => {
                     <Text style={{ marginBottom: 20, marginTop: 5, color: "#393C47", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>{defaultDescription}</Text>
                     <Text style={{ marginBottom: 20, marginTop: 5, color: "#393C47", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>{jewelleryDetails?.description}</Text>
                     {jewelleryDetails?.categoryType !== 'jewels' ?
-                    <ProductInfoCard color={jewelleryDetails?.color} size={jewelleryDetails?.size} />
-                     : null}
-                    </View>
+                        <ProductInfoCard color={jewelleryDetails?.color} size={jewelleryDetails?.size} />
+                        : null}
+                </View>
 
-                    {jewelleryDetails?.categoryType !== 'jewels' ?
+                {jewelleryDetails?.categoryType !== 'jewels' ?
 
-                <View style={{ width: '92%', alignSelf: 'center', marginTop: 20 }}>
-                    <View style={styles.headerRow}>
-                        <Text style={styles.headerText}>Size</Text>
-                        <Text style={styles.headerText}>{genderType == 'womens' ? 'Bust (inches)' : 'Chest (inches)'}</Text>
-                        <Text style={styles.headerText}>Waist (inches)</Text>
-                        {genderType == 'womens' && <Text style={styles.headerText}>Hip (inches)</Text>}
-                    </View>
-
-                    {/* Dynamically render the appropriate size chart */}
-                    {(genderType == 'mens' ? menSizes : womenSizes).map((item, index) => (
-                        <View key={index} style={styles.dataRow}>
-                            <Text style={styles.cellText}>{item.size}</Text>
-                            <Text style={styles.cellText}>{genderType == 'womens' ? item.bust : item.chest}</Text>
-                            <Text style={styles.cellText}>{item.waist}</Text>
-                            {genderType == 'womens' && <Text style={styles.cellText}>{item.hip}</Text>}
+                    <View style={{ width: '92%', alignSelf: 'center', marginTop: 20 }}>
+                        <View style={styles.headerRow}>
+                            <Text style={styles.headerText}>Size</Text>
+                            <Text style={styles.headerText}>{genderType == 'womens' ? 'Bust (inches)' : 'Chest (inches)'}</Text>
+                            <Text style={styles.headerText}>Waist (inches)</Text>
+                            {genderType == 'womens' && <Text style={styles.headerText}>Hip (inches)</Text>}
                         </View>
-                    ))}
-                </View> : null}
+
+                        {/* Dynamically render the appropriate size chart */}
+                        {(genderType == 'mens' ? menSizes : womenSizes).map((item, index) => (
+                            <View key={index} style={styles.dataRow}>
+                                <Text style={styles.cellText}>{item.size}</Text>
+                                <Text style={styles.cellText}>{genderType == 'womens' ? item.bust : item.chest}</Text>
+                                <Text style={styles.cellText}>{item.waist}</Text>
+                                {genderType == 'womens' && <Text style={styles.cellText}>{item.hip}</Text>}
+                            </View>
+                        ))}
+                    </View> : null}
                 <View style={{ marginTop: 10, marginBottom: 20 }}>
                     <PricingOptions
                         onSelect={handleSelect}

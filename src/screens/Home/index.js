@@ -48,6 +48,7 @@ import { promptForEnableLocationIfNeeded } from 'react-native-android-location-e
 import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
 import VegIcon from '../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
+import NotificationIcon from 'react-native-vector-icons/Ionicons';
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
@@ -64,6 +65,12 @@ const HomeDashboard = () => {
     const [getUserAuth, setGetUserAuth] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const [myBookings, setMyBookings] = useState();
+    const [cateringBookings, setCateringBookings] = useState();
+    const [hallsBookings, setHallsBookings] = useState();
+    const [pendingCount, setPendingCount] = useState();
+
 
     const bannerImages = [
         { id: '1', image: JewelleryCard },
@@ -107,6 +114,9 @@ const HomeDashboard = () => {
             getUserAuthTokenRes();
             getProfileData();
             getAllCaterings(currentPage);
+            getHallsBookings();
+            getMyBookings();
+            getCateringsBookings();
             // Cleanup function to run when the screen loses focus
             return () => {
                 console.log('Screen is unfocused');
@@ -114,6 +124,65 @@ const HomeDashboard = () => {
         }, [])
     );
 
+    const getMyBookings = async () => {
+        const token = await getUserAuthToken();
+        setGetUserAuth(token);
+        try {
+            const response = await axios.get(`${BASE_URL}/getUserClothJewelBookings`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log("BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+            setMyBookings(response?.data?.data)
+        } catch (error) {
+            console.log("My Bookings data error>>::", error);
+        }
+    };
+
+    const getCateringsBookings = async () => {
+        const token = await getUserAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/getUserFoodCateringBookings`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log("catering BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+            setCateringBookings(response?.data?.data)
+        } catch (error) {
+            console.log("My Bookings data error>>::", error);
+        }
+    };
+
+    const getHallsBookings = async () => {
+        const token = await getUserAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/getUserFunctionHallBookings`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log("Funtional halls BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+            setHallsBookings(response?.data?.data)
+
+            const countApproved = (data) =>
+                data?.filter((item) => item.bookingStatus === "approved").length;
+        
+            // Get counts for each dataset
+            const approvedHallsCount = countApproved(response?.data?.data);
+            const approvedCateringsCount = countApproved(cateringBookings);
+            const approvedClothesCount = countApproved(myBookings);
+        
+            const pendingCountTotal = approvedHallsCount + approvedCateringsCount + approvedClothesCount;
+            setPendingCount(pendingCountTotal)
+
+        } catch (error) {
+            console.log("My Bookings data error>>::", error);
+        }
+    };
+
+    
     const getUserAuthTokenRes = async () => {
         const token = await getUserAuthToken();
         console.log("usertoklen", token);
@@ -164,8 +233,8 @@ const HomeDashboard = () => {
 
             const newCateringsData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
             console.log('resp is caterings ::>>>', JSON.stringify(response?.data?.data));
-                setCateringsData(response?.data?.data);
-           
+            setCateringsData(response?.data?.data);
+
         } catch (error) {
             console.error('Error fetching food caterings:', error);
         }
@@ -206,17 +275,17 @@ const HomeDashboard = () => {
                 timeout: 60000,
             });
             console.log("getting location", location);
-    
+
             if (location) {
                 const apiKey = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo';  // Replace with your Google API key
                 const response = await fetch(
                     `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=${apiKey}`
                 );
-    
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-    
+
                 const data = await response.json();
                 console.log("address in home::::::", JSON.stringify(data));
                 setAddress(data?.results[0]?.formatted_address);
@@ -227,43 +296,43 @@ const HomeDashboard = () => {
             console.error("Error:", error);
         }
     };
-    
-     const handleCheckPressed = async() => {
-        if (Platform.OS === 'android') {
-          const checkEnabled= await isLocationEnabled();
-          console.log('checkEnabled', checkEnabled);
-          if(!checkEnabled){
-          handleEnabledPressed();
-          }else{
-            getLocation();
-          }
-        }
-      };
 
-      const  handleEnabledPressed = async() => {
+    const handleCheckPressed = async () => {
         if (Platform.OS === 'android') {
-          try {
-            const enableResult = await promptForEnableLocationIfNeeded();
-            console.log('enableResult', enableResult);
-            getLocation();
-            // The user has accepted to enable the location services
-            // data can be :
-            //  - "already-enabled" if the location services has been already enabled
-            //  - "enabled" if user has clicked on OK button in the popup
-          } catch (error) {
-            if (error instanceof Error) {
-              console.error(error.message);
-              // The user has not accepted to enable the location services or something went wrong during the process
-              // "err" : { "code" : "ERR00|ERR01|ERR02|ERR03", "message" : "message"}
-              // codes :
-              //  - ERR00 : The user has clicked on Cancel button in the popup
-              //  - ERR01 : If the Settings change are unavailable
-              //  - ERR02 : If the popup has failed to open
-              //  - ERR03 : Internal error
+            const checkEnabled = await isLocationEnabled();
+            console.log('checkEnabled', checkEnabled);
+            if (!checkEnabled) {
+                handleEnabledPressed();
+            } else {
+                getLocation();
             }
-          }
         }
-      };
+    };
+
+    const handleEnabledPressed = async () => {
+        if (Platform.OS === 'android') {
+            try {
+                const enableResult = await promptForEnableLocationIfNeeded();
+                console.log('enableResult', enableResult);
+                getLocation();
+                // The user has accepted to enable the location services
+                // data can be :
+                //  - "already-enabled" if the location services has been already enabled
+                //  - "enabled" if user has clicked on OK button in the popup
+            } catch (error) {
+                if (error instanceof Error) {
+                    console.error(error.message);
+                    // The user has not accepted to enable the location services or something went wrong during the process
+                    // "err" : { "code" : "ERR00|ERR01|ERR02|ERR03", "message" : "message"}
+                    // codes :
+                    //  - ERR00 : The user has clicked on Cancel button in the popup
+                    //  - ERR01 : If the Settings change are unavailable
+                    //  - ERR02 : If the popup has failed to open
+                    //  - ERR03 : Internal error
+                }
+            }
+        }
+    };
 
     const getPermissions = async () => {
         try {
@@ -347,23 +416,23 @@ const HomeDashboard = () => {
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignSelf: 'center', alignItems: 'center' }}>
                             <View style={{ flexDirection: 'row', }}>
-                                <FontAwesome name={"map-marker"} color={themevariable.Color_777777} size={20} style={{marginTop:5}} />
-                                <Text  style={{ fontWeight: '500', marginHorizontal: 5, color: themevariable.Color_777777, fontSize: 13, marginTop: 5, fontFamily: 'InterBold', bottom: 3 }}>{item?.functionHallAddress?.address}</Text>
+                                <FontAwesome name={"map-marker"} color={themevariable.Color_777777} size={20} style={{ marginTop: 5 }} />
+                                <Text style={{ fontWeight: '500', marginHorizontal: 5, color: themevariable.Color_777777, fontSize: 13, marginTop: 5, fontFamily: 'InterBold', bottom: 3 }}>{item?.functionHallAddress?.address}</Text>
                             </View>
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'row',marginTop:10,marginHorizontal:10 }}>
+                    <View style={{ flexDirection: 'row', marginTop: 10, marginHorizontal: 10 }}>
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.seatingCapacity} pax</Text>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.bedRooms} Rooms</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10,alignItems:"center"}}>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
 
-                            <Text style={{  }}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon/>}</Text>
-                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG': item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
+                            <Text style={{}}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -392,19 +461,19 @@ const HomeDashboard = () => {
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignSelf: 'center', alignItems: 'center' }}>
                             <View style={{ flexDirection: 'row', }}>
-                                <FontAwesome name={"map-marker"} color={themevariable.Color_777777} size={20} style={{marginTop:5}} />
+                                <FontAwesome name={"map-marker"} color={themevariable.Color_777777} size={20} style={{ marginTop: 5 }} />
                                 <Text style={{ fontWeight: '500', marginHorizontal: 5, color: themevariable.Color_777777, fontSize: 13, marginTop: 5, fontFamily: 'InterBold', bottom: 3 }}>{item?.foodCateringAddress?.address}</Text>
                             </View>
                         </View>
                     </View>
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "60%", padding: 5, marginBottom: 5 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between',marginTop:5}}>
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center",paddingVertical:5 }}>
-                            <Text>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
-                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
+                            <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center", paddingVertical: 5 }}>
+                                <Text>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
+                                <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
+                            </View>
                         </View>
-                    </View>
 
                     </View>
                 </TouchableOpacity>
@@ -450,12 +519,12 @@ const HomeDashboard = () => {
             navigation.navigate('CategoriesList', { catType: 'clothes' });
         } else if (name === 'Jewellery') {
             navigation.navigate('CategoriesList', { catType: 'jewels' });
-        }else if (name === 'Halls') {
+        } else if (name === 'Halls') {
             navigation.navigate('Events');
-        }else if (name === 'Catering') {
+        } else if (name === 'Catering') {
             navigation.navigate('Caterings');
         }
-        
+
         // Add other conditions for different categories if needed
     };
 
@@ -479,6 +548,11 @@ const HomeDashboard = () => {
                         </View>
                         <Pressable onPress={() => navigation.navigate('ProfileScreen')}>
                             <FontAwesome name={"user-circle"} color={"#000000"} size={35} />
+                            {pendingCount > 0 && (
+                                <TouchableOpacity onPress={() => navigation.navigate('MyBookings')} style={styles.badge}>
+                                    <Text style={styles.badgeText}>{pendingCount}</Text>
+                                </TouchableOpacity>
+                            )}
                         </Pressable>
 
                     </View>
@@ -607,43 +681,43 @@ const HomeDashboard = () => {
                         />
                     </View> : null}
 
-                    {eventsData?.length > 0 ?
+                {eventsData?.length > 0 ?
                     <>
-                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: horizontalScale(20) }}>
-                    <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Events')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
-                        <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
-                        <RightArrowIcon width={25} height={25} />
-                    </TouchableOpacity>
-                </View>
+                        <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: horizontalScale(20) }}>
+                            <Text style={styles.onDemandTextStyle}>On Demand Halls</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('Events')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                                <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
+                                <RightArrowIcon width={25} height={25} />
+                            </TouchableOpacity>
+                        </View>
 
-                <FlatList
-                    data={eventsData}
-                    renderItem={renderItem}
-                    horizontal
-                    keyExtractor={(item) => item?._id}
-                    showsHorizontalScrollIndicator={false}
-                />
-                </> : null}
+                        <FlatList
+                            data={eventsData}
+                            renderItem={renderItem}
+                            horizontal
+                            keyExtractor={(item) => item?._id}
+                            showsHorizontalScrollIndicator={false}
+                        />
+                    </> : null}
 
-                {cateringsData?.length > 0 ? 
-                <>
-                <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: horizontalScale(20) }}>
-                    <Text style={styles.onDemandTextStyle}>Food Caterings</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Caterings')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
-                        <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
-                        <RightArrowIcon width={25} height={25} />
-                    </TouchableOpacity>
-                </View>
+                {cateringsData?.length > 0 ?
+                    <>
+                        <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: horizontalScale(20) }}>
+                            <Text style={styles.onDemandTextStyle}>Food Caterings</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('Caterings')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                                <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See All</Text>
+                                <RightArrowIcon width={25} height={25} />
+                            </TouchableOpacity>
+                        </View>
 
-                <FlatList
-                    data={cateringsData}
-                    renderItem={renderCaterings}
-                    horizontal
-                    keyExtractor={(item) => item?._id}
-                    showsHorizontalScrollIndicator={false}
-                />
-                </> : null}
+                        <FlatList
+                            data={cateringsData}
+                            renderItem={renderCaterings}
+                            horizontal
+                            keyExtractor={(item) => item?._id}
+                            showsHorizontalScrollIndicator={false}
+                        />
+                    </> : null}
 
 
                 <View style={{
@@ -929,31 +1003,47 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      },
-      modalContainer: {
+    },
+    modalContainer: {
         width: '80%',
         padding: 20,
         backgroundColor: 'white',
         borderRadius: 10,
         alignItems: 'center',
-      },
-      modalText: {
+    },
+    modalText: {
         fontSize: 16,
         textAlign: 'center',
         marginBottom: 20,
-      },
-      buttonContainer: {
+    },
+    buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
-      },
-      noThanksText: {
+    },
+    noThanksText: {
         fontSize: 16,
         color: 'gray',
-      },
-      turnOnText: {
+    },
+    turnOnText: {
         fontSize: 16,
         color: '#1E90FF',
+    },
+    badge: {
+        position: "absolute",
+        right: -5,
+        top: -5,
+        backgroundColor: "#CC3F3C",
+        borderRadius: 10,
+        height: 20,
+        width: 20,
+        justifyContent: "center",
+        alignItems: "center",
+      },
+      badgeText: {
+        color: "white",
+        fontSize: 12,
+        fontWeight: "bold",
       },
 });
 

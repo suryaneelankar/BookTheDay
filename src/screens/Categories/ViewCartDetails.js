@@ -101,6 +101,13 @@ const BookingDetailsScreen = ({ navigation, route }) => {
       Alert.alert("Please Upload Aadhar Image");
       return;
     }
+    const userDeliveryLocationSaved = userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address;
+
+    if(!userDeliveryLocationSaved) {
+      Alert.alert("Please enter a delivery location.");
+      return;
+  }
+  
     const payload = {
       productId: catId,
       startDate: moment(startDate).format('DD MMMM YYYY'),

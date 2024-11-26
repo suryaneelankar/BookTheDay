@@ -36,7 +36,7 @@ const ViewCaterings = ({ route, navigation }) => {
     const [modalMessage, setModalMessage] = useState('');
     const { categoryId } = route.params;
     const actionSheetRef = useRef(null);
-    const [foodComboSelected,setFoodComboSelected] =  useState()
+    const [foodComboSelected, setFoodComboSelected] = useState()
 
 
     const timeSlots = [
@@ -119,7 +119,7 @@ const ViewCaterings = ({ route, navigation }) => {
         const isAdded = addedItems.some(addedItem => addedItem?._id === item?._id);
 
         return (
-            <View style={{ marginTop:15}}>
+            <View style={{ marginTop: 15 }}>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <View style={{ width: "60%" }}>
                         <Text style={{ color: "#100D25", fontSize: 16, fontWeight: "600", fontFamily: 'ManropeRegular' }}>{item?.title}</Text>
@@ -150,7 +150,7 @@ const ViewCaterings = ({ route, navigation }) => {
                 {isAdded && (
                     <>
                         <TextInput
-                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2,marginBottom:15 }}
+                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2, marginBottom: 15 }}
                             placeholder="Enter number of plates"
                             keyboardType='phone-pad'
                             editable={false}
@@ -173,7 +173,7 @@ const ViewCaterings = ({ route, navigation }) => {
     };
 
     const handleAdd = (item) => {
-        setAddedItems([...addedItems, item]);
+        // setAddedItems([...addedItems, item]);
         actionSheetRef.current?.show();
         setFoodComboSelected(item);
 
@@ -204,6 +204,28 @@ const ViewCaterings = ({ route, navigation }) => {
     const grandTotal = calculateGrandTotal(itemsWithTotalPrice);
 
     const renderActionSheetWithProductDetais = () => {
+        // const [numPlates, setNumPlates] = useState({});
+        const [errorMessage, setErrorMessage] = useState('');
+
+        const handleAddClick = () => {
+            const enteredValue = numPlates[foodComboSelected?.title];
+            const minOrder = foodComboSelected?.minOrder || 0;
+
+            if (!enteredValue || parseInt(enteredValue, 10) < minOrder) {
+                setErrorMessage(
+                    !enteredValue
+                        ? 'Please enter a valid number of plates.'
+                        : `Minimum order is ${minOrder} plates.`
+                );
+                return;
+            }
+
+            setErrorMessage(''); // Clear error message
+            actionSheetRef.current?.hide();
+            setAddedItems([...addedItems, foodComboSelected]);
+          
+            // Proceed with the valid value
+        };
 
         return (
             <ActionSheet
@@ -211,36 +233,40 @@ const ViewCaterings = ({ route, navigation }) => {
                 statusBarTranslucent
                 closeOnPressBack
                 defaultOverlayOpacity={0.5}
-                height={Dimensions.get("window").height-20}
+                height={Dimensions.get("window").height - 20}
                 containerStyle={styles.actionSheetContainer}
-                // animationType=
+            // animationType=
             >
                 <View style={{}}>
-                <Image style={{ height: 200, borderTopLeftRadius:10, borderTopRightRadius:10}} source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/9/96/Lunch_Meals.jpg' }} />
-                <View style={{paddingHorizontal:20,marginTop:10,flexDirection:"row",justifyContent:"space-between"}}>
-                    <View style={{width:"50%"}}>
-                <Text style={{ color: "#100D25", fontSize: 18, fontWeight:"800", fontFamily: 'ManropeRegular' }}>{foodComboSelected?.title}</Text>
-                <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5,fontWeight:"700" }}>{formatAmount(foodComboSelected?.perPlateCost)}</Text>
-                <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5 ,fontWeight:"700"}}>Min order: {foodComboSelected?.minOrder}</Text>
-                    </View>
-                <TouchableOpacity
-                            onPress={() => actionSheetRef.current?.hide()}
-                            style={{ borderRadius: 10, backgroundColor: "#F1F1F1",height:verticalScale(35)}}
+                    <Image style={{ height: 200, borderTopLeftRadius: 10, borderTopRightRadius: 10 }} source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/9/96/Lunch_Meals.jpg' }} />
+                    <View style={{ paddingHorizontal: 20, marginTop: 10, flexDirection: "row", justifyContent: "space-between" }}>
+                        <View style={{ width: "50%" }}>
+                            <Text style={{ color: "#100D25", fontSize: 18, fontWeight: "800", fontFamily: 'ManropeRegular' }}>{foodComboSelected?.title}</Text>
+                            <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5, fontWeight: "700" }}>{formatAmount(foodComboSelected?.perPlateCost)}</Text>
+                            <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5, fontWeight: "700" }}>Min order: {foodComboSelected?.minOrder}</Text>
+                        </View>
+                        <TouchableOpacity
+                            onPress={() => handleAddClick()}
+                            style={{ borderRadius: 10, backgroundColor: "#F1F1F1", height: verticalScale(35) }}
                         >
                             <Text style={styles.addText}>{'ADD'}</Text>
                         </TouchableOpacity>
-                </View> 
-                 <View style={{paddingHorizontal:20}}>
-                        <Text style={{ fontSize: 12, color: "#333333", marginTop: 5 ,fontWeight:"700",marginBottom:5,marginTop:20}}>Enter No.of Plates</Text>
+                    </View>
+                    <View style={{ paddingHorizontal: 20 }}>
+                        <Text style={{ fontSize: 12, color: "#333333", marginTop: 5, fontWeight: "700", marginBottom: 5, marginTop: 20 }}>Enter No.of Plates</Text>
                         <TextInput
-                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2,marginBottom:15 }}
+                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2, marginBottom: 15 }}
                             placeholder="Enter number of plates"
                             keyboardType='phone-pad'
                             value={numPlates[foodComboSelected?.title] || ''}
-                            onChangeText={(text) => setNumPlates({ ...numPlates, [foodComboSelected?.title]: text })}
+                            onChangeText={(text) => [setNumPlates({ ...numPlates, [foodComboSelected?.title]: text }), setErrorMessage('')]}
                         />
-                </View>
-            
+
+                        {errorMessage ? (
+                            <Text style={{ color: 'red', fontSize: 12, marginTop: 5 }}>{errorMessage}</Text>
+                        ) : null}
+                    </View>
+
                 </View>
                 <View style={styles.divider} />
 
@@ -285,11 +311,11 @@ const ViewCaterings = ({ route, navigation }) => {
                     </View>
 
                     <View style={{ flexDirection: "row", marginTop: 5, alignItems: "flex-start" }}>
-                        <MapMarkIcon style={{marginTop:2}} />
+                        <MapMarkIcon style={{ marginTop: 2 }} />
                         <Text style={{ color: "#939393", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', marginLeft: 5 }}>{eventsDetails?.foodCateringAddress?.address}</Text>
                     </View>
 
-                    <View style={{ marginTop: 20 ,marginBottom: 10 }}>
+                    <View style={{ marginTop: 20, marginBottom: 10 }}>
                         <Text style={styles.title}>Description</Text>
                         <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#8B8B8B", fontWeight: "400", marginTop: 4, marginBottom: 10 }}>{cateringsDescription}</Text>
                         <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#8B8B8B", fontWeight: "400", marginTop: 4, }}>{eventsDetails?.description}</Text>
@@ -632,9 +658,9 @@ const styles = StyleSheet.create({
     actionSheetContainer: {
         backgroundColor: 'white',
         paddingBottom: 20,
-        height: Dimensions.get('window').height- 350,
-        borderTopRightRadius:10,
-        borderTopLeftRadius:10
+        height: Dimensions.get('window').height - 350,
+        borderTopRightRadius: 10,
+        borderTopLeftRadius: 10
     },
     headerContainer: {
         flexDirection: 'row',
