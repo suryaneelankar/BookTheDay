@@ -50,8 +50,9 @@ const RequestConfirmation = ({ navigation, route }) => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            // console.log('before resp::><>', JSON.stringify(response?.data?.data));
             const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
+            console.log('before resp::><>', JSON.stringify(activeBookings));
+
             groupByFilterData(activeBookings);
             // groupByFilterData(response?.data?.data);
             setLoading(false);
@@ -69,7 +70,7 @@ const RequestConfirmation = ({ navigation, route }) => {
         }, {});
 
         const finalResult = result[`${productId}`]?.map(item => {
-            const catType = item?.catType;
+            let catType = item?.catType;
             let productName = '';
             let numOfDays = 0;
             let vendorAddress = '';
@@ -84,6 +85,8 @@ const RequestConfirmation = ({ navigation, route }) => {
             let userAddress = '';
             let userLatitude = '';
             let userLongitude = '';
+            let securityDepositAmount = 0;
+            let securityDepositAmountPaid = 0;
 
             if (catType === 'functionHalls') {
                 productName = item?.functionHallName;
@@ -99,6 +102,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                 userAddress = item?.userDeliveryLocation;
                 userLatitude = item?.userDeliveryLocationLatitude;
                 userLongitude = item?.userDeliveryLocationLongitude;
+                catType = catType
             }
             else if (catType === 'clothJewels') {
                 productName = item?.productName;
@@ -114,6 +118,9 @@ const RequestConfirmation = ({ navigation, route }) => {
                 userAddress = item?.userDeliveryLocation
                 userLatitude = item?.userDeliveryLocationLatitude;
                 userLongitude = item?.userDeliveryLocationLongitude;
+                securityDepositAmount = item?.securityDepositAmount;
+                securityDepositAmountPaid = item?.securityDepositAmountPaid;
+                catType = catType;
 
             }
             else if (catType === 'caterings') {
@@ -130,7 +137,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                 userAddress = item?.userDeliveryLocation;
                 userLatitude = item?.userDeliveryLocationLatitude;
                 userLongitude = item?.userDeliveryLocationLongitude;
-
+                catType = catType
             }
 
             return {
@@ -152,6 +159,8 @@ const RequestConfirmation = ({ navigation, route }) => {
                 userAddress: userAddress,
                 userLatitude: userLatitude,
                 userLongitude: userLongitude,
+                securityDepositAmount: securityDepositAmount,
+                securityDepositAmountPaid: securityDepositAmountPaid
             };
         });
         // setWholeBookingData(result[`${productId}`]);
@@ -417,13 +426,22 @@ const RequestConfirmation = ({ navigation, route }) => {
                             <UserIcon />
                             <Text style={styles.detailsStyle}>{selectedItemDetails?.userFullName}</Text>
                         </View>
-                        {selectedItemDetails?.advanceAmountPaid !== 0 && (
+                        {selectedItemDetails?.catType === 'clothJewels' ?
+                        <> {(selectedItemDetails?.securityDepositAmountPaid > 0) && (
                             <TouchableOpacity style={styles.detailsViewStyle} onPress={() => openDialPad(selectedItemDetails?.userMobileNumber)}>
                                 <PhoneIcon />
                                 <Text style={[styles.phoneNumDetailStyle, { textDecorationLine: "underline" }]}>{selectedItemDetails?.userMobileNumber}</Text>
                             </TouchableOpacity>
                         )}
-                        {selectedItemDetails?.advanceAmountPaid !== 0 && (
+                        </> : <>
+                        {(selectedItemDetails?.advanceAmountPaid !== 0 && selectedItemDetails?.advanceAmountPaid !== undefined) && (
+                            <TouchableOpacity style={styles.detailsViewStyle} onPress={() => openDialPad(selectedItemDetails?.userMobileNumber)}>
+                                <PhoneIcon />
+                                <Text style={[styles.phoneNumDetailStyle, { textDecorationLine: "underline" }]}>{selectedItemDetails?.userMobileNumber}</Text>
+                            </TouchableOpacity>
+                        )}
+                        </>}
+                        {(selectedItemDetails?.advanceAmountPaid !== 0 && selectedItemDetails?.userAddress) && (
                             <TouchableOpacity style={[styles.detailsViewStyle, { alignItems: "flex-start" }]} onPress={() => openMap(selectedItemDetails?.userLatitude, selectedItemDetails?.userLongitude)}>
                                 <LocationIcon />
                                 <Text style={[styles.phoneNumDetailStyle, { textDecorationLine: "underline" }]}>{selectedItemDetails?.userAddress}</Text>
@@ -431,11 +449,14 @@ const RequestConfirmation = ({ navigation, route }) => {
                         )}
                         <View style={styles.detailsViewStyle}>
                             <AdvPayIcon />
-                            <Text style={styles.detailsStyle}>Advance Paid: {formatAmount(selectedItemDetails?.advanceAmountPaid)}/-</Text>
-                        </View>
+                            {selectedItemDetails?.securityDepositAmount ?
+                            <Text style={styles.detailsStyle}>Security Deposit Paid: {formatAmount(selectedItemDetails?.securityDepositAmountPaid)}/-</Text>
+                           : <Text style={styles.detailsStyle}>Advance Paid: {formatAmount(selectedItemDetails?.advanceAmountPaid)}/-</Text>
+                            }
+                           </View>
                         <View style={styles.detailsViewStyle}>
                             <AdvPayIcon />
-                            <Text style={styles.detailsStyle}>Balance Payable: {formatAmount(selectedItemDetails?.totalAmount - selectedItemDetails?.advanceAmountPaid)}/-</Text>
+                            <Text style={styles.detailsStyle}>Balance Payable: {formatAmount(selectedItemDetails?.totalAmount - (selectedItemDetails?.advanceAmountPaid !== undefined  ? selectedItemDetails?.advanceAmountPaid : selectedItemDetails?.securityDepositAmountPaid ))}/-</Text>
                         </View>
 
                         {selectedItemDetails?.bookingItem && (

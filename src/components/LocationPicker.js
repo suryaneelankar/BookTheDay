@@ -16,7 +16,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
   const [pinCode, setPinCode] = useState('');
   const [label, setLabel] = useState('Home');
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [onSelectLoc,setOnSelectLoc] = useState(false);
+  const [onSelectLoc, setOnSelectLoc] = useState(false);
   const [searchLocation, setSearchLocation] = useState();
 
   const [places, setPlaces] = useState([]);
@@ -69,7 +69,8 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
           component.types.includes("sublocality_level_1")
         );
         setSubDivisionArea(subDivisionAreaCodeComponent?.long_name || "");
-      }
+      };
+      setOnSelectLoc(true);
     } catch (error) {
       console.log("Error:", error.message);
     }
@@ -217,10 +218,10 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       const result = await response.json();
 
       if (result.result) {
-        console.log('result.result is::>>>',result.result)
+        console.log('result.result is::>>>', result.result)
         const { lat, lng } = result.result.geometry.location;
         setSelectedLocation({ latitude: lat, longitude: lng });
-        const name  = result?.result?.name ? `${result?.result?.name}, ` : "";
+        const name = result?.result?.name ? `${result?.result?.name}, ` : "";
         setCompleteAddress(`${name}${result?.result?.formatted_address}`);
         setRegion({
           latitude: lat,
@@ -240,9 +241,9 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       {/* {console.log('places is::>>',places)} */}
 
 
-      <View style={{ marginTop: 10, flexDirection: "row", alignSelf: "center" }}>
+      <View style={{ width: "95%", marginTop: 10, flexDirection: "row", alignSelf: "center", alignItems: "center", justifyContent: "space-between" }}>
         <TouchableOpacity onPress={() => onBack()}>
-          <Iconleftcircle name='leftcircle' color={'#494a49'} size={33} />
+          <Iconleftcircle name='leftcircle' color={'#494a49'} size={33} style={{ bottom: 5 }} />
         </TouchableOpacity>
         <TextInput
           placeholder="Enter Location"
@@ -250,10 +251,15 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
           onChangeText={handleSearch}
           style={styles.locationInput}
           onFocus={() => setOnSelectLoc(false)}
+        // onBlur={() => setOnSelectLoc(true)}
         />
       </View>
+      {!onSelectLoc ?
+        <TouchableOpacity onPress={() => setOnSelectLoc(true)} style={{alignItems:"center"}}>
+          <Text>Get Current Location</Text>
+        </TouchableOpacity> : null}
 
-      {console.log('!selectedLocation is::>>',!selectedLocation)}
+      {console.log('!selectedLocation is vendor::>>', !selectedLocation)}
 
       {onSelectLoc ?
         <>
@@ -264,7 +270,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
               region={region}
               onPress={handleMapPress}
               showsUserLocation={true}
-              showsMyLocationButton={false}
+              showsMyLocationButton={true}
             >
               {selectedLocation && (
                 <Marker coordinate={selectedLocation} />
@@ -321,7 +327,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
           data={places}
           keyExtractor={(item) => item.place_id}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.listItem} onPress={() => {setOnSelectLoc(true),setSearchText(item.description),fetchPlaceDetails(item.place_id)}}>
+            <TouchableOpacity style={styles.listItem} onPress={() => { setOnSelectLoc(true), setSearchText(item.description), fetchPlaceDetails(item.place_id) }}>
               <Text style={styles.placeText}>{item.description}</Text>
             </TouchableOpacity>
           )}
@@ -374,7 +380,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderColor: '#ccc',
     borderWidth: 1,
-    marginBottom: 15,
+    marginBottom: 5,
     paddingHorizontal: 10,
     borderRadius: 8,
     backgroundColor: "#F0F5FA",

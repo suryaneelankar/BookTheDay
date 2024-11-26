@@ -141,8 +141,8 @@ const VendorCategoryScreen = ({ navigation }) => {
             id: 1,
             CatImg: FunctionHallVendorImg,
             navScreen: 'AddFunctionalHall',
-            title: 'Function Hall Booking',
-            description: 'Manage bookings for events, celebrations, and weddings.',
+            title: 'Function Hall Rental',
+            description: 'Manage listings for events, celebrations, and weddings.',
         },
         {
             id: 2,
