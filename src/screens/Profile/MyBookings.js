@@ -109,10 +109,10 @@ const ViewMyBookings = () => {
     }
   };
 
-  const handlePayment = async (advanceAmount, bookingId, catType, vendorMobileNumber, productName) => {
+  const handlePayment = async (advanceAmount, bookingId, catType, vendorMobileNumber, productName, totalAmount) => {
     const token = await getUserAuthToken();
     let initiatePaymentPayload = {
-      orderAmount: advanceAmount,
+      orderAmount: payDetails(catType, advanceAmount, totalAmount, advanceAmount),
       currency: 'INR',
       userFullName: userLoggedInName,
       userMobileNumber: userLoggedInMobileNum,
@@ -137,7 +137,7 @@ const ViewMyBookings = () => {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              amount: advanceAmount, // Amount in INR
+              amount: payDetails(catType, advanceAmount, totalAmount, advanceAmount), // Amount in INR
               currency: 'INR',
               receipt: 'receipt#1',
               userFullName: userLoggedInName,
@@ -176,7 +176,7 @@ const ViewMyBookings = () => {
               let statusPaymentPayload = {
                 orderId: initiateresponse?.data?.data?.OrderId,
                 paymentStatus: "success",
-                orderAdvanceAmount: advanceAmount,
+                orderAdvanceAmount: payDetails(catType, advanceAmount, totalAmount, advanceAmount),
                 razorpay_order_id: paymentData?.razorpay_order_id,
                 razorpay_payment_id: paymentData?.razorpay_payment_id,
                 razorpay_signature: paymentData?.razorpay_signature,
@@ -207,7 +207,7 @@ const ViewMyBookings = () => {
 
                 orderId: initiateresponse?.data?.data?.OrderId,
                 paymentStatus: "failed",
-                orderAdvanceAmount: advanceAmount,
+                orderAdvanceAmount: payDetails(catType, advanceAmount, totalAmount, advanceAmount),
                 razorpay_order_id: data?.orderId,
                 razorpay_payment_id: '',
                 razorpay_signature: ''
@@ -275,8 +275,8 @@ const ViewMyBookings = () => {
             <View style={{ marginLeft: 15 }}>
               <Text style={styles.cardTitle}>{item?.catType === 'caterings' ? item?.foodCateringName : item?.catType === 'functionHalls' ? item?.functionHallName : item?.productName} </Text>
               <Text style={styles.cardBalanceAmount}>Advance Amount: {formatAmount(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount)}</Text>
-              <Text style={styles.cardBalanceAmount}>Current Payable Amount: {formatAmount(item?.advanceAmountToPay ? (item?.totalAmount - item?.advanceAmountToPay) : (item?.totalAmount - item?.securityDepositAmount))}</Text>
-              <Text style={styles.cardBalanceAmount}>Balance Amount: {payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)}</Text>
+              <Text style={styles.cardBalanceAmount}>Current Payable Amount: {payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)}</Text>
+              <Text style={styles.cardBalanceAmount}>Balance Amount: {formatAmount(item?.advanceAmountToPay ? (item?.totalAmount - payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)) : (item?.totalAmount - payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)))}</Text>
 
               <Text style={styles.startDate}> Start Date: {item?.startDate}</Text>
               <Text style={styles.startDate}> End Date: {item?.endDate}</Text>
@@ -295,8 +295,6 @@ const ViewMyBookings = () => {
           labels={labels}
           stepCount={3}
         />
-
-
 
         <View style={styles.cardFooter}>
           <Text style={[styles.cardStatus, { borderWidth: 1, borderColor: "gray", paddingHorizontal: 20, fontSize: 11 }]}>
@@ -374,8 +372,8 @@ const ViewMyBookings = () => {
 
           <PaymentConfirmationModal
             visible={paymentModal}
-            message={`Redirecting to Pay Advance Amount ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount)}`}
-            onSubmit={() => [setPaymentModal(false), handlePayment(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount, selectedObjectedforPayment?.bookingId, selectedObjectedforPayment?.catType, selectedObjectedforPayment?.vendorMobileNumber, selectedObjectedforPayment?.catType === 'caterings' ? selectedObjectedforPayment?.foodCateringName : selectedObjectedforPayment?.catType === 'functionHalls' ? selectedObjectedforPayment?.functionHallName : selectedObjectedforPayment?.productName)]}
+            message={`Redirecting you to Pay Advance Amount: ${formatAmount(payDetails(selectedObjectedforPayment?.catType, selectedObjectedforPayment?.advanceAmountToPay, selectedObjectedforPayment?.totalAmount, selectedObjectedforPayment?.securityDepositAmount))} \n \n \n Balance Payable Amount: ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? (selectedObjectedforPayment?.totalAmount - payDetails(selectedObjectedforPayment?.catType, selectedObjectedforPayment?.advanceAmountToPay, selectedObjectedforPayment?.totalAmount, selectedObjectedforPayment?.securityDepositAmount)) : (selectedObjectedforPayment?.totalAmount - payDetails(selectedObjectedforPayment?.catType, selectedObjectedforPayment?.advanceAmountToPay, selectedObjectedforPayment?.totalAmount, selectedObjectedforPayment?.securityDepositAmount)))}`}
+            onSubmit={() => [setPaymentModal(false), handlePayment(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount, selectedObjectedforPayment?.bookingId, selectedObjectedforPayment?.catType, selectedObjectedforPayment?.vendorMobileNumber, selectedObjectedforPayment?.catType === 'caterings' ? selectedObjectedforPayment?.foodCateringName : selectedObjectedforPayment?.catType === 'functionHalls' ? selectedObjectedforPayment?.functionHallName : selectedObjectedforPayment?.productName, selectedObjectedforPayment?.totalAmount)]}
             onClose={() => setPaymentModal(false)}
           />
 

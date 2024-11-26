@@ -57,7 +57,8 @@ const styles = StyleSheet.create({
     color: '#333333',
     fontWeight:"400",
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 30,
+    marginTop: 20,
     marginHorizontal:5
   },
   buttonContainer: {
