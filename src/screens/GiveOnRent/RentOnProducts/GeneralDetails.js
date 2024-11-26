@@ -13,9 +13,10 @@ import { useSelector } from 'react-redux';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useNavigation } from '@react-navigation/native';
+import { formatAmount } from '../../../utils/GlobalFunctions';
 
 
-const GeneralDetails = ({isAadharUpdate}) => {
+const GeneralDetails = ({ isAadharUpdate }) => {
     console.log("isAadharUpdate value at fomr", isAadharUpdate);
     const navigation = useNavigation();
     const [productName, setProductName] = useState('');
@@ -250,8 +251,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
 
         if (!mainImageUrl || productName === '' || productDescription === '' ||
             (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || (securityDeposit === undefined || securityDeposit === '') || (selectedOption == null)
-            || (selectedColor === '' && ((selectedOption !== null 
-                && selectedOption === 'clothes'))) || (clothSize === '' && ((selectedOption !== null 
+            || (selectedColor === '' && ((selectedOption !== null
+                && selectedOption === 'clothes'))) || (clothSize === '' && ((selectedOption !== null
                     && selectedOption === 'clothes')))
         ) {
             Alert.alert('Please fill Mandatory fields');
@@ -333,7 +334,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
             if (response.status === 201) {
                 setLoading(false);
                 console.log('Success', `uploaded successfully`);
-                if(isAadharUpdate){
+                if (isAadharUpdate) {
                     Alert.alert(
                         "Confirmation",
                         "Your product posted successfully",
@@ -342,16 +343,16 @@ const GeneralDetails = ({isAadharUpdate}) => {
                         ],
                         { cancelable: false }
                     );
-                }else{
-                Alert.alert(
-                    "Confirmation",
-                    "Your product posted successfully, Please complete the KYC status",
-                    [
-                        { text: "OK", onPress: () => navigation.navigate('AadharUpload') }
-                    ],
-                    { cancelable: false }
-                );
-            }
+                } else {
+                    Alert.alert(
+                        "Confirmation",
+                        "Your product posted successfully, Please complete the KYC status",
+                        [
+                            { text: "OK", onPress: () => navigation.navigate('AadharUpload') }
+                        ],
+                        { cancelable: false }
+                    );
+                }
             } else {
                 setLoading(false);
                 console.log('Error', 'Failed to upload document');
@@ -440,7 +441,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
             ) :
                 <View>
                     <Modal visible={isLocationPickerVisible} animationType="slide">
-                        <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
+                        <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker} />
                         {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
                     </Modal>
 
@@ -525,52 +526,52 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             keyboardType='default'
                             isRequired={false}
                         />
-                        { (selectedOption !== null 
-                           && selectedOption === 'clothes') ?
-                        <>
-                        <Text style={styles.sizeLabel}>Select Cloth Size</Text>
-                        <Dropdown
-                            style={[styles.dropdown]}
-                            placeholderStyle={styles.placeholderStyle}
-                            selectedTextStyle={styles.selectedTextStyle}
-                            inputSearchStyle={styles.inputSearchStyle}
-                            iconStyle={styles.iconStyle}
-                            data={clothesSizeData}
-                            activeColor={'#f0e68c'}
-                            selectedStyle={{ backgroundColor: "red" }}
-                            maxHeight={300}
-                            labelField="label"
-                            valueField="value"
-                            placeholder={'Select Size'}
-                            value={clothSize}
-                            containerStyle={{ borderColor: "orange", borderWidth: 1, borderRadius: 5 }}
-                            onFocus={() => setIsFocus(true)}
-                            onBlur={() => setIsFocus(false)}
-                            onChange={item => {
-                                setClothSize(item.value);
-                                setIsFocus(false);
-                            }}
-                        />
+                        {(selectedOption !== null
+                            && selectedOption === 'clothes') ?
+                            <>
+                                <Text style={styles.sizeLabel}>Select Cloth Size</Text>
+                                <Dropdown
+                                    style={[styles.dropdown]}
+                                    placeholderStyle={styles.placeholderStyle}
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    iconStyle={styles.iconStyle}
+                                    data={clothesSizeData}
+                                    activeColor={'#f0e68c'}
+                                    selectedStyle={{ backgroundColor: "red" }}
+                                    maxHeight={300}
+                                    labelField="label"
+                                    valueField="value"
+                                    placeholder={'Select Size'}
+                                    value={clothSize}
+                                    containerStyle={{ borderColor: "orange", borderWidth: 1, borderRadius: 5 }}
+                                    onFocus={() => setIsFocus(true)}
+                                    onBlur={() => setIsFocus(false)}
+                                    onChange={item => {
+                                        setClothSize(item.value);
+                                        setIsFocus(false);
+                                    }}
+                                />
 
-                        <Text style={styles.sizeLabel}>Select Cloth Color</Text>
+                                <Text style={styles.sizeLabel}>Select Cloth Color</Text>
 
-                        <Dropdown
-                            style={styles.dropdown}
-                            data={colorOptions}
-                            labelField="label"
-                            valueField="value"
-                            placeholder="Select a color"
-                            value={selectedColor}
-                            selectedTextStyle={[styles.selectedTextStyle,{marginHorizontal:5}]}
-                            activeColor={'#f0e68c'}
-                            onChange={(item) => {
-                                setSelectedColor(item?.value);
-                                console.log(`Selected Color Code: ${item.value}`);
-                            }}
-                            renderItem={renderItem}
-                            renderLeftIcon={() => <View style={{backgroundColor:selectedColor,borderRadius:15,width:20,height:20}}/>}
-                        />
-                        </> : null }
+                                <Dropdown
+                                    style={styles.dropdown}
+                                    data={colorOptions}
+                                    labelField="label"
+                                    valueField="value"
+                                    placeholder="Select a color"
+                                    value={selectedColor}
+                                    selectedTextStyle={[styles.selectedTextStyle, { marginHorizontal: 5 }]}
+                                    activeColor={'#f0e68c'}
+                                    onChange={(item) => {
+                                        setSelectedColor(item?.value);
+                                        console.log(`Selected Color Code: ${item.value}`);
+                                    }}
+                                    renderItem={renderItem}
+                                    renderLeftIcon={() => <View style={{ backgroundColor: selectedColor, borderRadius: 15, width: 20, height: 20 }} />}
+                                />
+                            </> : null}
 
 
                         <TextField
@@ -586,13 +587,46 @@ const GeneralDetails = ({isAadharUpdate}) => {
                     <Text style={styles.title}>Rent Type</Text>
                     <View style={styles.mainContainer}>
                         <TextField
-                            label='Day Price (₹ / 1day)'
+                            label='Day Price (₹ / 1 day)'
                             placeholder="Please Enter per Day Price"
                             value={perDayRentPrice}
                             onChangeHandler={onChangePerDayRentPrice}
                             keyboardType='number-pad'
                             isRequired={true}
                         />
+                        {
+                            !isNaN(perDayRentPrice - (perDayRentPrice * discountPercentage / 100)) && perDayRentPrice ? (
+                                <>
+                                    {(() => {
+                                        const discountedPrice = perDayRentPrice - (perDayRentPrice * discountPercentage / 100);
+                                        const serviceFeePercentage = discountedPrice < 10000 ? 0.03 : 0.05; // 3% for < ₹10,000, 5% for ≥ ₹10,000
+                                        const serviceFee = discountedPrice * serviceFeePercentage;
+                                        const finalEarning = discountedPrice - serviceFee;
+
+                                        return (
+                                            <>
+                                                <Text style={styles.discountlabel}>
+                                                    Your Product Price (After Discount):
+                                                    <Text style={styles.highlightedValue}>{formatAmount(discountedPrice.toFixed(2))}</Text>
+                                                </Text>
+                                                <Text style={styles.discountlabel}>
+                                                    Service Fee ({serviceFeePercentage * 100}%):
+                                                    <Text style={styles.highlightedValue}>{formatAmount(serviceFee.toFixed(2))}</Text>
+                                                </Text>
+                                                <Text style={styles.discountlabel}>
+                                                    Your Earning (After Service Fee):
+                                                    <Text style={styles.highlightedValue}>{formatAmount(finalEarning.toFixed(2))}</Text>
+                                                </Text>
+                                            </>
+                                        );
+                                    })()}
+                                </>
+                            ) : null
+                        }
+                        <Text style={styles.commissionLabel}>Service Fee Details:</Text>
+                        <Text style={styles.discountlabel}>3% for orders below ₹10,000</Text>
+                        <Text style={styles.discountlabel}>5% for orders above ₹10,000</Text>
+
                         <TextField
                             label='Security Deposit'
                             placeholder="Please Enter Security Deposit"
@@ -611,12 +645,12 @@ const GeneralDetails = ({isAadharUpdate}) => {
                         /> */}
                         <Text style={styles.textInputlabel}>Discount if any</Text>
                         {discountPercentageList()}
-                        {!isNaN(perDayRentPrice - (perDayRentPrice * discountPercentage / 100)) && perDayRentPrice ? (
-                                <>
-                                    <Text style={styles.discountlabel}>Your product price: {perDayRentPrice}</Text>
-                                    <Text style={styles.discountlabel}>Your product price shown after discount: {perDayRentPrice - (perDayRentPrice * discountPercentage / 100)}</Text>
-                                </>
-                            ) : null}
+                        {/* {!isNaN(perDayRentPrice - (perDayRentPrice * discountPercentage / 100)) && perDayRentPrice ? (
+                            <>
+                                <Text style={styles.discountlabel}>Your product price: {perDayRentPrice}</Text>
+                                <Text style={styles.discountlabel}>Your product price shown after discount: {perDayRentPrice - (perDayRentPrice * discountPercentage / 100)}</Text>
+                            </>
+                        ) : null} */}
                     </View>
                     <Text style={styles.title}>Item Available Address</Text>
                     <View style={styles.mainContainer}>
@@ -715,16 +749,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 10,
-        marginHorizontal:10,
-        
+        marginHorizontal: 10,
 
-      },
-      colorBox: {
+
+    },
+    colorBox: {
         width: 20,
         height: 20,
         marginRight: 10,
         borderRadius: 10,
-      },
+    },
     radioContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -766,10 +800,6 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     image: {
-        // marginLeft: 15,
-        // marginRight: 7,
-        // marginTop: 5,
-        // backgroundColor:'red'
     },
     imageContainer: {
         alignSelf: 'center',
@@ -791,7 +821,14 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: 'ManropeRegular',
         fontWeight: "400",
-        color:"black",
+        color: "black",
+    },
+    commissionLabel: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: 'bold',
+        color: themevariable.Color_000000,
+        fontSize: 15,
+        marginTop: 15
     },
     placeholderStyle: {
         fontSize: 14,
@@ -827,11 +864,14 @@ const styles = StyleSheet.create({
         fontSize: 15,
         marginTop: 15
     },
+    highlightedValue: {
+        fontWeight: 'bold',
+        color: '#FD813B', // Blue color for highlighting values
+    },
     textTnputView: {
         borderWidth: 1,
         marginTop: 10,
         borderColor: themevariable.Color_C8C8C6,
-        // paddingHorizontal:12,
         borderRadius: 5,
     }
 

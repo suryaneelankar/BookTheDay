@@ -22,7 +22,7 @@ const ViewMyBookings = () => {
   const navigation = useNavigation();
   const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
   const userLoggedInName = useSelector((state) => state.userLoggedInName);
-  const [selectedObjectedforPayment,setSelectedObjectedforPayment] = useState();
+  const [selectedObjectedforPayment, setSelectedObjectedforPayment] = useState();
   const [paymentModal, setPaymentModal] = useState(false);
 
   const labels = ["Initiated", "Confirmed", "Payment Done"];
@@ -53,15 +53,15 @@ const ViewMyBookings = () => {
 
   useFocusEffect(
     useCallback(() => {
-    getMyBookings();
-    getCateringsBookings();
-    getHallsBookings();
-        // Cleanup function to run when the screen loses focus
-        return () => {
-            console.log('Screen is unfocused');
-        };
+      getMyBookings();
+      getCateringsBookings();
+      getHallsBookings();
+      // Cleanup function to run when the screen loses focus
+      return () => {
+        console.log('Screen is unfocused');
+      };
     }, [])
-);
+  );
 
   const getMyBookings = async () => {
     const token = await getUserAuthToken();
@@ -117,7 +117,7 @@ const ViewMyBookings = () => {
       userFullName: userLoggedInName,
       userMobileNumber: userLoggedInMobileNum,
       vendorMobileNumber: vendorMobileNumber,
-      productName : productName
+      productName: productName
     };
 
     try {
@@ -176,7 +176,7 @@ const ViewMyBookings = () => {
               let statusPaymentPayload = {
                 orderId: initiateresponse?.data?.data?.OrderId,
                 paymentStatus: "success",
-                orderAdvanceAmount:  advanceAmount,
+                orderAdvanceAmount: advanceAmount,
                 razorpay_order_id: paymentData?.razorpay_order_id,
                 razorpay_payment_id: paymentData?.razorpay_payment_id,
                 razorpay_signature: paymentData?.razorpay_signature,
@@ -242,6 +242,24 @@ const ViewMyBookings = () => {
     };
   };
 
+  const payDetails = (catType, advanceAmountToPay, totalAmount, securityDepositAmount) => {
+    let currentPayableAmount = 0;
+
+    if (catType === "functionHalls") {
+        const serviceFeePercentage = totalAmount > 30000 ? 0.05 : 0.03; // 5% for > 30k, 3% for ≤ 30k
+        currentPayableAmount = advanceAmountToPay + (totalAmount * serviceFeePercentage);
+    } else if (catType === "caterings") {
+        const serviceFeePercentage = totalAmount > 10000 ? 0.05 : 0.03; // 5% for > 10k, 3% for ≤ 10k
+        currentPayableAmount = totalAmount * serviceFeePercentage;
+    } else if (catType === "clothJewels") {
+        const serviceFeePercentage = totalAmount > 10000 ? 0.05 : 0.03; // 5% for > 10k, 3% for ≤ 10k
+        currentPayableAmount = securityDepositAmount + (totalAmount * serviceFeePercentage);
+    }
+
+    return currentPayableAmount;
+};
+
+
 
   const renderItem = ({ item }) => {
     const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
@@ -256,8 +274,9 @@ const ViewMyBookings = () => {
             }} style={styles.cardImage} />
             <View style={{ marginLeft: 15 }}>
               <Text style={styles.cardTitle}>{item?.catType === 'caterings' ? item?.foodCateringName : item?.catType === 'functionHalls' ? item?.functionHallName : item?.productName} </Text>
-              <Text style={styles.cardBalanceAmount}>Advance Amount {formatAmount(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount)}</Text>
-              <Text style={styles.cardBalanceAmount}>Balance Amount {formatAmount(item?.advanceAmountToPay ? (item?.totalAmount - item?.advanceAmountToPay) : (item?.totalAmount - item?.securityDepositAmount))}</Text>
+              <Text style={styles.cardBalanceAmount}>Advance Amount: {formatAmount(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount)}</Text>
+              <Text style={styles.cardBalanceAmount}>Current Payable Amount: {formatAmount(item?.advanceAmountToPay ? (item?.totalAmount - item?.advanceAmountToPay) : (item?.totalAmount - item?.securityDepositAmount))}</Text>
+              <Text style={styles.cardBalanceAmount}>Balance Amount: {payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)}</Text>
 
               <Text style={styles.startDate}> Start Date: {item?.startDate}</Text>
               <Text style={styles.startDate}> End Date: {item?.endDate}</Text>
@@ -265,14 +284,14 @@ const ViewMyBookings = () => {
               <Text style={styles.cardSubtitle}>{item.role}</Text>
             </View>
           </View>
-          <Text numberOfLines={2} style={[styles.cardStatus, getStatusStyle(item.bookingStatus),{width:75,textAlign:"center"}]}>
+          <Text numberOfLines={2} style={[styles.cardStatus, getStatusStyle(item.bookingStatus), { width: 75, textAlign: "center" }]}>
             {item.bookingStatus ? item.bookingStatus.charAt(0).toUpperCase() + item.bookingStatus.slice(1) : ''}
           </Text>
         </View>
 
         <StepIndicator
           customStyles={customStyles}
-          currentPosition={item?.bookingStatus == 'requested' ? '1' : item?.bookingStatus == 'approved' ? '2' :  item?.bookingStatus == 'payment successful' ? '3' : '0'}
+          currentPosition={item?.bookingStatus == 'requested' ? '1' : item?.bookingStatus == 'approved' ? '2' : item?.bookingStatus == 'payment successful' ? '3' : '0'}
           labels={labels}
           stepCount={3}
         />
@@ -287,9 +306,9 @@ const ViewMyBookings = () => {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.doneButton}>
-            <TouchableOpacity 
-            disabled={item.bookingStatus !== 'approved'} 
-            onPress={() => {setPaymentModal(true),setSelectedObjectedforPayment(item)}}>
+            <TouchableOpacity
+              disabled={item.bookingStatus !== 'approved'}
+              onPress={() => { setPaymentModal(true), setSelectedObjectedforPayment(item) }}>
               <Text style={styles.doneButtonText}>Pay Now</Text>
             </TouchableOpacity>
           </LinearGradient>
@@ -303,7 +322,7 @@ const ViewMyBookings = () => {
       case 'requested':
         return { backgroundColor: '#ECA73C29', color: '#F29300' };
       case 'approved':
-        return { backgroundColor: '#45FE3529', color: "#57A64F" };
+        return { backgroundColor: '#FFEAB0', color: "#B46609" };
       case 'rejected':
         return { backgroundColor: '#FE353529', color: '#EF0000' };
       case 'payment successful':
@@ -316,55 +335,55 @@ const ViewMyBookings = () => {
   return (
     <SafeAreaView style={styles.container}>
       {(myBookings?.length > 0 || cateringBookings?.length > 0 || hallsBookings?.length > 0) ?
-      <ScrollView style={{ flex: 1 }}>
-        {myBookings?.length > 0 ?
-        <>
-        <Text style={{ marginTop: 20, marginBottom: 5, marginHorizontal: 15, color: "#000000", fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular' }}>
-          Clothes jewellery bookings
-        </Text>
-        <FlatList
-          data={myBookings}
-          renderItem={renderItem}
-          keyExtractor={(item) => item?.id}
-        />
-        </> : null}
+        <ScrollView style={{ flex: 1 }}>
+          {myBookings?.length > 0 ?
+            <>
+              <Text style={{ marginTop: 20, marginBottom: 5, marginHorizontal: 15, color: "#000000", fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular' }}>
+                Clothes jewellery bookings
+              </Text>
+              <FlatList
+                data={myBookings}
+                renderItem={renderItem}
+                keyExtractor={(item) => item?.id}
+              />
+            </> : null}
 
-        {cateringBookings?.length > 0 ?
-        <>
-        <Text style={{ marginTop: 20, marginBottom: 5, marginHorizontal: 15, color: "#000000", fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular' }}>
-          Food Catering bookings
-        </Text>
-        <FlatList
-          data={cateringBookings}
-          renderItem={renderItem}
-          keyExtractor={(item) => item?.id}
-        />
-        </> : null}
+          {cateringBookings?.length > 0 ?
+            <>
+              <Text style={{ marginTop: 20, marginBottom: 5, marginHorizontal: 15, color: "#000000", fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular' }}>
+                Food Catering bookings
+              </Text>
+              <FlatList
+                data={cateringBookings}
+                renderItem={renderItem}
+                keyExtractor={(item) => item?.id}
+              />
+            </> : null}
 
-        {hallsBookings?.length > 0 ?
-        <>
-        <Text style={{ marginTop: 20, marginBottom: 5, marginHorizontal: 15, color: "#000000", fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular' }}>
-          Halls bookings
-        </Text>
-        <FlatList
-          data={hallsBookings}
-          renderItem={renderItem}
-          keyExtractor={(item) => item?.id}
-        />
-        </> : null}
+          {hallsBookings?.length > 0 ?
+            <>
+              <Text style={{ marginTop: 20, marginBottom: 5, marginHorizontal: 15, color: "#000000", fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular' }}>
+                Halls bookings
+              </Text>
+              <FlatList
+                data={hallsBookings}
+                renderItem={renderItem}
+                keyExtractor={(item) => item?.id}
+              />
+            </> : null}
 
-         <PaymentConfirmationModal
+          <PaymentConfirmationModal
             visible={paymentModal}
             message={`Redirecting to Pay Advance Amount ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount)}`}
-            onSubmit={() => [setPaymentModal(false), handlePayment(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount, selectedObjectedforPayment?.bookingId, selectedObjectedforPayment?.catType , selectedObjectedforPayment?.vendorMobileNumber,selectedObjectedforPayment?.catType === 'caterings' ? selectedObjectedforPayment?.foodCateringName : selectedObjectedforPayment?.catType === 'functionHalls' ? selectedObjectedforPayment?.functionHallName : selectedObjectedforPayment?.productName) ]}
+            onSubmit={() => [setPaymentModal(false), handlePayment(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount, selectedObjectedforPayment?.bookingId, selectedObjectedforPayment?.catType, selectedObjectedforPayment?.vendorMobileNumber, selectedObjectedforPayment?.catType === 'caterings' ? selectedObjectedforPayment?.foodCateringName : selectedObjectedforPayment?.catType === 'functionHalls' ? selectedObjectedforPayment?.functionHallName : selectedObjectedforPayment?.productName)]}
             onClose={() => setPaymentModal(false)}
           />
-                   
-      </ScrollView>
-      : 
-      <View style={{alignSelf:"center", alignItems:"center"}}>
-        <Text style={{color:"#333333", fontSize:14, fontWeight:"500",fontFamily: 'ManropeRegular',marginTop:50}}>No Booking initiated yet</Text>
-      </View>
+
+        </ScrollView>
+        :
+        <View style={{ alignSelf: "center", alignItems: "center" }}>
+          <Text style={{ color: "#333333", fontSize: 14, fontWeight: "500", fontFamily: 'ManropeRegular', marginTop: 50 }}>No Booking initiated yet</Text>
+        </View>
       }
     </SafeAreaView>
   );
@@ -417,7 +436,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: "#333333",
     fontFamily: 'ManropeRegular',
-    marginVertical: 5
+    marginVertical: 3
   },
   cardSubtitle: {
     fontSize: 14,
