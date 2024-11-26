@@ -264,7 +264,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
               region={region}
               onPress={handleMapPress}
               showsUserLocation={true}
-              showsMyLocationButton={false}
+              showsMyLocationButton={true}
             >
               {selectedLocation && (
                 <Marker coordinate={selectedLocation} />
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderColor: '#ccc',
     borderWidth: 1,
-    // marginBottom: 15,
+    marginBottom: 5,
     paddingHorizontal: 10,
     borderRadius: 8,
     backgroundColor: "#F0F5FA",

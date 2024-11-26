@@ -527,6 +527,9 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             keyboardType='number-pad'
                             isRequired={true}
                         />
+                        <Text style={styles.commissionLabel}>Service Fee Details:</Text>
+                        <Text style={styles.discountlabel}>3% for orders below ₹10,000</Text>
+                        <Text style={styles.discountlabel}>5% for orders above ₹10,000</Text>
 
                         <Text style={styles.textInputlabel}>Discount if any</Text>
                         {discountPercentageList()}
@@ -682,6 +685,20 @@ const styles = StyleSheet.create({
     textInputlabel: {
         fontFamily: 'ManropeRegular',
         fontWeight: 'bold',
+        color: themevariable.Color_000000,
+        fontSize: 15,
+        marginTop: 15
+    },
+    commissionLabel: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: 'bold',
+        color: themevariable.Color_000000,
+        fontSize: 15,
+        marginTop: 15
+    },
+    discountlabel: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: '600',
         color: themevariable.Color_000000,
         fontSize: 15,
         marginTop: 15

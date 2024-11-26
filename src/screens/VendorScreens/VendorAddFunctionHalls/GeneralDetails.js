@@ -18,9 +18,9 @@ import LocationPicker from '../../../components/LocationPicker';
 import DetectLocation from '../../../assets/svgs/detectLocation.svg';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useNavigation } from '@react-navigation/native';
+import { formatAmount } from '../../../utils/GlobalFunctions';
 
 const GeneralDetails = ({isAadharUpdate}) => {
-    console.log("isAadharUpdate value at fomr", isAadharUpdate);
     const navigation = useNavigation();
     const [BedRooms, setBedRooms] = useState();
     const [mainImageUrl, setMainImageUrl] = useState('');
@@ -43,13 +43,13 @@ const GeneralDetails = ({isAadharUpdate}) => {
     const [functionHallPinCode, setfunctionHallPinCode] = useState();
     const [perDayRentPrice, setPerDayRentPrice] = useState();
     const [advanceAmount, setAdvanceAmount] = useState();
-    const [discountPercentage, setDiscountPercentage] = useState();
+    const [discountPercentage, setDiscountPercentage] = useState(0);
     const [overTimeCharges, setOverTimeCharges] = useState();
     const [selectedItemArray, setSelectedItemArray] = useState([]);
     const [itemPrices, setItemPrices] = useState({});
     const [selectedSeatingCapacity, setSelectedSeatingCapacity] = useState('');
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
-    const discountPercentageArr = ['5', '10', '15', '20', '30', '50'];
+    const discountPercentageArr = ['0','5', '10', '15', '20', '30', '50'];
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
 
     const [loading, setLoading] = useState(false);
@@ -435,7 +435,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                     <View key={rowIndex} style={styles.row}>
                         {row.map((itemName, itemIndex) => {
                             const itemDetails = rentalItemPricingDetails[itemName]?.[0];
-                            const price = itemDetails?.perDayPrice?.toString() || '';
+                            // const price = itemDetails?.perDayPrice?.toString() || '';
 
                             return (
                                 <View key={itemIndex} style={styles.itemContainer}>
@@ -459,14 +459,14 @@ const GeneralDetails = ({isAadharUpdate}) => {
             if (previous.includes(itemName)) {
                 // Remove the item if it's already selected
                 const updatedPrices = { ...itemPrices };
-                console.log('updated price is::>>', updatedPrices);
+                // console.log('updated price is::>>', updatedPrices);
                 delete updatedPrices[itemName];
                 setItemPrices(updatedPrices);
                 return previous.filter((item) => item !== itemName);
             } else {
                 // Add the item if it's not already selected
                 const updatedPrices = { ...itemPrices, itemName };
-                console.log('updated price added is::>>', updatedPrices);
+                // console.log('updated price added is::>>', updatedPrices);
                 setItemPrices(updatedPrices);
                 return [...previous, itemName];
             }
@@ -707,13 +707,45 @@ const GeneralDetails = ({isAadharUpdate}) => {
                     <View style={styles.mainContainer}>
 
                         <TextField
-                            label='Per Day Charge (₹/ Per Day)*'
+                            label='Per Day Charge (₹/ Per Day)'
                             placeholder="Please Enter per Day Charge"
                             value={perDayRentPrice}
                             onChangeHandler={onChangePerDayRentPrice}
                             keyboardType='number-pad'
                             isRequired={true}
                         />
+                           {
+                            !isNaN(perDayRentPrice - (perDayRentPrice * discountPercentage / 100)) && perDayRentPrice ? (
+                                <>
+                                    {(() => {
+                                        const discountedPrice = perDayRentPrice - (perDayRentPrice * discountPercentage / 100);
+                                        const serviceFeePercentage = discountedPrice < 30000 ? 0.03 : 0.05; // 3% for < ₹10,000, 5% for ≥ ₹10,000
+                                        const serviceFee = discountedPrice * serviceFeePercentage;
+                                        const finalEarning = discountedPrice - serviceFee;
+
+                                        return (
+                                            <>
+                                                <Text style={styles.discountlabel}>
+                                                    Your Product Price (After Discount):
+                                                    <Text style={styles.highlightedValue}>{formatAmount(discountedPrice.toFixed(2))}</Text>
+                                                </Text>
+                                                <Text style={styles.discountlabel}>
+                                                    Service Fee ({serviceFeePercentage * 100}%):
+                                                    <Text style={styles.highlightedValue}>{formatAmount(serviceFee.toFixed(2))}</Text>
+                                                </Text>
+                                                <Text style={styles.discountlabel}>
+                                                    Your Earning (After Service Fee):
+                                                    <Text style={styles.highlightedValue}>{formatAmount(finalEarning.toFixed(2))}</Text>
+                                                </Text>
+                                            </>
+                                        );
+                                    })()}
+                                </>
+                            ) : null
+                        }
+                        <Text style={styles.commissionLabel}>Service Fee Details:</Text>
+                        <Text style={styles.discountlabel}>3% for orders below ₹30,000</Text>
+                        <Text style={styles.discountlabel}>5% for orders above ₹30,000</Text>
                         <TextField
                             label='Advance Booking Amount'
                             placeholder="Please Enter Advance Booking Amount"
@@ -931,6 +963,24 @@ const styles = StyleSheet.create({
         color: themevariable.Color_000000,
         fontSize: 15,
         marginTop: 15
+    },
+    commissionLabel: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: 'bold',
+        color: themevariable.Color_000000,
+        fontSize: 15,
+        marginTop: 15
+    },
+    discountlabel: {
+        fontFamily: 'ManropeRegular',
+        fontWeight: '600',
+        color: themevariable.Color_000000,
+        fontSize: 15,
+        marginTop: 15
+    },
+    highlightedValue: {
+        fontWeight: 'bold',
+        color: '#FD813B', // Blue color for highlighting values
     },
     textTnputView: {
         borderWidth: 1,
