@@ -8,7 +8,7 @@ const PaymentFailedScreen = () => {
 
   const handleRetry = () => {
     // Navigate to the payment retry or any other screen
-    // navigation.navigate('Payment');
+    navigation.navigate('ViewMyBookings');
   };
 
   const handleHome = () => {
