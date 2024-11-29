@@ -133,8 +133,10 @@ const HomeDashboard = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log("BOOKINGS RES:::::::::", JSON.stringify(response?.data))
-            setMyBookings(response?.data?.data)
+            console.log("BOOKINGS RES:::::::::", JSON.stringify(response?.data));
+            const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved").length;
+
+            setMyBookings(countApproved)
         } catch (error) {
             console.log("My Bookings data error>>::", error);
         }
@@ -149,7 +151,10 @@ const HomeDashboard = () => {
                 },
             });
             console.log("catering BOOKINGS RES:::::::::", JSON.stringify(response?.data))
-            setCateringBookings(response?.data?.data)
+            const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved").length;
+
+            setCateringBookings(countApproved);
+
         } catch (error) {
             console.log("My Bookings data error>>::", error);
         }
@@ -164,25 +169,16 @@ const HomeDashboard = () => {
                 },
             });
             console.log("Funtional halls BOOKINGS RES:::::::::", JSON.stringify(response?.data))
-            setHallsBookings(response?.data?.data)
+            const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved").length;
 
-            const countApproved = (data) =>
-                data?.filter((item) => item.bookingStatus === "approved").length;
-        
-            // Get counts for each dataset
-            const approvedHallsCount = countApproved(response?.data?.data);
-            const approvedCateringsCount = countApproved(cateringBookings);
-            const approvedClothesCount = countApproved(myBookings);
-        
-            const pendingCountTotal = approvedHallsCount + approvedCateringsCount + approvedClothesCount;
-            setPendingCount(pendingCountTotal)
+            setHallsBookings(countApproved);
 
         } catch (error) {
             console.log("My Bookings data error>>::", error);
         }
     };
 
-    
+
     const getUserAuthTokenRes = async () => {
         const token = await getUserAuthToken();
         console.log("usertoklen", token);
@@ -548,13 +544,12 @@ const HomeDashboard = () => {
                         </View>
                         <Pressable onPress={() => navigation.navigate('ProfileScreen')}>
                             <FontAwesome name={"user-circle"} color={"#000000"} size={35} />
-                            {pendingCount > 0 && (
+                            {hallsBookings + cateringBookings + myBookings > 0 ?
                                 <TouchableOpacity onPress={() => navigation.navigate('MyBookings')} style={styles.badge}>
-                                    <Text style={styles.badgeText}>{pendingCount}</Text>
+                                    <Text style={styles.badgeText}> {hallsBookings + cateringBookings + myBookings} </Text>
                                 </TouchableOpacity>
-                            )}
+                                : null}
                         </Pressable>
-
                     </View>
                     <View style={styles.searchContainer}>
                         <View style={styles.searchProduct}>
@@ -1039,12 +1034,12 @@ const styles = StyleSheet.create({
         width: 20,
         justifyContent: "center",
         alignItems: "center",
-      },
-      badgeText: {
+    },
+    badgeText: {
         color: "white",
         fontSize: 12,
         fontWeight: "bold",
-      },
+    },
 });
 
 export default HomeDashboard;

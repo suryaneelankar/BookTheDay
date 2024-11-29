@@ -30,12 +30,6 @@ export default profileData=[
         navigateScreen:'Notifications',
     },
     {
-        id:5,
-        iconName:'notification',
-        displayName:'Refer & Earn',
-        navigateScreen:'ReferAndEarn'
-    },
-    {
         id:6,
         iconName:'exclamationcircle',
         displayName:'About Us',

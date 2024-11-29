@@ -1,5 +1,4 @@
 import { View, Text, FlatList, StyleSheet } from "react-native";
-import HatIcon from '../assets/svgs/hatIcon.svg';
 import TickIcon from '../assets/svgs/tickIcon.svg';
 import UserIcon from '../assets/svgs/userIcon.svg';
 import DetailsCardIcon from '../assets/svgs/detailsCardIcon.svg';
