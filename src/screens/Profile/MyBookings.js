@@ -112,7 +112,7 @@ const ViewMyBookings = () => {
   const handlePayment = async (advanceAmount, bookingId, catType, vendorMobileNumber, productName, totalAmount) => {
     const token = await getUserAuthToken();
     let initiatePaymentPayload = {
-      orderAmount: payDetails(catType, advanceAmount, totalAmount, advanceAmount),
+      orderAmount: advanceAmount,
       currency: 'INR',
       userFullName: userLoggedInName,
       userMobileNumber: userLoggedInMobileNum,
@@ -137,7 +137,7 @@ const ViewMyBookings = () => {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              amount: payDetails(catType, advanceAmount, totalAmount, advanceAmount), // Amount in INR
+              amount: advanceAmount, // Amount in INR
               currency: 'INR',
               receipt: 'receipt#1',
               userFullName: userLoggedInName,
@@ -176,7 +176,7 @@ const ViewMyBookings = () => {
               let statusPaymentPayload = {
                 orderId: initiateresponse?.data?.data?.OrderId,
                 paymentStatus: "success",
-                orderAdvanceAmount: payDetails(catType, advanceAmount, totalAmount, advanceAmount),
+                orderAdvanceAmount: advanceAmount,
                 razorpay_order_id: paymentData?.razorpay_order_id,
                 razorpay_payment_id: paymentData?.razorpay_payment_id,
                 razorpay_signature: paymentData?.razorpay_signature,
@@ -207,7 +207,7 @@ const ViewMyBookings = () => {
 
                 orderId: initiateresponse?.data?.data?.OrderId,
                 paymentStatus: "failed",
-                orderAdvanceAmount: payDetails(catType, advanceAmount, totalAmount, advanceAmount),
+                orderAdvanceAmount: advanceAmount,
                 razorpay_order_id: data?.orderId,
                 razorpay_payment_id: '',
                 razorpay_signature: ''
@@ -267,16 +267,22 @@ const ViewMyBookings = () => {
     return (
       <View style={styles.card}>
         <View style={{ flexDirection: "row", marginTop: 20 }}>
-          <View style={{ flexDirection: "row", width: "80%" }}>
-            <FastImage resizeMode='cover' source={{
+          <View style={{ flexDirection: "row",width:"80%"}}>
+            <View style={{width:"35%", alignItems:"center"}}>
+            <FastImage resizeMode='contain' source={{
               uri: updatedImgUrl,
               headers: { Authorization: `Bearer ${getUserAuth}` }
             }} style={styles.cardImage} />
+            <Text style={[styles.cardTitle,{marginTop:5}]}>{formatAmount(item?.totalAmount)}</Text>
+            </View>
             <View style={{ marginLeft: 15 }}>
               <Text style={styles.cardTitle}>{item?.catType === 'caterings' ? item?.foodCateringName : item?.catType === 'functionHalls' ? item?.functionHallName : item?.productName} </Text>
-              <Text style={styles.cardBalanceAmount}>Advance Amount: {formatAmount(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount)}</Text>
-              <Text style={styles.cardBalanceAmount}>Current Payable Amount: {payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)}</Text>
-              <Text style={styles.cardBalanceAmount}>Balance Amount: {formatAmount(item?.advanceAmountToPay ? (item?.totalAmount - payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)) : (item?.totalAmount - payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)))}</Text>
+              <Text style={styles.cardBalanceAmount}>{ (item?.catType === 'caterings' || item?.catType === 'functionHalls') ? 'Advance Amount:' : 'Security Deposit'} {formatAmount(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount)}</Text>
+              
+              {/* <Text style={styles.cardBalanceAmount}>Current Payable Amount: {payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)}</Text> */}
+              {/* <Text style={styles.cardBalanceAmount}>Balance Amount: {formatAmount(item?.advanceAmountToPay ? (item?.totalAmount - payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)) : (item?.totalAmount - payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)))}</Text> */}
+              
+              <Text style={styles.cardBalanceAmount}>Balance Amount: {formatAmount(item?.advanceAmountToPay ? (item?.totalAmount - item?.advanceAmountToPay) : (item?.totalAmount - item?.securityDepositAmount))}</Text>
 
               <Text style={styles.startDate}> Start Date: {item?.startDate}</Text>
               <Text style={styles.startDate}> End Date: {item?.endDate}</Text>
@@ -372,7 +378,8 @@ const ViewMyBookings = () => {
 
           <PaymentConfirmationModal
             visible={paymentModal}
-            message={`Redirecting you to Pay Advance Amount: ${formatAmount(payDetails(selectedObjectedforPayment?.catType, selectedObjectedforPayment?.advanceAmountToPay, selectedObjectedforPayment?.totalAmount, selectedObjectedforPayment?.securityDepositAmount))} \n \n \n Balance Payable Amount: ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? (selectedObjectedforPayment?.totalAmount - payDetails(selectedObjectedforPayment?.catType, selectedObjectedforPayment?.advanceAmountToPay, selectedObjectedforPayment?.totalAmount, selectedObjectedforPayment?.securityDepositAmount)) : (selectedObjectedforPayment?.totalAmount - payDetails(selectedObjectedforPayment?.catType, selectedObjectedforPayment?.advanceAmountToPay, selectedObjectedforPayment?.totalAmount, selectedObjectedforPayment?.securityDepositAmount)))}`}
+            message={`Redirecting you to Pay Advance Amount: ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount)} \n \n \n Balance Payable Amount: ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? (selectedObjectedforPayment?.totalAmount - selectedObjectedforPayment?.advanceAmountToPay) : (selectedObjectedforPayment?.totalAmount - selectedObjectedforPayment?.securityDepositAmount))}`}
+            // message={`Redirecting you to Pay Advance Amount: ${formatAmount(payDetails(selectedObjectedforPayment?.catType, selectedObjectedforPayment?.advanceAmountToPay, selectedObjectedforPayment?.totalAmount, selectedObjectedforPayment?.securityDepositAmount))} \n \n \n Balance Payable Amount: ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? (selectedObjectedforPayment?.totalAmount - payDetails(selectedObjectedforPayment?.catType, selectedObjectedforPayment?.advanceAmountToPay, selectedObjectedforPayment?.totalAmount, selectedObjectedforPayment?.securityDepositAmount)) : (selectedObjectedforPayment?.totalAmount - payDetails(selectedObjectedforPayment?.catType, selectedObjectedforPayment?.advanceAmountToPay, selectedObjectedforPayment?.totalAmount, selectedObjectedforPayment?.securityDepositAmount)))}`}
             onSubmit={() => [setPaymentModal(false), handlePayment(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount, selectedObjectedforPayment?.bookingId, selectedObjectedforPayment?.catType, selectedObjectedforPayment?.vendorMobileNumber, selectedObjectedforPayment?.catType === 'caterings' ? selectedObjectedforPayment?.foodCateringName : selectedObjectedforPayment?.catType === 'functionHalls' ? selectedObjectedforPayment?.functionHallName : selectedObjectedforPayment?.productName, selectedObjectedforPayment?.totalAmount)]}
             onClose={() => setPaymentModal(false)}
           />
@@ -402,7 +409,7 @@ const styles = StyleSheet.create({
   },
   cardImage: {
     height: Dimensions.get('window').height / 10,
-    width: '30%',
+    width: '100%',
     borderRadius: 10,
   },
   startDate: {
