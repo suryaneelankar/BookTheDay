@@ -18,7 +18,6 @@ import MyEvents from "../screens/Profile/ProfileSubScreens/MyEvents";
 import MyLocations from "../screens/Profile/ProfileSubScreens/MyLocations";
 import Notifications from "../screens/Profile/ProfileSubScreens/Notifications";
 import ProfilePolicy from "../screens/Profile/ProfileSubScreens/PrivacyPolicy";
-import ReferAndEarn from "../screens/Profile/ProfileSubScreens/ReferAndEarn";
 import RefundPolicy from "../screens/Profile/ProfileSubScreens/RefundPolicy";
 import TermsAndCondition from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
 import NavigationHeader from "../components/NavigationHeader";
@@ -331,7 +330,6 @@ const MainNavigation = () => {
                 <Stack.Screen name="MyLocations" component={MyLocations} options={{ headerShown: true, }} />
                 <Stack.Screen name="Notifications" component={Notifications} options={{ headerShown: true, }} />
                 <Stack.Screen name="PrivacyPolicy" component={ProfilePolicy} options={{ headerShown: true, }} />
-                <Stack.Screen name="ReferAndEarn" component={ReferAndEarn} options={{ headerShown: true, }} />
                 <Stack.Screen name="RefundPolicy" component={RefundPolicy} options={{ headerShown: true, }} />
                 <Stack.Screen name="TermsAndConditions" component={TermsAndCondition} options={{ headerShown: true, }} />
                 {/* ############################################################ */}
