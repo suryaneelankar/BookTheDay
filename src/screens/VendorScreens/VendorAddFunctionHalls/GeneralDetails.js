@@ -689,7 +689,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
 
                         {/* <Text style={styles.labelText}>Hall SqFeet</Text> */}
                         <TextField
-                            label='Hall Area'
+                            label='Hall Area (in sft)'
                             placeholder="Enter Sq Feet Area approx."
                             value={functionHallAreaInSft}
                             onChangeHandler={(text) => setfunctionHallAreaInSft(text)}
