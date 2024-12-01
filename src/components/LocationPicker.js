@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, FlatList, ActivityIndicator, PermissionsAndroid, ScrollView } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import GetLocation from 'react-native-get-location';
 import SaveLocationButton from './SaveLocationButton';
 import Iconleftcircle from 'react-native-vector-icons/AntDesign';

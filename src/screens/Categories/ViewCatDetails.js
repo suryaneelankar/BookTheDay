@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { View, Text, SafeAreaView, ScrollView, Alert, TouchableOpacity, Dimensions, StyleSheet, Animated } from "react-native";
 import { formatAmount } from "../../utils/GlobalFunctions";
 import PricingOptions from "../../components/PriceOptions";
-import Swiper from 'react-native-swiper';
 import BookDatesButton from "../../components/GradientButton";
 import { useNavigation } from "@react-navigation/native";
 import { horizontalScale, moderateScale, verticalScale, width } from "../../utils/scalingMetrics";
@@ -203,25 +202,6 @@ const ViewCatDetails = ({ route }) => {
                         )}
                     />
 
-                    {/* <Swiper
-                        style={styles.wrapper}
-                        loop={false}
-                        index={activeIndex}
-                        onIndexChanged={(index) => setActiveIndex(index)}
-                        dotStyle={styles.dot}
-                        activeDotStyle={styles.activeDot}
-                        paginationStyle={{ bottom: 10 }} // Adjust the position of the dots if needed
-                        showsPagination={true}
-                    >
-                        {specifcadditionalImages.map((item, index) => (
-                            <View style={styles.slide} key={index}>
-                                <FastImage resizeMode='contain' source={{
-                                    uri: item?.uri,
-                                    headers: { Authorization: `Bearer ${getUserAuth}` }
-                                }} style={[styles.image, { width: '90%' }]} />
-                            </View>
-                        ))}
-                    </Swiper> */}
 
                     <View style={{ marginHorizontal: 20, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                         <Text style={{ color: "#100D25", fontSize: 20, fontWeight: "700", fontFamily: "ManropeRegular", }}>{jewelleryDetails?.productName}</Text>

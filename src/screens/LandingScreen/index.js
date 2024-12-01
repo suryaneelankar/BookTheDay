@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
-import CateringIcon from '../../assets/svgs/LandingScreen/cateringDash.svg';
-import Clothes from '../../assets/svgs/LandingScreen/clothesDashboard.svg';
-import DecorationIcon from '../../assets/svgs/LandingScreen/decorationDash.svg';
-import DressesIcon from '../../assets/svgs/LandingScreen/dressesDash.svg';
-import EventsMarriage from '../../assets/svgs/LandingScreen/eventsMarriage.svg';
-import JewelleryIcon from '../../assets/svgs/LandingScreen/jewellryDash.svg';
+// import CateringIcon from '../../assets/svgs/LandingScreen/cateringDash.svg';
+// import Clothes from '../../assets/svgs/LandingScreen/clothesDashboard.svg';
+// import DecorationIcon from '../../assets/svgs/LandingScreen/decorationDash.svg';
+// import DressesIcon from '../../assets/svgs/LandingScreen/dressesDash.svg';
+// import EventsMarriage from '../../assets/svgs/LandingScreen/eventsMarriage.svg';
+// import JewelleryIcon from '../../assets/svgs/LandingScreen/jewellryDash.svg';
 import LinearGradient from 'react-native-linear-gradient';
 import GiveOnRentSub from '../../assets/SelectUserOrVendor/GiveOnRentSub.svg';
 import TakeOnRentSubImage from '../../assets/SelectUserOrVendor/takeOnRentSub.svg';
@@ -13,14 +13,14 @@ import { useNavigation } from '@react-navigation/native';
 
 const LandingScreen = () => {
 
-    const items = [
-        { id: '1', component: <CateringIcon width="100%" height="100%" />, title: 'Catering' },
-        { id: '2', component: <Clothes width="100%" height="100%" />, title: 'Clothes' },
-        { id: '3', component: <DecorationIcon width="100%" height="100%" />, title: 'Decoration' },
-        { id: '4', component: <DressesIcon width="100%" height="100%" />, title: 'Dresses' },
-        { id: '5', component: <EventsMarriage width="100%" height="100%" />, title: 'Events' },
-        { id: '6', component: <JewelleryIcon width="100%" height="100%" />, title: 'Jewellery' },
-    ];
+    // const items = [
+    //     { id: '1', component: <CateringIcon width="100%" height="100%" />, title: 'Catering' },
+    //     { id: '2', component: <Clothes width="100%" height="100%" />, title: 'Clothes' },
+    //     { id: '3', component: <DecorationIcon width="100%" height="100%" />, title: 'Decoration' },
+    //     { id: '4', component: <DressesIcon width="100%" height="100%" />, title: 'Dresses' },
+    //     { id: '5', component: <EventsMarriage width="100%" height="100%" />, title: 'Events' },
+    //     { id: '6', component: <JewelleryIcon width="100%" height="100%" />, title: 'Jewellery' },
+    // ];
 
     const [selectedId, setSelectedId] = useState(null);
     const navigation = useNavigation();
@@ -72,7 +72,7 @@ const LandingScreen = () => {
         <SafeAreaView style={styles.container}>
             <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1 }}>
 
-                <FlatList
+                {/* <FlatList
                     data={items}
                     renderItem={({ item }) => (
                         <View style={styles.item}>
@@ -82,7 +82,7 @@ const LandingScreen = () => {
                     keyExtractor={(item) => item.id}
                     numColumns={3}
                     contentContainerStyle={styles.grid}
-                />
+                /> */}
 
                 <Text style={styles.rentTitle}>Rent products & Services</Text>
                 <Text style={styles.subtitle}>Are you ready to uproot and start over in a new area? Placoo will help you on your journey!</Text>

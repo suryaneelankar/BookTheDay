@@ -31,7 +31,7 @@ import TrendingNecklace from '../../assets/svgs/trendingNow/home_trendingnow_nec
 import TrendingTshirt from '../../assets/svgs/trendingNow/home_trendingnow_tshirt.svg';
 import CatCatering from '../../assets/svgs/categories/home_categories_catering_icon.svg';
 import CatChef from '../../assets/svgs/categories/home_categories_chef_icon.svg';
-import CatClothes from '../../assets/svgs/categories/home_categories_clothes_icon.svg';
+// import CatClothes from '../../assets/svgs/categories/home_categories_clothes_icon.svg';
 import CatDecoration from '../../assets/svgs/categories/home_categories_decoration_icon.svg';
 import CatDriver from '../../assets/svgs/categories/home_categories_driver_icon.svg';
 import CatHalls from '../../assets/svgs/categories/home_categories_hall_icon.svg';
@@ -78,7 +78,7 @@ const HomeDashboard = () => {
     ];
 
     const CategoriesData = [
-        { name: 'Clothes', image: CatClothes },
+        { name: 'Clothes', image: CatJewellery },
         { name: 'Jewellery', image: CatJewellery },
         { name: 'Chefs', image: CatChef },
         { name: 'Driver', image: CatDriver },
@@ -545,7 +545,7 @@ const HomeDashboard = () => {
                         <Pressable onPress={() => navigation.navigate('ProfileScreen')}>
                             <FontAwesome name={"user-circle"} color={"#000000"} size={35} />
                             {hallsBookings + cateringBookings + myBookings > 0 ?
-                                <TouchableOpacity onPress={() => navigation.navigate('MyBookings')} style={styles.badge}>
+                                <TouchableOpacity onPress={() => navigation.navigate('ViewMyBookings')} style={styles.badge}>
                                     <Text style={styles.badgeText}> {hallsBookings + cateringBookings + myBookings} </Text>
                                 </TouchableOpacity>
                                 : null}

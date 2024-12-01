@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Alert
 import LinearGradient from 'react-native-linear-gradient';
 import EditButton from '../../assets/svgs/categories/editButton.svg';
 import CalendarIcon from '../../assets/svgs/calendarOrangeIcon.svg';
-import CartBanner from '../../assets/svgs/cartBanner.svg';
+// import CartBanner from '../../assets/svgs/cartBanner.svg';
 import ExclamationIcon from '../../assets/svgs/exclamationmark.svg';
 import Modal from 'react-native-modal';
 import themevariable from '../../utils/themevariable';
@@ -232,8 +232,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
         </View>
       </View>
 
-      {/* <Image source={require('../../assets/cartBanner/cartBanner.png')}/> */}
-      <CartBanner style={{ alignSelf: "center", marginTop: 20 }} />
+      {/* <CartBanner style={{ alignSelf: "center", marginTop: 20 }} /> */}
 
 
       <View style={styles.footer}>
