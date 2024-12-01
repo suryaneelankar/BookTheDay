@@ -20,6 +20,8 @@ import axios from 'axios';
 import BASE_URL from '../../../apiconfig';
 import { useSelector, useDispatch } from 'react-redux';
 import { getLoginUserId } from '../../../../redux/actions';
+import ProfileDefaultIcon from 'react-native-vector-icons/EvilIcons';
+
 
 const VendorProfile = () => {
     const navigation = useNavigation();
@@ -81,10 +83,8 @@ const VendorProfile = () => {
         <LinearGradient start={{ x: 1, y: 0 }} end={{ x: 1, y: 1 }} colors={['#FFF3CD', '#FFDB7E', '#FFDB7E', '#FFDB7E']} style={{ flex: 1 }}>
             <View style={styles.profileContainer}>
                 <View style={styles.profileImageContainer}>
-                    <Image
-                        source={{ uri: 'https://via.placeholder.com/150' }} // Placeholder image, replace with your image source
-                        style={styles.profileImage}
-                    />
+                <ProfileDefaultIcon name='user' size={90}/>
+
                 </View>
                 <Text style={styles.profileName}>{profileData?.fullName}</Text>
                 <Text style={styles.profileEmail}>{profileData?.email}</Text>
@@ -247,12 +247,12 @@ const styles = StyleSheet.create({
     profileContainer: {
         alignItems: 'center',
         padding: 20,
+        alignSelf:"center"
     },
     profileImageContainer: {
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 10,
