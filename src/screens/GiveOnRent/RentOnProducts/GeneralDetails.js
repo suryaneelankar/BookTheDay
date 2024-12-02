@@ -246,8 +246,19 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         )
     }
 
+    const calculateCharges = () => {
+        const earningAmount = perDayRentPrice - (perDayRentPrice * discountPercentage / 100);
+        const serviceFeePercentage = earningAmount < 10000 ? 0.03 : 0.05; // 3% for < ₹10,000, 5% for ≥ ₹10,000
+        const serviceCharges = earningAmount * serviceFeePercentage;
+        const finalEarningAfterDiscount = earningAmount - serviceCharges;
+
+        return { finalEarningAfterDiscount, earningAmount, serviceCharges }
+
+    } 
+
     const onPressSaveAndPost = async () => {
-        console.log('selectedOption os:::>>', selectedOption);
+        const { finalEarningAfterDiscount, earningAmount, serviceCharges } = calculateCharges();
+        // console.log('selectedOption os:::>>', finalEarningAfterDiscount.toFixed(2), earningAmount.toFixed(2), serviceCharges.toFixed(2));
 
         if (!mainImageUrl || productName === '' || productDescription === '' ||
             (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || (securityDeposit === undefined || securityDeposit === '') || (selectedOption == null)
@@ -319,6 +330,9 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         formData.append('jewellaryType', jewelleryTypeSelected);
         formData.append('size', clothSize);
         formData.append('color', selectedColor);
+        formData.append('serviceCharges', serviceCharges.toFixed(2));
+        formData.append('vendorEarningAmount', earningAmount.toFixed(2));
+        formData.append('vendorEarningAmountAfterDiscount', finalEarningAfterDiscount.toFixed(2))
 
         console.log('formdata is ::>>', JSON.stringify(formData));
         const token = await getVendorAuthToken();
