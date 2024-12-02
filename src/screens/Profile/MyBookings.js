@@ -269,6 +269,16 @@ const ViewMyBookings = () => {
     Linking.openURL(url);
 };
 
+const openDialPad = (number) => {
+  if (Platform.OS === 'ios') {
+      number = `telprompt:${number}`;
+  }
+  else {
+      number = `tel:${number}`;
+  }
+  Linking.openURL(number);
+}
+
 
 
   const renderItem = ({ item }) => {
@@ -287,7 +297,7 @@ const ViewMyBookings = () => {
             </View>
             <View style={{ marginLeft: 15 }}>
               <Text style={styles.cardTitle}>{item?.catType === 'caterings' ? item?.foodCateringName : item?.catType === 'functionHalls' ? item?.functionHallName : item?.productName} </Text>
-              <Text style={styles.cardBalanceAmount}> {item?.catType === 'caterings' || item?.catType === 'functionHalls'
+              <Text style={styles.cardBalanceAmount}>{item?.catType === 'caterings' || item?.catType === 'functionHalls'
                 ? item?.advanceAmountPaid > 0
                   ? 'Advance Paid:'
                   : 'Advance Amount:'
@@ -314,8 +324,8 @@ const ViewMyBookings = () => {
         {(item?.catType === 'functionHalls' && item?.advanceAmountPaid > 0) ?
           <View style={{ flexDirection: "row",marginHorizontal:5 ,marginVertical:10}}>
             <LocationIcon />
-            <TouchableOpacity style={{ marginHorizontal:5}} onPress={() => openMap('')} >
-              <Text>{item?.functionHallAddress?.address}</Text>
+            <TouchableOpacity  style={{ marginHorizontal:5}} onPress={() => openMap(item?.vendorLatitude, item?.vendorLongitude)} >
+              <Text numberOfLines={2} style={styles.locationText}>{item?.functionHallAddress?.address}</Text>
             </TouchableOpacity>
           </View>
           : null}
@@ -328,9 +338,11 @@ const ViewMyBookings = () => {
         />
 
         <View style={styles.cardFooter}>
+          <TouchableOpacity  onPress={() => openDialPad('8297735285')}>
           <Text style={[styles.cardStatus, { borderWidth: 1, borderColor: "gray", paddingHorizontal: 20, fontSize: 11 }]}>
             NEED HELP?
           </Text>
+          </TouchableOpacity>
           <LinearGradient colors={item.bookingStatus === 'approved' ? ['#FE7939', '#FE7939'] : ['#B0B0B0', '#B0B0B0']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
@@ -467,6 +479,12 @@ const styles = StyleSheet.create({
     color: "#333333",
     fontFamily: 'ManropeRegular',
     marginVertical: 3
+  },
+  locationText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: "#333333",
+    fontFamily: 'ManropeRegular',
   },
   cardSubtitle: {
     fontSize: 14,

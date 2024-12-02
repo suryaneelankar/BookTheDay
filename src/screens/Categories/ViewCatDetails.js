@@ -258,6 +258,14 @@ const ViewCatDetails = ({ route }) => {
                     <PricingOptions
                         onSelect={handleSelect}
                         dailyPrice={jewelleryDetails?.rentPricePerDay}
+                        buttonText={'Per Day Chargers'}
+                        labelText={'Daily'}
+                    />
+                    <PricingOptions
+                        onSelect={handleSelect}
+                        dailyPrice={jewelleryDetails?.securityDepositAmount}
+                        buttonText={'Security Deposit'}
+                        labelText={'Deposit'}
                     />
                 </View>
             </ScrollView>

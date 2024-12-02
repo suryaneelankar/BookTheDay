@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { formatAmount } from '../utils/GlobalFunctions';
 
-const PricingOptions = ({ onSelect ,dailyPrice,monthlyPrice}) => {
+const PricingOptions = ({ onSelect ,dailyPrice,monthlyPrice, buttonText,labelText}) => {
   const [selectedOption, setSelectedOption] = useState('daily');
   const [selectedPrice, setSelectedPrice] = useState(600);
 
@@ -21,12 +21,12 @@ const PricingOptions = ({ onSelect ,dailyPrice,monthlyPrice}) => {
         style={[styles.optionContainer, selectedOption === 'daily' && styles.selectedOption]}
         onPress={() => handleSelect('daily', 300)}
       >
-        <View style={[styles.radioButton,{borderColor: selectedOption === 'daily' ? "#CC403C" : "gray"}]}>
+        {/* <View style={[styles.radioButton,{borderColor: selectedOption === 'daily' ? "#CC403C" : "gray"}]}>
           {selectedOption === 'daily' && <View style={styles.radioButtonSelected} />}
-        </View>
-        <Text style={styles.optionText}>Daily</Text>
+        </View> */}
+        <Text style={styles.optionText}>{labelText}</Text>
         <View style={styles.chargeContainer}>
-          <Text style={styles.chargeLabel}>Per Day Charges</Text>
+          <Text style={styles.chargeLabel}>{buttonText}</Text>
         </View>
         <Text style={styles.priceText}>{formatAmount(dailyPrice)}</Text>
       </TouchableOpacity> : null}
