@@ -244,6 +244,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
     }
 
     const onPressSaveAndPost = async () => {
+        const { finalEarningAfterDiscount, earningAmount, serviceCharges } = calculateCharges();
+        // console.log('finalEarningAfterDiscount, earningAmount, serviceCharges::>>',finalEarningAfterDiscount, earningAmount, serviceCharges);
         if (!mainImageUrl || functionHallName === '' || productDescription === ''  || functionHallAreaInSft === '' ||
             selectedItemArray?.length === 0 || (perDayRentPrice === '' || perDayRentPrice === undefined) || selectedItemArray === '' || (BedRooms === '' || BedRooms === undefined) || functionHallAddress === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '')
         ) {
@@ -309,7 +311,11 @@ const GeneralDetails = ({isAadharUpdate}) => {
         formData.append('latitude', locationLatitude);
         formData.append('longitude', locationLongitude);
         formData.append('foodType', selectedFoodType);
-        formData.append('functionHallAreaInSft', functionHallAreaInSft)
+        formData.append('functionHallAreaInSft', functionHallAreaInSft);
+        formData.append('serviceCharges', serviceCharges);
+        formData.append('vendorEarningAmount', earningAmount);
+        formData.append('vendorEarningAmountAfterDiscount', finalEarningAfterDiscount)
+
 
         console.log('formdata is ::>>', formData);
         const token = await getVendorAuthToken();
@@ -613,6 +619,15 @@ const GeneralDetails = ({isAadharUpdate}) => {
     };
 
 
+    const calculateCharges = () => {
+        const earningAmount = perDayRentPrice - (perDayRentPrice * discountPercentage / 100);
+        const serviceFeePercentage = earningAmount < 30000 ? 0.03 : 0.05; // 3% for < ₹10,000, 5% for ≥ ₹10,000
+        const serviceCharges = earningAmount * serviceFeePercentage;
+        const finalEarningAfterDiscount = earningAmount - serviceCharges;
+
+        return { finalEarningAfterDiscount, earningAmount, serviceCharges }
+
+    } 
 
     return (
         <View style={{ flex: 1, backgroundColor: "#EBEDF3", paddingHorizontal: 10 }}>
