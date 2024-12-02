@@ -181,7 +181,7 @@ const ViewCatDetails = ({ route }) => {
                         paginationDefaultColor="white"
                         paginationActiveColor="#FF6347"
                         showPagination={true}
-                        paginationStyle={{bottom:"20%" }}
+                        paginationStyle={{ bottom: Dimensions.get('window').height/6 }}
                         paginationStyleItem={{ alignSelf: 'center' }}
                         paginationStyleItemInactive={{ width: 7, height: 7 }}
                         paginationStyleItemActive={{ width: 10, height: 10 }}
@@ -189,23 +189,23 @@ const ViewCatDetails = ({ route }) => {
                         style={{ flex: 1, alignSelf: "center" }}
                         renderItem={({ item }) => (
                             <View style={[{ width: Dimensions.get('window').width, height: 300 }]}>
-                               
+
                                 <FastImage
                                     resizeMode="contain"
                                     source={{
                                         uri: item?.uri, // Make sure this points to the right data
                                         headers: { Authorization: `Bearer ${getUserAuth}` }
                                     }}
-                                    style={[styles.image, { }]}
+                                    style={[styles.image, {}]}
                                 />
                             </View>
                         )}
                     />
 
 
-                    <View style={{ marginHorizontal: 20, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                    <View style={{ marginHorizontal: 20, flexDirection: "row", alignItems: "center", justifyContent: "space-between", }}>
                         <Text style={{ color: "#100D25", fontSize: 20, fontWeight: "700", fontFamily: "ManropeRegular", }}>{jewelleryDetails?.productName}</Text>
-                        <Text style={{ color: "#100D25", fontSize: 18, fontWeight: "700", fontFamily: "ManropeRegular", }}>{formatAmount(jewelleryDetails?.rentPricePerDay)}</Text>
+                        <Text style={{ color: "#100D25", fontSize: 18, fontWeight: "700", fontFamily: "ManropeRegular", }}>{formatAmount(jewelleryDetails?.rentPricePerDay)}/day</Text>
                     </View>
 
                     <View style={{ marginBottom: 20, marginHorizontal: 20, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
@@ -217,6 +217,11 @@ const ViewCatDetails = ({ route }) => {
                             <Text style={{ marginLeft: 5, color: "#FD813B", fontSize: 11, fontWeight: "800", fontFamily: "ManropeRegular", }}>Trusted Lender</Text>
                         </View>
 
+                    </View>
+
+                    <View style={styles.priceDetailRow}>
+                        <Text style={styles.priceDetailLabel}>Security deposit</Text>
+                        <Text style={styles.priceDetailValue}>{formatAmount(jewelleryDetails?.securityDepositAmount)}</Text>
                     </View>
 
                 </View>
@@ -412,6 +417,24 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         margin: 3,
     },
+    priceDetailValue: {
+        fontSize: 15,
+        color: '#000000',
+        fontWeight: "400",
+        fontFamily: "ManropeRegular",
+    },
+    priceDetailRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginHorizontal: 20,
+        marginBottom:10
+      },
+      priceDetailLabel: {
+        fontSize: 15,
+        color: '#000000',
+        fontWeight: "400",
+        fontFamily: "ManropeRegular",
+      },
     detailsContainer: {
         flex: 1,
     },

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, ScrollView, Dimensions, Alert } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, ScrollView, Dimensions, Alert, Linking } from 'react-native';
 import BASE_URL, { LocalHostUrl } from '../../apiconfig';
 import axios from 'axios';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
@@ -12,6 +12,8 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import StepIndicator from 'react-native-step-indicator';
 import { useSelector } from 'react-redux';
 import PaymentConfirmationModal from '../../components/PaymentConfirmationModal';
+import LocationIcon from '../../assets/vendorIcons/locationIcon.svg';
+
 
 
 const ViewMyBookings = () => {
@@ -246,17 +248,25 @@ const ViewMyBookings = () => {
     let currentPayableAmount = 0;
 
     if (catType === "functionHalls") {
-        const serviceFeePercentage = totalAmount > 30000 ? 0.05 : 0.03; // 5% for > 30k, 3% for ≤ 30k
-        currentPayableAmount = advanceAmountToPay + (totalAmount * serviceFeePercentage);
+      const serviceFeePercentage = totalAmount > 30000 ? 0.05 : 0.03; // 5% for > 30k, 3% for ≤ 30k
+      currentPayableAmount = advanceAmountToPay + (totalAmount * serviceFeePercentage);
     } else if (catType === "caterings") {
-        const serviceFeePercentage = totalAmount > 10000 ? 0.05 : 0.03; // 5% for > 10k, 3% for ≤ 10k
-        currentPayableAmount = totalAmount * serviceFeePercentage;
+      const serviceFeePercentage = totalAmount > 10000 ? 0.05 : 0.03; // 5% for > 10k, 3% for ≤ 10k
+      currentPayableAmount = totalAmount * serviceFeePercentage;
     } else if (catType === "clothJewels") {
-        const serviceFeePercentage = totalAmount > 10000 ? 0.05 : 0.03; // 5% for > 10k, 3% for ≤ 10k
-        currentPayableAmount = securityDepositAmount + (totalAmount * serviceFeePercentage);
+      const serviceFeePercentage = totalAmount > 10000 ? 0.05 : 0.03; // 5% for > 10k, 3% for ≤ 10k
+      currentPayableAmount = securityDepositAmount + (totalAmount * serviceFeePercentage);
     }
 
     return currentPayableAmount;
+  };
+
+  const openMap = (lat, lon) => {
+    const url = Platform.select({
+        ios: `maps:0,0?q=${lat},${lon}`, // Apple Maps for iOS
+        android: `geo:0,0?q=${lat},${lon}` // Google Maps for Android
+    });
+    Linking.openURL(url);
 };
 
 
@@ -267,21 +277,28 @@ const ViewMyBookings = () => {
     return (
       <View style={styles.card}>
         <View style={{ flexDirection: "row", marginTop: 20 }}>
-          <View style={{ flexDirection: "row",width:"80%"}}>
-            <View style={{width:"35%", alignItems:"center"}}>
-            <FastImage resizeMode='contain' source={{
-              uri: updatedImgUrl,
-              headers: { Authorization: `Bearer ${getUserAuth}` }
-            }} style={styles.cardImage} />
-            <Text style={[styles.cardTitle,{marginTop:5}]}>{formatAmount(item?.totalAmount)}</Text>
+          <View style={{ flexDirection: "row", width: "80%" }}>
+            <View style={{ width: "35%", alignItems: "center" }}>
+              <FastImage resizeMode='contain' source={{
+                uri: updatedImgUrl,
+                headers: { Authorization: `Bearer ${getUserAuth}` }
+              }} style={styles.cardImage} />
+              <Text style={[styles.cardTitle, { marginTop: 5 }]}>{formatAmount(item?.totalAmount)}</Text>
             </View>
             <View style={{ marginLeft: 15 }}>
               <Text style={styles.cardTitle}>{item?.catType === 'caterings' ? item?.foodCateringName : item?.catType === 'functionHalls' ? item?.functionHallName : item?.productName} </Text>
-              <Text style={styles.cardBalanceAmount}>{ (item?.catType === 'caterings' || item?.catType === 'functionHalls') ? 'Advance Amount:' : 'Security Deposit'} {formatAmount(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount)}</Text>
-              
+              <Text style={styles.cardBalanceAmount}> {item?.catType === 'caterings' || item?.catType === 'functionHalls'
+                ? item?.advanceAmountPaid > 0
+                  ? 'Advance Paid:'
+                  : 'Advance Amount:'
+                : item?.securityDepositAmountPaid > 0
+                  ? 'Security Paid:'
+                  : 'Security Deposit:'} {formatAmount(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount)}</Text>
+              {/* <Text style={styles.cardBalanceAmount}>{ (item?.catType === 'caterings' || item?.catType === 'functionHalls') ? 'Advance Amount:' : 'Security Deposit'} {formatAmount(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount)}</Text> */}
+
               {/* <Text style={styles.cardBalanceAmount}>Current Payable Amount: {payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)}</Text> */}
               {/* <Text style={styles.cardBalanceAmount}>Balance Amount: {formatAmount(item?.advanceAmountToPay ? (item?.totalAmount - payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)) : (item?.totalAmount - payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)))}</Text> */}
-              
+
               <Text style={styles.cardBalanceAmount}>Balance Amount: {formatAmount(item?.advanceAmountToPay ? (item?.totalAmount - item?.advanceAmountToPay) : (item?.totalAmount - item?.securityDepositAmount))}</Text>
 
               <Text style={styles.startDate}> Start Date: {item?.startDate}</Text>
@@ -294,6 +311,14 @@ const ViewMyBookings = () => {
             {item.bookingStatus ? item.bookingStatus.charAt(0).toUpperCase() + item.bookingStatus.slice(1) : ''}
           </Text>
         </View>
+        {(item?.catType === 'functionHalls' && item?.advanceAmountPaid > 0) ?
+          <View style={{ flexDirection: "row",marginHorizontal:5 ,marginVertical:10}}>
+            <LocationIcon />
+            <TouchableOpacity style={{ marginHorizontal:5}} onPress={() => openMap('')} >
+              <Text>{item?.functionHallAddress?.address}</Text>
+            </TouchableOpacity>
+          </View>
+          : null}
 
         <StepIndicator
           customStyles={customStyles}
@@ -326,7 +351,7 @@ const ViewMyBookings = () => {
       case 'requested':
         return { backgroundColor: '#ECA73C29', color: '#F29300' };
       case 'approved':
-        return { backgroundColor: '#FFEAB0', color: "#B46609" };
+        return { backgroundColor: '#FE7939', color: "#FFFFFF" };
       case 'rejected':
         return { backgroundColor: '#FE353529', color: '#EF0000' };
       case 'payment successful':

@@ -161,10 +161,11 @@ const BookingDetailsScreen = ({ navigation, route }) => {
           }} style={styles.productImage} />
           <View style={styles.productDetails}>
             <Text style={styles.productTitle}>{productDetails?.productName}</Text>
+            {productDetails?.categoryType === 'clothes' ?
             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
               <View style={[styles.colorCircle, { backgroundColor: productDetails?.color, borderRadius: 10 }]} />
               <Text style={styles.productSubTitle}>Size: {productDetails?.size}</Text>
-            </View>
+            </View> : null}
             <Text style={styles.productPrice}>{formatAmount(productDetails?.rentPricePerDay)}<Text style={styles.productPriceperDay}>/day</Text></Text>
             <View style={styles.dateContainer}>
               <CalendarIcon />

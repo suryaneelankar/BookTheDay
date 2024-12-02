@@ -97,32 +97,17 @@ const ProfileMainScreen = () => {
                     onPress={() => navigation.navigate('UserAadharUpload')}
                     // onPress={() => toggleMyAccount()}
                 />
-                {isMyAccountOpen && (
-                    <View style={styles.dropdownContainer}>
-                        <DropdownItem title="My Profile" navigation={navigation} />
-                        <DropdownItem title="KYC Documents" navigation={navigation} />
-                        <DropdownItem title="Saved Items" navigation={navigation} />
-                        <DropdownItem title="Change Password" navigation={navigation} />
-                        <DropdownItem title="Log Out" navigation={navigation} />
-                        <DropdownItem title="Delete Account" navigation={navigation} />
-                    </View>
-                )}
+                
                 <MenuItem icon={<DashboardIcon />}
                     title="My Orders"
                     isSelected={isMyDashboardOpen ? true : false}
                     onPress={() => navigation.navigate('ViewMyBookings')}
                     // onPress={() => toggleMyDashboard()}
                 />
-                {isMyDashboardOpen && (
-                    <View style={styles.dropdownContainer}>
-                        <DropdownItem title="My Booking" navigation={navigation} />
-                        <DropdownItem title="My Lend" navigation={navigation} />
-                    </View>
-                )}
            
-                <MenuItem icon={<AboutUsIcon />} title="About Us" />
-                <MenuItem icon={<TermsConditionIcon />} title="Terms & Condition" />
-                <MenuItem icon={<RefundPolicy />} title="Refund Policy" />
+                <MenuItem icon={<AboutUsIcon />} title="About Us"  onPress={() => navigation.navigate('AboutUs')}/>
+                <MenuItem icon={<TermsConditionIcon />} title="Terms & Condition" onPress={() => navigation.navigate('TermsAndConditions')} />
+                <MenuItem icon={<RefundPolicy />} title="Refund Policy"  onPress={() => navigation.navigate('RefundPolicy')}/>
                 <MenuItem icon={<LogOutIcon />} title="Log Out" 
                 onPress={() => {[
                     dispatch(getLoginUserId('')),

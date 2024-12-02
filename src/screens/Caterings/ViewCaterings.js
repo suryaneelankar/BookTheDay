@@ -223,7 +223,7 @@ const ViewCaterings = ({ route, navigation }) => {
             setErrorMessage(''); // Clear error message
             actionSheetRef.current?.hide();
             setAddedItems([...addedItems, foodComboSelected]);
-          
+
             // Proceed with the valid value
         };
 
@@ -377,6 +377,12 @@ const ViewCaterings = ({ route, navigation }) => {
                         <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{noOfDays > 1 ? `${noOfDays} days` : '1 day'}</Text>
                     </View>
 
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, }}>
+
+                        <Text style={[styles.title, { marginTop: 10 }]}>Advance Amount :</Text>
+                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{`₹${eventsDetails?.advanceAmount}`}</Text>
+                    </View>
+
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, marginBottom: "25%" }}>
 
                         <Text style={[styles.title, { marginTop: 10 }]}>Total Price :</Text>
@@ -509,7 +515,7 @@ const ViewCaterings = ({ route, navigation }) => {
                             setModalVisible(true);
                         }
                     }}
-                    text={itemsWithTotalPrice?.length > 0 ? `₹${grandTotal}   View Cart` : "View Cart"}
+                    text={itemsWithTotalPrice?.length > 0 ? `₹${eventsDetails?.advanceAmount}   View Cart` : "View Cart"}
                     padding={10}
                 />
             </View>

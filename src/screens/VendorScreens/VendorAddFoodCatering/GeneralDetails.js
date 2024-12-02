@@ -358,7 +358,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                     "Confirmation",
                     "Your product posted successfully, Please complete KYC Status",
                     [
-                        { text: "Ok", onPress: () =>  navigation.navigate('AadharUpload')
+                        { text: "Ok", onPress: () =>   navigation.goBack()
                         }
                     ],
                     { cancelable: false }

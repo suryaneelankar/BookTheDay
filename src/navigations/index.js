@@ -56,6 +56,7 @@ import AboutUsScreen from "../screens/VendorScreens/VendorProfile/VendorAboutus"
 import VendorTersmAndCond from "../screens/VendorScreens/VendorProfile/VendorTermsAndCond";
 import VendorTermsAndCond from "../screens/VendorScreens/VendorProfile/VendorTermsAndCond";
 import VendorRefundPolicy from "../screens/VendorScreens/VendorProfile/VendorRefundPolicy";
+import TermsAndConditionsScreen from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
 
 const MainNavigation = () => {
 
@@ -331,7 +332,7 @@ const MainNavigation = () => {
                 <Stack.Screen name="Notifications" component={Notifications} options={{ headerShown: true, }} />
                 <Stack.Screen name="PrivacyPolicy" component={ProfilePolicy} options={{ headerShown: true, }} />
                 <Stack.Screen name="RefundPolicy" component={RefundPolicy} options={{ headerShown: true, }} />
-                <Stack.Screen name="TermsAndConditions" component={TermsAndCondition} options={{ headerShown: true, }} />
+                <Stack.Screen name="TermsAndConditions" component={TermsAndConditionsScreen} options={{ headerShown: true, }} />
                 {/* ############################################################ */}
 
 

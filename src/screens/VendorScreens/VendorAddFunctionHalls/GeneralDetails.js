@@ -345,7 +345,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
                     [
                         {
                             text: "Ok", onPress: () => {
-                    navigation.navigate('AadharUpload')
+                                navigation.goBack()
+                    // navigation.navigate('AadharUpload')
                 }
                         }
                     ],

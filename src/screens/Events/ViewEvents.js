@@ -346,6 +346,11 @@ const ViewEvents = ({ route, navigation }) => {
             <Text style={[styles.title, { marginTop: 10, fontWeight: "600", }]}>{noOfDays > 1 ? `${noOfDays} days` : '1 day'}</Text>
           </View>
 
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, }}>
+            <Text style={[styles.title, { marginTop: 10 }]}>Advance Amount :</Text>
+            <Text style={[styles.title, { marginTop: 10, fontWeight: "600" }]}>{formatAmount(eventsDetails?.advanceAmount)}</Text>
+          </View>
+
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, marginBottom: "20%" }}>
             <Text style={[styles.title, { marginTop: 10 }]}>Total Price :</Text>
             <Text style={[styles.title, { marginTop: 10, fontWeight: "600" }]}>{formatAmount(eventsDetails?.rentPricePerDay)}</Text>
@@ -465,7 +470,7 @@ const ViewEvents = ({ route, navigation }) => {
               setModalVisible(true);
             }
           }}
-          text={`${formatAmount(eventsDetails?.rentPricePerDay)} View Cart`}
+          text={`${formatAmount(eventsDetails?.advanceAmount)} View Cart`}
           padding={10}
         />
       </View>

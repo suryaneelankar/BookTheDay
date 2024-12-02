@@ -201,10 +201,10 @@ const VendorCategoryScreen = ({ navigation }) => {
                             <Text style={styles.overviewCount}>{totalBookings}</Text>
                             <Text style={styles.overviewLabel}>Total Bookings</Text>
                         </View>
-                        <View style={styles.overviewCard}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Events')} style={styles.overviewCard}>
                             <Text style={styles.overviewCount}>{pending}</Text>
                             <Text style={styles.overviewLabel}>Pending</Text>
-                        </View>
+                        </TouchableOpacity>
                         <View style={styles.overviewCard}>
                             <Text style={styles.overviewCount}>{completed}</Text>
                             <Text style={styles.overviewLabel}>Completed</Text>
