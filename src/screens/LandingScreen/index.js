@@ -141,7 +141,8 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         textAlign: 'center',
         color: "#1A1E25",
-        fontFamily: 'ManropeRegular'
+        fontFamily: 'ManropeRegular',
+        marginTop:"40%"
     },
     subtitle: {
         fontSize: 16,

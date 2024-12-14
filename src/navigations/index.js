@@ -13,11 +13,11 @@ import ContactUs from "../screens/Profile/ProfileSubScreens/ContactUs";
 import DeleteMyAccount from "../screens/Profile/ProfileSubScreens/DeleteMyAccount";
 // import EditProfileInfo from "../screens/Profile/ProfileSubScreens/EditProfileInfo";
 // import LogOut from "../screens/Profile/ProfileSubScreens/LogOut";
-import MyBookings from "../screens/Profile/ProfileSubScreens/MyBookings";
-import MyEvents from "../screens/Profile/ProfileSubScreens/MyEvents";
-import MyLocations from "../screens/Profile/ProfileSubScreens/MyLocations";
-import Notifications from "../screens/Profile/ProfileSubScreens/Notifications";
-import ProfilePolicy from "../screens/Profile/ProfileSubScreens/PrivacyPolicy";
+// import MyBookings from "../screens/Profile/ProfileSubScreens/MyBookings";
+// import MyEvents from "../screens/Profile/ProfileSubScreens/MyEvents";
+// import MyLocations from "../screens/Profile/ProfileSubScreens/MyLocations";
+// import Notifications from "../screens/Profile/ProfileSubScreens/Notifications";
+// import ProfilePolicy from "../screens/Profile/ProfileSubScreens/PrivacyPolicy";
 import RefundPolicy from "../screens/Profile/ProfileSubScreens/RefundPolicy";
 import TermsAndCondition from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
 import NavigationHeader from "../components/NavigationHeader";
@@ -28,7 +28,7 @@ import EditProfile from "../screens/Profile/EditProfile";
 import ViewMyBookings from "../screens/Profile/MyBookings";
 import RentOnProducts from "../screens/GiveOnRent/RentOnProducts";
 import LocationAdded from "../screens/Location/LocationAdded";
-import AddSelectLocation from "../screens/Location/AddSelectLocation";
+// import AddSelectLocation from "../screens/Location/AddSelectLocation";
 import AddFunctionalHall from "../screens/VendorScreens/VendorAddFunctionHalls/AddFunctionalHall";
 import HallsBookingOverView from "../screens/Bookings/HallsBokingOverView";
 import ViewCaterings from "../screens/Caterings/ViewCaterings";
@@ -237,14 +237,14 @@ const MainNavigation = () => {
                         headerShown: true,
                     }}
                 />
-                <Stack.Screen
+                {/* <Stack.Screen
                     name="AddSelectLocation"
                     component={AddSelectLocation}
                     options={{
                         header: () => <NavigationHeader Icon={true} title="Select Location" />,
                         headerShown: true,
                     }}
-                />
+                /> */}
                 <Stack.Screen
                     name="ViewCaterings"
                     component={ViewCaterings}
@@ -309,11 +309,11 @@ const MainNavigation = () => {
                 <Stack.Screen name="DeleteMyAccount" component={DeleteMyAccount} options={{ headerShown: true, }} />
                 {/* <Stack.Screen name="EditProfileInfo" component={EditProfileInfo} options={{ headerShown: true, }} /> */}
                 {/* <Stack.Screen name="LogOut" component={LogOut} options={{ headerShown: true, }} /> */}
-                <Stack.Screen name="MyBookings" component={MyBookings} options={{ headerShown: true, }} />
-                <Stack.Screen name="MyEvents" component={MyEvents} options={{ headerShown: true, }} />
-                <Stack.Screen name="MyLocations" component={MyLocations} options={{ headerShown: true, }} />
-                <Stack.Screen name="Notifications" component={Notifications} options={{ headerShown: true, }} />
-                <Stack.Screen name="PrivacyPolicy" component={ProfilePolicy} options={{ headerShown: true, }} />
+                {/* <Stack.Screen name="MyBookings" component={MyBookings} options={{ headerShown: true, }} /> */}
+                {/* <Stack.Screen name="MyEvents" component={MyEvents} options={{ headerShown: true, }} /> */}
+                {/* <Stack.Screen name="MyLocations" component={MyLocations} options={{ headerShown: true, }} /> */}
+                {/* <Stack.Screen name="Notifications" component={Notifications} options={{ headerShown: true, }} /> */}
+                {/* <Stack.Screen name="PrivacyPolicy" component={ProfilePolicy} options={{ headerShown: true, }} /> */}
                 <Stack.Screen name="RefundPolicy" component={RefundPolicy} options={{ headerShown: true, }} />
                 <Stack.Screen name="TermsAndConditions" component={TermsAndConditionsScreen} options={{ headerShown: true, }} />
                 {/* ############################################################ */}
