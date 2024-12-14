@@ -209,33 +209,6 @@ const MenuItem = ({ icon, title, children, isSelected, onPress }) => {
     );
 };
 
-const DropdownItem = ({ title, navigation }) => {
-    return (
-        <TouchableOpacity
-            onPress={() => {
-                if (title === 'My Profile') {
-                    navigation.navigate('ViewProfile')
-                } else if (title === 'KYC Documents') {
-                    // navigation.navigate('');
-                } else if (title === 'Saved Items') {
-                    // navigation.navigate('');
-                } else if (title === 'Change Password') {
-                    // navigation.navigate('');
-                } else if (title === 'Log Out') {
-                    // Handle log out
-                } else if (title === 'Delete Account') {
-                    // Handle delete account
-                } else if (title === 'My Booking') {
-                    navigation.navigate('ViewMyBookings')
-                } else if (title === 'My Lend') {
-                    navigation.navigate('ViewMyLendings')
-                }
-            }}
-            style={styles.dropdownItem}>
-            <Text style={styles.dropdownItemText}>{title}</Text>
-        </TouchableOpacity>
-    );
-};
 
 const styles = StyleSheet.create({
     container: {

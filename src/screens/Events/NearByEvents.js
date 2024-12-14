@@ -210,7 +210,7 @@ const NearByEvents = () => {
                         keyExtractor: (item) => item?._id.toString(),
                         renderItem: ({ item }) => (
                             <TouchableOpacity onPress={() => handleSelect(item?.value)}>
-                                <Text style={{ padding: 10 }}>{item?.value}</Text>
+                                <Text style={{ padding: 10, fontSize:12, color:"#000000", fontFamily: "ManropeRegular" }}>{item?.value}</Text>
                             </TouchableOpacity>
                         ),
                     }}

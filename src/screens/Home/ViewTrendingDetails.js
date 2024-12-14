@@ -125,7 +125,7 @@ const ViewTrendingDetails = ({ route }) => {
           <Image source={require('../../assets/offerIcon.png')}
             style={{ height: 50, width: 50, }}
           />
-          <Text style={{ marginRight: 10 }}>5% Discount on First Order</Text>
+          <Text style={{ marginRight: 10, color:"#333333", fontSize:12 }}>5% Discount on First Order</Text>
         </View>
 
         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20 }}>

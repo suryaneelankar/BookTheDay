@@ -211,6 +211,11 @@ const styles = StyleSheet.create({
     },
     checkboxLabel: {
         marginLeft: 10,
+        color:"#666666",
+        fontSize:12,
+        fontWeight:"400",
+        fontFamily: 'ManropeRegular',
+
     },
     button: {
         backgroundColor: '#FF6F61',

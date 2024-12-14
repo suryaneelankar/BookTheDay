@@ -608,6 +608,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 5,
+        color:"#333333"
       },
       vendorDetails: {
         fontSize: 14,

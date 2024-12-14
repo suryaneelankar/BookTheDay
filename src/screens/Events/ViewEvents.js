@@ -422,7 +422,8 @@ const ViewEvents = ({ route, navigation }) => {
             <Text style={{
               fontSize: 18,
               fontWeight: '700',
-              marginBottom: 10
+              marginBottom: 10,
+              color:"#666666"
             }}>Select Time Slot</Text>
             <FlatList
               data={timeSlots}
@@ -518,6 +519,12 @@ const styles = StyleSheet.create({
     marginTop: 5,
     height:30
 
+  },
+  timeSlotText:{
+    fontSize:13,
+    color:"#666666",
+    fontWeight:"500",
+    fontFamily: 'ManropeRegular',
   },
   calendarContainer: {
     flex: 1,

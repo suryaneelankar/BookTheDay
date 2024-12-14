@@ -24,10 +24,8 @@ import NavigationHeader from "../components/NavigationHeader";
 import ViewCatDetails from "../screens/Categories/ViewCatDetails";
 import BookingDetailsScreen from "../screens/Categories/ViewCartDetails";
 import RequestConfirmation from "../screens/VendorScreens/VendorDashBoard/RequestConfirmation";
-import ViewProfile from "../screens/Profile/ViewProfile";
 import EditProfile from "../screens/Profile/EditProfile";
 import ViewMyBookings from "../screens/Profile/MyBookings";
-import ViewMyLendings from "../screens/Profile/ViewMyLendings";
 import RentOnProducts from "../screens/GiveOnRent/RentOnProducts";
 import LocationAdded from "../screens/Location/LocationAdded";
 import AddSelectLocation from "../screens/Location/AddSelectLocation";
@@ -126,14 +124,6 @@ const MainNavigation = () => {
 
                
                 <Stack.Screen
-                    name="ViewProfile"
-                    component={ViewProfile}
-                    options={{
-                        header: () => <NavigationHeader Icon={true} title="View Profile" />,
-                        headerShown: true,
-                    }}
-                />
-                <Stack.Screen
                     name="EditProfile"
                     component={EditProfile}
                     options={{
@@ -149,14 +139,7 @@ const MainNavigation = () => {
                         headerShown: true,
                     }}
                 />
-                <Stack.Screen
-                    name="ViewMyLendings"
-                    component={ViewMyLendings}
-                    options={{
-                        header: () => <NavigationHeader Icon={true} title="My Lendings" />,
-                        headerShown: true,
-                    }}
-                />
+               
                 <Stack.Screen
                     name="ViewCatDetails"
                     component={ViewCatDetails}

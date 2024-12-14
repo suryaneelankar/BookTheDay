@@ -217,7 +217,7 @@ const Events = () => {
                         keyExtractor: (item) => item?._id.toString(),
                         renderItem: ({ item }) => (
                             <TouchableOpacity onPress={() => handleSelect(item?.value)}>
-                                <Text style={{ padding: 10 }}>{item?.value}</Text>
+                                <Text style={{ padding: 10, color:"#000000",fontSize:12, fontFamily: "ManropeRegular" }}>{item?.value}</Text>
                             </TouchableOpacity>
                         ),
                     }}
