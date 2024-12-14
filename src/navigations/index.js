@@ -11,8 +11,8 @@ import ProfileScreen from "../screens/Profile/ProfileScreen";
 import AboutUs from "../screens/Profile/ProfileSubScreens/AboutUs"
 import ContactUs from "../screens/Profile/ProfileSubScreens/ContactUs";
 import DeleteMyAccount from "../screens/Profile/ProfileSubScreens/DeleteMyAccount";
-import EditProfileInfo from "../screens/Profile/ProfileSubScreens/EditProfileInfo";
-import LogOut from "../screens/Profile/ProfileSubScreens/LogOut";
+// import EditProfileInfo from "../screens/Profile/ProfileSubScreens/EditProfileInfo";
+// import LogOut from "../screens/Profile/ProfileSubScreens/LogOut";
 import MyBookings from "../screens/Profile/ProfileSubScreens/MyBookings";
 import MyEvents from "../screens/Profile/ProfileSubScreens/MyEvents";
 import MyLocations from "../screens/Profile/ProfileSubScreens/MyLocations";
@@ -307,8 +307,8 @@ const MainNavigation = () => {
                 <Stack.Screen name="AboutUs" component={AboutUs} options={{ headerShown: true }} />
                 <Stack.Screen name="ContactUs" component={ContactUs} options={{ headerShown: false, }} />
                 <Stack.Screen name="DeleteMyAccount" component={DeleteMyAccount} options={{ headerShown: true, }} />
-                <Stack.Screen name="EditProfileInfo" component={EditProfileInfo} options={{ headerShown: true, }} />
-                <Stack.Screen name="LogOut" component={LogOut} options={{ headerShown: true, }} />
+                {/* <Stack.Screen name="EditProfileInfo" component={EditProfileInfo} options={{ headerShown: true, }} /> */}
+                {/* <Stack.Screen name="LogOut" component={LogOut} options={{ headerShown: true, }} /> */}
                 <Stack.Screen name="MyBookings" component={MyBookings} options={{ headerShown: true, }} />
                 <Stack.Screen name="MyEvents" component={MyEvents} options={{ headerShown: true, }} />
                 <Stack.Screen name="MyLocations" component={MyLocations} options={{ headerShown: true, }} />
