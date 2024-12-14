@@ -8,3 +8,10 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
+-dontwarn proguard.annotation.Keep
+-dontwarn proguard.annotation.KeepClassMembers
+
+-keep class com.amazonaws.** { *; }
+-dontwarn com.amazonaws.**
+-keepattributes Signature, *Annotation*
+

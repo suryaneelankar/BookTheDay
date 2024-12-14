@@ -19,6 +19,12 @@ import RazorpayCheckout from 'react-native-razorpay';
 
 const App = () => {
 
+  console.log = () => { };
+  console.info = () => { };
+  console.debug = () => { };
+  console.warn = () => { };
+  console.error = () => { };
+
   useEffect(() => {
     SplashScreen.hide();
   }, []);
@@ -26,7 +32,7 @@ const App = () => {
   useEffect(() => {
     requestUserPermission();
     getToken();
-  },[])
+  }, [])
 
   async function requestUserPermission() {
     const authStatus = await messaging().requestPermission();
