@@ -390,7 +390,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                         <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
                             onPress={() => onPressDiscountPercentage(item)}
                         >
-                            <Text>{item} %</Text>
+                            <Text style={{color:themevariable.Color_000000}}>{item} %</Text>
                         </TouchableOpacity>
                     )
                 })}
@@ -415,7 +415,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
     };
 
     const handleLocationSelected = (location, address) => {
-        console.log('Selected Location food:', location, address);
+        // console.log('Selected Location food:', location, address);
         setLocationCountyVal(location?.subDivisionArea);
         setLocationLatitude(location?.region?.latitude || 17.4021);
         setLocationLongitude(location?.region?.longitude || 78.4840);
@@ -668,6 +668,7 @@ const styles = StyleSheet.create({
     headerText: {
         fontSize: 16,
         fontWeight: 'bold',
+        color:themevariable.Color_000000,
     },
     itemsContainer: {
         marginTop: 10,
@@ -680,7 +681,8 @@ const styles = StyleSheet.create({
     },
     itemText: {
         fontSize: 14,
-        marginHorizontal: 10
+        marginHorizontal: 10,
+        color:themevariable.Color_000000,
     },
     textInputlabel: {
         fontFamily: 'ManropeRegular',
@@ -720,7 +722,8 @@ const styles = StyleSheet.create({
     addressTextInput:{ 
         height: '100%', 
         textAlignVertical: 'top', 
-        padding: 10 
+        padding: 10,
+        color:themevariable.Color_000000,
     },
     combocontainer: {
         marginHorizontal: 5,

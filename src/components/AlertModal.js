@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, View, Text, Button, StyleSheet } from 'react-native';
+import themevariable from '../utils/themevariable';
 
 const CustomModal = ({ visible, message, onClose }) => {
   return (
@@ -37,6 +38,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontSize: 16,
     textAlign: 'center',
+    color:themevariable.Color_000000,
   },
 });
 

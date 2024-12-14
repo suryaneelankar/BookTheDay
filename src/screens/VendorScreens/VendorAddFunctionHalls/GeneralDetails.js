@@ -390,7 +390,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                         <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
                             onPress={() => onPressDiscountPercentage(item)}
                         >
-                            <Text>{item} %</Text>
+                            <Text style={{color:themevariable.Color_000000}}>{item} %</Text>
                         </TouchableOpacity>
                     )
                 })}
@@ -539,7 +539,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                     }}
                         onPress={() => onPressSeatingCapacity(item)}
                     >
-                        <Text>{item}</Text>
+                        <Text style={{color:themevariable.Color_000000,}}>{item}</Text>
                     </TouchableOpacity>
                 )}
             </View>
@@ -703,7 +703,6 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             isRequired={true}
                         />
 
-                        {/* <Text style={styles.labelText}>Hall SqFeet</Text> */}
                         <TextField
                             label='Hall Area (in sft)'
                             placeholder="Enter Sq Feet Area approx."
@@ -939,6 +938,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '600',
         fontFamily: 'ManropeRegular',
+        color:themevariable.Color_000000,
 
     },
     itemsContainer: {
@@ -972,6 +972,7 @@ const styles = StyleSheet.create({
     },
     itemText: {
         marginHorizontal: 5,
+        color:themevariable.Color_000000,
     },
     textInputlabel: {
         fontFamily: 'ManropeRegular',

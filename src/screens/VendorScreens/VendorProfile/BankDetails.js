@@ -7,6 +7,7 @@ import BASE_URL from '../../../apiconfig';
 import BookDatesButton from '../../../components/GradientButton';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/AntDesign';
+import themevariable from '../../../utils/themevariable';
 
 const BankDetailsScreen = () => {
     const [accountNumber, setAccountNumber] = useState('');
@@ -207,6 +208,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         backgroundColor: '#f9f9f9',
         fontFamily: 'ManropeRegular',
+        color:themevariable.Color_000000,
     },
     saveButton: {
         backgroundColor: '#4CAF50',

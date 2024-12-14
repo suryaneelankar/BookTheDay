@@ -418,6 +418,7 @@ const styles = StyleSheet.create({
         borderColor: themevariable.Color_C8C8C6,
         paddingHorizontal: 12,
         borderRadius: 4,
+        color:themevariable.Color_000000,
     },
     iconButton: {
         marginHorizontal: 5,

@@ -413,7 +413,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
                             onPress={() => onPressDiscountPercentage(item)}
                         >
-                            <Text>{item} %</Text>
+                            <Text style={{color:themevariable.Color_000000,}}>{item} %</Text>
                         </TouchableOpacity>
                     )
                 })}
@@ -437,7 +437,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
                             onPress={() => onPressJewelleryType(item)}
                         >
-                            <Text>{item}</Text>
+                            <Text style={{color:themevariable.Color_000000,}}>{item}</Text>
                         </TouchableOpacity>
                     )
                 })}
@@ -649,22 +649,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             keyboardType='number-pad'
                             isRequired={true}
                         />
-                        {/* <TextField
-                            label='Advance Amount'
-                            placeholder="Please Enter Advance Amount"
-                            value={advanceAmount}
-                            onChangeHandler={onChangeAdvanceAmount}
-                            keyboardType='number-pad'
-                            isRequired={true}
-                        /> */}
                         <Text style={styles.textInputlabel}>Discount if any</Text>
                         {discountPercentageList()}
-                        {/* {!isNaN(perDayRentPrice - (perDayRentPrice * discountPercentage / 100)) && perDayRentPrice ? (
-                            <>
-                                <Text style={styles.discountlabel}>Your product price: {perDayRentPrice}</Text>
-                                <Text style={styles.discountlabel}>Your product price shown after discount: {perDayRentPrice - (perDayRentPrice * discountPercentage / 100)}</Text>
-                            </>
-                        ) : null} */}
                     </View>
                     <Text style={styles.title}>Item Available Address</Text>
                     <View style={styles.mainContainer}>
@@ -678,7 +664,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     value={productAddress}
                                     placeholder="Please Enter Address"
                                     keyboardType={'default'}
-                                    style={{ height: '100%', textAlignVertical: 'top', padding: 10 }}
+                                    style={{ height: '100%', textAlignVertical: 'top', padding: 10, color:themevariable.Color_000000, }}
                                     multiline={true}
                                     numberOfLines={4}
                                 />
@@ -863,6 +849,7 @@ const styles = StyleSheet.create({
     inputSearchStyle: {
         height: 40,
         fontSize: 16,
+        color:themevariable.Color_000000,
     },
     textInputlabel: {
         fontFamily: 'ManropeRegular',

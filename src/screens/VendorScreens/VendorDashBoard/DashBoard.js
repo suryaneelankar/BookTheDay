@@ -518,7 +518,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                     <ProfileIcon style={{}} />
                     <View>
                         <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular', textTransform: "capitalize" }}>Hi, {vendorLoggedInName}</Text>
-                        <Text style={{ fontFamily: 'LeagueSpartanRegular' }}>+91 {vendorLoggedInMobileNum}</Text>
+                        <Text style={{ fontFamily: 'LeagueSpartanRegular',color:themevariable.Color_000000, }}>+91 {vendorLoggedInMobileNum}</Text>
                     </View>
                     <TouchableOpacity onPress={() => navigation.navigate('AdminDashboard')}>
                         <ProfileIcon />

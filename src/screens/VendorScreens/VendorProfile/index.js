@@ -165,27 +165,25 @@ const VendorProfile = () => {
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 0 }}
                                 style={{ height: "100%", }}
-                            // style={styles.saveButton}
                             >
                                 <TouchableOpacity onPress={() => ('')}>
                                     <Text style={{ color: "#F4F4F6" }}>Save</Text>
                                 </TouchableOpacity>
                             </LinearGradient>
-                            {/* <Text style={styles.copiedText}>Copied!</Text> */}
                         </View>
                         <Text style={styles.shareText}>Share the link through</Text>
                         <View style={styles.shareButtons}>
                             <TouchableOpacity style={styles.shareButton} onPress={() => shareLink('airdrop')}>
                                 {/* <Icon name="share-social-outline" size={30} color="blue" /> */}
-                                <Text>AirDrop</Text>
+                                <Text style={{color:themevariable.Color_000000,}}>AirDrop</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.shareButton} onPress={() => shareLink('messages')}>
                                 {/* <Icon name="chatbubble-outline" size={30} color="green" /> */}
-                                <Text>Messages</Text>
+                                <Text style={{color:themevariable.Color_000000,}}>Messages</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.shareButton} onPress={() => shareLink('whatsapp')}>
                                 {/* <Icon name="logo-whatsapp" size={30} color="green" /> */}
-                                <Text>WhatsApp</Text>
+                                <Text style={{color:themevariable.Color_000000,}}>WhatsApp</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -292,6 +290,7 @@ const styles = StyleSheet.create({
     },
     menuIcon: {
         fontSize: 24,
+        color:themevariable.Color_000000,
     },
     menuText: {
         fontSize: 16,
@@ -397,6 +396,7 @@ const styles = StyleSheet.create({
         //    borderBottomLeftRadius:8,
         padding: 5,
         width: '70%',
+        color:themevariable.Color_000000,
     },
     copiedText: {
         color: 'red',
@@ -406,6 +406,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         fontSize: 16,
         fontWeight: 'bold',
+        color:themevariable.Color_000000,
     },
     shareButtons: {
         flexDirection: 'row',

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import themevariable from '../utils/themevariable';
 
 const ThankYouCard = () => {
   return (
@@ -73,11 +74,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
+    color:themevariable.Color_000000,
   },
   subtitle: {
     fontSize: 16,
     color: '#FF6F61',
     marginBottom: 10,
+    color:themevariable.Color_000000,
   },
   description: {
     fontSize: 14,

@@ -42,5 +42,6 @@ const styles= StyleSheet.create({
         borderColor:themevariable.Color_C8C8C6,
         paddingHorizontal:12,
         borderRadius:5,
+        color:themevariable.Color_000000,
     }
 })

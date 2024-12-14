@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import axios from "axios";
 import { formatAmount } from '../../../utils/GlobalFunctions';
+import themevariable from '../../../utils/themevariable';
 
 const MyTransactions = () => {
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
@@ -94,7 +95,7 @@ const MyTransactions = () => {
                 renderItem={({ item }) => <TransactionItem item={item} />}
                 ListEmptyComponent={() => (
                     <View style={{ flex: 1, alignSelf: "center", justifyContent: "center", height: Dimensions.get('window').height - 100, width: "100%", alignItems: "center" }}>
-                        <Text>No transactions are found</Text>
+                        <Text style={{color:themevariable.Color_000000,}}>No transactions are found</Text>
                     </View>
                 )}
             />

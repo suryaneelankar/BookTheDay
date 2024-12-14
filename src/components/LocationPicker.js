@@ -6,6 +6,7 @@ import SaveLocationButton from './SaveLocationButton';
 import Iconleftcircle from 'react-native-vector-icons/AntDesign';
 import { isLocationEnabled } from 'react-native-android-location-enabler';
 import { promptForEnableLocationIfNeeded } from 'react-native-android-location-enabler';
+import themevariable from '../utils/themevariable';
 
 const UserLocationPicker = ({ onLocationSelected, onBack }) => {
   const [region, setRegion] = useState(null);
@@ -255,7 +256,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       </View>
       {!onSelectLoc ?
         <TouchableOpacity onPress={() => setOnSelectLoc(true)} style={{alignItems:"center"}}>
-          <Text>Get Current Location</Text>
+          <Text style={{color:themevariable.Color_000000,}}>Get Current Location</Text>
         </TouchableOpacity> : null}
 
       {console.log('!selectedLocation is vendor::>>', !selectedLocation)}
@@ -374,6 +375,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 8,
     backgroundColor: "#F0F5FA",
+    color:themevariable.Color_000000,
   },
   locationInput: {
     height: 50,
@@ -383,7 +385,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 8,
     backgroundColor: "#F0F5FA",
-    width: "90%"
+    width: "90%",
+    color:themevariable.Color_000000,
   },
   searchInput: {
     height: 50,
