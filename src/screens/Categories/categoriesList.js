@@ -163,7 +163,7 @@ const CategoriesList = ({ route }) => {
             </View>
 
             <View style={{ marginBottom: "10%" }}>
-                <Text style={{alignSelf:'center'}}>{categories?.length} products</Text>
+                <Text style={{alignSelf:'center', color:"#000000"}}>{categories?.length} products</Text>
                
                     <FlatList
                         numColumns={2}
@@ -178,7 +178,7 @@ const CategoriesList = ({ route }) => {
                         }
                         ListEmptyComponent={
                             <View style={{flex:1,alignSelf:"center",height: Dimensions.get("window").height-250,justifyContent:"center"}}>
-                              <Text>No Products Available</Text>
+                              <Text style={{fontSize:12, color:"#000000", fontWeight:"400",fontFamily: 'ManropeRegular'}}>No Products Available</Text>
                             </View>
                           }
                     />

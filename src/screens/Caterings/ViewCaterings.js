@@ -458,7 +458,8 @@ const ViewCaterings = ({ route, navigation }) => {
                         <Text style={{
                             fontSize: 18,
                             fontWeight: '700',
-                            marginBottom: 10
+                            marginBottom: 10,
+                            color:"#666666"
                         }}>Select Time Slot</Text>
                         <FlatList
                             data={timeSlots}
@@ -555,6 +556,12 @@ const styles = StyleSheet.create({
         marginTop: verticalScale(2),
         marginTop: 10
     },
+    timeSlotText:{
+        fontSize:13,
+        color:"#666666",
+        fontWeight:"500",
+        fontFamily: 'ManropeRegular',
+      },
     off: {
         fontSize: 13,
         color: "#ed890e",

@@ -339,7 +339,7 @@ const openDialPad = (number) => {
 
         <View style={styles.cardFooter}>
           <TouchableOpacity  onPress={() => openDialPad('8297735285')}>
-          <Text style={[styles.cardStatus, { borderWidth: 1, borderColor: "gray", paddingHorizontal: 20, fontSize: 11 }]}>
+          <Text style={[styles.cardStatus, { borderWidth: 1, borderColor: "gray", paddingHorizontal: 20, fontSize: 11, color:"#666666" }]}>
             NEED HELP?
           </Text>
           </TouchableOpacity>

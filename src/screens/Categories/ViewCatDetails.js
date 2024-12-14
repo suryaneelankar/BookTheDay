@@ -543,6 +543,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         flex: 1,
         textAlign: 'center',
+        color:"#333333"
     },
     dataRow: {
         flexDirection: 'row',
@@ -558,5 +559,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         flex: 1,
         textAlign: 'center',
+        color:"#666666"
     },
 })

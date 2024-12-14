@@ -172,7 +172,7 @@ const LocationAdded = () => {
                                     <Text style={styles.addressText}>{item?.address}</Text>
                                 </View>
                                 <TouchableOpacity onPress={() => deleteAddress(item?._id)}>
-                                    <Text style={{ color: 'red' }}>Delete</Text>
+                                    <Text style={{ color: 'red',fontSize:13,fontWeight:"500" }}>Delete</Text>
                                 </TouchableOpacity>
 
                             </View>

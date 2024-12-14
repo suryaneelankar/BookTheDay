@@ -224,7 +224,7 @@ const NearByFoodCaterings = () => {
                             keyExtractor: (item) => item?._id.toString(),
                             renderItem: ({ item }) => (
                                 <TouchableOpacity onPress={() => handleSelect(item?.value)}>
-                                    <Text style={{ padding: 10 }}>{item?.value}</Text>
+                                    <Text style={{ padding: 10 , fontSize:12,color:"#333333", fontWeight:"400"}}>{item?.value}</Text>
                                 </TouchableOpacity>
                             ),
                         }}

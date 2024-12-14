@@ -172,15 +172,15 @@ const ProfileMainScreen = () => {
                         <View style={styles.shareButtons}>
                             <TouchableOpacity style={styles.shareButton} onPress={() => shareLink('airdrop')}>
                                 {/* <Icon name="share-social-outline" size={30} color="blue" /> */}
-                                <Text>AirDrop</Text>
+                                <Text style={styles.shareText}>AirDrop</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.shareButton} onPress={() => shareLink('messages')}>
                                 {/* <Icon name="chatbubble-outline" size={30} color="green" /> */}
-                                <Text>Messages</Text>
+                                <Text style={styles.shareText}>Messages</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.shareButton} onPress={() => shareLink('whatsapp')}>
                                 {/* <Icon name="logo-whatsapp" size={30} color="green" /> */}
-                                <Text>WhatsApp</Text>
+                                <Text style={styles.shareText}>WhatsApp</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -206,33 +206,6 @@ const MenuItem = ({ icon, title, children, isSelected, onPress }) => {
     );
 };
 
-const DropdownItem = ({ title, navigation }) => {
-    return (
-        <TouchableOpacity
-            onPress={() => {
-                if (title === 'My Profile') {
-                    navigation.navigate('ViewProfile')
-                } else if (title === 'KYC Documents') {
-                    // navigation.navigate('');
-                } else if (title === 'Saved Items') {
-                    // navigation.navigate('');
-                } else if (title === 'Change Password') {
-                    // navigation.navigate('');
-                } else if (title === 'Log Out') {
-                    // Handle log out
-                } else if (title === 'Delete Account') {
-                    // Handle delete account
-                } else if (title === 'My Booking') {
-                    navigation.navigate('ViewMyBookings')
-                } else if (title === 'My Lend') {
-                    navigation.navigate('ViewMyLendings')
-                }
-            }}
-            style={styles.dropdownItem}>
-            <Text style={styles.dropdownItemText}>{title}</Text>
-        </TouchableOpacity>
-    );
-};
 
 const styles = StyleSheet.create({
     container: {
@@ -400,6 +373,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         fontSize: 16,
         fontWeight: 'bold',
+        color:"#333333"
     },
     shareButtons: {
         flexDirection: 'row',

@@ -252,7 +252,7 @@ const Categories = () => {
                         }
                         ListEmptyComponent={
                             <View style={{flex:1,alignSelf:"center"}}>
-                              <Text>No Products Available</Text>
+                              <Text style={{fontSize:12, color:"#333333", fontWeight:"400", fontFamily: 'ManropeRegular'}}>No Products Available</Text>
                             </View>
                           }
                         />

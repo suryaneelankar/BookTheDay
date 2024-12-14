@@ -353,6 +353,9 @@ const styles = StyleSheet.create({
     },
     detailsAmount: {
         fontWeight: "700",
+        color: 'black',
+        fontSize: 14,
+        fontFamily: 'ManropeRegular',
     },
     bookingContainer: {
         backgroundColor: '#fdf5e6',
