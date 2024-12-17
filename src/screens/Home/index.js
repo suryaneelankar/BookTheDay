@@ -519,6 +519,8 @@ const HomeDashboard = () => {
             navigation.navigate('Events');
         } else if (name === 'Catering') {
             navigation.navigate('Caterings');
+        } else {
+            navigation.navigate('UserOTPScreen');
         }
 
         // Add other conditions for different categories if needed

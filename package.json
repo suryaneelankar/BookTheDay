@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@msg91comm/sendotp-react-native": "^1.0.0",
     "@react-native-community/cli": "^15.1.2",
     "@react-native-firebase/app": "^20.3.0",
     "@react-native-firebase/messaging": "^20.3.0",

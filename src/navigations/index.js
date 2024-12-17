@@ -55,6 +55,7 @@ import VendorTersmAndCond from "../screens/VendorScreens/VendorProfile/VendorTer
 import VendorTermsAndCond from "../screens/VendorScreens/VendorProfile/VendorTermsAndCond";
 import VendorRefundPolicy from "../screens/VendorScreens/VendorProfile/VendorRefundPolicy";
 import TermsAndConditionsScreen from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
+import UserOTPScreen from "../screens/LandingScreen/UserOTPScreen";
 
 const MainNavigation = () => {
 
@@ -234,6 +235,14 @@ const MainNavigation = () => {
                     component={LocationAdded}
                     options={{
                         header: () => <NavigationHeader Icon={true} title="Location" />,
+                        headerShown: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="UserOTPScreen"
+                    component={UserOTPScreen}
+                    options={{
+                        header: () => <NavigationHeader Icon={true} title={"OTP Verification"} />,
                         headerShown: true,
                     }}
                 />
