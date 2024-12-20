@@ -364,6 +364,7 @@ const styles = StyleSheet.create({
     //    borderBottomLeftRadius:8,
         padding: 5,
         width: '70%',
+        color: themevariable.Color_000000
     },
     copiedText: {
         color: 'red',

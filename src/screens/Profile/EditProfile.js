@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import themevariable from '../../utils/themevariable';
 
 const EditProfile = () => {
     const [fullName, setFullName] = useState('');
@@ -96,7 +97,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 5,
         marginTop: 10,
-        width:"98%"
+        width:"98%",
+        color: themevariable.Color_000000
     },
     buttonContainer: {
         flexDirection: 'row',
