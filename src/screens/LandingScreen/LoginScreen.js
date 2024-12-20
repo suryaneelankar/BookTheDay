@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState} from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import BookDatesButton from '../../components/GradientButton';
@@ -9,6 +9,7 @@ import { getCurrentLoggedInVendorMobileNum,getCurrentLoggedInUserMobileNum, getL
 import { useDispatch, useSelector } from 'react-redux';
 import { storeUserAuthToken,getVendorAuthToken, getUserAuthToken,storeVendorAuthToken } from '../../utils/StoreAuthToken';
 import themevariable from '../../utils/themevariable';
+import CustomModal from '../../components/AlertModal';
 
 const LoginScreen = ({ route }) => {
     const { type } = route.params;
@@ -23,6 +24,8 @@ const LoginScreen = ({ route }) => {
     const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
     console.log("selected mode::::::::;;", selectedMode,type);
     console.log('deviceFCMToken is::>>',deviceFCMToken)
+    const [fieldsCheckModalVisible, setFieldsCheckModalVisible] = useState(false);
+    
 
     // console.log('user auth token is::>>',getVendorAuthToken());
 
@@ -141,25 +144,37 @@ const LoginScreen = ({ route }) => {
                     onChangeText={setPhoneNumber}
                     keyboardType="phone-pad"
                 />
-                <Text style={styles.textLabel}>Password*</Text>
+                {/* <Text style={styles.textLabel}>Password*</Text>
 
                 <TextInput
                     style={styles.input}
                     placeholder="Enter Password"
                     value={password}
                     onChangeText={setPassword}
-                />
+                /> */}
 
 
                 <View style={styles.checkboxContainer}>
                     <Text style={styles.checkboxLabel}>Terms And Conditions</Text>
                 </View>
 
+                <CustomModal
+                    visible={fieldsCheckModalVisible}
+                    message={'Please fill all fields'}
+                    onClose={() => setFieldsCheckModalVisible(false)}
+                />
+
                 <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
 
                     <BookDatesButton
-                        onPress={() => getCheckUserValidation()}
-                        // onPress={() => navigation.navigate('OtpValidation')}
+                        // onPress={() => getCheckUserValidation()}
+                        onPress={() => {
+                            if(!phoneNumber || !email || !fullName){
+                                setFieldsCheckModalVisible(true);
+                            }else{
+                            navigation.navigate('OtpValidation',{mobileNumber: phoneNumber})
+                            }
+                        }}
                         text={'Create Account'}
                         padding={10}
                     />
