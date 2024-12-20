@@ -520,7 +520,7 @@ const HomeDashboard = () => {
         } else if (name === 'Catering') {
             navigation.navigate('Caterings');
         } else {
-            navigation.navigate('UserOTPScreen');
+            navigation.navigate('OtpValidation');
         }
 
         // Add other conditions for different categories if needed

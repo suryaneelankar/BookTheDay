@@ -15,10 +15,10 @@ const UserOTPScreen = () => {
 
     const handleSendOtp = async () => {
         const data = {
-            identifier: '8297735285'
+            identifier: '918919075651'
         }
         const response = await OTPWidget.sendOTP(data);
-        console.log(response);  
+        console.log("otp response********",response);  
     }
 
     return (
