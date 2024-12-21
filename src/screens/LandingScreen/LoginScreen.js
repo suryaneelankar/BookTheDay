@@ -171,10 +171,10 @@ const LoginScreen = ({ route }) => {
                             if(!phoneNumber || !email || !fullName){
                                 setFieldsCheckModalVisible(true);
                             }else{
-                            navigation.navigate('OtpValidation',{mobileNumber: phoneNumber})
+                            navigation.navigate('OtpValidation',{mobileNumber: phoneNumber, loginType : type})
                             }
                         }}
-                        text={'Create Account'}
+                        text={'Submit'}
                         padding={10}
                     />
                 </View>
