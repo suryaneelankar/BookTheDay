@@ -1,40 +1,35 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions, ToastAndroid } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { moderateScale } from '../../utils/scalingMetrics';
 import { OTPWidget } from '@msg91comm/sendotp-react-native';
+import BASE_URL from '../../apiconfig';
+import { getCurrentLoggedInUserMobileNum, getCurrentLoggedInVendorMobileNum, getLoginUserId } from '../../../redux/actions';
+import { getUserAuthToken, getVendorAuthToken, storeUserAuthToken, storeVendorAuthToken } from '../../utils/StoreAuthToken';
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
 
 const widgetId = "346c70705566333632373330";
 const tokenAuth = "436669TfIot32ZJOj67605d73P1";
 
 const OtpValidation = ({ navigation, route }) => {
 
-    const { mobileNumber } = route.params;
+    const { mobileNumber,loginType } = route.params;
+    const dispatch = useDispatch();
+    const selectedMode = useSelector((state) => state.userId);
+    const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
+    const [otp, setOtp] = useState(['', '', '', '']);
+    const [otpResponse, setOtpResponse] = useState();
+    const [otperrorMessage, setOtpErrorMessage] = useState();
+
+    const inputRefs = useRef([]);
+
 
     useEffect(() => {
         OTPWidget.initializeWidget(widgetId, tokenAuth); //Widget initialization
         handleSendOtp();
     }, [])
 
-
-    const [otp, setOtp] = useState(['', '', '', '']);
-    const [otpResponse, setOtpResponse] = useState();
-    const inputRefs = useRef([]);
-
-
-
-    // const handleOtpChange = (text, index) => {
-    //     const newOtp = [...otp];
-    //     newOtp[index] = text;
-    //     setOtp(newOtp);
-    // };
-
-    const handleSubmit = () => {
-        // Handle OTP submission logic
-        console.log('OTP Submitted:', otp.join(''));
-        navigation.navigate('Home')
-
-    };
 
     const handleSendOtp = async () => {
         const data = {
@@ -56,20 +51,38 @@ const OtpValidation = ({ navigation, route }) => {
         console.log("body for verify otp is", body)
         const response = await OTPWidget.verifyOTP(body);
         console.log("verify otp response", response);
-    }
+        if(response?.type === 'error'){
+            showToastWithGravityAndOffset();
+            setOtpErrorMessage(true);
+        }
+        if(response?.type === 'success'){
+            getCheckUserValidation();
+            setOtpErrorMessage(false);
 
-    const handleResubmit = () => {
-        // Handle OTP resubmission logic
-        console.log('OTP Resubmitted');
+        }
     };
+    
+      const showToastWithGravityAndOffset = () => {
+        ToastAndroid.showWithGravityAndOffset(
+          'Inavlid OTP',
+          ToastAndroid.LONG,
+          ToastAndroid.TOP,
+          0,
+          100,
+        );
+      };
+
 
     const handleRetryOtp = async () => {
         const body = {
-            reqId: '3463***************43931',
+            reqId: otpResponse?.message,
             retryChannel: 11 // Retry channel code (here, SMS:11)
         }
         const response = await OTPWidget.retryOTP(body);
-        console.log(response);
+        console.log("retry otp response is",response);
+        if(response?.type === 'error'){
+            ToastAndroid.show(response?.message, ToastAndroid.SHORT);
+        }
     };
 
     const handleOtpChange = (text, index) => {
@@ -81,6 +94,87 @@ const OtpValidation = ({ navigation, route }) => {
         if (text && index < otp.length - 1) {
             inputRefs.current[index + 1].focus();
         }
+    };
+
+    const storeUserDeviceToken = async () => {
+        const payload = {
+            mobileNumber: String(mobileNumber),
+            fcmToken: deviceFCMToken
+        }
+        console.log("payload is:::::::", payload, type);
+        const token = await getUserAuthToken();
+        console.log("LOgin screen sycan", token)
+        try {
+            const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
+            // console.log("userTokenRes  res:::::::::", userTokenRes);
+            if (userTokenRes?.status === 200) {
+
+            }
+        } catch (error) {
+            console.error("Error during add user token :", error);
+        }
+    };
+
+    const storeVendorDeviceToken = async () => {
+        const payload = {
+            mobileNumber: String(mobileNumber),
+            fcmToken: deviceFCMToken
+        }
+        console.log("payload is:::::::", payload, type);
+        const token = await getVendorAuthToken();
+        try {
+            const vendorTokenRes = await axios.post(`${BASE_URL}/addVendorFCMToken`, payload,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
+            console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
+            if (vendorTokenRes?.status === 200) {
+               
+            }
+        } catch (error) {
+            console.error("Error during add vendor token:", error);
+        }
+    };
+
+    const getCheckUserValidation = async () => {
+
+        const payload = {
+            mobileNumber: String(mobileNumber),
+            // password: String(password)
+            // fullName: fullName,
+            // role: type
+        }
+        console.log("payload is:::::::", payload, loginType);
+        try {
+            const logineRes = await axios.post(`${BASE_URL}/${loginType}/login`, payload);
+            console.log("login  res:::::::::", logineRes?.data);
+            if (logineRes?.status === 200) {
+                setAuthToken(logineRes?.data?.token);
+                if (loginType === 'vendor') {
+                    console.log('into vendor LOGG');
+                    dispatch(getLoginUserId(true));
+                    dispatch(getCurrentLoggedInVendorMobileNum(phoneNumber));
+                    storeVendorDeviceToken();
+                    storeVendorAuthToken(logineRes?.data?.token)
+                    navigation.navigate('Home');
+                } else {
+                    console.log('into USER LOGG');
+                    storeUserDeviceToken();
+                    dispatch(getLoginUserId(false));
+                    dispatch(getCurrentLoggedInUserMobileNum(phoneNumber));
+                    storeUserAuthToken(logineRes?.data?.token);
+                    navigation.navigate('Home');
+                }
+            }
+        } catch (error) {
+            console.error("Error during login:", error);
+        }
+
     };
 
     return (
@@ -107,6 +201,8 @@ const OtpValidation = ({ navigation, route }) => {
                         />
                     ))}
                 </View>
+                {otperrorMessage ?
+                <Text style={{color:"red", fontSize:12, fontWeight:"400",fontFamily: "ManropeRegular"}}>Invalid OTP enter.Please re-try</Text> : null}
                 <TouchableOpacity onPress={handleVerifyOtp} >
                     <LinearGradient
                         colors={['#D2453B', '#A0153E']}
@@ -121,7 +217,9 @@ const OtpValidation = ({ navigation, route }) => {
                 </TouchableOpacity>
                 <Text style={styles.resubmitText}>
                     Can't get OTP?{' '}
-                    <Text style={styles.resubmitLink} onPress={handleResubmit}>Resubmit</Text>
+                    <TouchableOpacity onPress={handleRetryOtp}>
+                    <Text style={styles.resubmitLink}>Resubmit</Text>
+                    </TouchableOpacity>
                 </Text>
             </LinearGradient>
         </SafeAreaView>
