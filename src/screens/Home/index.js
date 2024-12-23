@@ -968,7 +968,8 @@ const styles = StyleSheet.create({
     },
     textInput: {
         marginLeft: 10,
-        alignSelf: "center"
+        alignSelf: "center",
+        color: themevariable.Color_000000
     },
     filterView: {
         height: 45,

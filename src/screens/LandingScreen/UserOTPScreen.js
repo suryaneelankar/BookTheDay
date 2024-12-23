@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { OTPWidget } from '@msg91comm/sendotp-react-native';
 import { View, TextInput, TouchableOpacity, Text } from "react-native";
+import themevariable from '../../utils/themevariable';
 
 
 const widgetId = "346c70705566333632373330";
@@ -27,7 +28,7 @@ const UserOTPScreen = () => {
                 placeholder='Number'
                 value={number}
                 keyboardType='numeric'
-                style={{ backgroundColor: '#ededed', margin: 10 }}
+                style={{ backgroundColor: '#ededed', margin: 10, color: themevariable.Color_000000 }}
                 onChangeText={(text) => {
                     setNumber(text)
                 }}

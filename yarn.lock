@@ -1942,6 +1942,11 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@msg91comm/sendotp-react-native@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/@msg91comm/sendotp-react-native/-/sendotp-react-native-1.0.0.tgz"
+  integrity sha512-bDHF9pk3QQpJ3wjuaWoa1OcC+pzUBMhPeGQtbZs5lo/fHRJuG2+GIEEUdWk52A7hLNn9CSJvpf0I0YLZ6q8dbA==
+
 "@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1":
   version "5.1.1-v1"
   resolved "https://registry.npmjs.org/@nicolo-ribaudo/eslint-scope-5-internals/-/eslint-scope-5-internals-5.1.1-v1.tgz"

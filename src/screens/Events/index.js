@@ -375,11 +375,6 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         alignItems: "center"
     },
-    textInput: {
-        marginLeft: 10,
-        alignSelf: "center",
-        width: "80%"
-    },
     filterView: {
         height: 45,
         padding: 20,

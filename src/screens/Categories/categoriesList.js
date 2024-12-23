@@ -213,7 +213,8 @@ const styles = StyleSheet.create({
     },
     textInput: {
         marginLeft: verticalScale(15),
-        alignSelf: "center"
+        alignSelf: "center",
+        color:themevariable.Color_000000,
     },
     strickedoffer: {
         fontSize: 14,

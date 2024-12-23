@@ -340,7 +340,8 @@ const styles = StyleSheet.create({
     },
     textInput: {
         marginLeft: verticalScale(15),
-        alignSelf: "center"
+        alignSelf: "center",
+        color: themevariable.Color_000000
     },
     searchProduct: {
         height: 45,
@@ -359,7 +360,8 @@ const styles = StyleSheet.create({
     },
     textInput: {
         marginLeft: 10,
-        alignSelf: "center"
+        alignSelf: "center",
+        color: themevariable.Color_000000
     },
     dot: {
         backgroundColor: '#DCD7FD',

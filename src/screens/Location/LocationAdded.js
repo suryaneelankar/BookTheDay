@@ -9,6 +9,7 @@ import BASE_URL from '../../apiconfig';
 import { useDispatch } from 'react-redux';
 import { getUserLocation } from '../../../redux/actions';
 import UserLocationPicker from '../../components/userLocationPicker';
+import themevariable from '../../utils/themevariable';
 
 const LocationAdded = () => {
     const navigation = useNavigation();
@@ -232,7 +233,8 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         fontSize: 13,
         fontWeight: "700",
-        fontFamily: 'ManropeRegular'
+        fontFamily: 'ManropeRegular',
+        color: themevariable.Color_000000
     },
     microphoneButton: {
         marginLeft: 10,

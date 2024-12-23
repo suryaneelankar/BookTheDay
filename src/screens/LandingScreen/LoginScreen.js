@@ -8,6 +8,7 @@ import axios from 'axios';
 import { getCurrentLoggedInVendorMobileNum,getCurrentLoggedInUserMobileNum, getLoginUserId } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { storeUserAuthToken,getVendorAuthToken, getUserAuthToken,storeVendorAuthToken } from '../../utils/StoreAuthToken';
+import themevariable from '../../utils/themevariable';
 import CustomModal from '../../components/AlertModal';
 
 const LoginScreen = ({ route }) => {
@@ -218,6 +219,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginBottom: 15,
         paddingHorizontal: 10,
+        color: themevariable.Color_000000
     },
     checkboxContainer: {
         flexDirection: 'row',
