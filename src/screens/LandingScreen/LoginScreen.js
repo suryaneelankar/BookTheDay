@@ -119,22 +119,22 @@ const LoginScreen = ({ route }) => {
                     Connect to your 'Booktheday' account to explore local rental opportunities.
                 </Text>
 
-                <Text style={styles.textLabel}>Full Name*</Text>
+                {/* <Text style={styles.textLabel}>Full Name*</Text>
 
                 <TextInput
                     style={styles.input}
                     placeholder="your name"
                     value={fullName}
                     onChangeText={setFullName}
-                />
-                <Text style={styles.textLabel}>Email Address</Text>
+                /> */}
+                {/* //<Text style={styles.textLabel}>Email Address</Text> */}
 
-                <TextInput
+                {/* <TextInput
                     style={styles.input}
                     placeholder="your email id"
                     value={email}
                     onChangeText={setEmail}
-                />
+                /> */}
                 <Text style={styles.textLabel}>Phone Number*</Text>
 
                 <TextInput
@@ -169,7 +169,7 @@ const LoginScreen = ({ route }) => {
                     <BookDatesButton
                         // onPress={() => getCheckUserValidation()}
                         onPress={() => {
-                            if(!phoneNumber || !email || !fullName){
+                            if(!phoneNumber){
                                 setFieldsCheckModalVisible(true);
                             }else{
                             navigation.navigate('OtpValidation',{mobileNumber: phoneNumber, loginType : type})

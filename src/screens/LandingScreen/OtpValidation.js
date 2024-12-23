@@ -21,6 +21,7 @@ const OtpValidation = ({ navigation, route }) => {
     const [otp, setOtp] = useState(['', '', '', '']);
     const [otpResponse, setOtpResponse] = useState();
     const [otperrorMessage, setOtpErrorMessage] = useState();
+    const [authToken, setAuthToken] = useState('');
 
     const inputRefs = useRef([]);
 
@@ -124,7 +125,7 @@ const OtpValidation = ({ navigation, route }) => {
             mobileNumber: String(mobileNumber),
             fcmToken: deviceFCMToken
         }
-        console.log("payload is:::::::", payload, type);
+        console.log("payload is:::::::", payload, loginType);
         const token = await getVendorAuthToken();
         try {
             const vendorTokenRes = await axios.post(`${BASE_URL}/addVendorFCMToken`, payload,{
@@ -158,7 +159,7 @@ const OtpValidation = ({ navigation, route }) => {
                 if (loginType === 'vendor') {
                     console.log('into vendor LOGG');
                     dispatch(getLoginUserId(true));
-                    dispatch(getCurrentLoggedInVendorMobileNum(phoneNumber));
+                    dispatch(getCurrentLoggedInVendorMobileNum(mobileNumber));
                     storeVendorDeviceToken();
                     storeVendorAuthToken(logineRes?.data?.token)
                     navigation.navigate('Home');
@@ -166,7 +167,7 @@ const OtpValidation = ({ navigation, route }) => {
                     console.log('into USER LOGG');
                     storeUserDeviceToken();
                     dispatch(getLoginUserId(false));
-                    dispatch(getCurrentLoggedInUserMobileNum(phoneNumber));
+                    dispatch(getCurrentLoggedInUserMobileNum(mobileNumber));
                     storeUserAuthToken(logineRes?.data?.token);
                     navigation.navigate('Home');
                 }
