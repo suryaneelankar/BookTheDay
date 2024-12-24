@@ -8,6 +8,7 @@ import { getCurrentLoggedInUserMobileNum, getCurrentLoggedInVendorMobileNum, get
 import { getUserAuthToken, getVendorAuthToken, storeUserAuthToken, storeVendorAuthToken } from '../../utils/StoreAuthToken';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const widgetId = "346c70705566333632373330";
 const tokenAuth = "436669TfIot32ZJOj67605d73P1";
@@ -30,6 +31,32 @@ const OtpValidation = ({ navigation, route }) => {
         OTPWidget.initializeWidget(widgetId, tokenAuth); //Widget initialization
         handleSendOtp();
     }, [])
+
+    const storeLoginToken = async (key, value) => {
+        try {
+          await AsyncStorage.setItem(key, value); // Value must be a string
+          console.log('Data saved successfully!');
+        } catch (error) {
+          console.error('Error saving data:', error);
+        }
+    };
+
+    const storeLoginType = async (key, value) => {
+        try {
+          await AsyncStorage.setItem(key, value); // Value must be a string
+          console.log('Data saved successfully!');
+        } catch (error) {
+          console.error('Error saving data:', error);
+        }
+    };
+    const storeLoginMobileNumber = async (key, value) => {
+        try {
+          await AsyncStorage.setItem(key, value); // Value must be a string
+          console.log('Data saved successfully!');
+        } catch (error) {
+          console.error('Error saving data:', error);
+        }
+    };
 
 
     const handleSendOtp = async () => {
@@ -102,7 +129,7 @@ const OtpValidation = ({ navigation, route }) => {
             mobileNumber: String(mobileNumber),
             fcmToken: deviceFCMToken
         }
-        console.log("payload is:::::::", payload, type);
+        console.log("payload is:::::::", payload, loginType);
         const token = await getUserAuthToken();
         console.log("LOgin screen sycan", token)
         try {
@@ -161,7 +188,10 @@ const OtpValidation = ({ navigation, route }) => {
                     dispatch(getLoginUserId(true));
                     dispatch(getCurrentLoggedInVendorMobileNum(mobileNumber));
                     storeVendorDeviceToken();
-                    storeVendorAuthToken(logineRes?.data?.token)
+                    storeVendorAuthToken(logineRes?.data?.token);
+                    storeLoginToken('loginToken',logineRes?.data?.token);
+                    storeLoginType('loginType', 'true');
+                    storeLoginMobileNumber('loginMobileNumber', mobileNumber);
                     navigation.navigate('Home');
                 } else {
                     console.log('into USER LOGG');
@@ -169,6 +199,9 @@ const OtpValidation = ({ navigation, route }) => {
                     dispatch(getLoginUserId(false));
                     dispatch(getCurrentLoggedInUserMobileNum(mobileNumber));
                     storeUserAuthToken(logineRes?.data?.token);
+                    storeLoginToken('loginToken',logineRes?.data?.token);
+                    storeLoginType('loginType', 'false');
+                    storeLoginMobileNumber('loginMobileNumber', mobileNumber);
                     navigation.navigate('Home');
                 }
             }

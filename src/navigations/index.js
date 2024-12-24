@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect , useState} from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import UserTabs from "./UserTabs";
@@ -37,7 +37,7 @@ import LandingScreen from "../screens/LandingScreen";
 import CateringsOverView from "../screens/Bookings/CateringsOverView";
 import LoginScreen from "../screens/LandingScreen/LoginScreen";
 import OtpValidation from "../screens/LandingScreen/OtpValidation";
-import { getDeviceFCMToken } from "../../redux/actions";
+import { getCurrentLoggedInUserMobileNum, getCurrentLoggedInVendorMobileNum, getDeviceFCMToken } from "../../redux/actions";
 import messaging from '@react-native-firebase/messaging';
 import AadharUpload from "../screens/KYC/AadharUpload";
 import BankDetailsScreen from "../screens/VendorScreens/VendorProfile/BankDetails";
@@ -56,29 +56,126 @@ import VendorTermsAndCond from "../screens/VendorScreens/VendorProfile/VendorTer
 import VendorRefundPolicy from "../screens/VendorScreens/VendorProfile/VendorRefundPolicy";
 import TermsAndConditionsScreen from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
 import UserOTPScreen from "../screens/LandingScreen/UserOTPScreen";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUserAuthToken, getVendorAuthToken, storeUserAuthToken, storeVendorAuthToken } from "../utils/StoreAuthToken";
+import BASE_URL from "../apiconfig";
+import axios from "axios";
 
 const MainNavigation = () => {
 
     const Stack = createNativeStackNavigator();
     const switchtab = useSelector((state) => state.userId);
+    console.log("siwtch tab is:::::::",typeof switchtab)
     const dispatch = useDispatch();
+    const [storedLoginToken, setStoredLoginToken] = useState('');
+    const [storedLoginType, setStoredLoginType] = useState('');
+    const [deviceFCMTokenIs, setDeviceFCMTokenIs] = useState();
+
 
     useEffect(() => {
         getToken();
+        loadLoginToken();
+
     }, [])
+
+    const loadLoginToken = async () => {
+        console.log("IAM CALLING IN USEEFFECT**************************", switchtab)
+        const loginTokenVal = await AsyncStorage.getItem('loginToken');
+        const loginType = await AsyncStorage.getItem('loginType');
+        console.log("logintoken async is:::", loginTokenVal)
+        // const loginMobileNumber = await AsyncStorage.getItem('lobinMobileNumber');
+        setStoredLoginToken(loginTokenVal);
+        if(loginType === 'true'){
+         storeVendorAuthToken(loginTokenVal);
+       
+        }else if(loginType === 'false'){
+          storeUserAuthToken(loginTokenVal);
+        }
+
+      };
+
+      const loadLoginDetailsUpdate = async () => {
+        const loginTokenVal = await AsyncStorage.getItem('loginToken');
+        const loginType = await AsyncStorage.getItem('loginType');
+        const loginMobileNumber = await AsyncStorage.getItem('lobinMobileNumber');
+
+
+        setStoredLoginToken(loginTokenVal);
+        setStoredLoginType(loginType || '');
+        if(loginType === 'true'){
+         storeVendorAuthToken(loginTokenVal);
+         storeVendorDeviceToken();
+          dispatch(getCurrentLoggedInVendorMobileNum(loginMobileNumber));
+        
+        }else if(loginType === 'false'){
+          storeUserAuthToken(loginTokenVal);
+          storeUserDeviceToken();
+          dispatch(getCurrentLoggedInUserMobileNum(mobileNumber));
+
+        }
+
+      };
+
+      const storeVendorDeviceToken = async () => {
+        const payload = {
+            mobileNumber: String(mobileNumber),
+            fcmToken: deviceFCMTokenIs
+        }
+        console.log("payload is:::::::", payload, loginType);
+        const token = await getVendorAuthToken();
+        try {
+            const vendorTokenRes = await axios.post(`${BASE_URL}/addVendorFCMToken`, payload,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
+            console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
+            if (vendorTokenRes?.status === 200) {
+               
+            }
+        } catch (error) {
+            console.error("Error during add vendor token:", error);
+        }
+    };
+
+    const storeUserDeviceToken = async () => {
+        const payload = {
+            mobileNumber: String(mobileNumber),
+            fcmToken: deviceFCMTokenIs
+        }
+        console.log("payload is:::::::", payload, loginType);
+        const token = await getUserAuthToken();
+        console.log("LOgin screen sycan", token)
+        try {
+            const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload,{
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+            });
+            // console.log("userTokenRes  res:::::::::", userTokenRes);
+            if (userTokenRes?.status === 200) {
+
+            }
+        } catch (error) {
+            console.error("Error during add user token :", error);
+        }
+    };
 
     const getToken = async () => {
         const fcmToken = await messaging().getToken();
         console.log('device fcm test token is ::>>', fcmToken);
+        setDeviceFCMTokenIs(fcmToken);
         dispatch(getDeviceFCMToken(fcmToken));
     }
 
-    console.log("switch tab id:::::::::::", switchtab)
+    console.log("switch tab id:::::::::::", storedLoginType, '++++++++++',storedLoginToken)
 
     const HomeScreen = () => {
+        loadLoginDetailsUpdate();
+
         return (
             <>
-                {switchtab ?
+                {storedLoginType === 'true' && storedLoginType !== ''  ?
                     <VendorTabs />
                     :
                     <UserTabs />
@@ -91,6 +188,8 @@ const MainNavigation = () => {
         <NavigationContainer>
 
             <Stack.Navigator>
+                {(storedLoginToken === '' || storedLoginToken === null)  || switchtab === '' ?
+                <>
                 <Stack.Screen
                     name="LandingScreen"
                     component={LandingScreen}
@@ -114,8 +213,11 @@ const MainNavigation = () => {
                         // header: () => <NavigationHeader Icon={true} title="" />,
                         headerShown: false,
                     }}
-                />
+                /> 
+                </>
+                :
                 <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+                }                 
                 <Stack.Screen name="ViewTrendingDetails" component={ViewTrendingDetails} options={{ headerShown: true }} />
                 <Stack.Screen name="CategoriesList" component={CategoriesList} options={{
                     header: () => <NavigationHeader Icon={true} title="View Products" />,
