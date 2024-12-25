@@ -449,6 +449,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             placeholder={'Add Catering Image'}
                             onPressChooseFile={openGalleryOrCamera}
                         />
+                         <TouchableOpacity onPress={() => { openGalleryOrCamera() }}>
                         {mainImageUrl ?
                             <Image
                                 source={{ uri: mainImageUrl?.assets[0]?.uri }}
@@ -456,6 +457,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                                 height={300}
                                 resizeMode='cover'
                             /> : null}
+                        </TouchableOpacity>
 
                         <Text style={styles.title}>Additional Images</Text>
                         <Text style={styles.subTitle}>Please add up to 4 images*</Text>
@@ -531,8 +533,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
                         <Text style={styles.discountlabel}>3% for orders below ₹10,000</Text>
                         <Text style={styles.discountlabel}>5% for orders above ₹10,000</Text>
 
-                        <Text style={styles.textInputlabel}>Discount if any</Text>
-                        {discountPercentageList()}
+                        {/* <Text style={styles.textInputlabel}>Discount if any</Text> */}
+                        {/* {discountPercentageList()} */}
                         
                         <TextField
                             label='Travel Chargers'
@@ -560,6 +562,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                                     style={styles.addressTextInput}
                                     multiline={true}
                                     numberOfLines={4}
+                                    editable={false}
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', alignItems: 'center' }}>

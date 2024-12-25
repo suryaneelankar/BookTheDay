@@ -80,6 +80,15 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         { label: 'Dark Red', value: '#C70039' },
         { label: 'Purple', value: '#581845' },
         { label: 'Light Green', value: '#DAF7A6' },
+        { label: 'Orange', value: '#FFA500' },
+        { label: 'Maroon', value: '#800000' },
+        { label: 'Black', value: '#000000' },
+        { label: 'White', value: '#FFFFFF' },
+        { label: 'LightBlue', value: '#ADD8E6' },
+        { label: 'Brown', value: '#A52A2A' },
+        { label: 'Magenta', value: '#FF00FF' },
+        { label: 'Others', value: '#FFFFFF' },
+
     ];
 
     const renderItem = (item) => (
@@ -254,7 +263,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
         return { finalEarningAfterDiscount, earningAmount, serviceCharges }
 
-    } 
+    }
 
     const onPressSaveAndPost = async () => {
         const { finalEarningAfterDiscount, earningAmount, serviceCharges } = calculateCharges();
@@ -362,7 +371,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         "Confirmation",
                         "Your product posted successfully, Please complete the KYC status",
                         [
-                            { text: "OK", onPress: () =>  navigation.goBack() }
+                            { text: "OK", onPress: () => navigation.goBack() }
                         ],
                         { cancelable: false }
                     );
@@ -413,7 +422,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
                             onPress={() => onPressDiscountPercentage(item)}
                         >
-                            <Text style={{color:themevariable.Color_000000,}}>{item} %</Text>
+                            <Text style={{ color: themevariable.Color_000000, }}>{item} %</Text>
                         </TouchableOpacity>
                     )
                 })}
@@ -437,7 +446,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
                             onPress={() => onPressJewelleryType(item)}
                         >
-                            <Text style={{color:themevariable.Color_000000,}}>{item}</Text>
+                            <Text style={{ color: themevariable.Color_000000, }}>{item}</Text>
                         </TouchableOpacity>
                     )
                 })}
@@ -467,13 +476,15 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             placeholder={'Main Image'}
                             onPressChooseFile={openGalleryOrCamera}
                         />
-                        {mainImageUrl ?
-                            <Image
-                                source={{ uri: mainImageUrl?.assets[0].uri }}
-                                width={'100%'}
-                                height={300}
-                                resizeMode='cover'
-                            /> : null}
+                        <TouchableOpacity onPress={() => { openGalleryOrCamera() }}>
+                            {mainImageUrl ?
+                                <Image
+                                    source={{ uri: mainImageUrl?.assets[0].uri }}
+                                    width={'100%'}
+                                    height={300}
+                                    resizeMode='cover'
+                                /> : null}
+                        </TouchableOpacity>
 
                         <Text style={styles.title}>Additional Images</Text>
                         <Text style={styles.subTitle}>Please add up to 4 images*</Text>
@@ -664,9 +675,10 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     value={productAddress}
                                     placeholder="Please Enter Address"
                                     keyboardType={'default'}
-                                    style={{ height: '100%', textAlignVertical: 'top', padding: 10, color:themevariable.Color_000000, }}
+                                    style={{ height: '100%', textAlignVertical: 'top', padding: 10, color: themevariable.Color_000000, }}
                                     multiline={true}
                                     numberOfLines={4}
+                                    editable={false}
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -849,7 +861,7 @@ const styles = StyleSheet.create({
     inputSearchStyle: {
         height: 40,
         fontSize: 16,
-        color:themevariable.Color_000000,
+        color: themevariable.Color_000000,
     },
     textInputlabel: {
         fontFamily: 'ManropeRegular',

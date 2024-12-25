@@ -485,6 +485,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: "#333333",
     fontFamily: 'ManropeRegular',
+    textDecorationLine: "underline",
   },
   cardSubtitle: {
     fontSize: 14,

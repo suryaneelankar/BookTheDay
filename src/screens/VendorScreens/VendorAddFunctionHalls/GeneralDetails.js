@@ -20,14 +20,14 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../../utils/GlobalFunctions';
 
-const GeneralDetails = ({isAadharUpdate}) => {
+const GeneralDetails = ({ isAadharUpdate }) => {
     const navigation = useNavigation();
     const [BedRooms, setBedRooms] = useState();
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [functionHallName, setfunctionHallName] = useState('');
     const [productDescription, setProductDescription] = useState('');
-    const [isCollapsed, setIsCollapsed] = useState(true);
-    const [isFoodDropDownCollapsed, setIsFoodDropDownCollapsed] = useState(true);
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isFoodDropDownCollapsed, setIsFoodDropDownCollapsed] = useState(false);
     const [selectedFoodType, setSelectedFoodType] = useState('');
     const [additionalImages, setAdditionalImages] = useState({
         additionalImageOne: undefined,
@@ -49,7 +49,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
     const [itemPrices, setItemPrices] = useState({});
     const [selectedSeatingCapacity, setSelectedSeatingCapacity] = useState('');
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
-    const discountPercentageArr = ['0','5', '10', '15', '20', '30', '50'];
+    const discountPercentageArr = ['0', '5', '10', '15', '20', '30', '50'];
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
 
     const [loading, setLoading] = useState(false);
@@ -246,7 +246,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
     const onPressSaveAndPost = async () => {
         const { finalEarningAfterDiscount, earningAmount, serviceCharges } = calculateCharges();
         // console.log('finalEarningAfterDiscount, earningAmount, serviceCharges::>>',finalEarningAfterDiscount, earningAmount, serviceCharges);
-        if (!mainImageUrl || functionHallName === '' || productDescription === ''  || functionHallAreaInSft === '' ||
+        if (!mainImageUrl || functionHallName === '' || productDescription === '' || functionHallAreaInSft === '' ||
             selectedItemArray?.length === 0 || (perDayRentPrice === '' || perDayRentPrice === undefined) || selectedItemArray === '' || (BedRooms === '' || BedRooms === undefined) || functionHallAddress === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '')
         ) {
             Alert.alert('Please fill Mandatory fields');
@@ -331,7 +331,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
             if (response.status === 201) {
                 setLoading(false);
                 console.log('Success', `uploaded successfully`);
-                if(isAadharUpdate){
+                if (isAadharUpdate) {
                     Alert.alert(
                         "Confirmation",
                         "Your product posted successfully",
@@ -344,21 +344,21 @@ const GeneralDetails = ({isAadharUpdate}) => {
                         ],
                         { cancelable: false }
                     );
-                }else{
-                Alert.alert(
-                    "Confirmation",
-                    "Your product posted successfully, Please complete KYC Status",
-                    [
-                        {
-                            text: "Ok", onPress: () => {
-                                navigation.goBack()
-                    // navigation.navigate('AadharUpload')
+                } else {
+                    Alert.alert(
+                        "Confirmation",
+                        "Your product posted successfully, Please complete KYC Status",
+                        [
+                            {
+                                text: "Ok", onPress: () => {
+                                    navigation.goBack()
+                                    // navigation.navigate('AadharUpload')
+                                }
+                            }
+                        ],
+                        { cancelable: false }
+                    );
                 }
-                        }
-                    ],
-                    { cancelable: false }
-                );
-            }
             } else {
                 setLoading(false);
                 console.log('Error', 'Failed to upload document');
@@ -378,7 +378,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
         }
 
         <Modal visible={isLocationPickerVisible} animationType="slide">
-            <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
+            <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker} />
             {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
         </Modal>
         return (
@@ -390,7 +390,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                         <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
                             onPress={() => onPressDiscountPercentage(item)}
                         >
-                            <Text style={{color:themevariable.Color_000000}}>{item} %</Text>
+                            <Text style={{ color: themevariable.Color_000000 }}>{item} %</Text>
                         </TouchableOpacity>
                     )
                 })}
@@ -507,7 +507,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
         return (
             <View style={styles.container}>
                 <TouchableOpacity onPress={toggleCollapse} style={styles.header}>
-                    <Text style={styles.headerText}>Available Amenities</Text>
+                    <Text style={styles.headerText}>Available Amenities <Text style={{ color: "red" }}>*</Text></Text>
                     <Icon name={isCollapsed ? 'arrow-down' : 'arrow-up'} size={20} />
                 </TouchableOpacity>
                 {!isCollapsed && (
@@ -539,7 +539,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                     }}
                         onPress={() => onPressSeatingCapacity(item)}
                     >
-                        <Text style={{color:themevariable.Color_000000,}}>{item}</Text>
+                        <Text style={{ color: themevariable.Color_000000, }}>{item}</Text>
                     </TouchableOpacity>
                 )}
             </View>
@@ -627,7 +627,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
 
         return { finalEarningAfterDiscount, earningAmount, serviceCharges }
 
-    } 
+    }
 
     return (
         <View style={{ flex: 1, backgroundColor: "#EBEDF3", paddingHorizontal: 10 }}>
@@ -638,7 +638,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
             ) :
                 <View>
                     <Modal visible={isLocationPickerVisible} animationType="slide">
-                        <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
+                        <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker} />
                         {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
                     </Modal>
 
@@ -652,13 +652,15 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             placeholder={'Hall Image'}
                             onPressChooseFile={openGalleryOrCamera}
                         />
-                        {mainImageUrl ?
-                            <Image
-                                source={{ uri: mainImageUrl?.assets[0].uri }}
-                                width={'100%'}
-                                height={300}
-                                resizeMode='cover'
-                            /> : null}
+                        <TouchableOpacity onPress={() => { openGalleryOrCamera() }}>
+                            {mainImageUrl ?
+                                <Image
+                                    source={{ uri: mainImageUrl?.assets[0].uri }}
+                                    width={'100%'}
+                                    height={300}
+                                    resizeMode='cover'
+                                /> : null}
+                        </TouchableOpacity>
 
                         <Text style={styles.title}>Additional Images</Text>
                         <Text style={styles.subTitle}>Please add up to 4 images*</Text>
@@ -729,7 +731,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             keyboardType='number-pad'
                             isRequired={true}
                         />
-                           {
+                        {
                             !isNaN(perDayRentPrice - (perDayRentPrice * discountPercentage / 100)) && perDayRentPrice ? (
                                 <>
                                     {(() => {
@@ -770,7 +772,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             isRequired={true}
                         />
                         <TextField
-                            label='Over Time Charges'
+                            label='Over Time Charges / hr'
                             placeholder="Please Enter OverTime Charges"
                             value={overTimeCharges}
                             onChangeHandler={onChangeOverTimeCharges}
@@ -797,6 +799,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                                     style={{ height: '100%', textAlignVertical: 'top', padding: 10 }}
                                     multiline={true}
                                     numberOfLines={4}
+                                    editable={false}
                                 />
                             </View>
                             <View style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -938,7 +941,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '600',
         fontFamily: 'ManropeRegular',
-        color:themevariable.Color_000000,
+        color: themevariable.Color_000000,
 
     },
     itemsContainer: {
@@ -972,7 +975,7 @@ const styles = StyleSheet.create({
     },
     itemText: {
         marginHorizontal: 5,
-        color:themevariable.Color_000000,
+        color: themevariable.Color_000000,
     },
     textInputlabel: {
         fontFamily: 'ManropeRegular',
