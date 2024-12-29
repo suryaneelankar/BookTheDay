@@ -150,22 +150,22 @@ const NearByEvents = () => {
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'row',marginBottom:10 }}>
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
+                    <View  style={{ flexDirection: 'row',marginBottom:10,flexWrap: "wrap", paddingVertical:5}}>
+                        <View style={{alignItems:"center",justifyContent:"center",marginHorizontal:5,marginVertical:5, flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.seatingCapacity} pax</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
+                        <View style={{alignItems:"center",justifyContent:"center",marginHorizontal:5,marginVertical:5, flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.bedRooms} Rooms</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10,alignItems:"center"}}>
+                        <View style={{alignItems:"center",justifyContent:"center",marginHorizontal:5,marginVertical:5, flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10,alignItems:"center"}}>
 
                             <Text style={{  }}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon/>}</Text>
                             <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG': item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
                         </View>
 
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 5,paddingVertical:5,marginHorizontal:10 ,alignItems:"center"}}>
+                        <View style={{alignItems:"center",justifyContent:"center",marginHorizontal:5,marginVertical:5, flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 5,paddingVertical:5,marginHorizontal:10 ,alignItems:"center"}}>
                             <DistanceIcon/>
-                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>{item?.distance?.toFixed(1)}  km</Text>
+                            <Text style={{ flexShrink: 1, marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>{item?.distance?.toFixed(1)}  km</Text>
                         </View>
                     </View>
                 </TouchableOpacity>

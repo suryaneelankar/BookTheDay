@@ -274,8 +274,8 @@ const RequestConfirmation = ({ navigation, route }) => {
                     <View>
                         <TouchableOpacity
                             onPress={() => { actionSheetRef.current?.show(), setSelectedItemDetails(item) }}
-                            style={{ bottom: verticalScale(25), left: verticalScale(20) }}>
-                            <Text style={{ color: "#4A4A4A", textDecorationLine: "underline", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular" }}>View Details</Text>
+                            style={{ flex:1, }}>
+                            <Text style={{textAlign:"auto", justifyContent:"flex-start",color: "#4A4A4A", textDecorationLine: "underline", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular" }}>View Details</Text>
                         </TouchableOpacity>
 
                         {item?.bookingStatus == 'requested' ?
@@ -512,7 +512,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                                 <ThumsUpIcon />
                             </View>
                             <Text style={styles.title}>Thank You!</Text>
-                            <Text style={styles.description}>Our team will update the information to the customer and will get back in 2 hours</Text>
+                            <Text style={styles.description}>Our team will update the information to the customer and will get back in 1 hour</Text>
                             <LinearGradient colors={['#D2453B', '#A0153E']}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 0 }}

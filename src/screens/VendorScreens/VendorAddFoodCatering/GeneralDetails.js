@@ -47,7 +47,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
     const discountPercentageArr = ['5', '10', '15', '20', '30', '50'];
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
     const [loading, setLoading] = useState(false);
-    const [isFoodDropDownCollapsed, setIsFoodDropDownCollapsed] = useState(true);
+    const [isFoodDropDownCollapsed, setIsFoodDropDownCollapsed] = useState(false);
     const [selectedFoodType, setSelectedFoodType] = useState('');
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 

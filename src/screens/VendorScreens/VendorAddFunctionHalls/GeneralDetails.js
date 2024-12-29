@@ -662,7 +662,9 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                 /> : null}
                         </TouchableOpacity>
 
-                        <Text style={styles.title}>Additional Images</Text>
+                        <Text style={styles.title}>Additional Images  
+                           <Text style={{ color: "red" }}>*</Text>
+                        </Text>
                         <Text style={styles.subTitle}>Please add up to 4 images*</Text>
                         <FlatList
                             data={data}
@@ -680,7 +682,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             isRequired={true}
                         />
 
-                        <Text style={styles.labelText}>Food Type</Text>
+                        <Text style={styles.labelText}>Food Type <Text style={{ color: "red" }}>*</Text></Text>
                         {RentalFoodTypeList()}
 
                         <TextField
@@ -693,7 +695,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             isDescriptionField={true}
                         />
 
-                        <Text style={styles.labelText}>Seating Capacity pax</Text>
+                        <Text style={styles.labelText}>Seating Capacity pax <Text style={{ color: "red" }}>*</Text></Text>
                         {seatingCapacityList()}
 
                         <TextField
@@ -751,7 +753,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                                     <Text style={styles.highlightedValue}>{formatAmount(serviceFee.toFixed(2))}</Text>
                                                 </Text>
                                                 <Text style={styles.discountlabel}>
-                                                    Your Earning (After Service Fee):
+                                                    Your Earnings (After Service Fee):
                                                     <Text style={styles.highlightedValue}>{formatAmount(finalEarning.toFixed(2))}</Text>
                                                 </Text>
                                             </>

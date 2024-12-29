@@ -351,6 +351,11 @@ const ViewEvents = ({ route, navigation }) => {
             <Text style={[styles.title, { marginTop: 10, fontWeight: "600" }]}>{formatAmount(eventsDetails?.advanceAmount)}</Text>
           </View>
 
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, }}>
+            <Text style={[styles.title, { marginTop: 10 }]}>Over time charge/hr:</Text>
+            <Text style={[styles.title, { marginTop: 10, fontWeight: "600" }]}>{formatAmount(eventsDetails?.advanceAmount)}</Text>
+          </View>
+
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, marginBottom: "20%" }}>
             <Text style={[styles.title, { marginTop: 10 }]}>Total Price :</Text>
             <Text style={[styles.title, { marginTop: 10, fontWeight: "600" }]}>{formatAmount(eventsDetails?.rentPricePerDay)}</Text>

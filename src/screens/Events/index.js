@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, FlatList,  SafeAreaView, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, FlatList, SafeAreaView, ActivityIndicator } from 'react-native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";
 import { useNavigation } from '@react-navigation/native';
@@ -15,6 +15,7 @@ import IonIcon from 'react-native-vector-icons/Ionicons';
 import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
 import VegIcon from '../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
+import OfferStikcer from '../../assets/svgs/offerSticker.svg';
 
 const Events = () => {
     const navigation = useNavigation();
@@ -137,6 +138,28 @@ const Events = () => {
                             <TouchableOpacity style={styles.slide} key={index}
                                 onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
                             >
+                                {item?.discountPercentage ?
+                                    <>
+                                        <OfferStikcer style={{
+                                            position: 'absolute',
+                                            // alignSelf:"flex-end"
+                                            top: 5,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                        }} />
+                                        <View style={{
+                                            position: 'absolute',
+                                            top: 5,
+                                            left: 5,
+                                            right: 0,
+                                            bottom: 0,
+
+                                        }}>
+                                            <Text style={{ color: "#FFFFFF", fontSize: 10, fontWeight: "700", fontFamily: 'ManropeRegular' }}>{item?.discountPercentage}%</Text>
+                                            <Text style={{ color: "#FFFFFF", fontSize: 10, fontWeight: "700", fontFamily: 'ManropeRegular' }}>Off</Text>
+                                        </View>
+                                    </> : null}
                                 <FastImage source={{
                                     uri: itemData,
                                     headers: { Authorization: `Bearer ${getUserAuth}` }
@@ -161,17 +184,17 @@ const Events = () => {
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'row',marginBottom:10 }}>
+                    <View style={{ flexDirection: 'row', marginBottom: 10 }}>
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.seatingCapacity} pax</Text>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.bedRooms} Rooms</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10,alignItems:"center"}}>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
 
-                            <Text style={{  }}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon/>}</Text>
-                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG': item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
+                            <Text style={{}}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'veg' ? 'VEG' : 'NON-VEG'}</Text>
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -217,7 +240,7 @@ const Events = () => {
                         keyExtractor: (item) => item?._id.toString(),
                         renderItem: ({ item }) => (
                             <TouchableOpacity onPress={() => handleSelect(item?.value)}>
-                                <Text style={{ padding: 10, color:"#000000",fontSize:12, fontFamily: "ManropeRegular" }}>{item?.value}</Text>
+                                <Text style={{ padding: 10, color: "#000000", fontSize: 12, fontFamily: "ManropeRegular" }}>{item?.value}</Text>
                             </TouchableOpacity>
                         ),
                     }}
@@ -247,7 +270,7 @@ const Events = () => {
                     <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "400", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Function Halls in Hyderabad</Text>
                 </View>
                 <TouchableOpacity style={{}} onPress={() => navigation.navigate('NearByEvents')}>
-                    <Text style={{ backgroundColor:"#FF990066",marginTop: 15, color: "#333333", fontSize: 12, fontWeight: "600", fontFamily: "ManropeRegular",paddingHorizontal:7,paddingVertical:5,borderRadius:5 }}>Sort NearBy</Text>
+                    <Text style={{ backgroundColor: "#FF990066", marginTop: 15, color: "#333333", fontSize: 12, fontWeight: "600", fontFamily: "ManropeRegular", paddingHorizontal: 7, paddingVertical: 5, borderRadius: 5 }}>Sort NearBy</Text>
                 </TouchableOpacity>
             </View>
 
@@ -261,8 +284,8 @@ const Events = () => {
                     loading ? <ActivityIndicator size="large" color="orange" /> : null
                 }
                 ListEmptyComponent={
-                    <View style={{alignItems:"center", alignSelf:"center", justifyContent:"center"}}>
-                        <Text style={{color:"#333333", fontSize:14, fontWeight:"400",fontFamily: 'ManropeRegular',}}>No Function halls found</Text>
+                    <View style={{ alignItems: "center", alignSelf: "center", justifyContent: "center" }}>
+                        <Text style={{ color: "#333333", fontSize: 14, fontWeight: "400", fontFamily: 'ManropeRegular', }}>No Function halls found</Text>
                     </View>
                 }
                 contentContainerStyle={{}}

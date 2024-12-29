@@ -102,7 +102,7 @@ const OtpValidation = ({ navigation, route }) => {
             mobileNumber: String(mobileNumber),
             fcmToken: deviceFCMToken
         }
-        console.log("payload is:::::::", payload, type);
+        console.log("payload is:::::::", payload, loginType);
         const token = await getUserAuthToken();
         console.log("LOgin screen sycan", token)
         try {

@@ -169,7 +169,7 @@ const HallsBookingOverView = ({ route, navigation }) => {
                     </View>
                     <Text style={styles.title}>Thank You!</Text>
                     <Text style={styles.subtitle}>Your Booking Initiated.</Text>
-                    <Text style={styles.description}>Our team will update to you in less than 2 hours</Text>
+                    <Text style={styles.description}>Our team will update to you in less than 1 hour</Text>
                     <Text style={styles.description}>*Once booking approved please do the payment to confirm your booking.</Text>
                     <LinearGradient colors={['#D2453B', '#A0153E']}
                         start={{ x: 0, y: 0 }}

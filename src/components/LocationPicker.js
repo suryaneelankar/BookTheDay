@@ -241,18 +241,23 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       {/* {console.log('places is::>>',places)} */}
 
 
-      <View style={{ width: "95%", marginTop: 10, flexDirection: "row", alignSelf: "center", alignItems: "center", justifyContent: "space-between" }}>
+      <View style={{ width: "95%", marginTop: 10, flexDirection: "row", alignSelf: "center", alignItems: "center",justifyContent:"space-between" }}>
         <TouchableOpacity onPress={() => onBack()}>
           <Iconleftcircle name='leftcircle' color={'#494a49'} size={33} style={{ bottom: 5 }} />
         </TouchableOpacity>
+        <View style={[styles.locationInput,{flexDirection:"row",alignItems:"center"}]}>
         <TextInput
           placeholder="Enter Location"
           value={searchText}
           onChangeText={handleSearch}
-          style={styles.locationInput}
+          style={{width:"92%"}}
           onFocus={() => setOnSelectLoc(false)}
         // onBlur={() => setOnSelectLoc(true)}
         />
+         <TouchableOpacity onPress={() => setSearchText('')}>
+          <Iconleftcircle name='leftcircle' color={'#494a49'} size={18} />
+        </TouchableOpacity>
+        </View>
       </View>
       {!onSelectLoc ?
         <TouchableOpacity onPress={() => setOnSelectLoc(true)} style={{alignItems:"center"}}>
@@ -382,7 +387,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderWidth: 1,
     marginBottom: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
     borderRadius: 8,
     backgroundColor: "#F0F5FA",
     width: "90%",

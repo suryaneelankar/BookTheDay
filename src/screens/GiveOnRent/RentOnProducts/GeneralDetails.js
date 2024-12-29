@@ -639,7 +639,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                                     <Text style={styles.highlightedValue}>{formatAmount(serviceFee.toFixed(2))}</Text>
                                                 </Text>
                                                 <Text style={styles.discountlabel}>
-                                                    Your Earning (After Service Fee):
+                                                    Your Earnings (After Service Fee):
                                                     <Text style={styles.highlightedValue}>{formatAmount(finalEarning.toFixed(2))}</Text>
                                                 </Text>
                                             </>
