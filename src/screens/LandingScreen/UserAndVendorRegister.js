@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import BookDatesButton from '../../components/GradientButton';
 import { useNavigation } from '@react-navigation/native';
@@ -11,13 +11,12 @@ import { storeUserAuthToken, getVendorAuthToken, getUserAuthToken, storeVendorAu
 import themevariable from '../../utils/themevariable';
 import CustomModal from '../../components/AlertModal';
 
-const LoginScreen = ({ route }) => {
+const UserAndVendorRegister = ({ route }) => {
     const { type } = route.params;
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const navigation = useNavigation();
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [adminPhoneNumber, setAdminPhoneNumber] = useState('');
     const [password, setPassword] = useState('');
     const [authToken, setAuthToken] = useState('');
     const dispatch = useDispatch();
@@ -26,7 +25,6 @@ const LoginScreen = ({ route }) => {
     console.log("selected mode::::::::;;", selectedMode, type);
     console.log('deviceFCMToken is::>>', deviceFCMToken)
     const [fieldsCheckModalVisible, setFieldsCheckModalVisible] = useState(false);
-    const [adminMobileNums,setAdminMobileNums] = useState([]);
 
 
     // console.log('user auth token is::>>',getVendorAuthToken());
@@ -54,77 +52,36 @@ const LoginScreen = ({ route }) => {
         }
     }
 
-    const storeVendorDeviceToken = async () => {
-        const payload = {
-            mobileNumber: String(phoneNumber),
-            fcmToken: deviceFCMToken
-        }
-        console.log("payload is:::::::", payload, type);
-        const token = await getVendorAuthToken();
-        try {
-            const vendorTokenRes = await axios.post(`${BASE_URL}/addVendorFCMToken`, payload, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
-            if (vendorTokenRes?.status === 200) {
-
-            }
-        } catch (error) {
-            console.error("Error during add vendor token:", error);
-        }
-    }
-
-    const getAdminNumbers = async () => {
-        try {
-            const response = await axios.get(`${BASE_URL}/get/adminNumbers`);
-            const adminNumbers = response?.data;
-           if(adminNumbers){
-            setAdminMobileNums(adminNumbers?.data);
-            if (phoneNumber.includes(adminNumbers?.data)) {
-                getCheckUserValidation()
-            } else {
-                navigation.navigate('OtpValidation', { mobileNumber: phoneNumber, loginType: type })
-            }
-           }
-        } catch (error) {
-            console.error('Error fetching food items:', error);
-        }
-    };
-
     const getCheckUserValidation = async () => {
 
         const payload = {
             mobileNumber: String(phoneNumber),
-            password: String(password)
-            // fullName: fullName,
-            // role: type
+            password: String(password),
+            fullName: fullName,
+            role: type
         }
         console.log("payload is:::::::", payload, type);
         try {
-            const logineRes = await axios.post(`${BASE_URL}/${type}/login`, payload);
+            const logineRes = await axios.post(`${BASE_URL}/${type}/register`, payload);
             console.log("login  res:::::::::", logineRes?.data);
-            if (logineRes?.status === 200) {
-                setAuthToken(logineRes?.data?.token);
-                if (type === 'vendor') {
-                    console.log('into vendor LOGG');
-                    dispatch(getLoginUserId(true));
-                    dispatch(getCurrentLoggedInVendorMobileNum(phoneNumber));
-                    storeVendorDeviceToken();
-                    storeVendorAuthToken(logineRes?.data?.token)
-                    navigation.navigate('Home');
-                } else {
-                    console.log('into USER LOGG');
-                    storeUserDeviceToken();
-                    dispatch(getLoginUserId(false));
-                    dispatch(getCurrentLoggedInUserMobileNum(phoneNumber));
-                    storeUserAuthToken(logineRes?.data?.token);
-                    navigation.navigate('Home');
-                }
+            if (logineRes?.data?.message) {
+                // setAuthToken(logineRes?.data?.token);
+                // if (type === 'vendor') {
+                    Alert.alert(
+                        "Registration Status",
+                        logineRes?.data?.message,
+                        [
+                            {
+                                text: "Ok",
+                                onPress: () => {navigation.goBack()},
+                                // style: "cancel"
+                            },
+                        ],
+                        { cancelable: false }
+                    );
             }
         } catch (error) {
-            console.error("Error during login:", error);
+            console.error("Error during register:", error);
         }
 
     }
@@ -133,55 +90,50 @@ const LoginScreen = ({ route }) => {
         <SafeAreaView style={styles.container}>
             <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1, paddingHorizontal: 20 }}>
 
-                <Text style={styles.title}>Welcome!</Text>
+                <Text style={styles.title}>Register Here!</Text>
                 <Text style={styles.subtitle}>
-                    Connect to your 'Booktheday' account to explore local rental opportunities.
+                    Register here,Connect to your 'Booktheday' account to explore local rental opportunities.
                 </Text>
 
-                {/* <Text style={styles.textLabel}>Full Name*</Text>
+                <Text style={styles.textLabel}>Full Name*</Text>
 
                 <TextInput
                     style={styles.input}
                     placeholder="your name"
                     value={fullName}
                     onChangeText={setFullName}
-                /> */}
-                {/* //<Text style={styles.textLabel}>Email Address</Text> */}
+                />
+                <Text style={styles.textLabel}>Email Address</Text>
 
-                {/* <TextInput
+                <TextInput
                     style={styles.input}
                     placeholder="your email id"
                     value={email}
                     onChangeText={setEmail}
-                /> */}
+                />
                 <Text style={styles.textLabel}>Phone Number*</Text>
 
                 <TextInput
                     style={styles.input}
-                    placeholder="Enter Mobile Number"
+                    placeholder="+91 9343467389"
                     value={phoneNumber}
                     onChangeText={setPhoneNumber}
                     keyboardType="phone-pad"
                 />
-                {adminMobileNums.includes(phoneNumber) ?
-                    <>
-                        <Text style={styles.textLabel}>Password*</Text>
-                        <TextInput
+                    <> 
+                    <Text style={styles.textLabel}>Password*</Text>
+                    <TextInput
                             style={styles.input}
                             placeholder="Enter Password"
                             value={password}
                             onChangeText={setPassword}
                         />
-                        <TouchableOpacity onPress={() => navigation.navigate('UserAndVendorRegister',{type:type})}>
-                            <Text>Not having an account? Register</Text>
-                        </TouchableOpacity>
                     </>
-                    :
-                    null}
 
-                {/* <View style={styles.checkboxContainer}>
+
+                <View style={styles.checkboxContainer}>
                     <Text style={styles.checkboxLabel}>Terms And Conditions</Text>
-                </View> */}
+                </View>
 
                 <CustomModal
                     visible={fieldsCheckModalVisible}
@@ -197,12 +149,7 @@ const LoginScreen = ({ route }) => {
                             if (!phoneNumber) {
                                 setFieldsCheckModalVisible(true);
                             } else {
-                                getAdminNumbers();
-                                // if (phoneNumber == "9381491508") {
-                                //     getCheckUserValidation()
-                                // } else {
-                                //     navigation.navigate('OtpValidation', { mobileNumber: phoneNumber, loginType: type })
-                                // }
+                                    getCheckUserValidation()
                             }
                         }}
                         text={'Submit'}
@@ -285,4 +232,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default LoginScreen;
+export default UserAndVendorRegister;

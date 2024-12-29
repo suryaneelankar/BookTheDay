@@ -56,6 +56,7 @@ import VendorTermsAndCond from "../screens/VendorScreens/VendorProfile/VendorTer
 import VendorRefundPolicy from "../screens/VendorScreens/VendorProfile/VendorRefundPolicy";
 import TermsAndConditionsScreen from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
 import UserOTPScreen from "../screens/LandingScreen/UserOTPScreen";
+import UserAndVendorRegister from "../screens/LandingScreen/UserAndVendorRegister";
 
 const MainNavigation = () => {
 
@@ -108,6 +109,13 @@ const MainNavigation = () => {
                     }}
                 />
                 <Stack.Screen
+                    name="UserAndVendorRegister"
+                    component={UserAndVendorRegister}
+                    options={{
+                        headerShown: false,
+                    }}
+                />
+                <Stack.Screen
                     name="OtpValidation"
                     component={OtpValidation}
                     options={{
@@ -123,7 +131,7 @@ const MainNavigation = () => {
                 }} />
                 <Stack.Screen name="ViewEvents" component={ViewEvents} options={{ headerShown: true }} />
 
-               
+
                 <Stack.Screen
                     name="EditProfile"
                     component={EditProfile}
@@ -140,7 +148,7 @@ const MainNavigation = () => {
                         headerShown: true,
                     }}
                 />
-               
+
                 <Stack.Screen
                     name="ViewCatDetails"
                     component={ViewCatDetails}
@@ -165,7 +173,7 @@ const MainNavigation = () => {
                         headerShown: true,
                     }}
                 />
-                 <Stack.Screen
+                <Stack.Screen
                     name="EditAddFoodCatering"
                     component={EditAddFoodCatering}
                     options={{
@@ -173,7 +181,7 @@ const MainNavigation = () => {
                         headerShown: true,
                     }}
                 />
-                 <Stack.Screen
+                <Stack.Screen
                     name="EditAddFoodCateringGeneral"
                     component={EditAddFoodCateringGeneral}
                     options={{
@@ -229,7 +237,7 @@ const MainNavigation = () => {
                         headerShown: true,
                     }}
                 />
-               
+
                 <Stack.Screen
                     name="LocationAdded"
                     component={LocationAdded}
@@ -278,7 +286,7 @@ const MainNavigation = () => {
                         headerShown: true,
                     }}
                 />
-                 <Stack.Screen
+                <Stack.Screen
                     name="NearByFoodCaterings"
                     component={NearByFoodCaterings}
                     options={{
@@ -286,7 +294,7 @@ const MainNavigation = () => {
                         headerShown: true,
                     }}
                 />
-                 <Stack.Screen
+                <Stack.Screen
                     name="AboutUsScreen"
                     component={AboutUsScreen}
                     options={{
@@ -302,7 +310,7 @@ const MainNavigation = () => {
                         headerShown: true,
                     }}
                 />
-                 <Stack.Screen
+                <Stack.Screen
                     name="VendorRefundPolicy"
                     component={VendorRefundPolicy}
                     options={{
@@ -335,7 +343,7 @@ const MainNavigation = () => {
                     header: () => <NavigationHeader Icon={true} title="Request Details" />,
                     headerShown: true,
                 }} />
-               
+
 
 
                 <Stack.Screen name="RentOnProducts" component={RentOnProducts} options={{ header: () => <NavigationHeader Icon={true} title="Give on Rent" />, headerShown: true }} />
@@ -344,7 +352,7 @@ const MainNavigation = () => {
                     header: () => <NavigationHeader Icon={true} title="Give on Rent" />,
                     headerShown: true,
                 }} />
-               
+
 
                 <Stack.Screen name="AddFoodCatering" component={AddFoodCatering} options={{
                     header: () => <NavigationHeader Icon={true} title="Food Catering" />,

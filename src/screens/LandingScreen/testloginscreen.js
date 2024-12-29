@@ -5,11 +5,9 @@ import BookDatesButton from '../../components/GradientButton';
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL from '../../apiconfig';
 import axios from 'axios';
-import { getCurrentLoggedInVendorMobileNum, getCurrentLoggedInUserMobileNum, getLoginUserId } from '../../../redux/actions';
+import { getCurrentLoggedInVendorMobileNum,getCurrentLoggedInUserMobileNum, getLoginUserId } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { storeUserAuthToken, getVendorAuthToken, getUserAuthToken, storeVendorAuthToken } from '../../utils/StoreAuthToken';
-import themevariable from '../../utils/themevariable';
-import CustomModal from '../../components/AlertModal';
+import { storeUserAuthToken,getVendorAuthToken, getUserAuthToken,storeVendorAuthToken } from '../../utils/StoreAuthToken';
 
 const LoginScreen = ({ route }) => {
     const { type } = route.params;
@@ -17,17 +15,13 @@ const LoginScreen = ({ route }) => {
     const [email, setEmail] = useState('');
     const navigation = useNavigation();
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [adminPhoneNumber, setAdminPhoneNumber] = useState('');
     const [password, setPassword] = useState('');
     const [authToken, setAuthToken] = useState('');
     const dispatch = useDispatch();
     const selectedMode = useSelector((state) => state.userId);
     const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
-    console.log("selected mode::::::::;;", selectedMode, type);
-    console.log('deviceFCMToken is::>>', deviceFCMToken)
-    const [fieldsCheckModalVisible, setFieldsCheckModalVisible] = useState(false);
-    const [adminMobileNums,setAdminMobileNums] = useState([]);
-
+    console.log("selected mode::::::::;;", selectedMode,type);
+    console.log('deviceFCMToken is::>>',deviceFCMToken)
 
     // console.log('user auth token is::>>',getVendorAuthToken());
 
@@ -40,10 +34,10 @@ const LoginScreen = ({ route }) => {
         const token = await getUserAuthToken();
         console.log("LOgin screen sycan", token)
         try {
-            const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload, {
+            const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload,{
                 headers: {
                     Authorization: `Bearer ${token}`,
-                },
+                  },
             });
             // console.log("userTokenRes  res:::::::::", userTokenRes);
             if (userTokenRes?.status === 200) {
@@ -62,36 +56,19 @@ const LoginScreen = ({ route }) => {
         console.log("payload is:::::::", payload, type);
         const token = await getVendorAuthToken();
         try {
-            const vendorTokenRes = await axios.post(`${BASE_URL}/addVendorFCMToken`, payload, {
+            const vendorTokenRes = await axios.post(`${BASE_URL}/addVendorFCMToken`, payload,{
                 headers: {
                     Authorization: `Bearer ${token}`,
-                },
+                  },
             });
             console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
             if (vendorTokenRes?.status === 200) {
-
+               
             }
         } catch (error) {
             console.error("Error during add vendor token:", error);
         }
     }
-
-    const getAdminNumbers = async () => {
-        try {
-            const response = await axios.get(`${BASE_URL}/get/adminNumbers`);
-            const adminNumbers = response?.data;
-           if(adminNumbers){
-            setAdminMobileNums(adminNumbers?.data);
-            if (phoneNumber.includes(adminNumbers?.data)) {
-                getCheckUserValidation()
-            } else {
-                navigation.navigate('OtpValidation', { mobileNumber: phoneNumber, loginType: type })
-            }
-           }
-        } catch (error) {
-            console.error('Error fetching food items:', error);
-        }
-    };
 
     const getCheckUserValidation = async () => {
 
@@ -138,74 +115,51 @@ const LoginScreen = ({ route }) => {
                     Connect to your 'Booktheday' account to explore local rental opportunities.
                 </Text>
 
-                {/* <Text style={styles.textLabel}>Full Name*</Text>
+                <Text style={styles.textLabel}>Full Name*</Text>
 
                 <TextInput
                     style={styles.input}
                     placeholder="your name"
                     value={fullName}
                     onChangeText={setFullName}
-                /> */}
-                {/* //<Text style={styles.textLabel}>Email Address</Text> */}
+                />
+                <Text style={styles.textLabel}>Email Address</Text>
 
-                {/* <TextInput
+                <TextInput
                     style={styles.input}
                     placeholder="your email id"
                     value={email}
                     onChangeText={setEmail}
-                /> */}
+                />
                 <Text style={styles.textLabel}>Phone Number*</Text>
 
                 <TextInput
                     style={styles.input}
-                    placeholder="Enter Mobile Number"
+                    placeholder="+91 9343467389"
                     value={phoneNumber}
                     onChangeText={setPhoneNumber}
                     keyboardType="phone-pad"
                 />
-                {adminMobileNums.includes(phoneNumber) ?
-                    <>
-                        <Text style={styles.textLabel}>Password*</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Enter Password"
-                            value={password}
-                            onChangeText={setPassword}
-                        />
-                        <TouchableOpacity onPress={() => navigation.navigate('UserAndVendorRegister',{type:type})}>
-                            <Text>Not having an account? Register</Text>
-                        </TouchableOpacity>
-                    </>
-                    :
-                    null}
+                <Text style={styles.textLabel}>Password*</Text>
 
-                {/* <View style={styles.checkboxContainer}>
-                    <Text style={styles.checkboxLabel}>Terms And Conditions</Text>
-                </View> */}
-
-                <CustomModal
-                    visible={fieldsCheckModalVisible}
-                    message={'Please fill all fields'}
-                    onClose={() => setFieldsCheckModalVisible(false)}
+                <TextInput
+                    style={styles.input}
+                    placeholder="Enter Password"
+                    value={password}
+                    onChangeText={setPassword}
                 />
+
+
+                <View style={styles.checkboxContainer}>
+                    <Text style={styles.checkboxLabel}>Terms And Conditions</Text>
+                </View>
 
                 <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
 
                     <BookDatesButton
-                        // onPress={() => getCheckUserValidation()}
-                        onPress={() => {
-                            if (!phoneNumber) {
-                                setFieldsCheckModalVisible(true);
-                            } else {
-                                getAdminNumbers();
-                                // if (phoneNumber == "9381491508") {
-                                //     getCheckUserValidation()
-                                // } else {
-                                //     navigation.navigate('OtpValidation', { mobileNumber: phoneNumber, loginType: type })
-                                // }
-                            }
-                        }}
-                        text={'Submit'}
+                        onPress={() => getCheckUserValidation()}
+                        // onPress={() => navigation.navigate('OtpValidation')}
+                        text={'Create Account'}
                         padding={10}
                     />
                 </View>
@@ -249,7 +203,6 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginBottom: 15,
         paddingHorizontal: 10,
-        color: themevariable.Color_000000
     },
     checkboxContainer: {
         flexDirection: 'row',
@@ -258,9 +211,9 @@ const styles = StyleSheet.create({
     },
     checkboxLabel: {
         marginLeft: 10,
-        color: "#666666",
-        fontSize: 12,
-        fontWeight: "400",
+        color:"#666666",
+        fontSize:12,
+        fontWeight:"400",
         fontFamily: 'ManropeRegular',
 
     },
