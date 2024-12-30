@@ -54,7 +54,7 @@ const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
     const [address, setAddress] = useState('');
     const userLocationFetched = useSelector((state) => state.userLocation);
-    console.log("userLocationFetched home :::::", userLocationFetched)
+    // console.log("userLocationFetched home :::::", userLocationFetched)
     const userLoggedInMobileNumber = useSelector((state) => state.userLoggedInMobileNum);
     const dispatch = useDispatch();
     const [eventsData, setEventsData] = useState([]);
@@ -168,7 +168,7 @@ const HomeDashboard = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log("Funtional halls BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+            // console.log("Funtional halls BOOKINGS RES:::::::::", JSON.stringify(response?.data))
             const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved").length;
 
             setHallsBookings(countApproved);
@@ -193,7 +193,7 @@ const HomeDashboard = () => {
                 },
             });
             dispatch(getCurrentLoggedInUserName(response?.data?.data?.fullName));
-            console.log("profile user res:::", response?.data);
+            // console.log("profile user res:::", response?.data);
 
         } catch (error) {
             console.log("profile::::::::::", error);
@@ -228,7 +228,7 @@ const HomeDashboard = () => {
             });
 
             const newCateringsData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            console.log('resp is caterings ::>>>', JSON.stringify(response?.data?.data));
+            // console.log('resp is caterings ::>>>', JSON.stringify(response?.data?.data));
             setCateringsData(response?.data?.data);
 
         } catch (error) {
@@ -283,7 +283,7 @@ const HomeDashboard = () => {
                 }
 
                 const data = await response.json();
-                console.log("address in home::::::", JSON.stringify(data));
+                // console.log("address in home::::::", JSON.stringify(data));
                 setAddress(data?.results[0]?.formatted_address);
                 dispatch(getUserLocation(data?.results[0]));
                 dispatch(setUserCurrentLocation(data?.results[0]));

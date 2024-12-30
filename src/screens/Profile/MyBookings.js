@@ -104,7 +104,7 @@ const ViewMyBookings = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Funtional halls BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+      // console.log("Funtional halls BOOKINGS RES:::::::::", JSON.stringify(response?.data))
       setHallsBookings(response?.data?.data)
     } catch (error) {
       console.log("My Bookings data error>>::", error);

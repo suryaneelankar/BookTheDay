@@ -19,10 +19,10 @@ import RazorpayCheckout from 'react-native-razorpay';
 
 const App = () => {
 
-  console.log = () => { };
-  console.info = () => { };
-  console.debug = () => { };
-  console.warn = () => { };
+  // console.log = () => { };
+  // console.info = () => { };
+  // console.debug = () => { };
+  // console.warn = () => { };
   console.error = () => { };
 
   useEffect(() => {

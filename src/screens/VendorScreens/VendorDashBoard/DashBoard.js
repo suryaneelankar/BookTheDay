@@ -298,7 +298,7 @@ const VendorDashBoardTab = ({ navigation }) => {
 
     const renderVendorList = async ({ item }) => {
         const token = await getVendorAuthToken();
- 
+
         const convertedImageUrl = item?.productImage !== undefined ? item?.productImage.replace('localhost', LocalHostUrl) : item?.productImage;
         return (
             <TouchableOpacity
@@ -314,7 +314,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                         }}
                     />
                     <Text style={styles.productName}>{capitalizeFirstLetters(item?.productName)}</Text>
-                    <View style={{flexDirection:"row",justifyContent:"space-between",marginHorizontal:5}}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 5 }}>
                         <Text style={[styles.productListedName, { color: item?.available ? '#57A64F' : '#EF0000', backgroundColor: item?.available ? '#45FE3529' : '#FE353529' }]}>{item?.available ? 'Listed' : 'Not Listed'}</Text>
                         <Switch
                             trackColor={{ false: '#EF0000', true: '#e8e46b' }}
@@ -518,7 +518,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                     <ProfileIcon style={{}} />
                     <View>
                         <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular', textTransform: "capitalize" }}>Hi, {vendorLoggedInName}</Text>
-                        <Text style={{ fontFamily: 'LeagueSpartanRegular',color:themevariable.Color_000000, }}>+91 {vendorLoggedInMobileNum}</Text>
+                        <Text style={{ fontFamily: 'LeagueSpartanRegular', color: themevariable.Color_000000, }}>+91 {vendorLoggedInMobileNum}</Text>
                     </View>
                     <TouchableOpacity onPress={() => navigation.navigate('AdminDashboard')}>
                         <ProfileIcon />
@@ -540,9 +540,18 @@ const VendorDashBoardTab = ({ navigation }) => {
 
                 </LinearGradient>
                 <ScrollView>
+
                     {clothJewelBookingsData?.length || functionHallBookingsData?.length || cateringsBookingsData?.length ?
                         <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Recent Request</Text>
-                        : null}
+                        : <View style={styles.suggestionBox}>
+                            <Text style={styles.suggestionTitle}>Add Your Listings Now!</Text>
+                            <Text style={styles.suggestionText}>
+                                Start renting out your properties and increase your earnings today. Add listings for your rentals and attract potential customers easily.
+                            </Text>
+                            <TouchableOpacity style={styles.ctaButton} onPress={() => navigation.navigate('VendorHome')}>
+                                <Text style={styles.ctaButtonText}>Add Listing</Text>
+                            </TouchableOpacity>
+                        </View>}
                     <View >
                         {clothJewelBookingsData?.length ?
                             <>
@@ -629,7 +638,7 @@ const styles = StyleSheet.create({
         textAlign: "left",
         justifyContent: "flex-start",
         padding: 5,
-        borderRadius:5
+        borderRadius: 5
     },
     price: {
         color: themevariable.Color_202020,
@@ -640,7 +649,35 @@ const styles = StyleSheet.create({
         marginHorizontal: 5,
         margin: 5
     },
-
+    suggestionBox: {
+        backgroundColor: '#FFF5E1',
+        borderRadius: 10,
+        padding: 16,
+        marginTop: 20,
+        alignItems: 'center',
+    },
+    suggestionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 8,
+    },
+    suggestionText: {
+        fontSize: 14,
+        color: '#555',
+        textAlign: 'center',
+        marginBottom: 16,
+    },
+    ctaButton: {
+        backgroundColor: '#FFA726',
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 8,
+    },
+    ctaButtonText: {
+        color: '#FFF',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
 
 })
 

@@ -20,8 +20,8 @@ const LoginScreen = ({ route }) => {
     const dispatch = useDispatch();
     const selectedMode = useSelector((state) => state.userId);
     const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
-    console.log("selected mode::::::::;;", selectedMode,type);
-    console.log('deviceFCMToken is::>>',deviceFCMToken)
+    // console.log("selected mode::::::::;;", selectedMode,type);
+    // console.log('deviceFCMToken is::>>',deviceFCMToken)
 
     // console.log('user auth token is::>>',getVendorAuthToken());
 
@@ -30,9 +30,9 @@ const LoginScreen = ({ route }) => {
             mobileNumber: String(phoneNumber),
             fcmToken: deviceFCMToken
         }
-        console.log("payload is:::::::", payload, type);
+        // console.log("payload is:::::::", payload, type);
         const token = await getUserAuthToken();
-        console.log("LOgin screen sycan", token)
+        // console.log("LOgin screen sycan", token)
         try {
             const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload,{
                 headers: {
@@ -53,7 +53,7 @@ const LoginScreen = ({ route }) => {
             mobileNumber: String(phoneNumber),
             fcmToken: deviceFCMToken
         }
-        console.log("payload is:::::::", payload, type);
+        // console.log("payload is:::::::", payload, type);
         const token = await getVendorAuthToken();
         try {
             const vendorTokenRes = await axios.post(`${BASE_URL}/addVendorFCMToken`, payload,{
@@ -61,7 +61,7 @@ const LoginScreen = ({ route }) => {
                     Authorization: `Bearer ${token}`,
                   },
             });
-            console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
+            // console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
             if (vendorTokenRes?.status === 200) {
                
             }

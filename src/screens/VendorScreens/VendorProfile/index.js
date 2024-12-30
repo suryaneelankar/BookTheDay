@@ -15,11 +15,11 @@ import LinkBgm from '../../../assets/profilesvgs/linkBgm.svg';
 import CrossIcon from '../../../assets/profilesvgs/orangeCross.svg';
 import { moderateScale } from '../../../utils/scalingMetrics';
 import LogOutIcon from '../../../assets/svgs/logOutIcon.svg';
-import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
+import { getVendorAuthToken, removeUserAuthToken } from '../../../utils/StoreAuthToken';
 import axios from 'axios';
 import BASE_URL from '../../../apiconfig';
 import { useSelector, useDispatch } from 'react-redux';
-import { getLoginUserId } from '../../../../redux/actions';
+import { checkIsTokenStored, getLoginUserId } from '../../../../redux/actions';
 import ProfileDefaultIcon from 'react-native-vector-icons/EvilIcons';
 
 
@@ -83,7 +83,7 @@ const VendorProfile = () => {
         <LinearGradient start={{ x: 1, y: 0 }} end={{ x: 1, y: 1 }} colors={['#FFF3CD', '#FFDB7E', '#FFDB7E', '#FFDB7E']} style={{ flex: 1 }}>
             <View style={styles.profileContainer}>
                 <View style={styles.profileImageContainer}>
-                <ProfileDefaultIcon name='user' size={90}/>
+                    <ProfileDefaultIcon name='user' size={90} />
 
                 </View>
                 <Text style={styles.profileName}>{profileData?.fullName}</Text>
@@ -102,21 +102,19 @@ const VendorProfile = () => {
                     title="Update Bank Account"
                     onPress={() => navigation.navigate('BankDetailsScreen')}
                 />
-                <MenuItem 
-                    icon={<TransactionIcon />} 
-                    title="My Transaction" 
-                    onPress={() => navigation.navigate("MyTransactions")} 
+                <MenuItem
+                    icon={<TransactionIcon />}
+                    title="My Transaction"
+                    onPress={() => navigation.navigate("MyTransactions")}
                 />
 
-                <MenuItem icon={<AboutUsIcon />} title="About Us"  onPress={() => navigation.navigate('AboutUsScreen')}/>
-                <MenuItem icon={<TermsConditionIcon />} title="Terms & Condition"  onPress={() => navigation.navigate('VendorTermsAndCond')}/>
-                <MenuItem icon={<RefundPolicy />} title="Refund Policy"  onPress={ () => navigation.navigate('VendorRefundPolicy')}/>
+                <MenuItem icon={<AboutUsIcon />} title="About Us" onPress={() => navigation.navigate('AboutUsScreen')} />
+                <MenuItem icon={<TermsConditionIcon />} title="Terms & Condition" onPress={() => navigation.navigate('VendorTermsAndCond')} />
+                <MenuItem icon={<RefundPolicy />} title="Refund Policy" onPress={() => navigation.navigate('VendorRefundPolicy')} />
                 <MenuItem icon={<LogOutIcon />} title="Log Out"
-                    onPress={() => {
-                        [
-                            dispatch(getLoginUserId('')),
-                            navigation.navigate('LandingScreen')
-                        ]
+                    onPress={async () => {
+                        dispatch(checkIsTokenStored(false));
+                        await removeUserAuthToken();
                     }} />
 
             </ScrollView>
@@ -175,15 +173,15 @@ const VendorProfile = () => {
                         <View style={styles.shareButtons}>
                             <TouchableOpacity style={styles.shareButton} onPress={() => shareLink('airdrop')}>
                                 {/* <Icon name="share-social-outline" size={30} color="blue" /> */}
-                                <Text style={{color:themevariable.Color_000000,}}>AirDrop</Text>
+                                <Text style={{ color: themevariable.Color_000000, }}>AirDrop</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.shareButton} onPress={() => shareLink('messages')}>
                                 {/* <Icon name="chatbubble-outline" size={30} color="green" /> */}
-                                <Text style={{color:themevariable.Color_000000,}}>Messages</Text>
+                                <Text style={{ color: themevariable.Color_000000, }}>Messages</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.shareButton} onPress={() => shareLink('whatsapp')}>
                                 {/* <Icon name="logo-whatsapp" size={30} color="green" /> */}
-                                <Text style={{color:themevariable.Color_000000,}}>WhatsApp</Text>
+                                <Text style={{ color: themevariable.Color_000000, }}>WhatsApp</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -218,7 +216,7 @@ const styles = StyleSheet.create({
     profileContainer: {
         alignItems: 'center',
         padding: 20,
-        alignSelf:"center"
+        alignSelf: "center"
     },
     profileImageContainer: {
         width: 80,
@@ -263,7 +261,7 @@ const styles = StyleSheet.create({
     },
     menuIcon: {
         fontSize: 24,
-        color:themevariable.Color_000000,
+        color: themevariable.Color_000000,
     },
     menuText: {
         fontSize: 16,
@@ -369,7 +367,7 @@ const styles = StyleSheet.create({
         //    borderBottomLeftRadius:8,
         padding: 5,
         width: '70%',
-        color:themevariable.Color_000000,
+        color: themevariable.Color_000000,
     },
     copiedText: {
         color: 'red',
@@ -379,7 +377,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         fontSize: 16,
         fontWeight: 'bold',
-        color:themevariable.Color_000000,
+        color: themevariable.Color_000000,
     },
     shareButtons: {
         flexDirection: 'row',

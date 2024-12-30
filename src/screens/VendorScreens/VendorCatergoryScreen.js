@@ -181,6 +181,18 @@ const VendorCategoryScreen = ({ navigation }) => {
         </TouchableOpacity>
     );
 
+    const renderCategoryItem = ({ item }) => (
+        <TouchableOpacity style={styles.categoryCard} onPress={() => alert(`${item.title} Clicked`)}>
+           <LinearGradient colors={['#FFF5E1', '#FFE2BA']} style={styles.iconContainer}>
+                <item.CatImg width={50} height={50} />
+            </LinearGradient>
+          <View style={styles.categoryDetails}>
+            <Text style={styles.categoryTitle}>{item.title}</Text>
+            <Text style={styles.categoryDescription}>{item.description}</Text>
+          </View>
+        </TouchableOpacity>
+      );
+
     return (
         <ScrollView style={styles.container}>
             <LinearGradient
@@ -220,6 +232,13 @@ const VendorCategoryScreen = ({ navigation }) => {
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={styles.listContainer}
                 />
+                <FlatList
+                    data={categoriesData}
+                    renderItem={renderCategoryItem}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={styles.listContainer}
+                    showsVerticalScrollIndicator={false}
+                />  
 
                 {/* Quick Tips */}
                 <View style={styles.quickTips}>
@@ -237,6 +256,42 @@ const VendorCategoryScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+
+    listContainer: {
+        paddingBottom: 20,
+      },
+      categoryCard: {
+        flexDirection: 'row',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 5,
+      },
+      categoryImage: {
+        width: 80,
+        height: 80,
+        borderRadius: 12,
+        marginRight: 16,
+      },
+      categoryDetails: {
+        flex: 1,
+        justifyContent: 'center',
+      },
+      categoryTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 4,
+      },
+      categoryDescription: {
+        fontSize: 14,
+        color: '#777',
+      },
     container: {
         flex: 1,
     },

@@ -92,7 +92,7 @@ const Caterings = () => {
             });
 
             const newCateringsData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            console.log('resp is caterings ::>>>', response?.data?.data);
+            // console.log('resp is caterings ::>>>', response?.data?.data);
             if (response?.data?.data?.length > 0) {
                 setCateringsData((prevData) => [...prevData, ...newCateringsData]); // Append new data
                 setCurrentPage(page);
