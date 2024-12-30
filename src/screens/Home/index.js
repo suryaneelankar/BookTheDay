@@ -232,7 +232,7 @@ const HomeDashboard = () => {
             setCateringsData(response?.data?.data);
 
         } catch (error) {
-            console.error('Error fetching food caterings:', error);
+            console.error('Error fetching user dashbaord', error);
         }
     };
 

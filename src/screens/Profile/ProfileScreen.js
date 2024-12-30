@@ -15,9 +15,9 @@ import LinkBgm from '../../assets/profilesvgs/linkBgm.svg';
 import CrossIcon from '../../assets/profilesvgs/orangeCross.svg';
 import { moderateScale } from '../../utils/scalingMetrics';
 import LogOutIcon from '../../assets/svgs/logOutIcon.svg';
-import { getLoginUserId } from '../../../redux/actions';
+import { checkIsTokenStored, getLoginUserId } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserAuthToken } from '../../utils/StoreAuthToken';
+import { getUserAuthToken, removeUserAuthToken } from '../../utils/StoreAuthToken';
 import axios from 'axios';
 import BASE_URL from '../../apiconfig';
 import ProfileDefaultIcon from 'react-native-vector-icons/EvilIcons';
@@ -47,7 +47,7 @@ const ProfileMainScreen = () => {
                   },
             });
             setProfileData(response?.data?.data);
-        console.log("profile user res:::", response);
+        // console.log("profile user res:::", response);
            
         } catch (error) {
             console.log("profile::::::::::", error);
@@ -109,10 +109,12 @@ const ProfileMainScreen = () => {
                 <MenuItem icon={<TermsConditionIcon />} title="Terms & Condition" onPress={() => navigation.navigate('TermsAndConditions')} />
                 <MenuItem icon={<RefundPolicy />} title="Refund Policy"  onPress={() => navigation.navigate('RefundPolicy')}/>
                 <MenuItem icon={<LogOutIcon />} title="Log Out" 
-                onPress={() => {[
-                    dispatch(getLoginUserId('')),
-                    navigation.navigate('LandingScreen')
-                ]}} />
+                onPress={async() => {
+                    // dispatch(getLoginUserId('')),
+                    // navigation.navigate('LandingScreen')
+                    dispatch(checkIsTokenStored(false));
+                    await removeUserAuthToken();
+                }} />
 
             </ScrollView>
 
@@ -364,7 +366,6 @@ const styles = StyleSheet.create({
     //    borderBottomLeftRadius:8,
         padding: 5,
         width: '70%',
-        color: themevariable.Color_000000
     },
     copiedText: {
         color: 'red',
