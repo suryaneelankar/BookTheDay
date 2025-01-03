@@ -29,7 +29,7 @@ import LandingScreen from "../screens/LandingScreen";
 import CateringsOverView from "../screens/Bookings/CateringsOverView";
 import LoginScreen from "../screens/LandingScreen/LoginScreen";
 import OtpValidation from "../screens/LandingScreen/OtpValidation";
-import { checkIsTokenStored, getDeviceFCMToken, getLoginUserId } from "../../redux/actions";
+import { checkIsTokenStored, getCurrentLoggedInUserMobileNum, getCurrentLoggedInVendorMobileNum, getDeviceFCMToken, getLoginUserId } from "../../redux/actions";
 import messaging from '@react-native-firebase/messaging';
 import AadharUpload from "../screens/KYC/AadharUpload";
 import BankDetailsScreen from "../screens/VendorScreens/VendorProfile/BankDetails";
@@ -47,7 +47,7 @@ import VendorTersmAndCond from "../screens/VendorScreens/VendorProfile/VendorTer
 import VendorTermsAndCond from "../screens/VendorScreens/VendorProfile/VendorTermsAndCond";
 import VendorRefundPolicy from "../screens/VendorScreens/VendorProfile/VendorRefundPolicy";
 import TermsAndConditionsScreen from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
-import { getUserAuthToken, getVendorAuthToken } from "../utils/StoreAuthToken";
+import { getUserAuthToken, getUserMobileNumber, getVendorAuthToken, getVendorMobileNumber } from "../utils/StoreAuthToken";
 
 const MainNavigation = () => {
 
@@ -68,6 +68,8 @@ const MainNavigation = () => {
         dispatch(getDeviceFCMToken(fcmToken));
         const userToken = await getUserAuthToken();
         const vendorToken = await getVendorAuthToken();
+        const vendorMobileNumber = await getVendorMobileNumber();
+        const userMobileNumber = await getUserMobileNumber();
         console.log("user token for auto login is ::>>>>", userToken);
         console.log("vendorToken token for auto login is ::>>>>", vendorToken);
         console.log("switch tab id:::::::::::", switchtab);
@@ -78,13 +80,16 @@ const MainNavigation = () => {
         }
 
         console.log("checkIfAnyTokenStored is ::>>>",checkIfAnyTokenStored);
-        if(userToken){
-            dispatch(getLoginUserId(false));
-            return; 
-        }
         if(vendorToken){
             dispatch(getLoginUserId(true));
+            dispatch(getCurrentLoggedInVendorMobileNum(vendorMobileNumber));
             return;
+        }
+        if(userToken){
+            dispatch(getLoginUserId(false));
+            dispatch(getCurrentLoggedInUserMobileNum(userMobileNumber));
+
+            return; 
         }
     }
 
@@ -103,7 +108,8 @@ const MainNavigation = () => {
     };
 
     const AuthNavigator = () => (
-        <AuthStack.Navigator>
+        <AuthStack.Navigator 
+        initialRouteName="LandingScreen" >
             <Stack.Screen
                 name="LandingScreen"
                 component={LandingScreen}
@@ -132,7 +138,8 @@ const MainNavigation = () => {
     );
 
     const HomeNavigator = () => (
-        <HomeStack.Navigator>
+        <HomeStack.Navigator 
+        initialRouteName="Home" >
 
             <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
             <Stack.Screen name="ViewTrendingDetails" component={ViewTrendingDetails} options={{ headerShown: true }} />

@@ -4,8 +4,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import { moderateScale } from '../../utils/scalingMetrics';
 import { OTPWidget } from '@msg91comm/sendotp-react-native';
 import BASE_URL from '../../apiconfig';
-import { getCurrentLoggedInUserMobileNum, getCurrentLoggedInVendorMobileNum, getLoginUserId } from '../../../redux/actions';
-import { getUserAuthToken, getVendorAuthToken, storeUserAuthToken, storeVendorAuthToken } from '../../utils/StoreAuthToken';
+import { checkIsTokenStored, getCurrentLoggedInUserMobileNum, getCurrentLoggedInVendorMobileNum, getLoginUserId } from '../../../redux/actions';
+import { getUserAuthToken, getVendorAuthToken, storeUserAuthToken, storeVendorAuthToken, storeVendorMobileNumber } from '../../utils/StoreAuthToken';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 
@@ -157,19 +157,27 @@ const OtpValidation = ({ navigation, route }) => {
             if (logineRes?.status === 200) {
                 setAuthToken(logineRes?.data?.token);
                 if (loginType === 'vendor') {
-                    console.log('into vendor LOGG');
+                    console.log('into vendor LOGG',typeof mobileNumber);
+                    storeVendorDeviceToken();
                     dispatch(getLoginUserId(true));
                     dispatch(getCurrentLoggedInVendorMobileNum(mobileNumber));
-                    storeVendorDeviceToken();
-                    storeVendorAuthToken(logineRes?.data?.token)
-                    navigation.navigate('Home');
+                    storeVendorAuthToken(logineRes?.data?.token);
+                    if(logineRes?.data?.token){
+                        dispatch(checkIsTokenStored(true));
+                    }
+                    storeVendorMobileNumber(mobileNumber);
+
+                    // navigation.navigate('Home');
                 } else {
                     console.log('into USER LOGG');
                     storeUserDeviceToken();
                     dispatch(getLoginUserId(false));
                     dispatch(getCurrentLoggedInUserMobileNum(mobileNumber));
                     storeUserAuthToken(logineRes?.data?.token);
-                    navigation.navigate('Home');
+                    if(logineRes?.data?.token){
+                        dispatch(checkIsTokenStored(true));
+                    }
+                    // navigation.navigate('Home');
                 }
             }
         } catch (error) {

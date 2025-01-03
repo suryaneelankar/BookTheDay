@@ -17,7 +17,7 @@ import { moderateScale } from '../../utils/scalingMetrics';
 import LogOutIcon from '../../assets/svgs/logOutIcon.svg';
 import { checkIsTokenStored, getLoginUserId } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserAuthToken, removeUserAuthToken } from '../../utils/StoreAuthToken';
+import { getUserAuthToken, removeUserAuthToken, removeUserMobileNumber } from '../../utils/StoreAuthToken';
 import axios from 'axios';
 import BASE_URL from '../../apiconfig';
 import ProfileDefaultIcon from 'react-native-vector-icons/EvilIcons';
@@ -114,6 +114,7 @@ const ProfileMainScreen = () => {
                     // navigation.navigate('LandingScreen')
                     dispatch(checkIsTokenStored(false));
                     await removeUserAuthToken();
+                    await removeUserMobileNumber();
                 }} />
 
             </ScrollView>

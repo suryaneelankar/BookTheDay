@@ -15,7 +15,7 @@ import LinkBgm from '../../../assets/profilesvgs/linkBgm.svg';
 import CrossIcon from '../../../assets/profilesvgs/orangeCross.svg';
 import { moderateScale } from '../../../utils/scalingMetrics';
 import LogOutIcon from '../../../assets/svgs/logOutIcon.svg';
-import { getVendorAuthToken, removeUserAuthToken, removeVendorAuthToken } from '../../../utils/StoreAuthToken';
+import { getVendorAuthToken, removeUserAuthToken, removeVendorAuthToken, removeVendorMobileNumber } from '../../../utils/StoreAuthToken';
 import axios from 'axios';
 import BASE_URL from '../../../apiconfig';
 import { useSelector, useDispatch } from 'react-redux';
@@ -115,6 +115,7 @@ const VendorProfile = () => {
                     onPress={async () => {
                         dispatch(checkIsTokenStored(false));
                         await removeVendorAuthToken();
+                        await removeVendorMobileNumber();
                     }} />
 
             </ScrollView>
