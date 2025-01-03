@@ -194,7 +194,7 @@ const FoodMenu = ({ onSaveClick }) => {
             <Text style={styles.comboTitle}>Select veg/non-veg to add the combos.</Text>
             {RentalFoodTypeList()}
 
-            <Text style={[styles.label,{marginTop:15}]}>
+            <Text style={[styles.label, { marginTop: 15 }]}>
                 Combo Name <Text style={styles.asterisk}>*</Text>
             </Text>
 
@@ -215,7 +215,7 @@ const FoodMenu = ({ onSaveClick }) => {
                         data={category.items}
                         labelField="name"
                         valueField="name"
-                        selectedStyle={{ backgroundColor: '#FD813B' }}
+                        selectedStyle={{ backgroundColor: '#FFF3CD',borderRadius:10,borderColor:"#666666",borderWidth:1 }}
                         placeholder={`Select ${category.category}`}
                         value={selectedItemsByCategory[category.category] || []}
                         onChange={(items) => handleCategorySelection(category.category, items)}
@@ -223,6 +223,30 @@ const FoodMenu = ({ onSaveClick }) => {
                         placeholderStyle={styles.placeholderStyle}
                         search
                         searchPlaceholder={`Search ${category.category.toLowerCase()}...`}
+                        searchPlaceholderTextColor='#333333'
+                        itemTextStyle={{ color: "#333333",backgroundColor:"#fff9e7" }}
+                        containerStyle={{ borderColor: "lightgray", borderWidth: 1, borderRadius: 10, }}
+                        // itemContainerStyle={{backgroundColor:"#fff9e7"}}
+                        renderItem={(item) => {
+                            const isSelected = selectedItemsByCategory[category.category]?.includes(item.name);
+                            return (
+                                <View
+                                    style={[
+                                        styles.itemContainerDropdown,
+                                        isSelected && styles.selectedItemContainerDropDown, // Apply red background if selected
+                                    ]}
+                                >
+                                    <Text
+                                        style={[
+                                            styles.itemTextdropDown,
+                                            isSelected && styles.selectedItemTextdropDown, // Change text color if selected
+                                        ]}
+                                    >
+                                        {item?.name}
+                                    </Text>
+                                </View>
+                            );
+                        }}
                     />
                 </View>
             ))}
@@ -250,8 +274,8 @@ const FoodMenu = ({ onSaveClick }) => {
                 keyboardType="numeric"
             />
 
-            <Text style={[styles.label,{marginTop:10}]}>
-               Minimum Orders <Text style={styles.asterisk}>*</Text>
+            <Text style={[styles.label, { marginTop: 10 }]}>
+                Minimum Orders <Text style={styles.asterisk}>*</Text>
             </Text>
 
             <TextInput
@@ -366,23 +390,24 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     selectedItem: {
-        borderColor: 'gray',
+        borderColor: '#666666',
         borderWidth: 0.5,
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 5,
-        paddingHorizontal: 8
+        paddingHorizontal: 8,
+        borderRadius:10
     },
     placeholderStyle: {
         fontFamily: 'ManropeRegular',
         fontWeight: '500',
-        color: "gray",
+        color: "#333333",
         fontSize: 14,
     },
     selectedText: {
         fontFamily: 'ManropeRegular',
         fontWeight: '500',
-        color: "black",
+        color: "#333333",
         fontSize: 14,
     },
     crossIcon: {
@@ -418,7 +443,7 @@ const styles = StyleSheet.create({
         borderColor: themevariable.Color_C8C8C6,
         paddingHorizontal: 12,
         borderRadius: 4,
-        color:themevariable.Color_000000,
+        color: themevariable.Color_000000,
     },
     iconButton: {
         marginHorizontal: 5,
@@ -441,6 +466,21 @@ const styles = StyleSheet.create({
     asterisk: {
         color: 'red',
     },
+    itemContainerDropdown: {
+        padding: 15,
+        backgroundColor: '#fff9e7', 
+      },
+      selectedItemContainerDropDown: {
+        backgroundColor: '#FFF3CD', // Background for selected items
+      },
+      itemTextdropDown: {
+        color: '#333333',
+        fontSize:15
+      },
+      selectedItemTextdropDown: {
+        color: '#333333', 
+        fontSize:15
+      },
 });
 
 export default FoodMenu;
