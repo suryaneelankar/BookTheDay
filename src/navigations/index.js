@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import UserTabs from "./UserTabs";
@@ -48,6 +48,7 @@ import VendorTermsAndCond from "../screens/VendorScreens/VendorProfile/VendorTer
 import VendorRefundPolicy from "../screens/VendorScreens/VendorProfile/VendorRefundPolicy";
 import TermsAndConditionsScreen from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
 import { getUserAuthToken, getUserMobileNumber, getVendorAuthToken, getVendorMobileNumber } from "../utils/StoreAuthToken";
+import { ActivityIndicator, View } from "react-native";
 
 const MainNavigation = () => {
 
@@ -57,10 +58,11 @@ const MainNavigation = () => {
     const switchtab = useSelector((state) => state.userId);
     const checkIfAnyTokenStored = useSelector((state) => state.checkStoredToken);
     const dispatch = useDispatch();
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         getToken();
-    }, [checkIfAnyTokenStored,switchtab]);
+    }, [checkIfAnyTokenStored,switchtab,loading]);
 
     const getToken = async () => {
         const fcmToken = await messaging().getToken();
@@ -75,8 +77,12 @@ const MainNavigation = () => {
         console.log("switch tab id:::::::::::", switchtab);
         if(userToken || vendorToken){
             dispatch(checkIsTokenStored(true));
+            setLoading(false);
+
         }else{
             dispatch(checkIsTokenStored(false));
+            setLoading(false);
+
         }
 
         console.log("checkIfAnyTokenStored is ::>>>",checkIfAnyTokenStored);
@@ -357,6 +363,14 @@ const MainNavigation = () => {
 
         </HomeStack.Navigator>
     );
+
+    if (loading) {
+        return (
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <ActivityIndicator size="large" color="#FD813B" />
+            </View>
+        );
+    }
 
     return (
         <NavigationContainer>
