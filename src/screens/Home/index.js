@@ -62,6 +62,7 @@ const HomeDashboard = () => {
     const dispatch = useDispatch();
     const [eventsData, setEventsData] = useState([]);
     const [nearByEventsData, setNearByEventsData] = useState([]);
+    const [nearbyCateringsData, setNearByCateringsData] = useState([]);
     const [cateringsData, setCateringsData] = useState([]);
 
     const [discountProducts, setDiscountProducts] = useState([]);
@@ -121,6 +122,7 @@ const HomeDashboard = () => {
     useFocusEffect(
         useCallback(() => {
             getNearByEvents();
+            getNearByCaterings();
             // Cleanup function to run when the screen loses focus
             return () => {
                 console.log('Screen is unfocused');
@@ -147,6 +149,24 @@ const HomeDashboard = () => {
             console.error('Error fetching function halls:', error);
         }
     };
+
+    const getNearByCaterings = async () => {
+        const token = await getUserAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/getNearByFoodCaterings?latitude=${latitude}&longitude=${longitude}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            // console.log("nearby caterings:::;;;", response?.data?.data)
+            const newCaterings = Array.isArray(response?.data?.data) ? response?.data?.data : [];
+            if (response?.data?.data?.length > 0) {
+                setNearByCateringsData(newCaterings); // Append new data
+            }
+        } catch (error) {
+            console.error('Error fetching function halls:', error);
+        }
+    }
 
     const getMyBookings = async () => {
         const token = await getUserAuthToken();
@@ -449,7 +469,7 @@ const HomeDashboard = () => {
                             <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.seatingCapacity} pax</Text>
                         </View>
                         {item?.distance ?
-                            <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10,marginHorizontal:5, paddingVertical: 5, alignItems: "center" }}>
+                            <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, marginHorizontal: 5, paddingVertical: 5, alignItems: "center" }}>
                                 <DistanceIcon />
                                 <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>{item?.distance?.toFixed(1)}  km</Text>
                             </View>
@@ -461,7 +481,7 @@ const HomeDashboard = () => {
                             <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
 
                                 <Text style={{}}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
-                                <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
+                                <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'veg' ? 'VEG' : 'NON-VEG'}</Text>
                             </View>
                             : null}
                     </View>
@@ -499,9 +519,15 @@ const HomeDashboard = () => {
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: "60%", padding: 5, marginBottom: 5 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 5 }}>
+                            {item?.distance ?
+                                <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 5, paddingVertical: 5, marginHorizontal: 10, alignItems: "center" }}>
+                                    <DistanceIcon />
+                                    <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>{item?.distance.toFixed(1)}  km</Text>
+                                </View>
+                                : null}
                             <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center", paddingVertical: 5 }}>
                                 <Text>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
-                                <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
+                                <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'veg' ? 'VEG' : 'NON-VEG'}</Text>
                             </View>
                         </View>
 
@@ -709,6 +735,21 @@ const HomeDashboard = () => {
                     />
 
                 </View>
+
+                {nearbyCateringsData?.length > 0 ?
+                    <>
+                        <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: horizontalScale(20) }}>
+                            <Text style={styles.onDemandTextStyle}>Caterings Near You..</Text>
+                        </View>
+
+                        <FlatList
+                            data={nearbyCateringsData}
+                            renderItem={renderCaterings}
+                            horizontal
+                            keyExtractor={(item) => item?._id}
+                            showsHorizontalScrollIndicator={false}
+                        />
+                    </> : null}
 
                 {newlyAddedProducts?.length ?
                     <View style={{}}>
