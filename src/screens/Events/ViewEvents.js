@@ -3,7 +3,7 @@ import { Text, View, Image, StyleSheet, Dimensions, ScrollView, Button, Touchabl
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import axios from "axios";
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
-import {  verticalScale} from "../../utils/scalingMetrics";
+import { verticalScale } from "../../utils/scalingMetrics";
 import { Calendar } from 'react-native-calendars';
 import moment from 'moment';
 import MapMarkIcon from '../../assets/svgs/orangeMapMark.svg';
@@ -26,6 +26,9 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
+import ImageZoom from 'react-native-image-pan-zoom';
+import FastImage from "react-native-fast-image";
+import ZoomImage from "../../components/ZoomImage";
 
 
 const ViewEvents = ({ route, navigation }) => {
@@ -45,6 +48,10 @@ const ViewEvents = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const { categoryId } = route.params;
+
+  const [isCameraZoomImageModalVisible, setIsCameraZoomImageModalVisible] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   const HallDescription = 'Transform your special occasions into unforgettable memories with our exquisite function hall rentals! Whether you are hosting a grand wedding, a lively birthday bash, or a corporate event, our halls offer the perfect blend of elegance and comfort. With spacious layouts, stunning décor, and top-notch amenities, your guests will be impressed from the moment they arrive. Book with us today and let us help you create an event that exceeds all expectations!'
 
   const timeSlots = [
@@ -99,13 +106,13 @@ const ViewEvents = ({ route, navigation }) => {
       });
       setEventsDetails(response?.data);
 
-        const professionalImageUrl = convertLocalhostUrls(response?.data?.professionalImage?.url);
+      const professionalImageUrl = convertLocalhostUrls(response?.data?.professionalImage?.url);
 
-            const imageUrls = [
-                professionalImageUrl, // Add professional image as the first image
-                ...response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image?.url))
-            ];
-      
+      const imageUrls = [
+        professionalImageUrl, // Add professional image as the first image
+        ...response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image?.url))
+      ];
+
       setSubImages(imageUrls);
       console.log("hall amenities", JSON.stringify(response?.data))
       const amenities = response?.data?.hallAmenities[0].split(',').map((item, index) => ({
@@ -182,11 +189,11 @@ const ViewEvents = ({ route, navigation }) => {
   const getIcon = (name) => {
     switch (name) {
       case 'Parking':
-        return  <FontAwesome5 name={'car'} size={24} color={'#FD813B'}  />;
+        return <FontAwesome5 name={'car'} size={24} color={'#FD813B'} />;
       case 'Restrooms/Toilets':
-        return <FontAwesome5 name={'restroom'} size={24} color={'#FD813B'}  />;
+        return <FontAwesome5 name={'restroom'} size={24} color={'#FD813B'} />;
       case 'Wheelchair access':
-        return <FontAwesome name='wheelchair' size={24} color={'#FD813B'}/>;
+        return <FontAwesome name='wheelchair' size={24} color={'#FD813B'} />;
       case 'Tables with basic covers':
         return <MaterialIcon name='table-restaurant' size={24} color={'#FD813B'} />;
       case 'Power Backup':
@@ -223,7 +230,7 @@ const ViewEvents = ({ route, navigation }) => {
 
   const rows = chunkArray(amenitiesData, 4); // Split data into rows of 4 items
 
-  const renderHallAmenities = ({item}) => {
+  const renderHallAmenities = ({ item }) => {
 
     return (
       <View style={styles.row}>
@@ -253,8 +260,10 @@ const ViewEvents = ({ route, navigation }) => {
             paginationStyleItemActive={{ width: 12, height: 12 }}
             data={subImages}
             style={{ flex: 1, alignSelf: "center", }}
-            renderItem={({ item }) => (
-              <View style={[{ width: Dimensions.get('window').width, height: 300 }]}>
+            renderItem={({ item, index }) => (
+              <TouchableOpacity
+               onPress={() => [setCurrentIndex(index), setIsCameraZoomImageModalVisible(true)]} 
+               style={[{ width: Dimensions.get('window').width, height: 300 }]}>
                 <Image source={{
                   uri: item,
                   headers: { Authorization: `Bearer ${getUserAuth}` }
@@ -262,10 +271,18 @@ const ViewEvents = ({ route, navigation }) => {
                   resizeMethod="auto"
                   resizeMode="cover"
                 />
-              </View>
+              </TouchableOpacity>
             )}
           />
         </View>
+
+        <ZoomImage
+        visible={isCameraZoomImageModalVisible}
+        onClose={() => setIsCameraZoomImageModalVisible(false)}
+        images={subImages}
+        initialIndex={currentIndex}
+        tokenIs={getUserAuth}
+      />
 
 
         <View style={{ flex: 1, marginTop: 10, marginHorizontal: 20 }}>
@@ -277,18 +294,18 @@ const ViewEvents = ({ route, navigation }) => {
           </View>
 
           <View style={{ flexDirection: "row", marginTop: 15, alignItems: "flex-start" }}>
-            <MapMarkIcon style={{marginTop:2}}/>
+            <MapMarkIcon style={{ marginTop: 2 }} />
             <Text style={{ color: "#939393", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', marginLeft: 5 }}>{eventsDetails?.functionHallAddress?.address}</Text>
           </View>
 
-          <View style={{ flexDirection: "row", justifyContent: "space-between",marginTop:15 }}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 15 }}>
             < View style={{}}>
-            <Text style={{ fontSize: 14, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular'}}>Food Type Allowed</Text>
-            <Text style={{marginTop:10}}>{eventsDetails?.foodType == 'Both' ? <VegNonVegIcon/> :  eventsDetails?.foodType == 'veg' ? <VegIcon/>  : <NonVegIcon/>}</Text>
+              <Text style={{ fontSize: 14, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular' }}>Food Type Allowed</Text>
+              <Text style={{ marginTop: 10 }}>{eventsDetails?.foodType == 'Both' ? <VegNonVegIcon /> : eventsDetails?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
             </View>
-            <View style={{backgroundColor:"#FEF7DE",height:25}}>
-            <Text style={{marginTop:3, color: "#FD813B", fontSize: 14, fontWeight: "700", fontFamily: 'ManropeRegular' ,paddingHorizontal:10,borderRadius:5}}> {eventsDetails?.seatingCapacity} pax</Text>
-           </View>
+            <View style={{ backgroundColor: "#FEF7DE", height: 25 }}>
+              <Text style={{ marginTop: 3, color: "#FD813B", fontSize: 14, fontWeight: "700", fontFamily: 'ManropeRegular', paddingHorizontal: 10, borderRadius: 5 }}> {eventsDetails?.seatingCapacity} pax</Text>
+            </View>
           </View>
 
           <View style={{ marginTop: 20, marginBottom: 10 }}>
@@ -306,7 +323,7 @@ const ViewEvents = ({ route, navigation }) => {
               data={rows}
               keyExtractor={(item, index) => index.toString()}
               renderItem={renderHallAmenities}
-              contentContainerStyle={{marginTop:15}}
+              contentContainerStyle={{ marginTop: 15 }}
             />
 
           </View>
@@ -423,7 +440,7 @@ const ViewEvents = ({ route, navigation }) => {
               fontSize: 18,
               fontWeight: '700',
               marginBottom: 10,
-              color:"#666666"
+              color: "#666666"
             }}>Select Time Slot</Text>
             <FlatList
               data={timeSlots}
@@ -504,12 +521,12 @@ const styles = StyleSheet.create({
     // justifyContent: 'space-between',
     alignItems: "center",
     marginTop: 5,
-    justifyContent:"flex-start"
+    justifyContent: "flex-start"
   },
   itemContainer: {
     alignItems: 'center',
     width: Dimensions.get('window').width / 5,
-    marginRight:10
+    marginRight: 10
   },
   itemText: {
     fontSize: 10,
@@ -517,13 +534,13 @@ const styles = StyleSheet.create({
     color: "#606060",
     fontFamily: 'ManropeRegular',
     marginTop: 5,
-    height:30
+    height: 30
 
   },
-  timeSlotText:{
-    fontSize:13,
-    color:"#666666",
-    fontWeight:"500",
+  timeSlotText: {
+    fontSize: 13,
+    color: "#666666",
+    fontWeight: "500",
     fontFamily: 'ManropeRegular',
   },
   calendarContainer: {
