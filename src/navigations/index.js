@@ -103,7 +103,9 @@ const MainNavigation = () => {
     };
 
     const AuthNavigator = () => (
-        <AuthStack.Navigator>
+        <AuthStack.Navigator
+        initialRouteName="LandingScreen"
+        >
             <Stack.Screen
                 name="LandingScreen"
                 component={LandingScreen}
@@ -132,8 +134,9 @@ const MainNavigation = () => {
     );
 
     const HomeNavigator = () => (
-        <HomeStack.Navigator>
-
+        <HomeStack.Navigator
+        initialRouteName="Home"
+        >
             <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
             <Stack.Screen name="ViewTrendingDetails" component={ViewTrendingDetails} options={{ headerShown: true }} />
             <Stack.Screen name="CategoriesList" component={CategoriesList} options={{

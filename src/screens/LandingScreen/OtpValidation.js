@@ -4,7 +4,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { moderateScale } from '../../utils/scalingMetrics';
 import { OTPWidget } from '@msg91comm/sendotp-react-native';
 import BASE_URL from '../../apiconfig';
-import { getCurrentLoggedInUserMobileNum, getCurrentLoggedInVendorMobileNum, getLoginUserId } from '../../../redux/actions';
+import { checkIsTokenStored, getCurrentLoggedInUserMobileNum, getCurrentLoggedInVendorMobileNum, getLoginUserId } from '../../../redux/actions';
 import { getUserAuthToken, getVendorAuthToken, storeUserAuthToken, storeVendorAuthToken } from '../../utils/StoreAuthToken';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
@@ -162,14 +162,20 @@ const OtpValidation = ({ navigation, route }) => {
                     dispatch(getCurrentLoggedInVendorMobileNum(mobileNumber));
                     storeVendorDeviceToken();
                     storeVendorAuthToken(logineRes?.data?.token)
-                    navigation.navigate('Home');
+                    // navigation.navigate('Home');
+                    if(logineRes?.data?.token){
+                        dispatch(checkIsTokenStored(true));
+                    }
                 } else {
                     console.log('into USER LOGG');
                     storeUserDeviceToken();
                     dispatch(getLoginUserId(false));
                     dispatch(getCurrentLoggedInUserMobileNum(mobileNumber));
                     storeUserAuthToken(logineRes?.data?.token);
-                    navigation.navigate('Home');
+                    // navigation.navigate('Home');
+                    if(logineRes?.data?.token){
+                        dispatch(checkIsTokenStored(true));
+                    }
                 }
             }
         } catch (error) {

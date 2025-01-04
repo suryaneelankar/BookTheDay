@@ -19,26 +19,13 @@ const Caterings = () => {
     const navigation = useNavigation();
     const [cateringsData, setCateringsData] = useState([]);
     const [getUserAuth, setGetUserAuth] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('Catering');
-    const userLocationFetched = useSelector((state) => state.userLocation);
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
-    const [totalNearByPages, setTotalNearByPages] = useState(0);
-    const [nearByCurrentPage, setNearByCurrentPage] = useState(1);
-    const [nearByData, setNearByData] = useState([]);
-    const [hasMoreNearBy, setHasMoreNearBy] = useState(true);
-    const [nearByLoading, setNearByLoading] = useState(false);
-    const [nearByClicked, setNearByClicked] = useState(false);
     const [allLocations, setAllLocations] = useState([]);
     const [query, setQuery] = useState('');
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const [locationBasedData, setLoactionBasedData] = useState([]);
-
-
-    const userLatitude = userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude;
-    const userLongitude = userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude;
-    console.log("latitue long", userLatitude, '+++++++++', userLongitude, userLocationFetched);
+    const [locationBasedData, setLoactionBasedData] = useState([])
 
     useEffect(() => {
         getAllCaterings(currentPage);
@@ -50,34 +37,6 @@ const Caterings = () => {
             getAllCaterings(currentPage + 1); // Fetch the next page
             setCurrentPage((prev) => prev + 1); // Increment page number
         }
-    };
-
-    // This function loads more nearby function halls and ensures the page is incremented correctly
-    const loadMoreNearByCaterings = () => {
-        if (hasMoreNearBy && !nearByLoading) {
-            getNearByCaterings(nearByCurrentPage + 1); // Fetch the next page
-            setNearByCurrentPage((prev) => prev + 1); // Increment page number
-        }
-    };
-
-    const handleAllFoodCateringsPress = async () => {
-        // Reset the current page and data
-        setNearByClicked(false); // Set "All events" view
-        setCurrentPage(1); // Reset page to 1
-        setNearByCurrentPage(1); // Reset nearby page to 1
-        setCateringsData([]); // Clear current event data
-        setHasMore(true); // Reset pagination control
-        await getAllCaterings(1); // Fetch initial page of all events
-    };
-
-    const handleNearByFoodCateringsPress = async () => {
-        // Reset the nearby page and data
-        setNearByClicked(true); // Set "Nearby" view
-        setCurrentPage(1); // Reset page to 1
-        setNearByCurrentPage(1); // Reset nearby page to 1
-        setNearByData([]); // Clear nearby event data
-        setHasMoreNearBy(true); // Reset pagination control
-        await getNearByCaterings(1); // Fetch initial page of nearby events
     };
 
     const getAllCaterings = async (page = 1) => {
@@ -92,7 +51,7 @@ const Caterings = () => {
             });
 
             const newCateringsData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            console.log('resp is caterings ::>>>', response?.data?.data);
+            // console.log('resp is caterings ::>>>', response?.data?.data);
             if (response?.data?.data?.length > 0) {
                 setCateringsData((prevData) => [...prevData, ...newCateringsData]); // Append new data
                 setCurrentPage(page);
@@ -105,8 +64,6 @@ const Caterings = () => {
         }
         setLoading(false);
     };
-
-    console.log("caterings data::::", cateringsData)
 
     const getAllCateringsByLocation = async (value) => {
         console.log("value is :::",value);
@@ -163,36 +120,6 @@ const Caterings = () => {
             getAllCateringsByLocation(value);
         }
     };
-
-
-    const getNearByCaterings = async (nearByPage) => {
-        setCateringsData([]);
-        setNearByLoading(true);
-        const token = await getUserAuthToken();
-        setGetUserAuth(token);
-        console.log('userLocationFetched?.latitude caters is::>>', userLatitude, userLongitude)
-        try {
-            const response = await axios.get(`${BASE_URL}/getNearByFoodCaterings?page=${nearByPage}&limit=10&latitude=${userLatitude}&longitude=${userLongitude}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            const newCaterings = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            // console.log('resp is::>>>', response?.data);
-            setTotalNearByPages(response?.data?.totalPages);
-            if (response?.data?.data?.length > 0) {
-                setNearByData((prevData) => [...prevData, ...newCaterings]); // Append new data
-                setNearByCurrentPage(nearByPage);
-            } else {
-                setHasMoreNearBy(false); // No more data to load
-            }
-        } catch (error) {
-            setNearByLoading(false);
-            console.error('Error fetching function halls:', error);
-        }
-        setNearByLoading(false);
-    }
 
     const renderFoodCaterings = ({ item }) => {
         const convertLocalhostUrls = (url) => {
@@ -261,11 +188,11 @@ const Caterings = () => {
                         
                     }} style={{ width: Dimensions.get('window').width - 30, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
-                        <View style={{ width: '60%', }}>
+                        <View style={{ width: '100%', }}>
                             <Text style={{ color: '#101010', fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular" }} >{item?.foodCateringName}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
                                 <LocationMarkIcon />
-                                <Text numberOfLines={1} ellipsizeMode='tail' style={{ width: "90%", fontWeight: '400', marginHorizontal: 5, color: '#939393', fontSize: 13, fontFamily: "ManropeRegular" }}>{item?.county == 'undefined' ? item?.foodCateringAddress?.address : item?.county}</Text>
+                                <Text numberOfLines={2} ellipsizeMode='tail' style={{ fontWeight: '400', marginHorizontal: 5, color: '#939393', fontSize: 13, fontFamily: "ManropeRegular" }}>{item?.foodCateringAddress?.address}</Text>
                             </View>
                         </View>
                     </View>

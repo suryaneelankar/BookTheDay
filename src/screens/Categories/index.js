@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Dimensions, StyleSheet, FlatList, Image, SafeAreaView,ActivityIndicator, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Dimensions, StyleSheet, FlatList, Image, SafeAreaView, ActivityIndicator, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";
@@ -38,12 +38,12 @@ const Categories = () => {
     ]
 
     const categoryFilterList = [
-        { name: 'Chains', image: ChainIcon }, 
-        { name: 'Rings', image: RingsIcon }, 
-        { name: 'Bridal', image: ChainIcon  }, 
-        { name: 'Bangles', image:BanglesIcon  },
-        { name: 'EarRings', image:EarRingsIcon  },
-        { name: 'Bracelets' , image: BraceletIcon }
+        { name: 'Chains', image: ChainIcon },
+        { name: 'Rings', image: RingsIcon },
+        { name: 'Bridal', image: ChainIcon },
+        { name: 'Bangles', image: BanglesIcon },
+        { name: 'EarRings', image: EarRingsIcon },
+        { name: 'Bracelets', image: BraceletIcon }
     ]; //svg images for swipper  
     const [selectedJewelFilter, setSelectedJewelFilter] = useState(categoryFilterList[0]?.name);
 
@@ -53,9 +53,7 @@ const Categories = () => {
     }, [filteredJewellery]);
 
     const loadMoreClothJewels = () => {
-        if (hasMore && !loading) {
-            console.log('hasmore values::>>>',hasMore,loading);
-            getCategories(currentPage);
+        if (hasMore && !loading) {            getCategories(currentPage);
         }
     };
 
@@ -64,10 +62,10 @@ const Categories = () => {
         setGetUserAuth(token);
         setLoading(true);
         try {
-            const response = await axios.get(`${BASE_URL}/getAllClothesJewels?page=${page}&limit=10`,{
+            const response = await axios.get(`${BASE_URL}/getAllClothesJewels?page=${page}&limit=10`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
 
             if (response?.data?.data?.length > 0) {
@@ -81,7 +79,7 @@ const Categories = () => {
             const filteredJewelleryCategories = finalResponseData?.filter(category => category?.categoryType === 'jewels');
             const filteredDiscountItems = finalResponseData?.filter(category => category?.componentType === 'discount');
 
-            console.log("products u may like::::::", filteredClothesCategories);
+            // console.log("products u may like::::::", filteredClothesCategories);
             setJewelleryCategory(filteredJewelleryCategories);
             setProductYouMayLike(filteredClothesCategories);
             setDiscountProducts(filteredDiscountItems);
@@ -102,14 +100,14 @@ const Categories = () => {
                 <View style={{ width: 80, }}>
                     {isSelected ?
                         <LinearGradient start={{ x: 0, y: 1.2 }} end={{ x: 0, y: -1 }} colors={['#FFF3CD', '#FFDB7E']} style={{ flex: 1, }}>
-                            <View style={{ alignItems:"center",width: "auto", height: 4, backgroundColor: "#D2453B", borderTopRightRadius: 5, borderTopLeftRadius: 5, }} />
+                            <View style={{ alignItems: "center", width: "auto", height: 4, backgroundColor: "#D2453B", borderTopRightRadius: 5, borderTopLeftRadius: 5, }} />
                             <Text style={{ marginTop: 10, alignSelf: "center", color: "#D2453B", fontSize: 11, fontWeight: "400", fontFamily: "ManropeRegular", }}>{item?.name}</Text>
-                            <SvgComponent style={{alignSelf:"center",marginTop:5,marginBottom:5}} />
+                            <SvgComponent style={{ alignSelf: "center", marginTop: 5, marginBottom: 5 }} />
                         </LinearGradient>
                         :
                         <View>
                             <Text style={{ marginTop: 10, alignSelf: "center", color: "#000000", fontSize: 11, fontWeight: "400", fontFamily: "ManropeRegular", }}>{item?.name}</Text>
-                            <SvgComponent style={{alignSelf:"center",marginTop:8,marginBottom:5}} />
+                            <SvgComponent style={{ alignSelf: "center", marginTop: 8, marginBottom: 5 }} />
                         </View>
                     }
                 </View>
@@ -127,12 +125,13 @@ const Categories = () => {
             : originalPrice;
 
         return (
-            <View style={{marginHorizontal:15}}>
+            <View style={{ marginHorizontal: 15 }}>
                 <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })}
                     style={{ width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto' }}>
-                    <FastImage source={{ uri: updatedImgUrl,
-                        headers:{Authorization : `Bearer ${getUserAuth}`}
-                     }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '100%', height: Dimensions.get('window').height / 5 }}
+                    <FastImage source={{
+                        uri: updatedImgUrl,
+                        headers: { Authorization: `Bearer ${getUserAuth}` }
+                    }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '100%', height: Dimensions.get('window').height / 5 }}
                     />
                     {item?.discountPercentage ?
                         <>
@@ -165,7 +164,7 @@ const Categories = () => {
                                 : null}
                         </View>
                         <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })}
-                        style={{ width: "100%", borderColor: "#D0433C", borderWidth: 1, borderRadius: 5, alignSelf: "center", alignItems: "center", padding: 5, marginVertical: 10 }}>
+                            style={{ width: "100%", borderColor: "#D0433C", borderWidth: 1, borderRadius: 5, alignSelf: "center", alignItems: "center", padding: 5, marginVertical: 10 }}>
                             <Text style={{ color: "#D0433C", fontSize: 12, fontWeight: "700", fontFamily: 'ManropeRegular' }}>{item?.available ? 'Rent Now' : 'Not Available'}</Text>
                         </TouchableOpacity>
                     </View>
@@ -180,19 +179,25 @@ const Categories = () => {
 
     const renderClothesCat = ({ item, index }) => {
         const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
-
+        const originalPrice = item?.rentPricePerDay;
+        const discountPercentage = item?.discountPercentage;
+        const strikethroughPrice = discountPercentage
+            ? Math.round(originalPrice * (1 + discountPercentage / 100))
+            : originalPrice;
         return (
-            <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })} style={{ backgroundColor: 'white', marginTop: 10, width: 160, marginHorizontal: 5, borderRadius: 10 }}>
+            <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })} style={{ backgroundColor: 'white', marginTop: 10,  marginHorizontal: 5, borderRadius: 10,width: "46%" }}>
                 <View style={{ marginTop: 5, width: '100%' }}>
-                    <FastImage style={{ width: 150, height: 200, borderRadius: 10,alignSelf:"center" }} source={{ uri: updatedImgUrl,
-                        headers:{Authorization : `Bearer ${getUserAuth}`}
-                     }}  />
+                    <FastImage style={{ width: 150, height: 200, borderRadius: 10, alignSelf: "center" }} source={{
+                        uri: updatedImgUrl,
+                        headers: { Authorization: `Bearer ${getUserAuth}` }
+                    }} />
                     <Text style={styles.productName}>{capitalizeFirstLetters(item?.productName)}</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, justifyContent: 'space-between', width: '90%', bottom: 5 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 }}>
                             <Text style={styles.price}>{formatAmount(item?.rentPricePerDay)}</Text>
-                            <Text style={styles.discount}>{formatAmount(item?.rentPricePerDay + 500)}</Text>
-
+                            {item?.discountPercentage ?
+                                <Text style={styles.discount}>{formatAmount(strikethroughPrice)}</Text>
+                                : null}
                         </View>
                     </View>
                 </View>
@@ -207,7 +212,7 @@ const Categories = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, }}>
-            <ScrollView style={{ marginBottom: 70 ,marginTop:20}} >
+            <ScrollView style={{ marginBottom: 70, marginTop: 20 }} >
                 <View style={{ backgroundColor: "#F9F9F9" }}>
                     <View style={styles.searchProduct}>
                         <View style={styles.searchProHeader}>
@@ -243,26 +248,26 @@ const Categories = () => {
                         horizontal
                         showsHorizontalScrollIndicator={false}
                         data={categoryFilterList}
-                        contentContainerStyle={{ paddingHorizontal:15, marginTop: 15 }}
-                        renderItem={renderFilterBox} 
+                        contentContainerStyle={{ paddingHorizontal: 15, marginTop: 15 }}
+                        renderItem={renderFilterBox}
                         // onEndReached={loadMoreClothJewels} // Fetch more when list ends
                         onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
                         ListFooterComponent={() =>
                             loading ? <ActivityIndicator size="large" color="orange" /> : null
                         }
                         ListEmptyComponent={
-                            <View style={{flex:1,alignSelf:"center"}}>
-                              <Text style={{fontSize:12, color:"#333333", fontWeight:"400", fontFamily: 'ManropeRegular'}}>No Products Available</Text>
+                            <View style={{ flex: 1, alignSelf: "center" }}>
+                                <Text style={{ fontSize: 12, color: "#333333", fontWeight: "400", fontFamily: 'ManropeRegular' }}>No Products Available</Text>
                             </View>
-                          }
-                        />
+                        }
+                    />
 
                     <FlatList
                         horizontal
                         data={filteredJewellery}
                         showsHorizontalScrollIndicator={false}
                         contentContainerStyle={{ backgroundColor: "#FDF7D7", paddingVertical: 20 }}
-                        renderItem={renderJewellery} 
+                        renderItem={renderJewellery}
                         // onEndReached={loadMoreClothJewels} // Fetch more when list ends
                         onEndReachedThreshold={0.5} // Trigger when user scrolls near the bottom
                         ListFooterComponent={() =>
@@ -270,33 +275,33 @@ const Categories = () => {
                         }
                         ListEmptyComponent={
                             <View >
-                              <Text style={{marginHorizontal:15,textAlign:"center",fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular'}}>No Products Available</Text>
+                                <Text style={{ marginHorizontal: 15, textAlign: "center", fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular' }}>No Products Available</Text>
                             </View>
-                          }
-                        />
+                        }
+                    />
                 </View>
 
                 {limitedData?.length > 0 ?
-                <>
-                <View style={{ marginHorizontal: 20, flexDirection: "row", justifyContent: "space-between", marginTop: 25, marginBottom: 5 }}>
-                    <Text style={{ fontFamily: "ManropeRegular", fontWeight: "700", fontSize: 16, color: '#202020' }}>Products You May Like</Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('CategoriesList', { catType: 'clothes' })} style={styles.sellAllContainer}>
-                        <Text style={styles.seeAllText}>See All</Text>
-                        <BackButton width={20} height={20} style={styles.backButton} />
-                    </TouchableOpacity>
-                </View>
-                <FlatList
-                    data={limitedData}
-                    numColumns={2}
-                    contentContainerStyle={{marginHorizontal: 20 }}
-                    renderItem={renderClothesCat} 
-                    
-                    />
+                    <>
+                        <View style={{ marginHorizontal: 20, flexDirection: "row", justifyContent: "space-between", marginTop: 25, marginBottom: 5 }}>
+                            <Text style={{ fontFamily: "ManropeRegular", fontWeight: "700", fontSize: 16, color: '#202020' }}>Products You May Like</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('CategoriesList', { catType: 'clothes' })} style={styles.sellAllContainer}>
+                                <Text style={styles.seeAllText}>See All</Text>
+                                <BackButton width={20} height={20} style={styles.backButton} />
+                            </TouchableOpacity>
+                        </View>
+                        <FlatList
+                            data={limitedData}
+                            numColumns={2}
+                            contentContainerStyle={{ alignSelf: "center" }}
+                            renderItem={renderClothesCat}
+
+                        />
                     </> : null}
-                
-                 {discountProducts?.length ?
-                <TrendingNow data={discountProducts} textHeader={'Trending Now'} token={getUserAuth} />
-                 : null }
+
+                {discountProducts?.length ?
+                    <TrendingNow data={discountProducts} textHeader={'Trending Now'} token={getUserAuth} />
+                    : null}
                 <HowItWorks />
             </ScrollView>
         </SafeAreaView>
@@ -309,7 +314,7 @@ const styles = StyleSheet.create({
         fontFamily: 'ManropeRegular',
         color: 'black',
         marginHorizontal: 5,
-        marginTop:5
+        marginTop: 5
     },
     price: {
         color: themevariable.Color_202020,
@@ -317,9 +322,9 @@ const styles = StyleSheet.create({
         fontSize: 20
     },
     discount: {
-        color: themevariable.Color_ECA73C99,
+        color: "#A0153E",
         fontWeight: 'bold',
-        fontSize: 18,
+        fontSize: 14,
         textAlignVertical: 'center',
         marginLeft: 8,
         textDecorationLine: 'line-through'
@@ -327,7 +332,7 @@ const styles = StyleSheet.create({
     },
     strickedoffer: {
         fontSize: 14,
-        color: "#FF00006E",
+        color: "#A0153E",
         fontWeight: "700",
         fontFamily: 'ManropeRegular',
         marginLeft: 4,

@@ -49,15 +49,19 @@ import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
 import VegIcon from '../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 import NotificationIcon from 'react-native-vector-icons/Ionicons';
+import DistanceIcon from '../../assets/svgs/distanceIcon.svg';
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
     const [address, setAddress] = useState('');
     const userLocationFetched = useSelector((state) => state.userLocation);
-    console.log("userLocationFetched home :::::", userLocationFetched)
+    // console.log("userLocationFetched home :::::", userLocationFetched)
     const userLoggedInMobileNumber = useSelector((state) => state.userLoggedInMobileNum);
+    const latitude = userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude;
+    const longitude = userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
     const dispatch = useDispatch();
     const [eventsData, setEventsData] = useState([]);
+    const [nearByEventsData, setNearByEventsData] = useState([]);
     const [cateringsData, setCateringsData] = useState([]);
 
     const [discountProducts, setDiscountProducts] = useState([]);
@@ -69,8 +73,6 @@ const HomeDashboard = () => {
     const [myBookings, setMyBookings] = useState();
     const [cateringBookings, setCateringBookings] = useState();
     const [hallsBookings, setHallsBookings] = useState();
-    const [pendingCount, setPendingCount] = useState();
-
 
     const bannerImages = [
         { id: '1', image: JewelleryCard },
@@ -98,14 +100,6 @@ const HomeDashboard = () => {
         { id: '9', Component: TrendingNecklace, name: 'chains' },
         { id: '10', Component: TrendingBracelet, name: 'bracelets' },
     ];
-    // useEffect(() => {
-    //     // getPermissions();
-    //     getCategories();
-    //     getAllEvents(currentPage);
-    //     getUserAuthTokenRes();
-    //     getProfileData();
-    //     getAllCaterings(currentPage);
-    // }, []);
 
     useFocusEffect(
         useCallback(() => {
@@ -124,6 +118,36 @@ const HomeDashboard = () => {
         }, [])
     );
 
+    useFocusEffect(
+        useCallback(() => {
+            getNearByEvents();
+            // Cleanup function to run when the screen loses focus
+            return () => {
+                console.log('Screen is unfocused');
+            };
+        }, [latitude, longitude])
+    );
+
+    const getNearByEvents = async () => {
+        // console.log("latitude longitude in Home is::>>>", latitude, longitude);
+        const token = await getUserAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/getNearByFunctionHalls?latitude=${latitude}&longitude=${longitude}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const newFunctionHalls = Array.isArray(response?.data?.data) ? response?.data?.data : [];
+            console.log("neareby loc events in HOMEEEEEEE:::::::;", newFunctionHalls);
+            if (response?.data?.data?.length > 0) {
+                setNearByEventsData(newFunctionHalls); // Append new data
+            }
+        } catch (error) {
+            console.error('Error fetching function halls:', error);
+        }
+    };
+
     const getMyBookings = async () => {
         const token = await getUserAuthToken();
         setGetUserAuth(token);
@@ -133,7 +157,7 @@ const HomeDashboard = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log("BOOKINGS RES:::::::::", JSON.stringify(response?.data));
+            // console.log("BOOKINGS RES:::::::::", JSON.stringify(response?.data));
             const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved").length;
 
             setMyBookings(countApproved)
@@ -150,7 +174,7 @@ const HomeDashboard = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log("catering BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+            // console.log("catering BOOKINGS RES:::::::::", JSON.stringify(response?.data))
             const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved").length;
 
             setCateringBookings(countApproved);
@@ -168,7 +192,7 @@ const HomeDashboard = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log("Funtional halls BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+            // console.log("Funtional halls BOOKINGS RES:::::::::", JSON.stringify(response?.data))
             const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved").length;
 
             setHallsBookings(countApproved);
@@ -193,7 +217,7 @@ const HomeDashboard = () => {
                 },
             });
             dispatch(getCurrentLoggedInUserName(response?.data?.data?.fullName));
-            console.log("profile user res:::", response?.data);
+            // console.log("profile user res:::", response?.data);
 
         } catch (error) {
             console.log("profile::::::::::", error);
@@ -228,8 +252,8 @@ const HomeDashboard = () => {
             });
 
             const newCateringsData = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            console.log('resp is caterings ::>>>', JSON.stringify(response?.data?.data));
-            setCateringsData(response?.data?.data);
+            // console.log('resp is caterings ::>>>', JSON.stringify(response?.data?.data));
+            setCateringsData(newCateringsData);
 
         } catch (error) {
             console.error('Error fetching user dashbaord', error);
@@ -283,7 +307,7 @@ const HomeDashboard = () => {
                 }
 
                 const data = await response.json();
-                console.log("address in home::::::", JSON.stringify(data));
+                // console.log("address in home::::::", JSON.stringify(data));
                 setAddress(data?.results[0]?.formatted_address);
                 dispatch(getUserLocation(data?.results[0]));
                 dispatch(setUserCurrentLocation(data?.results[0]));
@@ -377,9 +401,7 @@ const HomeDashboard = () => {
                     <View style={{ marginTop: 15, marginHorizontal: 6 }}>
                         <Text numberOfLines={2} style={{ fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular' }}>{item?.productName}</Text>
                         <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5, marginBottom: 10 }}>
-                            {/* <Text style={{ fontWeight: '700', color:'#202020', fontSize: 14, fontFamily: 'ManropeRegular' }}>{formatAmount(item?.price)}/day</Text> */}
                             <Text style={{ fontWeight: '700', color: '#202020', fontSize: 14, fontFamily: 'ManropeRegular' }}>{formatAmount(item?.rentPricePerDay)}</Text>
-
                             <Text style={styles.strickedoffer}>{formatAmount(strikethroughPrice)}</Text>
                         </View>
 
@@ -413,7 +435,11 @@ const HomeDashboard = () => {
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignSelf: 'center', alignItems: 'center' }}>
                             <View style={{ flexDirection: 'row', }}>
                                 <FontAwesome name={"map-marker"} color={themevariable.Color_777777} size={20} style={{ marginTop: 5 }} />
-                                <Text numberOfLines={2} style={{ fontWeight: '500', marginHorizontal: 5, color: themevariable.Color_777777, fontSize: 13, marginTop: 5, fontFamily: 'InterBold', bottom: 3 }}>{item?.functionHallAddress?.address}</Text>
+                                {item?.distance ?
+                                    <Text style={{ fontWeight: '500', marginHorizontal: 5, color: themevariable.Color_777777, fontSize: 13, marginTop: 5, fontFamily: 'InterBold', }}>{item?.county}</Text>
+                                    :
+                                    <Text numberOfLines={2} style={{ fontWeight: '500', marginHorizontal: 5, color: themevariable.Color_777777, fontSize: 13, marginTop: 5, fontFamily: 'InterBold', bottom: 3 }}>{item?.functionHallAddress?.address}</Text>
+                                }
                             </View>
                         </View>
                     </View>
@@ -422,14 +448,22 @@ const HomeDashboard = () => {
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.seatingCapacity} pax</Text>
                         </View>
+                        {item?.distance ?
+                            <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10,marginHorizontal:5, paddingVertical: 5, alignItems: "center" }}>
+                                <DistanceIcon />
+                                <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>{item?.distance?.toFixed(1)}  km</Text>
+                            </View>
+                            : null}
                         <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.bedRooms} Rooms</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
+                        {!item?.distance ?
+                            <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
 
-                            <Text style={{}}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
-                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
-                        </View>
+                                <Text style={{}}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
+                                <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
+                            </View>
+                            : null}
                     </View>
                 </TouchableOpacity>
             </View>
@@ -647,6 +681,22 @@ const HomeDashboard = () => {
                     <TrendingNow data={discountProducts} textHeader={'Live Offers!'} token={getUserAuth} />
                     :
                     null}
+                {nearByEventsData?.length > 0 ?
+                    <>
+                        <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: horizontalScale(20) }}>
+                            <Text style={styles.onDemandTextStyle}>Deals Near You</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('Events')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                            </TouchableOpacity>
+                        </View>
+
+                        <FlatList
+                            data={nearByEventsData}
+                            renderItem={renderItem}
+                            horizontal
+                            keyExtractor={(item) => item?._id}
+                            showsHorizontalScrollIndicator={false}
+                        />
+                    </> : null}
                 <View style={{ marginTop: 20, }}>
                     <Text style={[styles.onDemandTextStyle, { alignSelf: 'flex-start', padding: 10, marginHorizontal: 10 }]}>Trusted Lender</Text>
                     <FlatList
@@ -1013,7 +1063,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: 'center',
         marginBottom: 20,
-        color:"#333333"
+        color: "#333333"
     },
     buttonContainer: {
         flexDirection: 'row',

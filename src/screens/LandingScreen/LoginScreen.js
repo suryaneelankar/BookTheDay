@@ -5,7 +5,7 @@ import BookDatesButton from '../../components/GradientButton';
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL from '../../apiconfig';
 import axios from 'axios';
-import { getCurrentLoggedInVendorMobileNum, getCurrentLoggedInUserMobileNum, getLoginUserId } from '../../../redux/actions';
+import { getCurrentLoggedInVendorMobileNum, getCurrentLoggedInUserMobileNum, getLoginUserId, checkIsTokenStored } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { storeUserAuthToken, getVendorAuthToken, getUserAuthToken, storeVendorAuthToken } from '../../utils/StoreAuthToken';
 import themevariable from '../../utils/themevariable';
@@ -77,9 +77,11 @@ const LoginScreen = ({ route }) => {
     }
 
     const getAdminNumbers = async () => {
+        // console.log("phoneNumber is ::>>>",phoneNumber);
         try {
             const response = await axios.get(`${BASE_URL}/get/adminNumbers`);
             const adminNumbers = response?.data;
+            // console.log("response is::>>admin::>>",response);
            if(adminNumbers){
             setAdminMobileNums(adminNumbers?.data);
             if (phoneNumber.includes(adminNumbers?.data)) {
@@ -89,7 +91,7 @@ const LoginScreen = ({ route }) => {
             }
            }
         } catch (error) {
-            console.error('Error fetching food items:', error);
+            console.error('Error fetching getAdminNumbers:', error);
         }
     };
 
@@ -113,14 +115,20 @@ const LoginScreen = ({ route }) => {
                     dispatch(getCurrentLoggedInVendorMobileNum(phoneNumber));
                     storeVendorDeviceToken();
                     storeVendorAuthToken(logineRes?.data?.token)
-                    navigation.navigate('Home');
+                    // navigation.navigate('Home');
+                    if(logineRes?.data?.token){
+                        dispatch(checkIsTokenStored(true));
+                    }
                 } else {
                     console.log('into USER LOGG');
                     storeUserDeviceToken();
                     dispatch(getLoginUserId(false));
                     dispatch(getCurrentLoggedInUserMobileNum(phoneNumber));
                     storeUserAuthToken(logineRes?.data?.token);
-                    navigation.navigate('Home');
+                    // navigation.navigate('Home');
+                    if(logineRes?.data?.token){
+                        dispatch(checkIsTokenStored(true));
+                    }
                 }
             }
         } catch (error) {

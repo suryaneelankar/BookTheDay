@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     },
     strickedoffer: {
         fontSize: 14,
-        color: "#FF00006E",
+        color: "#A0153E",
         fontWeight: "700",
         fontFamily: 'ManropeRegular',
         marginLeft: 4,
