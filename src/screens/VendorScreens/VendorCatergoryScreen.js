@@ -143,6 +143,8 @@ const VendorCategoryScreen = ({ navigation }) => {
             navScreen: 'AddFunctionalHall',
             title: 'Add Function Hall',
             description: 'Manage listings for events, celebrations, and weddings.',
+            catType:'funtionHalls'
+
         },
         {
             id: 2,
@@ -150,6 +152,8 @@ const VendorCategoryScreen = ({ navigation }) => {
             navScreen: 'RentOnProducts',
             title: 'Add Cloth & Jewels',
             description: 'List and manage your rental inventory with ease.',
+            catType:'clothsJewels'
+
         },
         {
             id: 3,
@@ -157,10 +161,15 @@ const VendorCategoryScreen = ({ navigation }) => {
             navScreen: 'AddFoodCatering',
             title: 'Add Food Catering',
             description: 'Handle food orders and service requests seamlessly.',
+            catType:'caterings'
         },
     ];
 
-    const renderItem = ({ item }) => (
+    const renderItem = ({ item }) => { 
+
+        console.log("item cattype:::::", item?.catType,'+++', profileData?.posts?.some(post => post?.postModel === "Catering"))
+        return(
+
         <TouchableOpacity
             style={styles.categoryCard}
             onPress={() => {
@@ -179,7 +188,7 @@ const VendorCategoryScreen = ({ navigation }) => {
             </View>
             <RightSideIcon />
         </TouchableOpacity>
-    );
+    )};
 
     return (
         <ScrollView style={styles.container}>

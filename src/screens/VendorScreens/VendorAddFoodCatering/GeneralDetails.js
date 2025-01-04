@@ -20,7 +20,7 @@ import FoodMenu from '../../../components/VendorAddOwnCombo';
 import CustomModal from '../../../components/AlertModal';
 import { useNavigation } from '@react-navigation/native';
 
-const GeneralDetails = ({isAadharUpdate}) => {
+const GeneralDetails = ({ isAadharUpdate }) => {
     const navigation = useNavigation();
     const [comboModalSuccess, setcomboModalSuccess] = useState(false);
     const [overTimeCharges, setOverTimeCharges] = useState();
@@ -47,7 +47,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
     const discountPercentageArr = ['5', '10', '15', '20', '30', '50'];
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
     const [loading, setLoading] = useState(false);
-    const [isFoodDropDownCollapsed, setIsFoodDropDownCollapsed] = useState(true);
+    const [isFoodDropDownCollapsed, setIsFoodDropDownCollapsed] = useState(false);
     const [selectedFoodType, setSelectedFoodType] = useState('');
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
 
@@ -196,9 +196,9 @@ const GeneralDetails = ({isAadharUpdate}) => {
         }
 
         return (
-            <View style={styles.container}>
+            <View style={styles.containerFoodType}>
                 <TouchableOpacity onPress={toggleCollapse} style={styles.header}>
-                    <Text style={styles.headerText}>Select Food Type</Text>
+                    <Text style={styles.headerText}>Food Type Service</Text>
                     <Icon name={isFoodDropDownCollapsed ? 'arrow-down' : 'arrow-up'} size={20} />
                 </TouchableOpacity>
                 {!isFoodDropDownCollapsed && (
@@ -260,7 +260,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
     }
 
     const onPressSaveAndPost = async () => {
-        if (!mainImageUrl || foodCateringName === '' || cateringDescription === '' ||
+        if (!mainImageUrl || foodCateringName === '' || cateringDescription === '' || cateringCity === '' ||
             cateringAddress === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '') || finalCombomenu?.length === 0
         ) {
             Alert.alert('Please fill Mandatory fields');
@@ -343,7 +343,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
             if (response.status === 201) {
                 setLoading(false);
                 console.log('Success', `uploaded successfully`);
-                if(isAadharUpdate){
+                if (isAadharUpdate) {
                     Alert.alert(
                         "Confirmation",
                         "Your product posted successfully",
@@ -353,17 +353,18 @@ const GeneralDetails = ({isAadharUpdate}) => {
                         { cancelable: false }
                     );
 
-                }else{
-                Alert.alert(
-                    "Confirmation",
-                    "Your product posted successfully, Please complete KYC Status",
-                    [
-                        { text: "Ok", onPress: () =>   navigation.goBack()
-                        }
-                    ],
-                    { cancelable: false }
-                );
-            }
+                } else {
+                    Alert.alert(
+                        "Confirmation",
+                        "Your product posted successfully, Please complete KYC Status",
+                        [
+                            {
+                                text: "Ok", onPress: () => navigation.goBack()
+                            }
+                        ],
+                        { cancelable: false }
+                    );
+                }
             } else {
                 setLoading(false);
                 console.log('Error', 'Failed to upload document');
@@ -390,7 +391,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                         <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
                             onPress={() => onPressDiscountPercentage(item)}
                         >
-                            <Text style={{color:themevariable.Color_000000}}>{item} %</Text>
+                            <Text style={{ color: themevariable.Color_000000 }}>{item} %</Text>
                         </TouchableOpacity>
                     )
                 })}
@@ -439,7 +440,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
             ) :
                 <View>
                     <Modal visible={isLocationPickerVisible} animationType="slide">
-                        <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
+                        <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker} />
                         {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
                     </Modal>
                     <View style={styles.mainContainer}>
@@ -449,14 +450,14 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             placeholder={'Add Catering Image'}
                             onPressChooseFile={openGalleryOrCamera}
                         />
-                         <TouchableOpacity onPress={() => { openGalleryOrCamera() }}>
-                        {mainImageUrl ?
-                            <Image
-                                source={{ uri: mainImageUrl?.assets[0]?.uri }}
-                                width={'100%'}
-                                height={300}
-                                resizeMode='cover'
-                            /> : null}
+                        <TouchableOpacity onPress={() => { openGalleryOrCamera() }}>
+                            {mainImageUrl ?
+                                <Image
+                                    source={{ uri: mainImageUrl?.assets[0]?.uri }}
+                                    width={'100%'}
+                                    height={300}
+                                    resizeMode='cover'
+                                /> : null}
                         </TouchableOpacity>
 
                         <Text style={styles.title}>Additional Images</Text>
@@ -486,7 +487,6 @@ const GeneralDetails = ({isAadharUpdate}) => {
                             isRequired={true}
                             isDescriptionField={true}
                         />
-                        <Text style={styles.labelText}>Food Type</Text>
                         {RentalFoodTypeList()}
                     </View>
 
@@ -535,7 +535,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
 
                         {/* <Text style={styles.textInputlabel}>Discount if any</Text> */}
                         {/* {discountPercentageList()} */}
-                        
+
                         <TextField
                             label='Travel Chargers'
                             placeholder="Please Enter Travel Charges"
@@ -602,13 +602,13 @@ const GeneralDetails = ({isAadharUpdate}) => {
 export default GeneralDetails
 
 const styles = StyleSheet.create({
-    container:{ 
+    container: {
         alignSelf: 'center',
-         flex: 1,
-          width: '100%',
-           height: Dimensions.get('window').height,
-            justifyContent: 'center' 
-        },
+        flex: 1,
+        width: '100%',
+        height: Dimensions.get('window').height,
+        justifyContent: 'center'
+    },
     mainContainer: {
         backgroundColor: themevariable.Color_FFFFFF,
         paddingVertical: 20,
@@ -622,7 +622,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: themevariable.Color_000000,
         fontSize: 18,
-        marginTop: 10
+        marginTop: 10,
+        marginHorizontal:10
     },
     labelText: {
         fontFamily: 'ManropeRegular',
@@ -655,10 +656,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         fontSize: 14,
     },
-    container: {
+    containerFoodType: {
         // backgroundColor: '#FFF4E1',
         // padding: 10,
         borderRadius: 5,
+        marginTop:20
     },
     header: {
         flexDirection: 'row',
@@ -671,7 +673,7 @@ const styles = StyleSheet.create({
     headerText: {
         fontSize: 16,
         fontWeight: 'bold',
-        color:themevariable.Color_000000,
+        color: themevariable.Color_000000,
     },
     itemsContainer: {
         marginTop: 10,
@@ -680,12 +682,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: 5,
-        width: "50%"
+        width: "50%",
+        marginHorizontal:10
     },
     itemText: {
         fontSize: 14,
         marginHorizontal: 10,
-        color:themevariable.Color_000000,
+        color: themevariable.Color_000000,
     },
     textInputlabel: {
         fontFamily: 'ManropeRegular',
@@ -715,18 +718,18 @@ const styles = StyleSheet.create({
         // paddingHorizontal:12,
         borderRadius: 5,
     },
-    addedComboText:{ 
-        color: "black", 
-        fontSize: 14, 
+    addedComboText: {
+        color: "black",
+        fontSize: 14,
         fontWeight: "500",
-         marginBottom: 5, 
-         marginHorizontal: 8 
+        marginBottom: 5,
+        marginHorizontal: 8
     },
-    addressTextInput:{ 
-        height: '100%', 
-        textAlignVertical: 'top', 
+    addressTextInput: {
+        height: '100%',
+        textAlignVertical: 'top',
         padding: 10,
-        color:themevariable.Color_000000,
+        color: themevariable.Color_000000,
     },
     combocontainer: {
         marginHorizontal: 5,
@@ -736,7 +739,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingVertical: 10,
         paddingHorizontal: 10,
-        width:Dimensions.get('window').width - 150
+        width: Dimensions.get('window').width - 150
     },
     combotitle: {
         color: 'black',
