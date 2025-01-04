@@ -77,9 +77,11 @@ const LoginScreen = ({ route }) => {
     }
 
     const getAdminNumbers = async () => {
+        // console.log("phoneNumber is ::>>>",phoneNumber);
         try {
             const response = await axios.get(`${BASE_URL}/get/adminNumbers`);
             const adminNumbers = response?.data;
+            // console.log("response is::>>admin::>>",response);
            if(adminNumbers){
             setAdminMobileNums(adminNumbers?.data);
             if (phoneNumber.includes(adminNumbers?.data)) {
@@ -89,7 +91,7 @@ const LoginScreen = ({ route }) => {
             }
            }
         } catch (error) {
-            console.error('Error fetching  login api admin', error);
+            console.error('Error fetching getAdminNumbers:', error);
         }
     };
 

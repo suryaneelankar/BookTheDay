@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, FlatList,  SafeAreaView, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, FlatList, SafeAreaView, ActivityIndicator } from 'react-native';
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import axios from "axios";
 import { useNavigation } from '@react-navigation/native';
@@ -27,7 +27,7 @@ const NearByEvents = () => {
     const [query, setQuery] = useState('');
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [locationBasedData, setLoactionBasedData] = useState([]);
-    const latitude =  userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude;
+    const latitude = userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude;
     const longitude = userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
 
 
@@ -86,7 +86,7 @@ const NearByEvents = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log("all locations resL::::", response?.data);
+            // console.log("all locations resL::::", response?.data);
             setAllLocations(response?.data?.data);
         } catch (error) {
             setLoading(false);
@@ -150,22 +150,21 @@ const NearByEvents = () => {
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'row',marginBottom:10 }}>
+                    <View style={{ flexDirection: 'row', marginBottom: 10,marginRight: 20 }}>
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.seatingCapacity} pax</Text>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.bedRooms} Rooms</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10,alignItems:"center"}}>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 5, paddingVertical: 5, alignItems: "center" }}>
+                            <DistanceIcon />
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>{item?.distance?.toFixed(1)}  km</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10,marginHorizontal:5, alignItems:"center"}}>
 
                             <Text style={{  }}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon/>}</Text>
-                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG': item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
-                        </View>
-
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 5,paddingVertical:5,marginHorizontal:10 ,alignItems:"center"}}>
-                            <DistanceIcon/>
-                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>{item?.distance?.toFixed(1)}  km</Text>
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'NON-VEG': item?.foodType == 'veg' ? 'VEG' : 'NON-VEG'}</Text>
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -210,7 +209,7 @@ const NearByEvents = () => {
                         keyExtractor: (item) => item?._id.toString(),
                         renderItem: ({ item }) => (
                             <TouchableOpacity onPress={() => handleSelect(item?.value)}>
-                                <Text style={{ padding: 10, fontSize:12, color:"#000000", fontFamily: "ManropeRegular" }}>{item?.value}</Text>
+                                <Text style={{ padding: 10, fontSize: 12, color: "#000000", fontFamily: "ManropeRegular" }}>{item?.value}</Text>
                             </TouchableOpacity>
                         ),
                     }}
@@ -249,8 +248,8 @@ const NearByEvents = () => {
                     loading ? <ActivityIndicator size="large" color="orange" /> : null
                 }
                 ListEmptyComponent={
-                    <View style={{alignItems:"center", alignSelf:"center", justifyContent:"center"}}>
-                    <Text style={{color:"#333333", fontSize:14, fontWeight:"400",fontFamily: 'ManropeRegular',}}>No Function halls found</Text>
+                    <View style={{ alignItems: "center", alignSelf: "center", justifyContent: "center" }}>
+                        <Text style={{ color: "#333333", fontSize: 14, fontWeight: "400", fontFamily: 'ManropeRegular', }}>No Function halls found</Text>
                     </View>
                 }
             />

@@ -97,7 +97,7 @@ const Events = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log("all locations resL::::", response?.data);
+            // console.log("all locations resL::::", response?.data);
             setAllLocations(response?.data?.data);
         } catch (error) {
             setLoading(false);
@@ -171,7 +171,7 @@ const Events = () => {
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10,alignItems:"center"}}>
 
                             <Text style={{  }}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon/>}</Text>
-                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG': item?.foodType == 'vEG' ? 'VEG' : 'NON-VEG'}</Text>
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG': item?.foodType == 'veg' ? 'VEG' : 'NON-VEG'}</Text>
                         </View>
                     </View>
                 </TouchableOpacity>

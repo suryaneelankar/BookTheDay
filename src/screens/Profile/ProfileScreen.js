@@ -51,7 +51,6 @@ const ProfileMainScreen = () => {
            
         } catch (error) {
             console.log("profile::::::::::", error);
-            setLoading(false);
         }
     }
 

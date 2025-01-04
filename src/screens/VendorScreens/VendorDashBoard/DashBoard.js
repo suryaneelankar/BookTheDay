@@ -33,6 +33,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     useFocusEffect(
         useCallback(() => {
             // Code to run when the screen is focused
+            getVendorAuthTokenRes();
             getTotalVendorEarnings();
             getVendorClothJewelBookings();
             getVendorFunctionHallBookings();
@@ -46,6 +47,11 @@ const VendorDashBoardTab = ({ navigation }) => {
             };
         }, [])
     );
+
+    const getVendorAuthTokenRes = async () => {
+        const token = await getVendorAuthToken();
+        console.log("VendorAuthToken", token);
+    };
 
     const getTotalVendorEarnings = async () => {
         const vendorMobileNumber = vendorLoggedInMobileNum;
@@ -543,15 +549,7 @@ const VendorDashBoardTab = ({ navigation }) => {
 
                     {clothJewelBookingsData?.length || functionHallBookingsData?.length || cateringsBookingsData?.length ?
                         <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Recent Request</Text>
-                        : <View style={styles.suggestionBox}>
-                            <Text style={styles.suggestionTitle}>Add Your Listings Now!</Text>
-                            <Text style={styles.suggestionText}>
-                                Start renting out your properties and increase your earnings today. Add listings for your rentals and attract potential customers easily.
-                            </Text>
-                            <TouchableOpacity style={styles.ctaButton} onPress={() => navigation.navigate('VendorHome')}>
-                                <Text style={styles.ctaButtonText}>Add Listing</Text>
-                            </TouchableOpacity>
-                        </View>}
+                        : null}
                     <View >
                         {clothJewelBookingsData?.length ?
                             <>
@@ -591,7 +589,15 @@ const VendorDashBoardTab = ({ navigation }) => {
                     </View>
                     {vendorListing?.length > 0 ?
                         <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: 20 }}>All Listed Products</Text>
-                        : null}
+                        : <View style={styles.suggestionBox}>
+                        <Text style={styles.suggestionTitle}>Add Your Listings Now!</Text>
+                        <Text style={styles.suggestionText}>
+                            Start renting out your properties and increase your earnings today. Add listings for your rentals and attract potential customers easily.
+                        </Text>
+                        <TouchableOpacity style={styles.ctaButton} onPress={() => navigation.navigate('VendorHome')}>
+                            <Text style={styles.ctaButtonText}>Add Listing</Text>
+                        </TouchableOpacity>
+                    </View>}
                     <FlatList
                         data={vendorListing}
                         renderItem={renderVendorList}
