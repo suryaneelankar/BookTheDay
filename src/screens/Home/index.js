@@ -80,11 +80,11 @@ const HomeDashboard = () => {
     const CategoriesData = [
         { name: 'Clothes', image: CatJewellery },
         { name: 'Jewellery', image: CatJewellery },
-        { name: 'Chefs', image: CatChef },
-        { name: 'Driver', image: CatDriver },
-        { name: 'Tent House', image: CatTentHouse },
+        // { name: 'Chefs', image: CatChef },
+        // { name: 'Driver', image: CatDriver },
+        // { name: 'Tent House', image: CatTentHouse },
         { name: 'Halls', image: CatHalls },
-        { name: 'Decoration', image: CatDecoration },
+        // { name: 'Decoration', image: CatDecoration },
         { name: 'Catering', image: CatCatering }
     ];
 
@@ -551,7 +551,7 @@ const HomeDashboard = () => {
                                 : null}
                         </Pressable>
                     </View>
-                    <View style={styles.searchContainer}>
+                    {/* <View style={styles.searchContainer}>
                         <View style={styles.searchProduct}>
                             <View style={styles.searchProHeader}>
                                 <SearchIcon style={{ marginLeft: 10 }} />
@@ -563,7 +563,7 @@ const HomeDashboard = () => {
                         <View style={styles.filterView}>
                             <FilterIcon />
                         </View>
-                    </View>
+                    </View> */}
                     <Swiper
                         autoplay
                         autoplayTimeout={3}
