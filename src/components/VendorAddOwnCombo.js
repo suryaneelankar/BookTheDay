@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert } from 'react-native';
-import { MultiSelect } from 'react-native-element-dropdown';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, Dimensions } from 'react-native';
+import { MultiSelect, Dropdown } from 'react-native-element-dropdown';
 import themevariable from '../utils/themevariable';
 import CheckIconGreen from '../assets/vendorIcons/checkIconGreen.svg';
 import CrossIconRed from '../assets/vendorIcons/crossIconRed.svg';
@@ -10,7 +10,8 @@ import BASE_URL from '../apiconfig';
 import VegIcon from '../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../assets/svgs/foodtype/NonVeg.svg';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
-import { Dropdown } from 'react-native-element-dropdown';
+import BookDatesButton from './GradientButton';
+import LinearGradient from "react-native-linear-gradient";
 
 const FoodMenu = ({ onSaveClick }) => {
     const [menuList, setMenuList] = useState([]);
@@ -22,7 +23,7 @@ const FoodMenu = ({ onSaveClick }) => {
     const [title, setcomboTitle] = useState(''); // Combo title
     const [foodCategories, setFoodCategories] = useState([]); // Holds categories like Main Course, Roti
     const [selectedItemsByCategory, setSelectedItemsByCategory] = useState({}); // Track selected items per category
-    const [selectedFoodTypes, setSelectedFoodTypes] = useState([]);
+    const [selectedFoodTypes, setSelectedFoodTypes] = useState(["veg", "non-veg"]);
     const [comboNames, setComboNames] = useState();
 
     const foodTypes = [
@@ -86,7 +87,7 @@ const FoodMenu = ({ onSaveClick }) => {
             if (foodItemsRes && foodItemsRes.length > 0) {
                 const filteredByComboName = foodItemsRes.filter(item => item.category === 'combonames');
                 const remainingData = foodItemsRes.filter(item => item.category !== 'combonames');
-                               
+
                 const comboItems = filteredByComboName[0].items.map(item => ({
                     label: item.name,
                     value: item.name,
@@ -243,6 +244,23 @@ const FoodMenu = ({ onSaveClick }) => {
                         data={category.items}
                         labelField="name"
                         valueField="name"
+                        // confirmSelectItem
+                        // confirmUnSelectItem
+                        // onConfirmSelectItem={(item) => {
+                        //   Alert.alert('Confirm', 'Message confirm', [
+                        //     {
+                        //       text: 'Cancel',
+                        //       onPress: () => {},
+                        //     },
+                        //     {
+                        //       text: 'Confirm',
+                        //       onPress: () => {
+                        //         // setSelected(item);
+                        //         handleCategorySelection(category.category, item)
+                        //       },
+                        //     },
+                        //   ]);
+                        // }}
                         selectedStyle={{ backgroundColor: '#FFF3CD', borderRadius: 10, borderColor: "#666666", borderWidth: 1 }}
                         placeholder={`Select ${category.category}`}
                         value={selectedItemsByCategory[category.category] || []}
@@ -281,10 +299,11 @@ const FoodMenu = ({ onSaveClick }) => {
 
             <View style={styles.selectedItemsContainer}>
                 {customItems.map((item, index) => (
-                    <View key={index} style={styles.selectedItem}>
+                    <View key={index} style={styles.selectedItem} >
                         <Text style={styles.selectedText}>{item}</Text>
-                        <TouchableOpacity onPress={() => handleRemoveItem(item)}>
-                            <Text style={styles.crossIcon}>✗</Text>
+                        <TouchableOpacity onPress={() => handleRemoveItem(item)} style={{marginHorizontal: 8}}>
+                            {/* <Text style={styles.crossIcon}>✗</Text> */}
+                            <CrossIconRed width={15} height={15}/>
                         </TouchableOpacity>
                     </View>
                 ))}
@@ -326,21 +345,37 @@ const FoodMenu = ({ onSaveClick }) => {
                         <TouchableOpacity style={styles.iconButton} onPress={handleAddCustomItem}>
                             <CheckIconGreen />
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.iconButton} onPress={() => setCustomItemVal('')}>
+                        <TouchableOpacity style={styles.iconButton} onPress={() => { setCustomItemVal(''), setShowCustomTextInput(!showCustomTextInput) }}>
                             <CrossIconRed />
                         </TouchableOpacity>
                     </View>
                 </View>
             )}
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 style={styles.customButton}
                 onPress={() => setShowCustomTextInput(!showCustomTextInput)}
             >
-                <Text style={styles.customButtonText}>Add Your Customized Item</Text>
+                <Text style={styles.customButtonText}>Add Your Customized Food Item</Text>
+            </TouchableOpacity> */}
+
+            <TouchableOpacity style={{ marginTop: 20 }} onPress={() => setShowCustomTextInput(!showCustomTextInput)}>
+                <LinearGradient
+                    colors={['#ECA73C', '#ECA73C']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={[styles.buttonView, {
+                        width: Dimensions.get('window').width - 50, borderRadius: 10,
+                        alignItems: "center", padding: 12, alignSelf: 'center'
+                    }]}
+                >
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
+                        <Text style={styles.buttonText}>Add Your Customized Food Item</Text>
+                    </View>
+                </LinearGradient>
             </TouchableOpacity>
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 style={styles.saveButton}
                 onPress={handleSaveMenu}
                 disabled={
@@ -348,7 +383,16 @@ const FoodMenu = ({ onSaveClick }) => {
                 }
             >
                 <Text style={styles.customButtonText}>Save Combo</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
+            <BookDatesButton
+                onPress={handleSaveMenu}
+                text={'Save Combo'}
+                padding={10}
+                showIcon={false}
+                disabled={
+                    Object.values(selectedItemsByCategory).flat().length === 0 && customItems.length === 0
+                }
+            />
         </View>
     );
 };
@@ -382,6 +426,13 @@ const styles = StyleSheet.create({
         fontSize: 15,
         marginTop: 10
     },
+    buttonText: {
+        color: "#333333",
+        fontSize: 14,
+        fontWeight: "600",
+        fontFamily: "ManropeRegular",
+        textAlign: "center"
+    },
     item: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -406,7 +457,7 @@ const styles = StyleSheet.create({
     },
     dropdown: {
         height: 50,
-        borderColor: themevariable.Color_C8C8C6,
+        borderColor: "#FD813B",
         borderWidth: 1,
         borderRadius: 8,
         paddingHorizontal: 10,
@@ -415,7 +466,8 @@ const styles = StyleSheet.create({
     selectedItemsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        marginBottom: 10
+        marginBottom: 10,
+        marginTop: 10
     },
     selectedItem: {
         borderColor: '#666666',
@@ -424,7 +476,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 5,
         paddingHorizontal: 8,
-        borderRadius: 10
+        borderRadius: 10,
+        marginHorizontal: 5
     },
     placeholderStyle: {
         fontFamily: 'ManropeRegular',
@@ -468,7 +521,7 @@ const styles = StyleSheet.create({
     input: {
         borderWidth: 1,
         marginTop: 10,
-        borderColor: '#333333',
+        borderColor: '#ECA73C',
         paddingHorizontal: 12,
         borderRadius: 4,
         color: themevariable.Color_000000,
