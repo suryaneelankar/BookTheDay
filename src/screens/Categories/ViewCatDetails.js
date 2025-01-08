@@ -18,6 +18,7 @@ import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
 import SwiperFlatList from "react-native-swiper-flatlist";
 import { Image } from "react-native-svg";
+import ZoomImage from "../../components/ZoomImage";
 
 const ViewCatDetails = ({ route }) => {
 
@@ -36,6 +37,8 @@ const ViewCatDetails = ({ route }) => {
     });
     const [numberOfDays, setNumberOfDays] = useState(0);
     const [getUserAuth, setGetUserAuth] = useState('');
+    const [isCameraZoomImageModalVisible, setIsCameraZoomImageModalVisible] = useState(false);
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     const womenSizes = [
         { size: 'XS', bust: 32, waist: 26, hip: 34 },
@@ -181,14 +184,16 @@ const ViewCatDetails = ({ route }) => {
                         paginationDefaultColor="white"
                         paginationActiveColor="#FF6347"
                         showPagination={true}
-                        paginationStyle={{ bottom: Dimensions.get('window').height/6 }}
+                        paginationStyle={{ bottom: Dimensions.get('window').height / 6 }}
                         paginationStyleItem={{ alignSelf: 'center' }}
                         paginationStyleItemInactive={{ width: 7, height: 7 }}
                         paginationStyleItemActive={{ width: 10, height: 10 }}
                         data={specifcadditionalImages} // Replace this with your actual data array
                         style={{ flex: 1, alignSelf: "center" }}
-                        renderItem={({ item }) => (
-                            <View style={[{ width: Dimensions.get('window').width, height: 300 }]}>
+                        renderItem={({ item , index}) => (
+                            <TouchableOpacity
+                                onPress={() => [setCurrentIndex(index), setIsCameraZoomImageModalVisible(true)]}
+                                style={[{ width: Dimensions.get('window').width, height: 300 }]}>
 
                                 <FastImage
                                     resizeMode="contain"
@@ -198,8 +203,16 @@ const ViewCatDetails = ({ route }) => {
                                     }}
                                     style={[styles.image, {}]}
                                 />
-                            </View>
+                            </TouchableOpacity>
                         )}
+                    />
+
+                    <ZoomImage
+                        visible={isCameraZoomImageModalVisible}
+                        onClose={() => setIsCameraZoomImageModalVisible(false)}
+                        images={specifcadditionalImages}
+                        initialIndex={currentIndex}
+                        tokenIs={getUserAuth}
                     />
 
 
@@ -435,14 +448,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginHorizontal: 20,
-        marginBottom:10
-      },
-      priceDetailLabel: {
+        marginBottom: 10
+    },
+    priceDetailLabel: {
         fontSize: 15,
         color: '#000000',
         fontWeight: "400",
         fontFamily: "ManropeRegular",
-      },
+    },
     detailsContainer: {
         flex: 1,
     },
@@ -543,7 +556,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         flex: 1,
         textAlign: 'center',
-        color:"#333333"
+        color: "#333333"
     },
     dataRow: {
         flexDirection: 'row',
@@ -559,6 +572,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         flex: 1,
         textAlign: 'center',
-        color:"#666666"
+        color: "#666666"
     },
 })
