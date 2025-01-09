@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, Button, FlatList, Modal, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, BackHandler, Button, FlatList, Modal, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import SearchIcon from '../../assets/svgs/searchIcon.svg';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
@@ -21,8 +21,8 @@ const LocationAdded = () => {
     const userLocationFetched = useSelector((state) => state.userCurrentLocation);
     console.log("user locations is::::::::::", userLocationFetched);
     const [selectedAddressId, setSelectedAddressId] = useState('');
-    const [selectedAddressVal,setSelectedAddressVal] = useState('');
-    const [selectedCurrentAddress,setSelectedCurrentAddress] = useState(false);
+    const [selectedAddressVal, setSelectedAddressVal] = useState('');
+    const [selectedCurrentAddress, setSelectedCurrentAddress] = useState(false);
 
     useEffect(() => {
         getUserAddresses();
@@ -120,15 +120,37 @@ const LocationAdded = () => {
         // if(selectedAddressVal?.address){
         //     dispatch(getUserLocation(selectedAddressVal?.address))
         // }else{
-            dispatch(getUserLocation(selectedAddressVal))
+        dispatch(getUserLocation(selectedAddressVal))
         // }
     }
+
+    const handleBackPress = () => {
+        if (isLocationPickerVisible) {
+            setLocationPickerVisible(false);
+              // Close the modal
+            return true; // Prevent default back button behavior (i.e., exiting the app)
+        }
+        return false;  // Allow default behavior (i.e., exiting the app if the modal is not open)
+    };
+
+    useEffect(() => {
+        // Add listener when the component is mounted
+        BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+
+        // Clean up the listener when the component is unmounted
+        return () => {
+            BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+        };
+    }, [isLocationPickerVisible]); 
 
     return (
         <SafeAreaView style={styles.container}>
 
-            <Modal visible={isLocationPickerVisible} animationType="slide">
-                <UserLocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
+            <Modal visible={isLocationPickerVisible} animationType="slide" 
+            onRequestClose={() => handleCloseLocationPicker()}>
+                <UserLocationPicker 
+                onLocationSelected={handleLocationSelected}
+                 onBack={handleCloseLocationPicker} />
                 {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
             </Modal>
 
@@ -143,18 +165,24 @@ const LocationAdded = () => {
                         // value={userAddress}
                         numberOfLines={4}
                         multiline={true}
-                        onFocus={ () => setLocationPickerVisible(true)}
+                        onFocus={() => setLocationPickerVisible(true)}
                     //   onChangeText={(text) => [setLocationPickerVisible(true)]}
 
                     />
                 </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={[styles.locationItem,{borderColor: selectedCurrentAddress ? 'red' : '', borderWidth: selectedCurrentAddress ? 1 : 0, borderRadius: selectedCurrentAddress ? 10 : 0}]} 
-            onPress={() => {setSelectedAddressVal(userLocationFetched),setSelectedCurrentAddress(true)}}>
+            <TouchableOpacity style={[styles.locationItem, { borderColor: selectedCurrentAddress ? 'red' : '', borderWidth: selectedCurrentAddress ? 1 : 0, borderRadius: selectedCurrentAddress ? 10 : 0 }]}
+                onPress={() => {
+                    if (userLocationFetched) {
+                        setSelectedAddressVal(userLocationFetched), setSelectedCurrentAddress(true), setSelectedAddressId('');
+                    }else{
+                        setSelectedAddressVal(userLocationFetched), setSelectedCurrentAddress(false), setSelectedAddressId('');
+                    }
+                }}>
                 <View style={styles.locationTextContainer}>
                     <Text style={styles.locationText}>Use Current Location</Text>
-                    <Text style={styles.addressText}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address}</Text>
+                    <Text style={styles.addressText}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address ? userLocationFetched?.address : 'No Location selected'}</Text>
                 </View>
             </TouchableOpacity>
 
@@ -165,14 +193,16 @@ const LocationAdded = () => {
                     const selectedId = selectedAddressId
                     return (
                         <TouchableOpacity style={[styles.locationItem, { borderColor: selectedAddressId == item?._id ? 'red' : '', borderWidth: selectedAddressId == item?._id ? 1 : 0, borderRadius: selectedAddressId == item?._id ? 10 : 0 }]}
-                         onPress={() => { setSelectedAddressId(item?._id),setSelectedAddressVal(item) }}>
+                            onPress={() => {
+                                setSelectedAddressId(item?._id), setSelectedAddressVal(item), setSelectedCurrentAddress(false);
+                            }}>
                             <View style={[styles.locationTextContainer, { flexDirection: "row", alignItems: "center" }]}>
                                 <View style={{ width: "85%" }} >
                                     <Text style={styles.locationText}>{item?.addressType}</Text>
                                     <Text style={styles.addressText}>{item?.address}</Text>
                                 </View>
                                 <TouchableOpacity onPress={() => deleteAddress(item?._id)}>
-                                    <Text style={{ color: 'red',fontSize:13,fontWeight:"500" }}>Delete</Text>
+                                    <Text style={{ color: 'red', fontSize: 13, fontWeight: "500" }}>Delete</Text>
                                 </TouchableOpacity>
 
                             </View>
@@ -181,8 +211,11 @@ const LocationAdded = () => {
                 }}
             />
 
-            <TouchableOpacity onPress={() => {saveSelectedLoaction(),navigation.goBack()}} style={[styles.addButton,{borderColor:'green'}]}>
-                <Text style={styles.useButtonText}>Use This Location</Text>
+            <TouchableOpacity
+                disabled={!selectedAddressId && !selectedCurrentAddress}
+                onPress={() => { saveSelectedLoaction(), navigation.goBack() }}
+                style={[styles.addButton, { borderColor: (!selectedAddressId && !selectedCurrentAddress) ? '#666666' : 'green' }]}>
+                <Text style={[styles.useButtonText, { color: (!selectedAddressId && !selectedCurrentAddress) ? '#666666' : 'green' }]}>Use This Location</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => setLocationPickerVisible(true)} style={styles.addButton}>

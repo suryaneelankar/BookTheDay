@@ -31,7 +31,7 @@ import TrendingNecklace from '../../assets/svgs/trendingNow/home_trendingnow_nec
 import TrendingTshirt from '../../assets/svgs/trendingNow/home_trendingnow_tshirt.svg';
 import CatCatering from '../../assets/svgs/categories/home_categories_catering_icon.svg';
 import CatChef from '../../assets/svgs/categories/home_categories_chef_icon.svg';
-// import CatClothes from '../../assets/svgs/categories/home_categories_clothes_icon.svg';
+import CatClothes from '../../assets/svgs/categories/home_categories_clothes_icon.svg';
 import CatDecoration from '../../assets/svgs/categories/home_categories_decoration_icon.svg';
 import CatDriver from '../../assets/svgs/categories/home_categories_driver_icon.svg';
 import CatHalls from '../../assets/svgs/categories/home_categories_hall_icon.svg';
@@ -78,7 +78,7 @@ const HomeDashboard = () => {
     ];
 
     const CategoriesData = [
-        { name: 'Clothes', image: CatJewellery },
+        { name: 'Clothes', image: CatClothes },
         { name: 'Jewellery', image: CatJewellery },
         // { name: 'Chefs', image: CatChef },
         // { name: 'Driver', image: CatDriver },
@@ -537,7 +537,7 @@ const HomeDashboard = () => {
                                     <LocationMarkIcon />
                                 </TouchableOpacity>
                                 <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('LocationAdded') }}>
-                                    <Text numberOfLines={1} style={styles.retrievedLoc}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address}</Text>
+                                    <Text numberOfLines={1} style={styles.retrievedLoc}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address ? userLocationFetched?.address : 'Select Location' }</Text>
                                     <ArrowDown />
                                 </TouchableOpacity>
                             </View>
@@ -608,13 +608,13 @@ const HomeDashboard = () => {
                         <View style={styles.verticalLine} />
                         <InfoBox
                             IconComponent={Cloth}
-                            mainText="1500+"
+                            mainText="150+"
                             subText="Products"
                         />
                         <View style={styles.verticalLine} />
                         <InfoBox
                             IconComponent={Cheers}
-                            mainText="1500+"
+                            mainText="100+"
                             subText="Events"
                         />
 

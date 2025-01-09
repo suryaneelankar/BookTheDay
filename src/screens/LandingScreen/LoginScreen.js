@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import BookDatesButton from '../../components/GradientButton';
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL from '../../apiconfig';
 import axios from 'axios';
-import { getCurrentLoggedInVendorMobileNum,getCurrentLoggedInUserMobileNum, getLoginUserId } from '../../../redux/actions';
+import { getCurrentLoggedInVendorMobileNum, getCurrentLoggedInUserMobileNum, getLoginUserId } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { storeUserAuthToken,getVendorAuthToken, getUserAuthToken,storeVendorAuthToken } from '../../utils/StoreAuthToken';
+import { storeUserAuthToken, getVendorAuthToken, getUserAuthToken, storeVendorAuthToken } from '../../utils/StoreAuthToken';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const LoginScreen = ({ route }) => {
     const { type } = route.params;
@@ -20,8 +21,14 @@ const LoginScreen = ({ route }) => {
     const dispatch = useDispatch();
     const selectedMode = useSelector((state) => state.userId);
     const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
-    console.log("selected mode::::::::;;", selectedMode,type);
-    console.log('deviceFCMToken is::>>',deviceFCMToken)
+    const [isPasswordVisible, setPasswordVisible] = useState(false);
+
+    console.log("selected mode::::::::;;", selectedMode, type);
+    console.log('deviceFCMToken is::>>', deviceFCMToken)
+
+    const togglePasswordVisibility = () => {
+        setPasswordVisible(!isPasswordVisible);
+    };
 
     // console.log('user auth token is::>>',getVendorAuthToken());
 
@@ -34,10 +41,10 @@ const LoginScreen = ({ route }) => {
         const token = await getUserAuthToken();
         console.log("LOgin screen sycan", token)
         try {
-            const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload,{
+            const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
             // console.log("userTokenRes  res:::::::::", userTokenRes);
             if (userTokenRes?.status === 200) {
@@ -56,14 +63,14 @@ const LoginScreen = ({ route }) => {
         console.log("payload is:::::::", payload, type);
         const token = await getVendorAuthToken();
         try {
-            const vendorTokenRes = await axios.post(`${BASE_URL}/addVendorFCMToken`, payload,{
+            const vendorTokenRes = await axios.post(`${BASE_URL}/addVendorFCMToken`, payload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                  },
+                },
             });
             console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
             if (vendorTokenRes?.status === 200) {
-               
+
             }
         } catch (error) {
             console.error("Error during add vendor token:", error);
@@ -115,7 +122,7 @@ const LoginScreen = ({ route }) => {
                     Connect to your 'Booktheday' account to explore local rental opportunities.
                 </Text>
 
-                <Text style={styles.textLabel}>Full Name*</Text>
+                <Text style={styles.textLabel}>Full Name</Text>
 
                 <TextInput
                     style={styles.input}
@@ -123,14 +130,14 @@ const LoginScreen = ({ route }) => {
                     value={fullName}
                     onChangeText={setFullName}
                 />
-                <Text style={styles.textLabel}>Email Address</Text>
+                {/* <Text style={styles.textLabel}>Email Address</Text>
 
                 <TextInput
                     style={styles.input}
                     placeholder="your email id"
                     value={email}
                     onChangeText={setEmail}
-                />
+                /> */}
                 <Text style={styles.textLabel}>Phone Number*</Text>
 
                 <TextInput
@@ -142,17 +149,23 @@ const LoginScreen = ({ route }) => {
                 />
                 <Text style={styles.textLabel}>Password*</Text>
 
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter Password"
-                    value={password}
-                    onChangeText={setPassword}
-                />
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Enter Password"
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry={!isPasswordVisible} // Hide or show password based on isPasswordVisible
+                    />
 
-
-                <View style={styles.checkboxContainer}>
-                    <Text style={styles.checkboxLabel}>Terms And Conditions</Text>
+                    <TouchableOpacity onPress={togglePasswordVisibility} style={styles.eyeIcon}>
+                        <Icon name={!isPasswordVisible ? 'eye-slash' : 'eye'} size={18} color="#666666" />
+                    </TouchableOpacity>
                 </View>
+
+                {/* <View style={styles.checkboxContainer}>
+                    <Text style={styles.checkboxLabel}>Terms And Conditions</Text>
+                </View> */}
 
                 <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
 
@@ -211,9 +224,9 @@ const styles = StyleSheet.create({
     },
     checkboxLabel: {
         marginLeft: 10,
-        color:"#666666",
-        fontSize:12,
-        fontWeight:"400",
+        color: "#666666",
+        fontSize: 12,
+        fontWeight: "400",
         fontFamily: 'ManropeRegular',
 
     },
@@ -235,6 +248,18 @@ const styles = StyleSheet.create({
     signInText: {
         color: '#FF6F61',
         fontWeight: 'bold',
+    },
+    inputContainer: {
+        position: 'relative',
+        justifyContent:"space-between",
+    },
+    eyeIcon: {
+        position: 'absolute',
+        right: 10,
+        top:10,
+        // top:Dimensions.get('window').height/65
+        // top: '50%',
+        // transform: [{ translateY: -10 }],
     },
 });
 

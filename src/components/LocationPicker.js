@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, FlatList, ActivityIndicator, PermissionsAndroid, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, FlatList, ActivityIndicator, PermissionsAndroid, ScrollView, Linking } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import GetLocation from 'react-native-get-location';
 import SaveLocationButton from './SaveLocationButton';
@@ -91,7 +91,14 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         handleCheckPressed();
       } else {
-        Alert.alert("Location permission denied");
+        Alert.alert(
+          'Location Permission Denied',
+          'You have denied the location permission. Please enable it in your settings to use this feature.',
+          [
+            { text: 'OK' },
+            { text: 'Open Settings', onPress: () => Linking.openSettings() },
+          ]
+        );
       }
     } catch (err) {
       console.warn(err);
@@ -255,8 +262,8 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
         />
       </View>
       {!onSelectLoc ?
-        <TouchableOpacity onPress={() => setOnSelectLoc(true)} style={{alignItems:"center"}}>
-          <Text style={{color:themevariable.Color_000000,}}>Get Current Location</Text>
+        <TouchableOpacity onPress={() => setOnSelectLoc(true)} style={{ alignItems: "center" }}>
+          <Text style={{ color: themevariable.Color_000000,marginTop:"20%" }}>Get Current Location</Text>
         </TouchableOpacity> : null}
 
       {console.log('!selectedLocation is vendor::>>', !selectedLocation)}
@@ -375,7 +382,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 8,
     backgroundColor: "#F0F5FA",
-    color:themevariable.Color_000000,
+    color: themevariable.Color_000000,
   },
   locationInput: {
     height: 50,
@@ -386,7 +393,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#F0F5FA",
     width: "90%",
-    color:themevariable.Color_000000,
+    color: themevariable.Color_000000,
   },
   searchInput: {
     height: 50,

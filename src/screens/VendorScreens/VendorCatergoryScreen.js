@@ -192,9 +192,9 @@ const VendorCategoryScreen = ({ navigation }) => {
                 {/* Header */}
 
                 {/* Bookings Overview */}
-                <View style={{ marginTop: 15, alignSelf: "center" }}>
+                <TouchableOpacity onPress={() => navigation.navigate('Events')}  style={{ marginTop: 15, alignSelf: "center" }}>
                     <JewelleryCard />
-                </View>
+                </TouchableOpacity>
                 <View style={styles.bookingsOverview}>
                     <View style={styles.overviewCards}>
                         <View style={styles.overviewCard}>

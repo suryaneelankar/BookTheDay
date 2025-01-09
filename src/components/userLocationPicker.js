@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, FlatList, ActivityIndicator, PermissionsAndroid, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, FlatList, ActivityIndicator, PermissionsAndroid, ScrollView, Linking } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import GetLocation from 'react-native-get-location';
 import SaveLocationButton from './SaveLocationButton';
@@ -90,8 +90,14 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         handleCheckPressed();
       } else {
-        Alert.alert("Location permission denied");
-      }
+        Alert.alert(
+          'Location Permission Denied',
+          'You have denied the location permission. Please enable it in your settings to use this feature.',
+          [
+            { text: 'OK' },
+            { text: 'Open Settings', onPress: () => Linking.openSettings() },
+          ]
+        );      }
     } catch (err) {
       console.warn(err);
     }

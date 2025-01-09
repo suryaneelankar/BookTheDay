@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal, TextInput, ScrollView, ActivityIndicator } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal, TextInput, ScrollView, ActivityIndicator, BackHandler } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
@@ -70,6 +70,25 @@ const GeneralDetails = ({isAadharUpdate}) => {
         "Bridal Room": [{ name: 'Bridal Room', icon: 'ios-basket' }],
         "Sound/music license": [{ name: 'Sound/music license', icon: 'ios-volume-high' }]
     });
+
+     const handleBackPress = () => {
+            if (isLocationPickerVisible) {
+                setLocationPickerVisible(false);
+                  // Close the modal
+                return true; // Prevent default back button behavior (i.e., exiting the app)
+            }
+            return false;  // Allow default behavior (i.e., exiting the app if the modal is not open)
+        };
+    
+        useEffect(() => {
+            // Add listener when the component is mounted
+            BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+    
+            // Clean up the listener when the component is unmounted
+            return () => {
+                BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+            };
+        }, [isLocationPickerVisible]); 
 
     const foodTypes = [
         { name: 'veg', icon: VegIcon },
@@ -377,10 +396,13 @@ const GeneralDetails = ({isAadharUpdate}) => {
             setSelectedDiscountVal(item);
         }
 
-        <Modal visible={isLocationPickerVisible} animationType="slide">
-            <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
+        <Modal visible={isLocationPickerVisible} animationType="slide"
+        onRequestClose={() => handleCloseLocationPicker()} >
+            <LocationPicker onLocationSelected={handleLocationSelected} 
+            onBack={handleCloseLocationPicker}/>
             {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
         </Modal>
+
         return (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ width: '100%' }}>
                 {discountPercentageArr.map((item) => {
@@ -637,7 +659,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                 </View>
             ) :
                 <View>
-                    <Modal visible={isLocationPickerVisible} animationType="slide">
+                    <Modal visible={isLocationPickerVisible} animationType="slide" onRequestClose={() => handleCloseLocationPicker()}>
                         <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
                         {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
                     </Modal>

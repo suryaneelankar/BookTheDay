@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal, ActivityIndicator, Button, TextInput, ScrollView } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal, ActivityIndicator, Button, TextInput, ScrollView, BackHandler } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
@@ -81,6 +81,25 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         { label: 'Purple', value: '#581845' },
         { label: 'Light Green', value: '#DAF7A6' },
     ];
+
+    const handleBackPress = () => {
+        if (isLocationPickerVisible) {
+            setLocationPickerVisible(false);
+            // Close the modal
+            return true; // Prevent default back button behavior (i.e., exiting the app)
+        }
+        return false;  // Allow default behavior (i.e., exiting the app if the modal is not open)
+    };
+
+    useEffect(() => {
+        // Add listener when the component is mounted
+        BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+
+        // Clean up the listener when the component is unmounted
+        return () => {
+            BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+        };
+    }, [isLocationPickerVisible]);
 
     const renderItem = (item) => (
         <View style={styles.itemContainer}>
@@ -254,7 +273,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
         return { finalEarningAfterDiscount, earningAmount, serviceCharges }
 
-    } 
+    }
 
     const onPressSaveAndPost = async () => {
         const { finalEarningAfterDiscount, earningAmount, serviceCharges } = calculateCharges();
@@ -362,7 +381,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         "Confirmation",
                         "Your product posted successfully, Please complete the KYC status",
                         [
-                            { text: "OK", onPress: () =>  navigation.goBack() }
+                            { text: "OK", onPress: () => navigation.goBack() }
                         ],
                         { cancelable: false }
                     );
@@ -413,7 +432,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
                             onPress={() => onPressDiscountPercentage(item)}
                         >
-                            <Text style={{color:themevariable.Color_000000,}}>{item} %</Text>
+                            <Text style={{ color: themevariable.Color_000000, }}>{item} %</Text>
                         </TouchableOpacity>
                     )
                 })}
@@ -437,7 +456,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
                             onPress={() => onPressJewelleryType(item)}
                         >
-                            <Text style={{color:themevariable.Color_000000,}}>{item}</Text>
+                            <Text style={{ color: themevariable.Color_000000, }}>{item}</Text>
                         </TouchableOpacity>
                     )
                 })}
@@ -454,7 +473,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                 </View>
             ) :
                 <View>
-                    <Modal visible={isLocationPickerVisible} animationType="slide">
+                    <Modal visible={isLocationPickerVisible} animationType="slide" onRequestClose={() => handleCloseLocationPicker()}>
                         <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker} />
                         {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
                     </Modal>
@@ -664,7 +683,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     value={productAddress}
                                     placeholder="Please Enter Address"
                                     keyboardType={'default'}
-                                    style={{ height: '100%', textAlignVertical: 'top', padding: 10, color:themevariable.Color_000000, }}
+                                    style={{ height: '100%', textAlignVertical: 'top', padding: 10, color: themevariable.Color_000000, }}
                                     multiline={true}
                                     numberOfLines={4}
                                 />
@@ -849,7 +868,7 @@ const styles = StyleSheet.create({
     inputSearchStyle: {
         height: 40,
         fontSize: 16,
-        color:themevariable.Color_000000,
+        color: themevariable.Color_000000,
     },
     textInputlabel: {
         fontFamily: 'ManropeRegular',
