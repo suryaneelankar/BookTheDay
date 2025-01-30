@@ -160,6 +160,7 @@ const VendorProfile = () => {
                                 style={styles.linkText}
                                 value={link}
                                 editable={false}
+                                placeholderTextColor={"#7E8389"}
                             />
                             <LinearGradient colors={['#D2453B', '#A0153E']}
                                 start={{ x: 0, y: 0 }}

@@ -575,6 +575,7 @@ const GeneralDetails = ({isAadharUpdate}) => {
                                     onChangeText={onChangeCateringAddress}
                                     value={cateringAddress}
                                     placeholder="Please Enter Address"
+                                    placeholderTextColor={"#7E8389"}
                                     keyboardType={'default'}
                                     style={styles.addressTextInput}
                                     multiline={true}

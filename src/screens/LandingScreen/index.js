@@ -49,7 +49,7 @@ const LandingScreen = () => {
             <View style={styles.textContainer}>
                 <Text style={styles.title}>{title}</Text>
                 <Text style={styles.description}>{description}</Text>
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity onPress={onPress} style={styles.button}>
                     <Text style={styles.buttonText}>{buttonText}</Text>
                 </TouchableOpacity>
             </View>

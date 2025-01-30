@@ -683,6 +683,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     value={productAddress}
                                     placeholder="Please Enter Address"
                                     keyboardType={'default'}
+                                    placeholderTextColor={"#7E8389"}
                                     style={{ height: '100%', textAlignVertical: 'top', padding: 10, color: themevariable.Color_000000, }}
                                     multiline={true}
                                     numberOfLines={4}

@@ -37,6 +37,7 @@ const OtpValidation = ({ navigation }) => {
                             value={value}
                             onChangeText={(text) => handleOtpChange(text, index)}
                             keyboardType="numeric"
+                            placeholderTextColor={"#7E8389"}
                             maxLength={1}
                         />
                     ))}

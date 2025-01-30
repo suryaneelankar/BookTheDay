@@ -815,8 +815,9 @@ const GeneralDetails = ({isAadharUpdate}) => {
                                     onChangeText={onChangefunctionHallAddress}
                                     value={functionHallAddress}
                                     placeholder="Please Enter Address"
+                                    placeholderTextColor={"#7E8389"}
                                     keyboardType={'default'}
-                                    style={{ height: '100%', textAlignVertical: 'top', padding: 10 }}
+                                    style={{ height: '100%', textAlignVertical: 'top', padding: 10,color:"#333333" }}
                                     multiline={true}
                                     numberOfLines={4}
                                 />

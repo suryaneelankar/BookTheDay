@@ -265,7 +265,8 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         fontSize: 13,
         fontWeight: "700",
-        fontFamily: 'ManropeRegular'
+        fontFamily: 'ManropeRegular',
+        color:"#333333"
     },
     microphoneButton: {
         marginLeft: 10,

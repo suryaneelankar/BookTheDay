@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions, Alert } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import BookDatesButton from '../../components/GradientButton';
 import { useNavigation } from '@react-navigation/native';
@@ -78,6 +78,10 @@ const LoginScreen = ({ route }) => {
     }
 
     const getCheckUserValidation = async () => {
+        if(!phoneNumber || !password){
+            Alert.alert("Please fill all feilds");
+            return;
+        }
 
         const payload = {
             mobileNumber: String(phoneNumber),
@@ -128,6 +132,7 @@ const LoginScreen = ({ route }) => {
                     style={styles.input}
                     placeholder="your name"
                     value={fullName}
+                    placeholderTextColor={"#7E8389"}
                     onChangeText={setFullName}
                 />
                 {/* <Text style={styles.textLabel}>Email Address</Text>
@@ -139,20 +144,26 @@ const LoginScreen = ({ route }) => {
                     onChangeText={setEmail}
                 /> */}
                 <Text style={styles.textLabel}>Phone Number*</Text>
-
+                <View style={styles.phoneContainer}>
+                <Text style={styles.countryCode}>+91</Text>
                 <TextInput
-                    style={styles.input}
-                    placeholder="+91 9343467389"
+                    // style={styles.input}
+                    style={{color:"#333333", width:"100%"}}
+                    placeholderTextColor={"#7E8389"}
+                    placeholder="9343467389"
                     value={phoneNumber}
                     onChangeText={setPhoneNumber}
                     keyboardType="phone-pad"
+                    maxLength={10} // Limit the length for phone number
                 />
+            </View>
                 <Text style={styles.textLabel}>Password*</Text>
 
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
                         placeholder="Enter Password"
+                        placeholderTextColor={"#7E8389"}
                         value={password}
                         onChangeText={setPassword}
                         secureTextEntry={!isPasswordVisible} // Hide or show password based on isPasswordVisible
@@ -199,8 +210,6 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         fontFamily: 'ManropeRegular',
         fontWeight: "400"
-
-
     },
     textLabel: {
         fontSize: 14,
@@ -210,12 +219,13 @@ const styles = StyleSheet.create({
         marginBottom: 5
     },
     input: {
-        height: 40,
+        height: 45,
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 5,
         marginBottom: 15,
         paddingHorizontal: 10,
+        color:"#333333"
     },
     checkboxContainer: {
         flexDirection: 'row',
@@ -260,6 +270,19 @@ const styles = StyleSheet.create({
         // top:Dimensions.get('window').height/65
         // top: '50%',
         // transform: [{ translateY: -10 }],
+    },
+    phoneContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        paddingHorizontal: 8,
+        borderRadius:5,
+        height:45
+    },
+    countryCode: {
+        // fontSize: 16,
+        color: '#000',
     },
 });
 

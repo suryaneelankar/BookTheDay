@@ -257,6 +257,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
           value={searchText}
           onChangeText={handleSearch}
           style={styles.locationInput}
+          placeholderTextColor={"#7E8389"}
           onFocus={() => setOnSelectLoc(false)}
         // onBlur={() => setOnSelectLoc(true)}
         />
@@ -298,6 +299,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
               placeholder="Address"
               editable={true}
               multiline={true}
+              placeholderTextColor={"#7E8389"}
             />
 
             <Text style={[styles.labelText, { marginTop: 20 }]}>Pincode</Text>
@@ -306,6 +308,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
               value={pinCode}
               onChangeText={setPinCode}
               placeholder="Pin Code"
+              placeholderTextColor={"#7E8389"}
             />
 
             <View style={styles.labels}>

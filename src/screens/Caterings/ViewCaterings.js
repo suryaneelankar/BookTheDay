@@ -150,8 +150,9 @@ const ViewCaterings = ({ route, navigation }) => {
                 {isAdded && (
                     <>
                         <TextInput
-                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2, marginBottom: 15 }}
+                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2, marginBottom: 15, color:"#333333" }}
                             placeholder="Enter number of plates"
+                            placeholderTextColor={"#7E8389"}
                             keyboardType='phone-pad'
                             editable={false}
                             value={numPlates[item.title] || ''}
@@ -255,9 +256,10 @@ const ViewCaterings = ({ route, navigation }) => {
                     <View style={{ paddingHorizontal: 20 }}>
                         <Text style={{ fontSize: 12, color: "#333333", marginTop: 5, fontWeight: "700", marginBottom: 5, marginTop: 20 }}>Enter No.of Plates</Text>
                         <TextInput
-                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2, marginBottom: 15 }}
+                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2, marginBottom: 15 ,color:"#333333"}}
                             placeholder="Enter number of plates"
                             keyboardType='phone-pad'
+                            placeholderTextColor={"#7E8389"}
                             value={numPlates[foodComboSelected?.title] || ''}
                             onChangeText={(text) => [setNumPlates({ ...numPlates, [foodComboSelected?.title]: text }), setErrorMessage('')]}
                         />

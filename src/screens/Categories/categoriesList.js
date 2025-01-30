@@ -158,6 +158,7 @@ const CategoriesList = ({ route }) => {
                     />
                     <TextInput
                         placeholder="Browse requirements"
+                        placeholderTextColor={"#7E8389"}
                         style={styles.textInput} />
                 </View>
             </View>

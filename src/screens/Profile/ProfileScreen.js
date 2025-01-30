@@ -155,6 +155,7 @@ const ProfileMainScreen = () => {
                                 style={styles.linkText}
                                 value={link}
                                 editable={false}
+                                placeholderTextColor={"#7E8389"}
                             />
                               <LinearGradient colors={['#D2453B', '#A0153E']}
             start={{ x: 0, y: 0 }}
@@ -364,6 +365,7 @@ const styles = StyleSheet.create({
     //    borderBottomLeftRadius:8,
         padding: 5,
         width: '70%',
+        color:"#333333"
     },
     copiedText: {
         color: 'red',
