@@ -9,10 +9,12 @@ import { getCurrentLoggedInVendorMobileNum, getCurrentLoggedInUserMobileNum, get
 import { useDispatch, useSelector } from 'react-redux';
 import { storeUserAuthToken, getVendorAuthToken, getUserAuthToken, storeVendorAuthToken } from '../../utils/StoreAuthToken';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import CustomModal from '../../components/AlertModal';
 
 const LoginScreen = ({ route }) => {
     const { type } = route.params;
     const [fullName, setFullName] = useState('');
+    const [modalVisible, setModalVisible] = useState('');
     const [email, setEmail] = useState('');
     const navigation = useNavigation();
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -112,6 +114,7 @@ const LoginScreen = ({ route }) => {
                 }
             }
         } catch (error) {
+           setModalVisible(true)
             console.error("Error during login:", error);
         }
 
@@ -187,6 +190,12 @@ const LoginScreen = ({ route }) => {
                         padding={10}
                     />
                 </View>
+
+                <CustomModal
+            visible={modalVisible}
+            message={'Invalid Details'}
+            onClose={() => setModalVisible(false)}
+        />
 
             </LinearGradient>
         </SafeAreaView>

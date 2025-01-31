@@ -243,7 +243,7 @@ const ViewCaterings = ({ route, navigation }) => {
                     <View style={{ paddingHorizontal: 20, marginTop: 10, flexDirection: "row", justifyContent: "space-between" }}>
                         <View style={{ width: "50%" }}>
                             <Text style={{ color: "#100D25", fontSize: 18, fontWeight: "800", fontFamily: 'ManropeRegular' }}>{foodComboSelected?.title}</Text>
-                            <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5, fontWeight: "700" }}>{formatAmount(foodComboSelected?.perPlateCost)}</Text>
+                            <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5, fontWeight: "700" }}>Per plate cost {formatAmount(foodComboSelected?.perPlateCost)}</Text>
                             <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5, fontWeight: "700" }}>Min order: {foodComboSelected?.minOrder}</Text>
                         </View>
                         <TouchableOpacity
@@ -256,7 +256,7 @@ const ViewCaterings = ({ route, navigation }) => {
                     <View style={{ paddingHorizontal: 20 }}>
                         <Text style={{ fontSize: 12, color: "#333333", marginTop: 5, fontWeight: "700", marginBottom: 5, marginTop: 20 }}>Enter No.of Plates</Text>
                         <TextInput
-                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2, marginBottom: 15 ,color:"#333333"}}
+                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2, marginBottom: 15 ,color:"#333333",paddingHorizontal:10}}
                             placeholder="Enter number of plates"
                             keyboardType='phone-pad'
                             placeholderTextColor={"#7E8389"}
@@ -382,13 +382,13 @@ const ViewCaterings = ({ route, navigation }) => {
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, }}>
 
                         <Text style={[styles.title, { marginTop: 10 }]}>Advance Amount :</Text>
-                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{`₹${eventsDetails?.advanceAmount}`}</Text>
+                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{formatAmount(eventsDetails?.advanceAmount)}</Text>
                     </View>
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, marginBottom: "25%" }}>
 
                         <Text style={[styles.title, { marginTop: 10 }]}>Total Price :</Text>
-                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{`₹${grandTotal}`}</Text>
+                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{formatAmount(grandTotal)}</Text>
                     </View>
 
                 </View>
@@ -518,7 +518,7 @@ const ViewCaterings = ({ route, navigation }) => {
                             setModalVisible(true);
                         }
                     }}
-                    text={itemsWithTotalPrice?.length > 0 ? `₹${eventsDetails?.advanceAmount}   View Cart` : "View Cart"}
+                    text={itemsWithTotalPrice?.length > 0 ? `${formatAmount(eventsDetails?.advanceAmount)}   View Cart` : "View Cart"}
                     padding={10}
                 />
             </View>

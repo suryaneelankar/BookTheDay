@@ -197,7 +197,10 @@ const NearByFoodCaterings = () => {
                         </View>
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 5,paddingVertical:5,marginHorizontal:10,alignItems:"center" }}>
                            <DistanceIcon/>
-                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>{item?.distance.toFixed(1)}  km</Text>
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>
+                                {item?.distance !== undefined && item?.distance !== null ? `${item.distance.toFixed(1)} km` : 'N/A'}
+                              
+                                </Text>
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -214,7 +217,7 @@ const NearByFoodCaterings = () => {
     return (
         <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
             <View style={{ flex: 1 }}>
-                <View style={styles.autocompleteContainer}>
+                {/* <View style={styles.autocompleteContainer}>
                     <Autocomplete
                         data={dropdownVisible && filteredData?.length > 0 ? filteredData : []}  // Conditionally hide results based on dropdownVisible
                         value={query}
@@ -245,9 +248,9 @@ const NearByFoodCaterings = () => {
                     }}>
                         <IonIcon name="close-circle" size={24} color="gray" style={{ marginTop: 0 }} />
                     </TouchableOpacity>
-                </View>
+                </View> */}
 
-                <View style={{ marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row', marginTop: 60 }}>
+                <View style={{ marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row',}}>
                     <View>
                         <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
                         <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Catering Services in Hyderabad</Text>

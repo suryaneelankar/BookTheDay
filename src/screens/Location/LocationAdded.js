@@ -154,11 +154,11 @@ const LocationAdded = () => {
                 {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
             </Modal>
 
-            <View style={styles.searchProHeader}>
+            <TouchableOpacity onPress={() => setLocationPickerVisible(true)} style={styles.searchProHeader}>
                 <TouchableOpacity onPress={() => setLocationPickerVisible(true)} style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 10 }}>
                     <SearchIcon style={{}} />
 
-                    <TextInput
+                    {/* <TextInput
                         placeholderTextColor={"#7E8389"}
                         placeholder="Add a new address"
                         style={[styles.textInput, { marginLeft: 0, height: 50 }]}
@@ -168,9 +168,12 @@ const LocationAdded = () => {
                         onFocus={() => setLocationPickerVisible(true)}
                     //   onChangeText={(text) => [setLocationPickerVisible(true)]}
 
-                    />
+                    /> */}
+                    <Text style={[styles.textInput, {  }]}>
+                     Add a new address
+                    </Text>
                 </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
 
             <TouchableOpacity style={[styles.locationItem, { borderColor: selectedCurrentAddress ? 'red' : '', borderWidth: selectedCurrentAddress ? 1 : 0, borderRadius: selectedCurrentAddress ? 10 : 0 }]}
                 onPress={() => {
@@ -258,7 +261,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#F2F2F2",
         borderRadius: 8,
-        marginHorizontal: 20
+        marginHorizontal: 20,
+        height:45
     },
     textInput: {
         marginLeft: 10,

@@ -80,7 +80,27 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         { label: 'Dark Red', value: '#C70039' },
         { label: 'Purple', value: '#581845' },
         { label: 'Light Green', value: '#DAF7A6' },
+        { label: 'Black', value: '#000000' },
+        { label: 'White', value: '#FFFFFF' },
+        { label: 'Gray', value: '#808080' },
+        { label: 'Orange', value: '#FFA500' },
+        { label: 'Brown', value: '#A52A2A' },
+        { label: 'Cyan', value: '#00FFFF' },
+        { label: 'Magenta', value: '#FF00FF' },
+        { label: 'Light Blue', value: '#ADD8E6' },
+        { label: 'Lime', value: '#00FF00' },
+        { label: 'Gold', value: '#FFD700' },
+        { label: 'Silver', value: '#C0C0C0' },
+        { label: 'Teal', value: '#008080' },
+        { label: 'Navy', value: '#000080' },
+        { label: 'Indigo', value: '#4B0082' },
+        { label: 'Beige', value: '#F5F5DC' },
+        { label: 'Coral', value: '#FF7F50' },
+        { label: 'Lavender', value: '#E6E6FA' },
+        { label: 'Turquoise', value: '#40E0D0' },
+        { label: 'Peach', value: '#FFDAB9' }
     ];
+    
 
     const handleBackPress = () => {
         if (isLocationPickerVisible) {

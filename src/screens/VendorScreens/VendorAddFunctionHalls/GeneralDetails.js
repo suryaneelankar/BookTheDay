@@ -26,8 +26,8 @@ const GeneralDetails = ({isAadharUpdate}) => {
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [functionHallName, setfunctionHallName] = useState('');
     const [productDescription, setProductDescription] = useState('');
-    const [isCollapsed, setIsCollapsed] = useState(true);
-    const [isFoodDropDownCollapsed, setIsFoodDropDownCollapsed] = useState(true);
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isFoodDropDownCollapsed, setIsFoodDropDownCollapsed] = useState(false);
     const [selectedFoodType, setSelectedFoodType] = useState('');
     const [additionalImages, setAdditionalImages] = useState({
         additionalImageOne: undefined,
