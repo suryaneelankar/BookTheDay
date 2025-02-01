@@ -1,33 +1,36 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions, Alert } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import BookDatesButton from '../../components/GradientButton';
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL from '../../apiconfig';
 import axios from 'axios';
-import { getCurrentLoggedInVendorMobileNum, getCurrentLoggedInUserMobileNum, getLoginUserId, checkIsTokenStored } from '../../../redux/actions';
+import { getCurrentLoggedInVendorMobileNum, getCurrentLoggedInUserMobileNum, getLoginUserId } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { storeUserAuthToken, getVendorAuthToken, getUserAuthToken, storeVendorAuthToken, storeVendorMobileNumber, storeUserMobileNumber } from '../../utils/StoreAuthToken';
-import themevariable from '../../utils/themevariable';
+import { storeUserAuthToken, getVendorAuthToken, getUserAuthToken, storeVendorAuthToken } from '../../utils/StoreAuthToken';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import CustomModal from '../../components/AlertModal';
 
 const LoginScreen = ({ route }) => {
     const { type } = route.params;
     const [fullName, setFullName] = useState('');
+    const [modalVisible, setModalVisible] = useState('');
     const [email, setEmail] = useState('');
     const navigation = useNavigation();
     const [phoneNumber, setPhoneNumber] = useState('');
-    const [adminPhoneNumber, setAdminPhoneNumber] = useState('');
     const [password, setPassword] = useState('');
     const [authToken, setAuthToken] = useState('');
     const dispatch = useDispatch();
     const selectedMode = useSelector((state) => state.userId);
     const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
+    const [isPasswordVisible, setPasswordVisible] = useState(false);
+
     console.log("selected mode::::::::;;", selectedMode, type);
     console.log('deviceFCMToken is::>>', deviceFCMToken)
-    const [fieldsCheckModalVisible, setFieldsCheckModalVisible] = useState(false);
-    const [adminMobileNums,setAdminMobileNums] = useState([]);
 
+    const togglePasswordVisibility = () => {
+        setPasswordVisible(!isPasswordVisible);
+    };
 
     // console.log('user auth token is::>>',getVendorAuthToken());
 
@@ -76,26 +79,11 @@ const LoginScreen = ({ route }) => {
         }
     }
 
-    const getAdminNumbers = async () => {
-        // console.log("phoneNumber is ::>>>",phoneNumber);
-        try {
-            const response = await axios.get(`${BASE_URL}/get/adminNumbers`);
-            const adminNumbers = response?.data;
-            // console.log("response is::>>admin::>>",response);
-           if(adminNumbers){
-            setAdminMobileNums(adminNumbers?.data);
-            if (phoneNumber.includes(adminNumbers?.data)) {
-                getCheckUserValidation()
-            } else {
-                navigation.navigate('OtpValidation', { mobileNumber: phoneNumber, loginType: type })
-            }
-           }
-        } catch (error) {
-            console.error('Error fetching getAdminNumbers:', error);
-        }
-    };
-
     const getCheckUserValidation = async () => {
+        if(!phoneNumber || !password){
+            Alert.alert("Please fill all feilds");
+            return;
+        }
 
         const payload = {
             mobileNumber: String(phoneNumber),
@@ -111,29 +99,22 @@ const LoginScreen = ({ route }) => {
                 setAuthToken(logineRes?.data?.token);
                 if (type === 'vendor') {
                     console.log('into vendor LOGG');
-                    storeVendorDeviceToken();
                     dispatch(getLoginUserId(true));
                     dispatch(getCurrentLoggedInVendorMobileNum(phoneNumber));
-                    storeVendorAuthToken(logineRes?.data?.token);
-                    storeVendorMobileNumber(phoneNumber);
-                    if(logineRes?.data?.token){
-                        dispatch(checkIsTokenStored(true));
-                    }
-                    // navigation.navigate('Home');
+                    storeVendorDeviceToken();
+                    storeVendorAuthToken(logineRes?.data?.token)
+                    navigation.navigate('Home');
                 } else {
                     console.log('into USER LOGG');
                     storeUserDeviceToken();
                     dispatch(getLoginUserId(false));
                     dispatch(getCurrentLoggedInUserMobileNum(phoneNumber));
                     storeUserAuthToken(logineRes?.data?.token);
-                    storeUserMobileNumber(phoneNumber);
-                    if(logineRes?.data?.token){
-                        dispatch(checkIsTokenStored(true));
-                    }
-                    // navigation.navigate('Home');
+                    navigation.navigate('Home');
                 }
             }
         } catch (error) {
+           setModalVisible(true)
             console.error("Error during login:", error);
         }
 
@@ -148,77 +129,73 @@ const LoginScreen = ({ route }) => {
                     Connect to your 'Booktheday' account to explore local rental opportunities.
                 </Text>
 
-                {/* <Text style={styles.textLabel}>Full Name*</Text>
+                <Text style={styles.textLabel}>Full Name</Text>
 
                 <TextInput
                     style={styles.input}
                     placeholder="your name"
                     value={fullName}
+                    placeholderTextColor={"#7E8389"}
                     onChangeText={setFullName}
-                /> */}
-                {/* //<Text style={styles.textLabel}>Email Address</Text> */}
+                />
+                {/* <Text style={styles.textLabel}>Email Address</Text>
 
-                {/* <TextInput
+                <TextInput
                     style={styles.input}
                     placeholder="your email id"
                     value={email}
                     onChangeText={setEmail}
                 /> */}
-                <Text style={styles.textLabel}>Phone Number*</Text>
-
+                <Text style={styles.textLabel}>Phone Number<Text style={{color:"red", fontSize:14}}> *</Text></Text>
+                <View style={styles.phoneContainer}>
+                <Text style={styles.countryCode}>+91</Text>
                 <TextInput
-                    style={styles.input}
-                    placeholder="Enter Mobile Number"
+                    // style={styles.input}
+                    style={{color:"#333333", width:"100%"}}
+                    placeholderTextColor={"#7E8389"}
+                    placeholder="9343467389"
                     value={phoneNumber}
                     onChangeText={setPhoneNumber}
                     keyboardType="phone-pad"
+                    maxLength={10} // Limit the length for phone number
                 />
-                {adminMobileNums.includes(phoneNumber) ?
-                    <>
-                        <Text style={styles.textLabel}>Password*</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Enter Password"
-                            value={password}
-                            onChangeText={setPassword}
-                        />
-                        <TouchableOpacity onPress={() => navigation.navigate('UserAndVendorRegister',{type:type})}>
-                            <Text>Not having an account? Register</Text>
-                        </TouchableOpacity>
-                    </>
-                    :
-                    null}
+            </View>
+                <Text style={styles.textLabel}>Password<Text style={{color:"red", fontSize:14}}> *</Text></Text>
+
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Enter Password"
+                        placeholderTextColor={"#7E8389"}
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry={!isPasswordVisible} // Hide or show password based on isPasswordVisible
+                    />
+
+                    <TouchableOpacity onPress={togglePasswordVisibility} style={styles.eyeIcon}>
+                        <Icon name={!isPasswordVisible ? 'eye-slash' : 'eye'} size={18} color="#666666" />
+                    </TouchableOpacity>
+                </View>
 
                 {/* <View style={styles.checkboxContainer}>
                     <Text style={styles.checkboxLabel}>Terms And Conditions</Text>
                 </View> */}
 
-                <CustomModal
-                    visible={fieldsCheckModalVisible}
-                    message={'Please fill all fields'}
-                    onClose={() => setFieldsCheckModalVisible(false)}
-                />
-
                 <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
 
                     <BookDatesButton
-                        // onPress={() => getCheckUserValidation()}
-                        onPress={() => {
-                            if (!phoneNumber) {
-                                setFieldsCheckModalVisible(true);
-                            } else {
-                                getAdminNumbers();
-                                // if (phoneNumber == "9381491508") {
-                                //     getCheckUserValidation()
-                                // } else {
-                                //     navigation.navigate('OtpValidation', { mobileNumber: phoneNumber, loginType: type })
-                                // }
-                            }
-                        }}
-                        text={'Submit'}
+                        onPress={() => getCheckUserValidation()}
+                        // onPress={() => navigation.navigate('OtpValidation')}
+                        text={'Create Account'}
                         padding={10}
                     />
                 </View>
+
+                <CustomModal
+            visible={modalVisible}
+            message={'Invalid Details'}
+            onClose={() => setModalVisible(false)}
+        />
 
             </LinearGradient>
         </SafeAreaView>
@@ -242,8 +219,6 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         fontFamily: 'ManropeRegular',
         fontWeight: "400"
-
-
     },
     textLabel: {
         fontSize: 14,
@@ -253,13 +228,13 @@ const styles = StyleSheet.create({
         marginBottom: 5
     },
     input: {
-        height: 40,
+        height: 45,
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 5,
         marginBottom: 15,
         paddingHorizontal: 10,
-        color: themevariable.Color_000000
+        color:"#333333"
     },
     checkboxContainer: {
         flexDirection: 'row',
@@ -292,6 +267,31 @@ const styles = StyleSheet.create({
     signInText: {
         color: '#FF6F61',
         fontWeight: 'bold',
+    },
+    inputContainer: {
+        position: 'relative',
+        justifyContent:"space-between",
+    },
+    eyeIcon: {
+        position: 'absolute',
+        right: 10,
+        top:10,
+        // top:Dimensions.get('window').height/65
+        // top: '50%',
+        // transform: [{ translateY: -10 }],
+    },
+    phoneContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        paddingHorizontal: 8,
+        borderRadius:5,
+        height:45
+    },
+    countryCode: {
+        // fontSize: 16,
+        color: '#000',
     },
 });
 

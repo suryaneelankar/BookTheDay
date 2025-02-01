@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal, ActivityIndicator, Button, TextInput, ScrollView } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal, ActivityIndicator, Button, TextInput, ScrollView, BackHandler } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
@@ -80,16 +80,46 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         { label: 'Dark Red', value: '#C70039' },
         { label: 'Purple', value: '#581845' },
         { label: 'Light Green', value: '#DAF7A6' },
-        { label: 'Orange', value: '#FFA500' },
-        { label: 'Maroon', value: '#800000' },
         { label: 'Black', value: '#000000' },
         { label: 'White', value: '#FFFFFF' },
-        { label: 'LightBlue', value: '#ADD8E6' },
+        { label: 'Gray', value: '#808080' },
+        { label: 'Orange', value: '#FFA500' },
         { label: 'Brown', value: '#A52A2A' },
+        { label: 'Cyan', value: '#00FFFF' },
         { label: 'Magenta', value: '#FF00FF' },
-        { label: 'Others', value: '#FFFFFF' },
-
+        { label: 'Light Blue', value: '#ADD8E6' },
+        { label: 'Lime', value: '#00FF00' },
+        { label: 'Gold', value: '#FFD700' },
+        { label: 'Silver', value: '#C0C0C0' },
+        { label: 'Teal', value: '#008080' },
+        { label: 'Navy', value: '#000080' },
+        { label: 'Indigo', value: '#4B0082' },
+        { label: 'Beige', value: '#F5F5DC' },
+        { label: 'Coral', value: '#FF7F50' },
+        { label: 'Lavender', value: '#E6E6FA' },
+        { label: 'Turquoise', value: '#40E0D0' },
+        { label: 'Peach', value: '#FFDAB9' }
     ];
+    
+
+    const handleBackPress = () => {
+        if (isLocationPickerVisible) {
+            setLocationPickerVisible(false);
+            // Close the modal
+            return true; // Prevent default back button behavior (i.e., exiting the app)
+        }
+        return false;  // Allow default behavior (i.e., exiting the app if the modal is not open)
+    };
+
+    useEffect(() => {
+        // Add listener when the component is mounted
+        BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+
+        // Clean up the listener when the component is unmounted
+        return () => {
+            BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+        };
+    }, [isLocationPickerVisible]);
 
     const renderItem = (item) => (
         <View style={styles.itemContainer}>
@@ -463,7 +493,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                 </View>
             ) :
                 <View>
-                    <Modal visible={isLocationPickerVisible} animationType="slide">
+                    <Modal visible={isLocationPickerVisible} animationType="slide" onRequestClose={() => handleCloseLocationPicker()}>
                         <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker} />
                         {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
                     </Modal>
@@ -675,6 +705,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     value={productAddress}
                                     placeholder="Please Enter Address"
                                     keyboardType={'default'}
+                                    placeholderTextColor={"#7E8389"}
                                     style={{ height: '100%', textAlignVertical: 'top', padding: 10, color: themevariable.Color_000000, }}
                                     multiline={true}
                                     numberOfLines={4}

@@ -141,6 +141,7 @@ const BankDetailsScreen = () => {
             <TextInput
                 style={styles.input}
                 placeholder="Bank Account Number"
+                placeholderTextColor={"#7E8389"}
                 editable={isEditable}
                 // keyboardType="numeric"
                 value={accountNumber}
@@ -150,6 +151,7 @@ const BankDetailsScreen = () => {
 
             <TextInput
                 style={styles.input}
+                placeholderTextColor={"#7E8389"}
                 placeholder="IFSC Code"
                 value={ifscCode}
                 editable={isEditable}
@@ -160,6 +162,7 @@ const BankDetailsScreen = () => {
 
             <TextInput
                 style={styles.input}
+                placeholderTextColor={"#7E8389"}
                 placeholder="UPI ID"
                 value={upiId}
                 onChangeText={setUpiId}
@@ -168,6 +171,7 @@ const BankDetailsScreen = () => {
             <Text style={{ marginVertical: 5, color: "black", fontSize: 14, fontWeight: "400", fontFamily: 'ManropeRegular', }}> PhonePe/ Gpay Number</Text>
             <TextInput
                 style={styles.input}
+                placeholderTextColor={"#7E8389"}
                 placeholder="PhonePe/Gpay Number"
                 keyboardType="phone-pad"
                 value={mobileNumber}

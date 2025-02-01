@@ -182,7 +182,7 @@ const Events = () => {
 
     const returnCategoriesCount = () => {
         let count = 0;
-        count = eventsData?.length;
+        count = query ? (locationBasedData?.length) : (eventsData?.length);
         return count;
     };
     console.log("selected query is:::::::", query)

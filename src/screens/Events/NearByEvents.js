@@ -150,23 +150,29 @@ const NearByEvents = () => {
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'row', marginBottom: 10,marginRight: 20 }}>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', flexShrink: 1 }}>
+                        {/* Other Views */}
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.seatingCapacity} pax</Text>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.bedRooms} Rooms</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 5, paddingVertical: 5, alignItems: "center" }}>
-                            <DistanceIcon />
-                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>{item?.distance?.toFixed(1)}  km</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10,marginHorizontal:5, alignItems:"center"}}>
-
-                            <Text style={{  }}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon/>}</Text>
-                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'NON-VEG': item?.foodType == 'veg' ? 'VEG' : 'NON-VEG'}</Text>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
+                            <Text>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>
+                                {item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'veg' ? 'VEG' : 'NON-VEG'}
+                            </Text>
                         </View>
                     </View>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', flexShrink: 1, marginTop: 5 }}>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 5, paddingVertical: 5, marginTop: 5, alignItems: "center" }}>
+                            <DistanceIcon />
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>
+                                {item?.distance !== undefined && item?.distance !== null ? `${item.distance.toFixed(1)} km` : 'N/A'}</Text>
+                        </View>
+                    </View>
+
                 </TouchableOpacity>
             </View>
         )
@@ -175,7 +181,7 @@ const NearByEvents = () => {
 
     const returnCategoriesCount = () => {
         let count = 0;
-        count = eventsData?.length;
+        count = query ? locationBasedData?.length : eventsData?.length;
         return count;
     };
 
@@ -199,7 +205,7 @@ const NearByEvents = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
-            <View style={styles.autocompleteContainer}>
+            {/* <View style={styles.autocompleteContainer}>
                 <Autocomplete
                     data={dropdownVisible && filteredData?.length > 0 ? filteredData : []}  // Conditionally hide results based on dropdownVisible
                     value={query}
@@ -231,9 +237,9 @@ const NearByEvents = () => {
                 }}>
                     <IonIcon name="close-circle" size={24} color="gray" style={{ marginTop: 0 }} />
                 </TouchableOpacity>
-            </View>
+            </View> */}
 
-            <View style={{ marginTop: 60, marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
+            <View style={{marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
                 <View>
                     <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
                     <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "400", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Function Halls in Hyderabad</Text>

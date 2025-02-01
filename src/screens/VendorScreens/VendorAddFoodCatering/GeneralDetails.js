@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, TextInput, ScrollView, ActivityIndicator, Modal } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, TextInput, ScrollView, ActivityIndicator, Modal, BackHandler } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
@@ -60,6 +60,25 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     useEffect(() => {
         getFoodMenuItems();
     }, []);
+
+     const handleBackPress = () => {
+                if (isLocationPickerVisible) {
+                    setLocationPickerVisible(false);
+                      // Close the modal
+                    return true; // Prevent default back button behavior (i.e., exiting the app)
+                }
+                return false;  // Allow default behavior (i.e., exiting the app if the modal is not open)
+            };
+        
+            useEffect(() => {
+                // Add listener when the component is mounted
+                BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+        
+                // Clean up the listener when the component is unmounted
+                return () => {
+                    BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+                };
+            }, [isLocationPickerVisible]); 
 
     const getFoodMenuItems = async () => {
         const token = await getVendorAuthToken();
@@ -439,8 +458,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                 </View>
             ) :
                 <View>
-                    <Modal visible={isLocationPickerVisible} animationType="slide">
-                        <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker} />
+                    <Modal visible={isLocationPickerVisible} animationType="slide"  onRequestClose={() => handleCloseLocationPicker()}>
+                        <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
                         {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
                     </Modal>
                     <View style={styles.mainContainer}>
@@ -558,6 +577,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     onChangeText={onChangeCateringAddress}
                                     value={cateringAddress}
                                     placeholder="Please Enter Address"
+                                    placeholderTextColor={"#7E8389"}
                                     keyboardType={'default'}
                                     style={styles.addressTextInput}
                                     multiline={true}

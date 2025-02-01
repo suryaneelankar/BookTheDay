@@ -152,6 +152,7 @@ const ViewCaterings = ({ route, navigation }) => {
                         <TextInput
                             style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2,marginTop:20, marginBottom: 15, color: themevariable.Color_000000,paddingHorizontal:15 }}
                             placeholder="Enter number of plates"
+                            placeholderTextColor={"#7E8389"}
                             keyboardType='phone-pad'
                             editable={false}
                             value={`${numPlates[item.title] + '  Plates'}` || ''}
@@ -165,6 +166,7 @@ const ViewCaterings = ({ route, navigation }) => {
                         borderStyle: 'dashed',
                         borderWidth: 1,
                         borderColor: '#E0E0E0',
+                        marginVertical:20
 
                     }} />
                 )}
@@ -242,8 +244,8 @@ const ViewCaterings = ({ route, navigation }) => {
                     <View style={{ paddingHorizontal: 20, marginTop: 10, flexDirection: "row", justifyContent: "space-between" }}>
                         <View style={{ width: "50%" }}>
                             <Text style={{ color: "#100D25", fontSize: 18, fontWeight: "800", fontFamily: 'ManropeRegular' }}>{foodComboSelected?.title}</Text>
-                            <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5, fontWeight: "700" }}>{formatAmount(foodComboSelected?.perPlateCost)}</Text>
-                            <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5, fontWeight: "700" }}>Min order: {foodComboSelected?.minOrder}</Text>
+                            <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5, fontWeight: "700" }}><Text style={{ fontSize: 14, color: "#FD813B", marginTop: 5, fontWeight: "700" }}>Per plate cost: </Text> {formatAmount(foodComboSelected?.perPlateCost)}</Text>
+                            <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5, fontWeight: "700" }}><Text style={{ fontSize: 14, color: "#FD813B", marginTop: 5, fontWeight: "700" }}>Min order: </Text> {foodComboSelected?.minOrder} plates</Text>
                         </View>
                         <TouchableOpacity
                             onPress={() => handleAddClick()}
@@ -258,6 +260,7 @@ const ViewCaterings = ({ route, navigation }) => {
                             style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2, marginBottom: 15, color:themevariable.Color_000000, paddingHorizontal: 15 }}
                             placeholder="Enter number of plates"
                             keyboardType='phone-pad'
+                            placeholderTextColor={"#7E8389"}
                             value={numPlates[foodComboSelected?.title] || ''}
                             onChangeText={(text) => [setNumPlates({ ...numPlates, [foodComboSelected?.title]: text }), setErrorMessage('')]}
                         />
@@ -380,13 +383,13 @@ const ViewCaterings = ({ route, navigation }) => {
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, }}>
 
                         <Text style={[styles.title, { marginTop: 10 }]}>Advance Amount :</Text>
-                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{`₹${eventsDetails?.advanceAmount}`}</Text>
+                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{formatAmount(eventsDetails?.advanceAmount)}</Text>
                     </View>
 
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, marginBottom: "25%" }}>
 
                         <Text style={[styles.title, { marginTop: 10 }]}>Total Price :</Text>
-                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{`₹${grandTotal}`}</Text>
+                        <Text style={[styles.title, { marginTop: 10, fontWeight: "bold" }]}>{formatAmount(grandTotal)}</Text>
                     </View>
 
                 </View>
@@ -516,7 +519,7 @@ const ViewCaterings = ({ route, navigation }) => {
                             setModalVisible(true);
                         }
                     }}
-                    text={itemsWithTotalPrice?.length > 0 ? `₹${eventsDetails?.advanceAmount}   View Cart` : "View Cart"}
+                    text={itemsWithTotalPrice?.length > 0 ? `${formatAmount(eventsDetails?.advanceAmount)}   View Cart` : "View Cart"}
                     padding={10}
                 />
             </View>

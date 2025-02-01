@@ -199,6 +199,7 @@ const OtpValidation = ({ navigation, route }) => {
                             value={value}
                             onChangeText={(text) => handleOtpChange(text, index)}
                             keyboardType="numeric"
+                            placeholderTextColor={"#7E8389"}
                             maxLength={1}
                             ref={(ref) => (inputRefs.current[index] = ref)} // Assign reference
                             onKeyPress={({ nativeEvent }) => {

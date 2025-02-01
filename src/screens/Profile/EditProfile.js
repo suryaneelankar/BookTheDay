@@ -33,6 +33,8 @@ const EditProfile = () => {
                     placeholder="Name"
                     value={fullName}
                     onChangeText={setFullName}
+                    placeholderTextColor={"#7E8389"}
+
                 />
                 <Text style={{ color: "#000000", fontSize: 13, fontWeight: "700", fontFamily: 'ManropeRegular', marginTop: 20 }}>Contact Number*</Text>
                 <TextInput
@@ -40,6 +42,8 @@ const EditProfile = () => {
                     placeholder="Contact Number"
                     value={contactNumber}
                     onChangeText={setContactNumber}
+                    placeholderTextColor={"#7E8389"}
+
                 />
                 <Text style={{ color: "#000000", fontSize: 13, fontWeight: "700", fontFamily: 'ManropeRegular', marginTop: 20 }}>Email Address*</Text>
                 <TextInput
@@ -47,6 +51,8 @@ const EditProfile = () => {
                     placeholder="Email Address"
                     value={email}
                     onChangeText={setEmail}
+                    placeholderTextColor={"#7E8389"}
+
                 />
                 <Text style={{ color: "#000000", fontSize: 13, fontWeight: "700", fontFamily: 'ManropeRegular', marginTop: 20 }}>Address*</Text>
 
@@ -55,6 +61,8 @@ const EditProfile = () => {
                     placeholder="Address"
                     value={address}
                     onChangeText={setAddress}
+                    placeholderTextColor={"#7E8389"}
+
                 />
             </View>
             </View>

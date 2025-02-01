@@ -219,6 +219,7 @@ const Categories = () => {
                             <SearchIcon style={{ marginLeft: verticalScale(20) }} />
                             <TextInput
                                 placeholder="Search fashion"
+                                placeholderTextColor={"#7E8389"}
                                 style={styles.textInput} />
                         </View>
                     </View>

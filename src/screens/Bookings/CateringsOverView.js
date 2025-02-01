@@ -206,7 +206,7 @@ const CateringsOverView = ({ route, navigation }) => {
                                     <View style={{ paddingVertical: 5 }}>
                                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
                                             <Text style={styles.comboPriceMainText}>Per Plate Cost:</Text>
-                                            <Text style={styles.comboPriceSubText}>{item.perPlateCost}</Text>
+                                            <Text style={styles.comboPriceSubText}>{formatAmount(item.perPlateCost)}</Text>
                                         </View>
                                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
                                             <Text style={styles.comboPriceMainText}>Number of Plates:</Text>
@@ -214,7 +214,7 @@ const CateringsOverView = ({ route, navigation }) => {
                                         </View>
                                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
                                             <Text style={styles.comboPriceMainText}>Total Price:</Text>
-                                            <Text style={styles.comboPriceSubText}>{item.totalPrice}</Text>
+                                            <Text style={styles.comboPriceSubText}>{formatAmount(item.totalPrice)}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -225,12 +225,12 @@ const CateringsOverView = ({ route, navigation }) => {
                     <View>
                         <View style={styles.row}>
                             <Text style={[styles.text, styles.label]}>Total Amount</Text>
-                            <Text style={[styles.text, styles.value]}>{totalPrice}</Text>
+                            <Text style={[styles.text, styles.value]}>{totalPrice?.toLocaleString('en-IN')}</Text>
                         </View>
                         <View style={styles.row}>
                             <Text style={[styles.text, styles.label]}>Advance Amount</Text>
                             <Text style={[styles.text, styles.value]}>
-                                {bookingDetails?.advanceAmount}
+                            {formatAmount(bookingDetails?.advanceAmount)}
                             </Text>
                         </View>
                     </View>
@@ -266,9 +266,9 @@ const CateringsOverView = ({ route, navigation }) => {
                         <ThumsUpIcon />
                     </View>
                     <Text style={styles.title}>Thank You!</Text>
-                    <Text style={styles.subtitle}>Your Booking Initiated.</Text>
-                    <Text style={styles.description}>Our team will update to you in less than 2 hours</Text>
-                    <Text style={styles.description}>*Once booking approved please do the payment to confirm your booking.</Text>
+                    <Text style={styles.subtitle}>Your Booking Has Been Initiated.</Text>
+                    <Text style={styles.description}>Our team is processing your request and will update you within the next 1 hour.</Text>
+                    <Text style={styles.description}>*Once your booking is approved, please complete the payment to confirm your reservation.</Text>
                     <LinearGradient colors={['#D2453B', '#A0153E']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}

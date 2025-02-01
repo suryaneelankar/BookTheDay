@@ -220,7 +220,7 @@ const FoodMenu = ({ onSaveClick }) => {
                 keyboardType="default"
             /> */}
 
-            <Dropdown
+            {/* <Dropdown
                 style={styles.dropdown}
                 data={comboNames || []}
                 labelField="label"
@@ -233,7 +233,8 @@ const FoodMenu = ({ onSaveClick }) => {
                 selectedTextStyle={styles.selectedTextStyle}
                 placeholderStyle={styles.placeholderStyle}
                 containerStyle={styles.dropdownContainer}
-            />
+                placeholderTextColor={"#7E8389"}
+           /> */}
 
             {filteredCategories.map((category) => (
                 <View key={category.category} style={styles.categoryContainer}>
@@ -319,6 +320,8 @@ const FoodMenu = ({ onSaveClick }) => {
                 value={perPlateCost}
                 onChangeText={setPerPlatePrice}
                 keyboardType="numeric"
+                placeholderTextColor={"#7E8389"}
+
             />
 
             <Text style={[styles.label, { marginTop: 10 }]}>
@@ -331,6 +334,8 @@ const FoodMenu = ({ onSaveClick }) => {
                 value={minOrder}
                 onChangeText={setMinOrderMembers}
                 keyboardType="numeric"
+                placeholderTextColor={"#7E8389"}
+
             />
 
             {showCustomTextInput && (
@@ -341,6 +346,7 @@ const FoodMenu = ({ onSaveClick }) => {
                             value={customItemVal}
                             onChangeText={(text) => setCustomItemVal(text)}
                             placeholder="Add Custom Item"
+                            placeholderTextColor={"#7E8389"}
                         />
                         <TouchableOpacity style={styles.iconButton} onPress={handleAddCustomItem}>
                             <CheckIconGreen />
