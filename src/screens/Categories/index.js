@@ -214,7 +214,7 @@ const Categories = () => {
         <SafeAreaView style={{ flex: 1, }}>
             <ScrollView style={{ marginBottom: 70, marginTop: 20 }} >
                 <View style={{ backgroundColor: "#F9F9F9" }}>
-                    <View style={styles.searchProduct}>
+                    {/* <View style={styles.searchProduct}>
                         <View style={styles.searchProHeader}>
                             <SearchIcon style={{ marginLeft: verticalScale(20) }} />
                             <TextInput
@@ -222,7 +222,7 @@ const Categories = () => {
                                 placeholderTextColor={"#7E8389"}
                                 style={styles.textInput} />
                         </View>
-                    </View>
+                    </View> */}
 
                     <Swiper
                         autoplay

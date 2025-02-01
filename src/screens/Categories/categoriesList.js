@@ -151,7 +151,7 @@ const CategoriesList = ({ route }) => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-            <View style={[styles.headerContainer, { flexDirection: "row", }]}>
+            {/* <View style={[styles.headerContainer, { flexDirection: "row", }]}>
                 <View style={styles.searchView}>
                     <Image source={require('../../assets/searchIcon.png')}
                         style={styles.serachIcon}
@@ -161,10 +161,10 @@ const CategoriesList = ({ route }) => {
                         placeholderTextColor={"#7E8389"}
                         style={styles.textInput} />
                 </View>
-            </View>
+            </View> */}
 
             <View style={{ marginBottom: "10%" }}>
-                <Text style={{alignSelf:'center', color:"#000000"}}>{categories?.length} products</Text>
+                {/* <Text style={{alignSelf:'center', color:"#000000"}}>{categories?.length} products</Text> */}
                
                     <FlatList
                         numColumns={2}

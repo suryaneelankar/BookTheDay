@@ -253,7 +253,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
           <Iconleftcircle name='leftcircle' color={'#494a49'} size={33} style={{ bottom: 5 }} />
         </TouchableOpacity>
         <TextInput
-          placeholder="Enter Location"
+          placeholder="Search for area, street name.."
           value={searchText}
           onChangeText={handleSearch}
           style={styles.locationInput}

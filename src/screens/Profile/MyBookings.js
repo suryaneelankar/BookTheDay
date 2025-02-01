@@ -263,21 +263,21 @@ const ViewMyBookings = () => {
 
   const openMap = (lat, lon) => {
     const url = Platform.select({
-        ios: `maps:0,0?q=${lat},${lon}`, // Apple Maps for iOS
-        android: `geo:0,0?q=${lat},${lon}` // Google Maps for Android
+      ios: `maps:0,0?q=${lat},${lon}`, // Apple Maps for iOS
+      android: `geo:0,0?q=${lat},${lon}` // Google Maps for Android
     });
     Linking.openURL(url);
-};
+  };
 
-const openDialPad = (number) => {
-  if (Platform.OS === 'ios') {
+  const openDialPad = (number) => {
+    if (Platform.OS === 'ios') {
       number = `telprompt:${number}`;
-  }
-  else {
+    }
+    else {
       number = `tel:${number}`;
+    }
+    Linking.openURL(number);
   }
-  Linking.openURL(number);
-}
 
 
 
@@ -322,9 +322,9 @@ const openDialPad = (number) => {
           </Text>
         </View>
         {(item?.catType === 'functionHalls' && item?.advanceAmountPaid > 0) ?
-          <View style={{ flexDirection: "row",marginHorizontal:5 ,marginVertical:10}}>
+          <View style={{ flexDirection: "row", marginHorizontal: 5, marginVertical: 10 }}>
             <LocationIcon />
-            <TouchableOpacity  style={{ marginHorizontal:5}} onPress={() => openMap(item?.vendorLatitude, item?.vendorLongitude)} >
+            <TouchableOpacity style={{ marginHorizontal: 5 }} onPress={() => openMap(item?.vendorLatitude, item?.vendorLongitude)} >
               <Text numberOfLines={2} style={styles.locationText}>{item?.functionHallAddress?.address}</Text>
             </TouchableOpacity>
           </View>
@@ -338,21 +338,23 @@ const openDialPad = (number) => {
         />
 
         <View style={styles.cardFooter}>
-          <TouchableOpacity  onPress={() => openDialPad('8297735285')}>
-          <Text style={[styles.cardStatus, { borderWidth: 1, borderColor: "gray", paddingHorizontal: 20, fontSize: 11, color:"#666666" }]}>
-            NEED HELP?
-          </Text>
+          <TouchableOpacity onPress={() => openDialPad('8297735285')}>
+            <Text style={[styles.cardStatus, { borderWidth: 1, borderColor: "gray", paddingHorizontal: 20, fontSize: 11, color: "#666666" }]}>
+              NEED HELP?
+            </Text>
           </TouchableOpacity>
-          <LinearGradient colors={item.bookingStatus === 'approved' ? ['#FE7939', '#FE7939'] : ['#B0B0B0', '#B0B0B0']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.doneButton}>
-            <TouchableOpacity
-              disabled={item.bookingStatus !== 'approved'}
-              onPress={() => { setPaymentModal(true), setSelectedObjectedforPayment(item) }}>
+          <TouchableOpacity
+            disabled={item.bookingStatus !== 'approved'}
+            onPress={() => { setPaymentModal(true), setSelectedObjectedforPayment(item) }}>
+            <LinearGradient colors={item.bookingStatus === 'approved' ? ['#FE7939', '#FE7939'] : ['#B0B0B0', '#B0B0B0']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.doneButton}>
+
               <Text style={styles.doneButtonText}>Pay Now</Text>
-            </TouchableOpacity>
-          </LinearGradient>
+
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
       </View>
     )

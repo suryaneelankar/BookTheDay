@@ -1,39 +1,45 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/Ionicons'; // Assuming you're using Ionicons
+import LinearGradient from 'react-native-linear-gradient';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const PaymentFailedScreen = () => {
   const navigation = useNavigation();
 
   const handleRetry = () => {
-    // Navigate to the payment retry or any other screen
     navigation.navigate('ViewMyBookings');
   };
 
   const handleHome = () => {
-    // Navigate to the home screen
     navigation.navigate('Home');
   };
 
   return (
     <View style={styles.container}>
+      {/* Failure Icon */}
       <View style={styles.iconContainer}>
-        <Icon name="close-circle" size={100} color="#FF4C4C" />
+        <Icon name="close-circle-outline" size={110} color="#E63946" />
       </View>
 
-      <Text style={styles.failedText}>Payment Failed</Text>
+      {/* Failure Text */}
+      <Text style={styles.failedText}>Payment Unsuccessful</Text>
 
+      {/* Description */}
       <Text style={styles.descriptionText}>
-        Oops! Something went wrong. Please try again later or contact support.
+        Oops! We couldn’t process your payment. Please try again.
       </Text>
 
-      <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
-        <Text style={styles.buttonText}>Retry Payment</Text>
-      </TouchableOpacity>
+      {/* Retry Payment Button (Gradient Red) */}
+      <LinearGradient colors={['#D32F2F', '#9B0000']} style={styles.retryButton}>
+        <TouchableOpacity style={styles.buttonContent} onPress={handleRetry}>
+          <Text style={styles.retryButtonText}>Try Again</Text>
+        </TouchableOpacity>
+      </LinearGradient>
 
-      <TouchableOpacity style={styles.homeButton} onPress={handleHome}>
-        <Text style={styles.buttonText}>Go to Home</Text>
+      {/* Home Button (White with Red Border) */}
+      <TouchableOpacity style={styles.homeButton} onPress={handleHome} activeOpacity={0.8}>
+        <Text style={styles.homeButtonText}>Back to Home</Text>
       </TouchableOpacity>
     </View>
   );
@@ -42,55 +48,69 @@ const PaymentFailedScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    // justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#FAFAFA',
     paddingHorizontal: 20,
+    paddingVertical:30
   },
   iconContainer: {
-    marginBottom: 30,
+    marginBottom: 25,
+    shadowColor: '#D32F2F',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 5,
   },
   failedText: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
-    color: '#FF4C4C',
+    color: '#D32F2F',
     marginBottom: 10,
   },
   descriptionText: {
     fontSize: 16,
-    color: '#666',
+    color: '#555',
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: 35,
+    paddingHorizontal: 15,
+    lineHeight: 24,
   },
   retryButton: {
-    backgroundColor: '#FF4C4C',
+    borderRadius: 12,
+    width: '80%',
+    overflow: 'hidden',
+    elevation: 4,
+  },
+  buttonContent: {
     paddingVertical: 15,
-    paddingHorizontal: 60,
-    borderRadius: 10,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
-    elevation: 3,
-    marginBottom: 20,
+  },
+  retryButtonText: {
+    color: '#FFF', // White Text
+    fontSize: 17,
+    fontWeight: 'bold',
   },
   homeButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 15,
-    paddingHorizontal: 60,
-    borderRadius: 10,
+    backgroundColor: '#FFFFFF', // White Background
+    paddingVertical: 14,
+    paddingHorizontal: 50,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#D32F2F', // Red Border
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
+    width: '80%',
+    marginTop: 10,
     elevation: 3,
+    shadowColor: '#D32F2F',
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 5,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  homeButtonText: {
+    color: '#D32F2F', // Red Text
+    fontSize: 17,
+    fontWeight: 'bold',
   },
 });
 

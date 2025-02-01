@@ -109,11 +109,11 @@ const ProfileMainScreen = () => {
                 <MenuItem icon={<RefundPolicy />} title="Refund Policy"  onPress={() => navigation.navigate('RefundPolicy')}/>
                 <MenuItem icon={<LogOutIcon />} title="Log Out" 
                 onPress={async() => {
-                    // dispatch(getLoginUserId('')),
-                    // navigation.navigate('LandingScreen')
-                    dispatch(checkIsTokenStored(false));
-                    await removeUserAuthToken();
-                    await removeUserMobileNumber();
+                    dispatch(getLoginUserId('')),
+                    navigation.navigate('LandingScreen')
+                    // dispatch(checkIsTokenStored(false));
+                    // await removeUserAuthToken();
+                    // await removeUserMobileNumber();
                 }} />
 
             </ScrollView>

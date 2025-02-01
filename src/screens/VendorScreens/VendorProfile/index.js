@@ -113,9 +113,11 @@ const VendorProfile = () => {
                 <MenuItem icon={<RefundPolicy />} title="Refund Policy" onPress={() => navigation.navigate('VendorRefundPolicy')} />
                 <MenuItem icon={<LogOutIcon />} title="Log Out"
                     onPress={async () => {
-                        dispatch(checkIsTokenStored(false));
-                        await removeVendorAuthToken();
-                        await removeVendorMobileNumber();
+                        dispatch(getLoginUserId('')),
+                        navigation.navigate('LandingScreen')
+                        // dispatch(checkIsTokenStored(false));
+                        // await removeVendorAuthToken();
+                        // await removeVendorMobileNumber();
                     }} />
 
             </ScrollView>
