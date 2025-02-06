@@ -2,20 +2,20 @@ import React, { useEffect, useState } from "react";
 import { View, Dimensions, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
 import ImageZoom from "react-native-image-pan-zoom";
+import RightSideIcon from '../assets/profilesvgs/zoomRight.svg';
+import LeftSideIcon from '../assets/profilesvgs/zoomLeft.svg';
+import CloseIcon from '../assets/profilesvgs/zoomClose.svg';
 
 const ZoomImage = ({ visible, onClose, images, initialIndex, tokenIs }) => {
     const screenWidth = Dimensions.get("window").width;
     const screenHeight = Dimensions.get("window").height;
-   
 
 
+    console.log("images recoeved ate clothes:::::::", images);
     const [currentIndex, setCurrentIndex] = useState(initialIndex || 0);
     useEffect(() => {
         setCurrentIndex(initialIndex || 0);
     }, [initialIndex]);
-
-    console.log("initial index::::::", initialIndex);
-    console.log("current index is::::", currentIndex);
 
     const handleNext = () => {
         if (currentIndex < images.length - 1) {
@@ -31,21 +31,25 @@ const ZoomImage = ({ visible, onClose, images, initialIndex, tokenIs }) => {
 
 
     return (
-        <Modal isVisible={visible} onBackdropPress={onClose} style={{ margin: 0, flex: 1 }}>
-            <View style={{ flex: 1, backgroundColor: "white", marginHorizontal: 20, borderRadius: 20, marginVertical: 20 }}>
+        <Modal backdropColor="rgba(0,0,0,0.5)" isVisible={visible} onBackdropPress={onClose} style={{ margin: 0, flex: 1 }}>
+            <View style={{ flex: 1, backgroundColor: "white", marginHorizontal: 20, borderRadius: 20, marginVertical: 60 }}>
                 <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                    <Text style={styles.closeText}>X</Text>
+                    <Text style={styles.closeText}>
+                        <CloseIcon />
+                    </Text>
                 </TouchableOpacity>
 
                 <View style={styles.imageContainer}>
                     <TouchableOpacity style={styles.arrowLeft} onPress={handlePrevious} disabled={currentIndex === 0}>
-                        <Text style={[styles.arrowText, currentIndex === 0 && styles.arrowDisabled]}>{"<"}</Text>
+                        <Text style={[styles.arrowText, currentIndex === 0 && styles.arrowDisabled]}>
+                            <LeftSideIcon />
+                        </Text>
                     </TouchableOpacity>
                     <ImageZoom
                         cropWidth={screenWidth}
-                        cropHeight={screenHeight - 80}
+                        cropHeight={screenHeight - 200}
                         imageWidth={screenWidth}
-                        imageHeight={screenHeight - 150}
+                        imageHeight={screenHeight - 200}
                     >
                         <Image
                             source={{
@@ -62,7 +66,7 @@ const ZoomImage = ({ visible, onClose, images, initialIndex, tokenIs }) => {
                         disabled={currentIndex === images.length - 1}
                     >
                         <Text style={[styles.arrowText, currentIndex === images.length - 1 && styles.arrowDisabled]}>
-                            {">"}
+                            <RightSideIcon />
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -86,8 +90,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 30
     },
     closeText: {
-        color: "white",
-        fontSize: 16,
+        color: "#333333",
+        fontSize: 20,
         fontWeight: "bold",
     },
     arrowLeft: {
@@ -113,17 +117,12 @@ const styles = StyleSheet.create({
         top: 10,
         right: 10,
         zIndex: 2,
-        backgroundColor: "gray",
+        // backgroundColor: "gray",
         width: 40,
         height: 40,
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 20,
-    },
-    closeText: {
-        color: "white",
-        fontSize: 20,
-        fontWeight: "bold",
     },
 });
 

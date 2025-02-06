@@ -262,8 +262,8 @@ const ViewEvents = ({ route, navigation }) => {
             style={{ flex: 1, alignSelf: "center", }}
             renderItem={({ item, index }) => (
               <TouchableOpacity
-               onPress={() => [setCurrentIndex(index), setIsCameraZoomImageModalVisible(true)]} 
-               style={[{ width: Dimensions.get('window').width, height: 300 }]}>
+                onPress={() => [setCurrentIndex(index), setIsCameraZoomImageModalVisible(true)]}
+                style={[{ width: Dimensions.get('window').width, height: 300 }]}>
                 <Image source={{
                   uri: item,
                   headers: { Authorization: `Bearer ${getUserAuth}` }
@@ -277,12 +277,12 @@ const ViewEvents = ({ route, navigation }) => {
         </View>
 
         <ZoomImage
-        visible={isCameraZoomImageModalVisible}
-        onClose={() => setIsCameraZoomImageModalVisible(false)}
-        images={subImages}
-        initialIndex={currentIndex}
-        tokenIs={getUserAuth}
-      />
+          visible={isCameraZoomImageModalVisible}
+          onClose={() => setIsCameraZoomImageModalVisible(false)}
+          images={subImages || []}
+          initialIndex={currentIndex}
+          tokenIs={getUserAuth}
+        />
 
 
         <View style={{ flex: 1, marginTop: 10, marginHorizontal: 20 }}>

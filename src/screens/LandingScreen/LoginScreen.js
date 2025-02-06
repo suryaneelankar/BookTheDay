@@ -129,7 +129,7 @@ const LoginScreen = ({ route }) => {
                     Connect to your 'Booktheday' account to explore local rental opportunities.
                 </Text>
 
-                <Text style={styles.textLabel}>Full Name</Text>
+                {/* <Text style={styles.textLabel}>Full Name</Text>
 
                 <TextInput
                     style={styles.input}
@@ -137,7 +137,7 @@ const LoginScreen = ({ route }) => {
                     value={fullName}
                     placeholderTextColor={"#7E8389"}
                     onChangeText={setFullName}
-                />
+                /> */}
                 {/* <Text style={styles.textLabel}>Email Address</Text>
 
                 <TextInput
@@ -193,7 +193,7 @@ const LoginScreen = ({ route }) => {
 
                 <CustomModal
             visible={modalVisible}
-            message={'Invalid Details'}
+            message={'Please Enter Valid Credentials'}
             onClose={() => setModalVisible(false)}
         />
 

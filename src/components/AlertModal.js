@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, View, Text, Button, StyleSheet } from 'react-native';
 import themevariable from '../utils/themevariable';
+import BookDatesButton from './GradientButton';
 
 const CustomModal = ({ visible, message, onClose }) => {
   return (
@@ -13,7 +14,14 @@ const CustomModal = ({ visible, message, onClose }) => {
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <Text style={styles.modalText}>{message}</Text>
-          <Button title="Close" onPress={onClose} />
+          {/* <BookDatesButton
+                onPress={onClose}
+                text={'Save Combo'}
+                padding={10}
+                showIcon={false}
+
+            /> */}
+          <Button title="OK" onPress={onClose} />
         </View>
       </View>
     </Modal>

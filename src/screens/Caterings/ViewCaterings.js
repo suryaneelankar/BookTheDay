@@ -16,6 +16,7 @@ import ServiceTime from '../../assets/svgs/serviceTime.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import CustomModal from "../../components/AlertModal";
 import ActionSheet from 'react-native-actions-sheet';
+import ZoomImage from "../../components/ZoomImage";
 
 
 const ViewCaterings = ({ route, navigation }) => {
@@ -37,6 +38,8 @@ const ViewCaterings = ({ route, navigation }) => {
     const { categoryId } = route.params;
     const actionSheetRef = useRef(null);
     const [foodComboSelected, setFoodComboSelected] = useState()
+    const [isCameraZoomImageModalVisible, setIsCameraZoomImageModalVisible] = useState(false);
+    const [currentIndex, setCurrentIndex] = useState(0);
 
 
     const timeSlots = [
@@ -150,7 +153,7 @@ const ViewCaterings = ({ route, navigation }) => {
                 {isAdded && (
                     <>
                         <TextInput
-                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2,marginTop:20, marginBottom: 15, color: themevariable.Color_000000,paddingHorizontal:15 }}
+                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2, marginTop: 20, marginBottom: 15, color: themevariable.Color_000000, paddingHorizontal: 15 }}
                             placeholder="Enter number of plates"
                             placeholderTextColor={"#7E8389"}
                             keyboardType='phone-pad'
@@ -166,7 +169,7 @@ const ViewCaterings = ({ route, navigation }) => {
                         borderStyle: 'dashed',
                         borderWidth: 1,
                         borderColor: '#E0E0E0',
-                        marginVertical:20
+                        marginVertical: 20
 
                     }} />
                 )}
@@ -257,7 +260,7 @@ const ViewCaterings = ({ route, navigation }) => {
                     <View style={{ paddingHorizontal: 20 }}>
                         <Text style={{ fontSize: 12, color: "#333333", marginTop: 5, fontWeight: "700", marginBottom: 5, marginTop: 20 }}>Enter No.of Plates</Text>
                         <TextInput
-                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2, marginBottom: 15, color:themevariable.Color_000000, paddingHorizontal: 15 }}
+                            style={{ backgroundColor: "#F1F1F1", borderRadius: 5, elevation: 2, marginBottom: 15, color: themevariable.Color_000000, paddingHorizontal: 15 }}
                             placeholder="Enter number of plates"
                             keyboardType='phone-pad'
                             placeholderTextColor={"#7E8389"}
@@ -276,6 +279,7 @@ const ViewCaterings = ({ route, navigation }) => {
             </ActionSheet>
         );
     };
+    console.log("subimages::::", subImages)
 
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -292,8 +296,10 @@ const ViewCaterings = ({ route, navigation }) => {
                         paginationStyleItemActive={{ width: 10, height: 10 }}
                         data={subImages}
                         style={{ flex: 1, alignSelf: "center", }}
-                        renderItem={({ item }) => (
-                            <View style={[{ width: Dimensions.get('window').width, height: 300 }]}>
+                        renderItem={({ item , index}) => (
+                            <TouchableOpacity
+                                onPress={() => [setCurrentIndex(index), setIsCameraZoomImageModalVisible(true)]}
+                                style={[{ width: Dimensions.get('window').width, height: 300 }]}>
                                 <Image source={{
                                     uri: item,
                                     headers: { Authorization: `Bearer ${getUserAuth}` }
@@ -301,10 +307,18 @@ const ViewCaterings = ({ route, navigation }) => {
                                     resizeMethod="auto"
                                     resizeMode="cover"
                                 />
-                            </View>
+                            </TouchableOpacity>
                         )}
                     />
                 </View>
+
+                <ZoomImage
+                    visible={isCameraZoomImageModalVisible}
+                    onClose={() => setIsCameraZoomImageModalVisible(false)}
+                    images={subImages || []}
+                    initialIndex={currentIndex}
+                    tokenIs={getUserAuth}
+                />
 
 
                 <View style={{ flex: 1, marginTop: 10, marginHorizontal: 20 }}>
@@ -462,7 +476,7 @@ const ViewCaterings = ({ route, navigation }) => {
                             fontSize: 18,
                             fontWeight: '700',
                             marginBottom: 10,
-                            color:"#666666"
+                            color: "#666666"
                         }}>Select Time Slot</Text>
                         <FlatList
                             data={timeSlots}
@@ -559,12 +573,12 @@ const styles = StyleSheet.create({
         marginTop: verticalScale(2),
         marginTop: 10
     },
-    timeSlotText:{
-        fontSize:13,
-        color:"#666666",
-        fontWeight:"500",
+    timeSlotText: {
+        fontSize: 13,
+        color: "#666666",
+        fontWeight: "500",
         fontFamily: 'ManropeRegular',
-      },
+    },
     off: {
         fontSize: 13,
         color: "#ed890e",

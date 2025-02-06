@@ -28,6 +28,8 @@ const ViewCatDetails = ({ route }) => {
     const navigation = useNavigation();
     const { catId, genderType } = route.params;
     const [specifcadditionalImages, setSpecificAdditionImages] = useState([]);
+    const [specifcZoomImages, setSpecifcZoomImages] = useState([]);
+
     const touchCoordinates = new Animated.Value(0);
     const [jewelleryDetails, setJewelleryDetails] = useState()
     const [isVisible, setIsVisible] = useState(false);
@@ -90,6 +92,8 @@ const ViewCatDetails = ({ route }) => {
                 }))
             ];
             setSpecificAdditionImages(photos);
+            const imageArray = photos.map(item => item.uri);
+            setSpecifcZoomImages(imageArray);
 
         } catch (error) {
             console.log("categories::::::::::", error);
@@ -210,7 +214,7 @@ const ViewCatDetails = ({ route }) => {
                     <ZoomImage
                         visible={isCameraZoomImageModalVisible}
                         onClose={() => setIsCameraZoomImageModalVisible(false)}
-                        images={specifcadditionalImages}
+                        images={specifcZoomImages || []}
                         initialIndex={currentIndex}
                         tokenIs={getUserAuth}
                     />
