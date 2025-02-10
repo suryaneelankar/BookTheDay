@@ -395,9 +395,9 @@ const FoodMenu = ({ onSaveClick }) => {
                 text={'Save Combo'}
                 padding={10}
                 showIcon={false}
-                disabled={
-                    Object.values(selectedItemsByCategory).flat().length === 0 && customItems.length === 0
-                }
+                // disabled={
+                //     Object.values(selectedItemsByCategory).flat().length === 0 && customItems.length === 0
+                // }
             />
         </View>
     );
@@ -405,11 +405,9 @@ const FoodMenu = ({ onSaveClick }) => {
 
 const styles = StyleSheet.create({
     container: {
-        // backgroundColor: '#FFF5E3',
-        paddingVertical: 10,
         paddingHorizontal: 10,
-        borderRadius: 10
-        // padding: 20
+        borderRadius: 10,
+        // bottom:5
     },
     title: {
         fontFamily: 'ManropeRegular',
@@ -423,7 +421,6 @@ const styles = StyleSheet.create({
         fontWeight: '400',
         color: themevariable.Color_000000,
         fontSize: 15,
-        marginTop: 5
     },
     subHeading: {
         fontFamily: 'ManropeRegular',

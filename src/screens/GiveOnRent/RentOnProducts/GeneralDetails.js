@@ -40,10 +40,10 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     const [securityDeposit, setSecurityDeposit] = useState();
     const [advanceAmount, setAdvanceAmount] = useState();
     const [discountPercentage, setDiscountPercentage] = useState('');
-    const discountPercentageArr = ['0', '5', '10', '15', '20', '30', '50'];
+    const discountPercentageArr = ['0', '5', '10', '15', '20', '25', '30', '50'];
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
     const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
-    const jewelleryTypes = ["rings", "bridal", "chains", "earrings", "bangles", "bracelets"];
+    const jewelleryTypes = ["Rings", "Bridal", "Chains", "Ear Rings", "Bangles", "Bracelets"];
     const [jewelleryTypeSelected, setJewelleryTypeSelected] = useState();
     const [jewelleryTypeVal, setJewelleryTypeVal] = useState();
     const [loading, setLoading] = useState(false);
@@ -100,7 +100,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         { label: 'Turquoise', value: '#40E0D0' },
         { label: 'Peach', value: '#FFDAB9' }
     ];
-    
+
 
     const handleBackPress = () => {
         if (isLocationPickerVisible) {
@@ -299,7 +299,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         const { finalEarningAfterDiscount, earningAmount, serviceCharges } = calculateCharges();
         // console.log('selectedOption os:::>>', finalEarningAfterDiscount.toFixed(2), earningAmount.toFixed(2), serviceCharges.toFixed(2));
 
-        if (!mainImageUrl || productName === '' || productDescription === '' ||
+        if (!mainImageUrl || productName === '' ||
             (perDayRentPrice === '' || perDayRentPrice === undefined) || productAddress === '' || (securityDeposit === undefined || securityDeposit === '') || (selectedOption == null)
             || (selectedColor === '' && ((selectedOption !== null
                 && selectedOption === 'clothes'))) || (clothSize === '' && ((selectedOption !== null
@@ -437,52 +437,78 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     };
 
     const discountPercentageList = () => {
-
         const onPressDiscountPercentage = (item) => {
             setDiscountPercentage(item);
             setSelectedDiscountVal(item);
-        }
+        };
 
         return (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ width: '100%' }}>
-                {discountPercentageArr.map((item) => {
+            <FlatList
+                data={discountPercentageArr}
+                numColumns={4}
+                keyExtractor={(item, index) => index.toString()}
+                contentContainerStyle={{ paddingVertical: 15 }}
+                renderItem={({ item }) => {
                     const isSelected = item === selectedDiscountVal;
                     const backgroundColor = isSelected ? '#FFD700' : '#FFF5E3';
+
                     return (
-                        <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
+                        <TouchableOpacity
+                            style={{
+                                backgroundColor,
+                                flex: 1,
+                                margin: 5,
+                                borderRadius: 5,
+                                padding: 10,
+                                alignItems: 'center',
+                            }}
                             onPress={() => onPressDiscountPercentage(item)}
                         >
-                            <Text style={{ color: themevariable.Color_000000, }}>{item} %</Text>
+                            <Text style={{ color: themevariable.Color_000000 }}>{item} %</Text>
                         </TouchableOpacity>
-                    )
-                })}
-            </ScrollView>
+                    );
+                }}
+            />
         );
-    }
+    };
+
 
     const jewelleryTypeList = () => {
-
         const onPressJewelleryType = (item) => {
             setJewelleryTypeSelected(item);
             setJewelleryTypeVal(item);
-        }
+        };
 
         return (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ width: '100%' }}>
-                {jewelleryTypes.map((item) => {
+            <FlatList
+                data={jewelleryTypes}
+                numColumns={3}
+                keyExtractor={(item, index) => index.toString()}
+                contentContainerStyle={{ paddingVertical: 15 }}
+                renderItem={({ item }) => {
                     const isSelected = item === jewelleryTypeVal;
                     const backgroundColor = isSelected ? '#FFD700' : '#FFF5E3';
+
                     return (
-                        <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
+                        <TouchableOpacity
+                            style={{
+                                backgroundColor,
+                                flex: 1,
+                                margin: 5,
+                                borderRadius: 5,
+                                padding: 10,
+                                alignItems: 'center',
+                            }}
                             onPress={() => onPressJewelleryType(item)}
                         >
-                            <Text style={{ color: themevariable.Color_000000, }}>{item}</Text>
+                            <Text style={{ color: themevariable.Color_000000 }}>{item}</Text>
                         </TouchableOpacity>
-                    )
-                })}
-            </ScrollView>
+                    );
+                }}
+            />
         );
-    }
+    };
+
 
 
     return (
@@ -516,8 +542,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                 /> : null}
                         </TouchableOpacity>
 
-                        <Text style={styles.title}>Additional Images</Text>
-                        <Text style={styles.subTitle}>Please add up to 4 images*</Text>
+                        <Text style={styles.title}>Additional Images<Text style={{ color: "red" }}>*</Text></Text>
+                        <Text style={styles.subTitle}>Please add up to 4 images</Text>
                         <FlatList
                             data={data}
                             renderItem={ListItem}
@@ -526,7 +552,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             contentContainerStyle={{ width: '100%', justifyContent: 'space-around' }}
                         />
                         <View style={styles.radioViewcontainer}>
-                            <Text style={[styles.title, {}]}>Choose an option* :</Text>
+                            <Text style={[styles.title, {}]}>Choose an option<Text style={{ color: "red" }}>*</Text></Text>
                             {options.map(option => (
                                 <TouchableOpacity
                                     key={option.id}
@@ -544,7 +570,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         {selectedOption !== null ?
                             selectedOption === 'clothes' ?
                                 <View style={styles.radioViewcontainer}>
-                                    <Text style={[styles.title, {}]}>Select the Gender* :</Text>
+                                    <Text style={[styles.title, {}]}>Select the Gender<Text style={{ color: "red" }}>*</Text></Text>
                                     {genderTypes.map(option => (
                                         <TouchableOpacity
                                             key={option.id}
@@ -560,7 +586,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                 </View>
                                 :
                                 <>
-                                    <Text style={styles.textInputlabel}>Select the jewellery type: </Text>
+                                    <Text style={styles.textInputlabel}>Select the jewellery type<Text style={{ color: "red" }}>*</Text></Text>
                                     {jewelleryTypeList()}
                                 </>
                             : null}
@@ -574,8 +600,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         />
 
                         <TextField
-                            label='Product`s Brand'
-                            placeholder="Please Enter Brand"
+                            label='Brand Name'
+                            placeholder="Please Enter Brand Name"
                             value={productBrand}
                             onChangeHandler={onChangeProductBrand}
                             keyboardType='default'
@@ -584,7 +610,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         {(selectedOption !== null
                             && selectedOption === 'clothes') ?
                             <>
-                                <Text style={styles.sizeLabel}>Select Cloth Size</Text>
+                                <Text style={styles.sizeLabel}>Select Cloth Size<Text style={{ color: "red" }}>*</Text></Text>
                                 <Dropdown
                                     style={[styles.dropdown]}
                                     placeholderStyle={styles.placeholderStyle}
@@ -608,7 +634,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     }}
                                 />
 
-                                <Text style={styles.sizeLabel}>Select Cloth Color</Text>
+                                <Text style={styles.sizeLabel}>Select Cloth Color<Text style={{ color: "red" }}>*</Text></Text>
 
                                 <Dropdown
                                     style={styles.dropdown}
@@ -635,12 +661,12 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             value={productDescription}
                             onChangeHandler={onChangeDescription}
                             keyboardType='default'
-                            isRequired={true}
+                            isRequired={false}
                             isDescriptionField={true}
                         />
                     </View>
-                    <Text style={styles.title}>Rent Type</Text>
-                    <View style={styles.mainContainer}>
+                    <Text style={[styles.title, { marginHorizontal: 10 }]}>Rent Type</Text>
+                    <View style={[styles.mainContainer, { paddingVertical: 0 }]}>
                         <TextField
                             label='Day Price (₹ / 1 day)'
                             placeholder="Please Enter per Day Price"
@@ -693,9 +719,9 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         <Text style={styles.textInputlabel}>Discount if any</Text>
                         {discountPercentageList()}
                     </View>
-                    <Text style={styles.title}>Item Available Address</Text>
-                    <View style={styles.mainContainer}>
-                        <Text style={styles.textInputlabel}>
+                    <Text style={[styles.title, { marginTop: 10, marginHorizontal: 10 }]}>Item Available Address</Text>
+                    <View style={[styles.mainContainer, { paddingVertical: 10 }]}>
+                        <Text style={[styles.textInputlabel,{marginTop:5}]}>
                             Address<Text style={{ color: "red" }}>*</Text>
                         </Text>
                         <TouchableOpacity onPress={handleOpenLocationPicker} style={[styles.textTnputView, { height: 100, flexDirection: "row", }]}>

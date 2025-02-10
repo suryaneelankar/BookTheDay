@@ -520,11 +520,13 @@ const VendorDashBoardTab = ({ navigation }) => {
         <SafeAreaView style={styles.mainContainer}>
             <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFF7E7']} style={{ flex: 1 }}>
 
-                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'white' }}>
-                    <ProfileIcon style={{}} />
-                    <View>
-                        <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular', textTransform: "capitalize" }}>Hi, {vendorLoggedInName}</Text>
-                        <Text style={{ fontFamily: 'LeagueSpartanRegular', color: themevariable.Color_000000, }}>+91 {vendorLoggedInMobileNum}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', justifyContent: "space-between" }}>
+                    <View style={{ flexDirection: "row" , alignItems:"center"}}>
+                        <ProfileIcon style={{}} />
+                        <View>
+                            <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular', textTransform: "capitalize" }}>Hi, {vendorLoggedInName}</Text>
+                            <Text style={{ fontFamily: 'LeagueSpartanRegular', color: themevariable.Color_000000, }}>+91 {vendorLoggedInMobileNum}</Text>
+                        </View>
                     </View>
                     <TouchableOpacity onPress={() => navigation.navigate('AdminDashboard')}>
                         <ProfileIcon />
@@ -590,14 +592,14 @@ const VendorDashBoardTab = ({ navigation }) => {
                     {vendorListing?.length > 0 ?
                         <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: 20 }}>All Listed Products</Text>
                         : <View style={styles.suggestionBox}>
-                        <Text style={styles.suggestionTitle}>Add Your Listings Now!</Text>
-                        <Text style={styles.suggestionText}>
-                            Start renting out your properties and increase your earnings today. Add listings for your rentals and attract potential customers easily.
-                        </Text>
-                        <TouchableOpacity style={styles.ctaButton} onPress={() => navigation.navigate('VendorHome')}>
-                            <Text style={styles.ctaButtonText}>Add Listing</Text>
-                        </TouchableOpacity>
-                    </View>}
+                            <Text style={styles.suggestionTitle}>Add Your Listings Now!</Text>
+                            <Text style={styles.suggestionText}>
+                                Start renting out your properties and increase your earnings today. Add listings for your rentals and attract potential customers easily.
+                            </Text>
+                            <TouchableOpacity style={styles.ctaButton} onPress={() => navigation.navigate('VendorHome')}>
+                                <Text style={styles.ctaButtonText}>Add Listing</Text>
+                            </TouchableOpacity>
+                        </View>}
                     <FlatList
                         data={vendorListing}
                         renderItem={renderVendorList}

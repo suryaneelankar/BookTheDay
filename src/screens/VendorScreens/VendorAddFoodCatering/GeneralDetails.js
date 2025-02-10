@@ -61,24 +61,24 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         getFoodMenuItems();
     }, []);
 
-     const handleBackPress = () => {
-                if (isLocationPickerVisible) {
-                    setLocationPickerVisible(false);
-                      // Close the modal
-                    return true; // Prevent default back button behavior (i.e., exiting the app)
-                }
-                return false;  // Allow default behavior (i.e., exiting the app if the modal is not open)
-            };
-        
-            useEffect(() => {
-                // Add listener when the component is mounted
-                BackHandler.addEventListener('hardwareBackPress', handleBackPress);
-        
-                // Clean up the listener when the component is unmounted
-                return () => {
-                    BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
-                };
-            }, [isLocationPickerVisible]); 
+    const handleBackPress = () => {
+        if (isLocationPickerVisible) {
+            setLocationPickerVisible(false);
+            // Close the modal
+            return true; // Prevent default back button behavior (i.e., exiting the app)
+        }
+        return false;  // Allow default behavior (i.e., exiting the app if the modal is not open)
+    };
+
+    useEffect(() => {
+        // Add listener when the component is mounted
+        BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+
+        // Clean up the listener when the component is unmounted
+        return () => {
+            BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+        };
+    }, [isLocationPickerVisible]);
 
     const getFoodMenuItems = async () => {
         const token = await getVendorAuthToken();
@@ -279,8 +279,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     }
 
     const onPressSaveAndPost = async () => {
-        if (!mainImageUrl || foodCateringName === '' || cateringDescription === '' || cateringCity === '' ||
-            cateringAddress === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '') || finalCombomenu?.length === 0
+        if (!mainImageUrl || foodCateringName === '' || cateringCity === '' ||
+            cateringAddress === '' || (advanceAmount === undefined || advanceAmount === '') || finalCombomenu?.length === 0
         ) {
             Alert.alert('Please fill Mandatory fields');
             return;
@@ -458,8 +458,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                 </View>
             ) :
                 <View>
-                    <Modal visible={isLocationPickerVisible} animationType="slide"  onRequestClose={() => handleCloseLocationPicker()}>
-                        <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
+                    <Modal visible={isLocationPickerVisible} animationType="slide" onRequestClose={() => handleCloseLocationPicker()}>
+                        <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker} />
                         {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
                     </Modal>
                     <View style={styles.mainContainer}>
@@ -503,13 +503,13 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             value={cateringDescription}
                             onChangeHandler={onChangeDescription}
                             keyboardType='default'
-                            isRequired={true}
+                            isRequired={false}
                             isDescriptionField={true}
                         />
                         {RentalFoodTypeList()}
                     </View>
 
-                    <Text style={styles.title}>Add Menu Items</Text>
+                    <Text style={[styles.title, { marginHorizontal: 10 }]}>Add Menu Items</Text>
                     <View style={styles.mainContainer}>
                         <FoodMenu onSaveClick={(menuItems) => {
                             setcomboModalSuccess(true);
@@ -537,8 +537,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         </View> :
                         null}
 
-                    <Text style={styles.title}>Pricing Details</Text>
-                    <View style={styles.mainContainer}>
+                    <Text style={[styles.title, { marginHorizontal: 10 }]}>Pricing Details</Text>
+                    <View style={[styles.mainContainer, { paddingVertical: 0 }]}>
 
                         <TextField
                             label='Advance Booking Amount'
@@ -565,8 +565,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         />
                     </View>
 
-                    <Text style={styles.title}>Catering Address</Text>
-                    <View style={styles.mainContainer}>
+                    <Text style={[styles.title, { marginHorizontal: 10 ,marginTop:30}]}>Catering Address</Text>
+                    <View style={[styles.mainContainer, { paddingVertical: 0,bottom:10 }]}>
 
                         <Text style={styles.textInputlabel}>
                             Address<Text style={{ color: "red" }}>*</Text>
@@ -643,7 +643,6 @@ const styles = StyleSheet.create({
         color: themevariable.Color_000000,
         fontSize: 18,
         marginTop: 10,
-        marginHorizontal:10
     },
     labelText: {
         fontFamily: 'ManropeRegular',
@@ -680,7 +679,7 @@ const styles = StyleSheet.create({
         // backgroundColor: '#FFF4E1',
         // padding: 10,
         borderRadius: 5,
-        marginTop:20
+        marginTop: 20
     },
     header: {
         flexDirection: 'row',
@@ -703,7 +702,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 5,
         width: "50%",
-        marginHorizontal:10
+        marginHorizontal: 10
     },
     itemText: {
         fontSize: 14,

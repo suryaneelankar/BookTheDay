@@ -50,6 +50,7 @@ import VegIcon from '../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 import NotificationIcon from 'react-native-vector-icons/Ionicons';
 import DistanceIcon from '../../assets/svgs/distanceIcon.svg';
+import FloatingCartButton from "../../components/FloatingCartButton";
 
 const HomeDashboard = () => {
     const [categories, setCategories] = useState([])
@@ -74,6 +75,8 @@ const HomeDashboard = () => {
     const [myBookings, setMyBookings] = useState();
     const [cateringBookings, setCateringBookings] = useState();
     const [hallsBookings, setHallsBookings] = useState();
+    const [showCart, setShowCart] = useState(true);
+
 
     const bannerImages = [
         { id: '1', image: JewelleryCard },
@@ -178,7 +181,7 @@ const HomeDashboard = () => {
                 },
             });
             // console.log("BOOKINGS RES:::::::::", JSON.stringify(response?.data));
-            const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved").length;
+            const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved");
 
             setMyBookings(countApproved)
         } catch (error) {
@@ -195,7 +198,7 @@ const HomeDashboard = () => {
                 },
             });
             // console.log("catering BOOKINGS RES:::::::::", JSON.stringify(response?.data))
-            const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved").length;
+            const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved");
 
             setCateringBookings(countApproved);
 
@@ -213,7 +216,7 @@ const HomeDashboard = () => {
                 },
             });
             // console.log("Funtional halls BOOKINGS RES:::::::::", JSON.stringify(response?.data))
-            const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved").length;
+            const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved");
 
             setHallsBookings(countApproved);
 
@@ -599,16 +602,16 @@ const HomeDashboard = () => {
                                     <LocationMarkIcon />
                                 </TouchableOpacity>
                                 <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => { navigation.navigate('LocationAdded') }}>
-                                    <Text numberOfLines={1} style={styles.retrievedLoc}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address ? userLocationFetched?.address : 'Select Location' }</Text>
+                                    <Text numberOfLines={1} style={styles.retrievedLoc}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address ? userLocationFetched?.address : 'Select Location'}</Text>
                                     <ArrowDown />
                                 </TouchableOpacity>
                             </View>
                         </View>
                         <Pressable onPress={() => navigation.navigate('ProfileScreen')}>
                             <FontAwesome name={"user-circle"} color={"#000000"} size={35} />
-                            {hallsBookings + cateringBookings + myBookings > 0 ?
+                            {hallsBookings?.length + cateringBookings?.length + myBookings?.length > 0 ?
                                 <TouchableOpacity onPress={() => navigation.navigate('ViewMyBookings')} style={styles.badge}>
-                                    <Text style={styles.badgeText}> {hallsBookings + cateringBookings + myBookings} </Text>
+                                    <Text style={styles.badgeText}> {(hallsBookings?.length) + (cateringBookings?.length) + (myBookings?.length)} </Text>
                                 </TouchableOpacity>
                                 : null}
                         </Pressable>
@@ -843,7 +846,20 @@ const HomeDashboard = () => {
                     </View>
                 </Modal>
 
+
+
             </ScrollView>
+
+            {showCart && (
+                <FloatingCartButton 
+                totalCount={hallsBookings + cateringBookings + myBookings}
+                hallsData={hallsBookings}
+                cateringData={cateringBookings}
+                clothsData={myBookings}
+                authToken ={getUserAuth}
+                onPress={() => setShowCart(false)} 
+                onClose={() => setShowCart(false)} />
+            )}
         </SafeAreaView>
     )
 }

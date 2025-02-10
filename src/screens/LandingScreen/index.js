@@ -85,7 +85,9 @@ const LandingScreen = () => {
                 /> */}
 
                 <Text style={styles.rentTitle}>Rent products & Services</Text>
-                <Text style={styles.subtitle}>Are you ready to uproot and start over in a new area? Placoo will help you on your journey!</Text>
+                <Text style={styles.subtitle}>Need event essentials or want to offer your services? BookTheDay lets users rent clothes & jewellery, book catering and function halls, while vendors showcase and grow their business—all in one platform!
+
+                </Text>
 
             </LinearGradient>
 

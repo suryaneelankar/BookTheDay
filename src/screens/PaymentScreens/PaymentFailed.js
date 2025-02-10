@@ -8,7 +8,8 @@ const PaymentFailedScreen = () => {
   const navigation = useNavigation();
 
   const handleRetry = () => {
-    navigation.navigate('ViewMyBookings');
+    // navigation.navigate('ViewMyBookings');
+    navigation.goBack();
   };
 
   const handleHome = () => {

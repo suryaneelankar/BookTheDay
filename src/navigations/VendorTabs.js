@@ -25,7 +25,7 @@ const VendorTabs = () => {
           tabBarInactiveTintColor: '#AAAEBB', // Change the inactive tab color
           tabBarStyle: {
             backgroundColor: 'white',
-            height: 40,
+            height: 60,
             position: 'absolute',
           },
         };

@@ -176,7 +176,7 @@ const LocationAdded = () => {
                 </TouchableOpacity>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.locationItem, { borderColor: selectedCurrentAddress ? 'red' : '', borderWidth: selectedCurrentAddress ? 1 : 0, borderRadius: selectedCurrentAddress ? 10 : 0 }]}
+            <TouchableOpacity style={[styles.locationItem, { borderColor: selectedCurrentAddress ? '#FD813B' : '', borderWidth: selectedCurrentAddress ? 1 : 0, borderRadius: selectedCurrentAddress ? 10 : 0,backgroundColor: selectedCurrentAddress ? '#FEF7DE' : "white" }]}
                 onPress={() => {
                     if (userLocationFetched) {
                         setSelectedAddressVal(userLocationFetched), setSelectedCurrentAddress(true), setSelectedAddressId('');
@@ -196,7 +196,7 @@ const LocationAdded = () => {
                 renderItem={({ item, index }) => {
                     const selectedId = selectedAddressId
                     return (
-                        <TouchableOpacity style={[styles.locationItem, { borderColor: selectedAddressId == item?._id ? 'red' : '', borderWidth: selectedAddressId == item?._id ? 1 : 0, borderRadius: selectedAddressId == item?._id ? 10 : 0 }]}
+                        <TouchableOpacity style={[styles.locationItem, { borderColor: selectedAddressId == item?._id ? '#FD813B' : '', borderWidth: selectedAddressId == item?._id ? 1 : 0, borderRadius: selectedAddressId == item?._id ? 10 : 0, backgroundColor: selectedAddressId == item?._id ? '#FEF7DE' : "white" }]}
                             onPress={() => {
                                 setSelectedAddressId(item?._id), setSelectedAddressVal(item), setSelectedCurrentAddress(false);
                             }}>
@@ -222,7 +222,7 @@ const LocationAdded = () => {
                 <Text style={[styles.useButtonText, { color: (!selectedAddressId && !selectedCurrentAddress) ? '#666666' : 'green' }]}>Use This Location</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setLocationPickerVisible(true)} style={styles.addButton}>
+            <TouchableOpacity onPress={() => setLocationPickerVisible(true)} style={[styles.addButton,{marginBottom:20}]}>
                 <Text style={styles.addButtonText}>Add New Location</Text>
             </TouchableOpacity>
         </SafeAreaView>
@@ -269,9 +269,9 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         alignSelf: "center",
         fontSize: 13,
-        fontWeight: "700",
-        fontFamily: 'ManropeRegular',
-        color:"#333333"
+        fontWeight: "600",
+        fontFamily: 'ManropeSemiBold',
+        color:"#7E8389"
     },
     microphoneButton: {
         marginLeft: 10,
@@ -279,6 +279,7 @@ const styles = StyleSheet.create({
     locationItem: {
         flexDirection: 'row',
         alignItems: 'center',
+        marginVertical:5,
         // marginBottom: 20,
         marginHorizontal: 20,
         // marginTop: 15
@@ -307,7 +308,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         borderColor: "#D0433C",
         borderWidth: 1,
-        marginTop: 25
+        marginTop: 15
     },
     addButtonText: {
         color: '#D0433C',

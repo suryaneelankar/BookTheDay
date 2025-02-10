@@ -80,7 +80,7 @@ const LoginScreen = ({ route }) => {
     }
 
     const getCheckUserValidation = async () => {
-        if(!phoneNumber || !password){
+        if (!phoneNumber || !password) {
             Alert.alert("Please fill all feilds");
             return;
         }
@@ -114,7 +114,7 @@ const LoginScreen = ({ route }) => {
                 }
             }
         } catch (error) {
-           setModalVisible(true)
+            setModalVisible(true)
             console.error("Error during login:", error);
         }
 
@@ -125,9 +125,16 @@ const LoginScreen = ({ route }) => {
             <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1, paddingHorizontal: 20 }}>
 
                 <Text style={styles.title}>Welcome!</Text>
-                <Text style={styles.subtitle}>
-                    Connect to your 'Booktheday' account to explore local rental opportunities.
-                </Text>
+                {type === 'user' ?
+                    <Text style={styles.subtitle}>
+                        Connect to 'Booktheday', From dazzling outfits to grand halls & catering, book everything you need in just a few taps
+                    </Text>
+                    :
+                    <Text style={styles.subtitle}>
+                        Connect to 'Booktheday', Whether it’s catering, venues, or fashion rentals, let customers find you & book instantly.
+                    </Text>
+
+                }
 
                 {/* <Text style={styles.textLabel}>Full Name</Text>
 
@@ -146,21 +153,21 @@ const LoginScreen = ({ route }) => {
                     value={email}
                     onChangeText={setEmail}
                 /> */}
-                <Text style={styles.textLabel}>Phone Number<Text style={{color:"red", fontSize:14}}> *</Text></Text>
+                <Text style={styles.textLabel}>Phone Number<Text style={{ color: "red", fontSize: 14 }}> *</Text></Text>
                 <View style={styles.phoneContainer}>
-                <Text style={styles.countryCode}>+91</Text>
-                <TextInput
-                    // style={styles.input}
-                    style={{color:"#333333", width:"100%"}}
-                    placeholderTextColor={"#7E8389"}
-                    placeholder="9343467389"
-                    value={phoneNumber}
-                    onChangeText={setPhoneNumber}
-                    keyboardType="phone-pad"
-                    maxLength={10} // Limit the length for phone number
-                />
-            </View>
-                <Text style={styles.textLabel}>Password<Text style={{color:"red", fontSize:14}}> *</Text></Text>
+                    <Text style={styles.countryCode}>+91</Text>
+                    <TextInput
+                        // style={styles.input}
+                        style={{ color: "#333333", width: "100%" }}
+                        placeholderTextColor={"#7E8389"}
+                        placeholder="Enter Mobile Number"
+                        value={phoneNumber}
+                        onChangeText={setPhoneNumber}
+                        keyboardType="phone-pad"
+                        maxLength={10} // Limit the length for phone number
+                    />
+                </View>
+                <Text style={styles.textLabel}>Password<Text style={{ color: "red", fontSize: 14 }}> *</Text></Text>
 
                 <View style={styles.inputContainer}>
                     <TextInput
@@ -186,16 +193,16 @@ const LoginScreen = ({ route }) => {
                     <BookDatesButton
                         onPress={() => getCheckUserValidation()}
                         // onPress={() => navigation.navigate('OtpValidation')}
-                        text={'Create Account'}
+                        text={'Login'}
                         padding={10}
                     />
                 </View>
 
                 <CustomModal
-            visible={modalVisible}
-            message={'Please Enter Valid Credentials'}
-            onClose={() => setModalVisible(false)}
-        />
+                    visible={modalVisible}
+                    message={'Please Enter Valid Credentials'}
+                    onClose={() => setModalVisible(false)}
+                />
 
             </LinearGradient>
         </SafeAreaView>
@@ -234,7 +241,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginBottom: 15,
         paddingHorizontal: 10,
-        color:"#333333"
+        color: "#333333"
     },
     checkboxContainer: {
         flexDirection: 'row',
@@ -270,12 +277,12 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
         position: 'relative',
-        justifyContent:"space-between",
+        justifyContent: "space-between",
     },
     eyeIcon: {
         position: 'absolute',
         right: 10,
-        top:10,
+        top: 10,
         // top:Dimensions.get('window').height/65
         // top: '50%',
         // transform: [{ translateY: -10 }],
@@ -286,8 +293,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ccc',
         paddingHorizontal: 8,
-        borderRadius:5,
-        height:45
+        borderRadius: 5,
+        height: 45
     },
     countryCode: {
         // fontSize: 16,

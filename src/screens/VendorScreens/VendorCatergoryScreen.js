@@ -13,7 +13,8 @@ import { getVendorAuthToken } from '../../utils/StoreAuthToken';
 import BASE_URL from '../../apiconfig';
 import VendorHowItWorks from '../../components/VendorHowItWorks';
 import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.svg';
-import RightSideIcon from '../../assets/profilesvgs/Chevron-Right.svg';
+// import RightSideIcon from '../../assets/profilesvgs/Chevron-Right.svg';
+import RightSideIcon from '../../assets/profilesvgs/zoomRight.svg';
 
 const VendorCategoryScreen = ({ navigation }) => {
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
@@ -186,7 +187,7 @@ const VendorCategoryScreen = ({ navigation }) => {
                 <Text style={styles.categoryTitle}>{item.title}</Text>
                 <Text style={styles.categoryDescription}>{item.description}</Text>
             </View>
-            <RightSideIcon />
+            <RightSideIcon style={{marginLeft:10}}/>
         </TouchableOpacity>
     )};
 

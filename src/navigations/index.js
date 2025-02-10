@@ -332,7 +332,7 @@ const MainNavigation = () => {
                 <Stack.Screen name="RentOnProducts" component={RentOnProducts} options={{ header: () => <NavigationHeader Icon={true} title="Give on Rent" />, headerShown: true }} />
 
                 <Stack.Screen name="AddFunctionalHall" component={AddFunctionalHall} options={{
-                    header: () => <NavigationHeader Icon={true} title="Give on Rent" />,
+                    header: () => <NavigationHeader Icon={true} title="Add Functional Hall" />,
                     headerShown: true,
                 }} />
                

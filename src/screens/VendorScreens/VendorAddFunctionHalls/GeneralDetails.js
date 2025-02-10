@@ -49,7 +49,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     const [itemPrices, setItemPrices] = useState({});
     const [selectedSeatingCapacity, setSelectedSeatingCapacity] = useState('');
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
-    const discountPercentageArr = ['0', '5', '10', '15', '20', '30', '50'];
+    const discountPercentageArr = ['0', '5', '10', '15', '20', '25' ,'30', '50'];
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
 
     const [loading, setLoading] = useState(false);
@@ -106,7 +106,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         { name: 'Parking' },
         { name: 'Wheelchair access' },
         { name: 'Coolers / Fans' },
-        { name: 'Air Conditioners' },
+        { name: 'Air Conditioners (AC)' },
         { name: 'Bedrooms' },
         { name: 'Sound/music license' },
         { name: 'Lighting' },
@@ -265,8 +265,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     const onPressSaveAndPost = async () => {
         const { finalEarningAfterDiscount, earningAmount, serviceCharges } = calculateCharges();
         // console.log('finalEarningAfterDiscount, earningAmount, serviceCharges::>>',finalEarningAfterDiscount, earningAmount, serviceCharges);
-        if (!mainImageUrl || functionHallName === '' || productDescription === '' || functionHallAreaInSft === '' ||
-            selectedItemArray?.length === 0 || (perDayRentPrice === '' || perDayRentPrice === undefined) || selectedItemArray === '' || (BedRooms === '' || BedRooms === undefined) || functionHallAddress === '' || (overTimeCharges === undefined || overTimeCharges === '') || (advanceAmount === undefined || advanceAmount === '')
+        if (!mainImageUrl || functionHallName === '' || functionHallAreaInSft === '' ||
+            selectedItemArray?.length === 0 || (perDayRentPrice === '' || perDayRentPrice === undefined) || selectedItemArray === '' || (BedRooms === '' || BedRooms === undefined) || functionHallAddress === '' || (advanceAmount === undefined || advanceAmount === '')
         ) {
             Alert.alert('Please fill Mandatory fields');
             return;
@@ -390,35 +390,56 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     }
 
     const discountPercentageList = () => {
-
         const onPressDiscountPercentage = (item) => {
             setDiscountPercentage(item);
             setSelectedDiscountVal(item);
-        }
-
-        <Modal visible={isLocationPickerVisible} animationType="slide"
-        onRequestClose={() => handleCloseLocationPicker()} >
-            <LocationPicker onLocationSelected={handleLocationSelected} 
-            onBack={handleCloseLocationPicker}/>
-            {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
-        </Modal>
-
+        };
+    
         return (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ width: '100%' }}>
-                {discountPercentageArr.map((item) => {
-                    const isSelected = item === selectedDiscountVal;
-                    const backgroundColor = isSelected ? '#FFD700' : '#FFF5E3';
-                    return (
-                        <TouchableOpacity style={{ backgroundColor: backgroundColor, marginHorizontal: 10, borderRadius: 5, padding: 10, marginTop: 15 }}
-                            onPress={() => onPressDiscountPercentage(item)}
-                        >
-                            <Text style={{ color: themevariable.Color_000000 }}>{item} %</Text>
-                        </TouchableOpacity>
-                    )
-                })}
-            </ScrollView>
+            <>
+                {/* Location Picker Modal */}
+                <Modal 
+                    visible={isLocationPickerVisible} 
+                    animationType="slide"
+                    onRequestClose={handleCloseLocationPicker}
+                >
+                    <LocationPicker 
+                        onLocationSelected={handleLocationSelected} 
+                        onBack={handleCloseLocationPicker} 
+                    />
+                </Modal>
+    
+                {/* Discount Percentage List */}
+                <FlatList
+                    data={discountPercentageArr}
+                    numColumns={4}
+                    keyExtractor={(item, index) => index.toString()}
+                    contentContainerStyle={{ paddingVertical: 15 }}
+                    renderItem={({ item }) => {
+                        const isSelected = item === selectedDiscountVal;
+                        const backgroundColor = isSelected ? '#FFD700' : '#FFF5E3';
+    
+                        return (
+                            <TouchableOpacity
+                                style={{
+                                    backgroundColor,
+                                    flex: 1,
+                                    margin: 5,
+                                    borderRadius: 5,
+                                    padding: 10,
+                                    alignItems: 'center',
+                                }}
+                                onPress={() => onPressDiscountPercentage(item)}
+                            >
+                                <Text style={{ color: themevariable.Color_000000 }}>{item} %</Text>
+                            </TouchableOpacity>
+                        );
+                    }}
+                />
+            </>
         );
-    }
+    };
+    
 
     const ItemList = () => {
         const screenWidth = Dimensions.get('window').width;
@@ -666,7 +687,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
 
 
-                    <Text style={styles.mainHeading}>General Details</Text>
+                    <Text style={[styles.mainHeading,{marginHorizontal:10}]}>General Details</Text>
                     <View style={styles.mainContainer}>
                         <ChooseFileField
                             label={'Hall Image'}
@@ -684,8 +705,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                 /> : null}
                         </TouchableOpacity>
 
-                        <Text style={styles.title}>Additional Images</Text>
-                        <Text style={styles.subTitle}>Please add up to 4 images*</Text>
+                        <Text style={styles.title}>Additional Images<Text style={{color:"red"}}>*</Text></Text>
+                        <Text style={styles.subTitle}>Please add up to 4 images</Text>
                         <FlatList
                             data={data}
                             renderItem={ListItem}
@@ -711,11 +732,11 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             value={productDescription}
                             onChangeHandler={onChangeDescription}
                             keyboardType='default'
-                            isRequired={true}
+                            isRequired={false}
                             isDescriptionField={true}
                         />
 
-                        <Text style={styles.labelText}>Seating Capacity pax</Text>
+                        <Text style={styles.labelText}>Seating Capacity pax<Text style={{color:"red"}}>*</Text></Text>
                         {seatingCapacityList()}
 
                         <TextField
@@ -737,13 +758,13 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         />
 
 
-                        <Text style={styles.labelText}>Available Hall Amenities</Text>
+                        <Text style={styles.labelText}>Available Hall Amenities<Text style={{color:"red"}}>*</Text></Text>
                         {RentalItemsList()}
                         {ItemList()}
 
                     </View>
-                    <Text style={styles.title}>Pricing Details</Text>
-                    <View style={styles.mainContainer}>
+                    <Text style={[styles.title,{marginHorizontal:10}]}>Pricing Details<Text style={{color:"red"}}>*</Text></Text>
+                    <View style={[styles.mainContainer,{paddingVertical:0}]}>
 
                         <TextField
                             label='Per Day Charge (₹/ Per Day)'
@@ -799,16 +820,16 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             value={overTimeCharges}
                             onChangeHandler={onChangeOverTimeCharges}
                             keyboardType='number-pad'
-                            isRequired={true}
+                            isRequired={false}
                         />
 
                         <Text style={styles.textInputlabel}>Discount if any</Text>
                         {discountPercentageList()}
                     </View>
-                    <Text style={styles.title}>Item Available Address</Text>
+                    <Text style={[styles.title,{marginHorizontal:10,marginTop:25}]}>Item Available Address</Text>
                     <View style={styles.mainContainer}>
 
-                        <Text style={styles.textInputlabel}>
+                        <Text style={[styles.textInputlabel,{marginTop:0}]}>
                             Address<Text style={{ color: "red" }}>*</Text>
                         </Text>
                         <TouchableOpacity onPress={handleOpenLocationPicker} style={[styles.textTnputView, { height: 100, flexDirection: "row", }]}>

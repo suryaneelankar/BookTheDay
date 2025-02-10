@@ -512,7 +512,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                                 <ThumsUpIcon />
                             </View>
                             <Text style={styles.title}>Thank You!</Text>
-                            <Text style={styles.description}>Our team will update the information to the customer and will get back in 2 hours</Text>
+                            <Text style={styles.description}>Our team will update the information to the customer and will get back in an Hour</Text>
                             <LinearGradient colors={['#D2453B', '#A0153E']}
                                 start={{ x: 0, y: 0 }}
                                 end={{ x: 1, y: 0 }}

@@ -24,7 +24,7 @@ const UserTabs = () => {
           tabBarShowLabel: false,
           tabBarStyle: {
             backgroundColor: 'white',
-            height: 50,
+            height: 60,
             position: 'absolute',
           },
           tabBarActiveTintColor: '#ED9D20',

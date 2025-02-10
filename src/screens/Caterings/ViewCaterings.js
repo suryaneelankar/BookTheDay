@@ -17,6 +17,7 @@ import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import CustomModal from "../../components/AlertModal";
 import ActionSheet from 'react-native-actions-sheet';
 import ZoomImage from "../../components/ZoomImage";
+import ZoomIcon from 'react-native-vector-icons/MaterialIcons';
 
 
 const ViewCaterings = ({ route, navigation }) => {
@@ -247,8 +248,8 @@ const ViewCaterings = ({ route, navigation }) => {
                     <View style={{ paddingHorizontal: 20, marginTop: 10, flexDirection: "row", justifyContent: "space-between" }}>
                         <View style={{ width: "50%" }}>
                             <Text style={{ color: "#100D25", fontSize: 18, fontWeight: "800", fontFamily: 'ManropeRegular' }}>{foodComboSelected?.title}</Text>
-                            <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5, fontWeight: "700" }}><Text style={{ fontSize: 14, color: "#FD813B", marginTop: 5, fontWeight: "700" }}>Per plate cost: </Text> {formatAmount(foodComboSelected?.perPlateCost)}</Text>
-                            <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5, fontWeight: "700" }}><Text style={{ fontSize: 14, color: "#FD813B", marginTop: 5, fontWeight: "700" }}>Min order: </Text> {foodComboSelected?.minOrder} plates</Text>
+                            <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5, fontWeight: "400" }}><Text style={{ fontSize: 14, color: "#333333", marginTop: 5, fontWeight: "700" }}>Per Plate Cost : </Text> {formatAmount(foodComboSelected?.perPlateCost)}</Text>
+                            <Text style={{ fontSize: 16, color: "#FD813B", marginTop: 5, fontWeight: "400" }}><Text style={{ fontSize: 14, color: "#333333", marginTop: 5, fontWeight: "700" }}>Min Order         : </Text> {foodComboSelected?.minOrder} plates</Text>
                         </View>
                         <TouchableOpacity
                             onPress={() => handleAddClick()}
@@ -296,7 +297,7 @@ const ViewCaterings = ({ route, navigation }) => {
                         paginationStyleItemActive={{ width: 10, height: 10 }}
                         data={subImages}
                         style={{ flex: 1, alignSelf: "center", }}
-                        renderItem={({ item , index}) => (
+                        renderItem={({ item, index }) => (
                             <TouchableOpacity
                                 onPress={() => [setCurrentIndex(index), setIsCameraZoomImageModalVisible(true)]}
                                 style={[{ width: Dimensions.get('window').width, height: 300 }]}>
@@ -307,6 +308,9 @@ const ViewCaterings = ({ route, navigation }) => {
                                     resizeMethod="auto"
                                     resizeMode="cover"
                                 />
+                                <View style={styles.zoomIconContainer}>
+                                    <ZoomIcon name="zoom-out-map" size={28} />
+                                </View>
                             </TouchableOpacity>
                         )}
                     />
@@ -561,6 +565,14 @@ const styles = StyleSheet.create({
         fontSize: 10,
         color: 'gray',
     },
+    zoomIconContainer: {
+        position: "absolute",
+        top: 10,
+        right: 10,
+        backgroundColor: "rgba(0, 0, 0, 0.4)",
+        padding: 5,
+        borderRadius: 15,
+      },
     calendarContainer: {
         flex: 1,
         justifyContent: 'center',

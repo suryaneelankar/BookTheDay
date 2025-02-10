@@ -9,9 +9,6 @@ import CloseIcon from '../assets/profilesvgs/zoomClose.svg';
 const ZoomImage = ({ visible, onClose, images, initialIndex, tokenIs }) => {
     const screenWidth = Dimensions.get("window").width;
     const screenHeight = Dimensions.get("window").height;
-
-
-    console.log("images recoeved ate clothes:::::::", images);
     const [currentIndex, setCurrentIndex] = useState(initialIndex || 0);
     useEffect(() => {
         setCurrentIndex(initialIndex || 0);
@@ -31,8 +28,8 @@ const ZoomImage = ({ visible, onClose, images, initialIndex, tokenIs }) => {
 
 
     return (
-        <Modal backdropColor="rgba(0,0,0,0.5)" isVisible={visible} onBackdropPress={onClose} style={{ margin: 0, flex: 1 }}>
-            <View style={{ flex: 1, backgroundColor: "white", marginHorizontal: 20, borderRadius: 20, marginVertical: 60 }}>
+        <Modal backdropColor="rgba(0,0,0,0.5)" isVisible={visible} onBackdropPress={onClose} style={{ margin: 0, flex: 1,}}>
+            <View style={{ flex: 1, backgroundColor: "#faf7f7", marginHorizontal: 20, borderRadius: 20, marginVertical: 60 }}>
                 <TouchableOpacity style={styles.closeButton} onPress={onClose}>
                     <Text style={styles.closeText}>
                         <CloseIcon />
@@ -42,7 +39,7 @@ const ZoomImage = ({ visible, onClose, images, initialIndex, tokenIs }) => {
                 <View style={styles.imageContainer}>
                     <TouchableOpacity style={styles.arrowLeft} onPress={handlePrevious} disabled={currentIndex === 0}>
                         <Text style={[styles.arrowText, currentIndex === 0 && styles.arrowDisabled]}>
-                            <LeftSideIcon />
+                            <LeftSideIcon/>
                         </Text>
                     </TouchableOpacity>
                     <ImageZoom

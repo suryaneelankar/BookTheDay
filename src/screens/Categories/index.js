@@ -185,13 +185,15 @@ const Categories = () => {
             ? Math.round(originalPrice * (1 + discountPercentage / 100))
             : originalPrice;
         return (
-            <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })} style={{ backgroundColor: 'white', marginTop: 10,  marginHorizontal: 5, borderRadius: 10,width: "46%" }}>
-                <View style={{ marginTop: 5, width: '100%' }}>
-                    <FastImage style={{ width: 150, height: 200, borderRadius: 10, alignSelf: "center" }} source={{
+            <TouchableOpacity onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })} style={{ backgroundColor: 'white', marginTop: 10,  marginHorizontal: 5, borderRadius: 10,width: "47%" }}>
+                <View style={{ width: '100%' }}>
+                    <FastImage 
+                    // resizeMode="contain"
+                    style={{ alignSelf: "center" , width:"100%", height:220, borderTopLeftRadius:10,borderTopRightRadius:10}} source={{
                         uri: updatedImgUrl,
                         headers: { Authorization: `Bearer ${getUserAuth}` }
                     }} />
-                    <Text style={styles.productName}>{capitalizeFirstLetters(item?.productName)}</Text>
+                    <Text numberOfLines={1} style={styles.productName}>{capitalizeFirstLetters(item?.productName)}</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, justifyContent: 'space-between', width: '90%', bottom: 5 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 }}>
                             <Text style={styles.price}>{formatAmount(item?.rentPricePerDay)}</Text>

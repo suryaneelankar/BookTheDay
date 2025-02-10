@@ -14,6 +14,7 @@ import OfferStikcer from '../../assets/svgs/offerSticker.svg';
 import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
 import VegIcon from '../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
+import RightSideIcon from '../../assets/profilesvgs/Chevron-Right.svg';
 
 const Caterings = () => {
     const navigation = useNavigation();
@@ -66,7 +67,7 @@ const Caterings = () => {
     };
 
     const getAllCateringsByLocation = async (value) => {
-        console.log("value is :::",value);
+        console.log("value is :::", value);
         const token = await getUserAuthToken();
         try {
             const response = await axios.get(`${BASE_URL}/getAllFoodCateringsByLocation/${value}`, {
@@ -111,10 +112,10 @@ const Caterings = () => {
         } else {
             setDropdownVisible(false);  // Hide dropdown if query is cleared
         }
-       
+
     };
     const handleSelect = (value) => {
-        setQuery(value); 
+        setQuery(value);
         setDropdownVisible(false);
         if (value) {
             getAllCateringsByLocation(value);
@@ -183,9 +184,9 @@ const Caterings = () => {
                 </View>
                 <TouchableOpacity
                     onPress={() => {
-                       
-                            navigation.navigate('ViewCaterings', { categoryId: item?._id });
-                        
+
+                        navigation.navigate('ViewCaterings', { categoryId: item?._id });
+
                     }} style={{ width: Dimensions.get('window').width - 30, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', }}>
                         <View style={{ width: '100%', }}>
@@ -197,8 +198,8 @@ const Caterings = () => {
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between',marginTop:10 }}>
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center",paddingVertical:5 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center", paddingVertical: 5 }}>
                             <Text>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
                             <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'veg' ? 'VEG' : 'NON-VEG'}</Text>
                         </View>
@@ -225,16 +226,19 @@ const Caterings = () => {
                         placeholder="Search Location..."
                         flatListProps={{
                             keyExtractor: (item) => item?._id.toString(),
-                            renderItem: ({ item }) => (
+                            renderItem: ({ item, index }) => (
                                 <TouchableOpacity onPress={() => handleSelect(item?.value)}>
-                                    <Text style={{ padding: 10 , fontSize:12, fontWeight:"300", color:"#333333"}}>{item?.value}</Text>
+                                    <Text style={{ padding: 10, fontSize: 12, fontWeight: "300", color: "#333333", marginVertical: 5 }}>{item?.value}</Text>
+                                    {index !== filteredData.length - 1 && (
+                                        <View style={{ borderBottomWidth: 1, borderBottomColor: "#ccc", marginHorizontal: 10 }} />
+                                    )}
                                 </TouchableOpacity>
                             ),
                         }}
                         inputContainerStyle={{
-                            borderRadius: 15,
+                            borderRadius: 10,
                             height: 50,
-                            width: "90%",
+                            width: "95%",
                             alignSelf: "center",
                             marginTop: 10,
                             backgroundColor: "#E3E3E7",
@@ -255,9 +259,10 @@ const Caterings = () => {
                         <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
                         <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "500", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Catering Services in Hyderabad</Text>
                     </View>
-                    <TouchableOpacity style={{}} onPress={() => navigation.navigate('NearByFoodCaterings')}>
-                    <Text style={{ backgroundColor:"#FF990066",marginTop: 15, color: "#333333", fontSize: 12, fontWeight: "600", fontFamily: "ManropeRegular",paddingHorizontal:7,paddingVertical:5,borderRadius:5 }}>Sort NearBy</Text>
-                </TouchableOpacity>
+                    <TouchableOpacity style={{ marginTop: 15, height: "50%", backgroundColor: "#FF990066", flexDirection: "row", paddingHorizontal: 5, paddingVertical: 3, borderRadius: 5, alignItems: "center" }} onPress={() => navigation.navigate('NearByFoodCaterings')}>
+                        <Text style={{ color: "#333333", fontSize: 12, fontWeight: "600", fontFamily: "ManropeRegular", marginHorizontal: 5 }}>Sort NearBy</Text>
+                        <RightSideIcon />
+                    </TouchableOpacity>
                 </View>
 
                 <FlatList
@@ -270,9 +275,9 @@ const Caterings = () => {
                         loading ? <ActivityIndicator size="large" color="orange" /> : null
                     }
                     ListEmptyComponent={
-                        <View style={{alignItems:"center", alignSelf:"center", justifyContent:"center"}}>
-                        <Text style={{color:"#333333", fontSize:14, fontWeight:"400",fontFamily: 'ManropeRegular',}}>No Caterings found</Text>
-                    </View>
+                        <View style={{ alignItems: "center", alignSelf: "center", justifyContent: "center" }}>
+                            <Text style={{ color: "#333333", fontSize: 14, fontWeight: "400", fontFamily: 'ManropeRegular', }}>No Caterings found</Text>
+                        </View>
                     }
                     contentContainerStyle={{}}
                 />

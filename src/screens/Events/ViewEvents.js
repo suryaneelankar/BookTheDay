@@ -29,7 +29,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import ImageZoom from 'react-native-image-pan-zoom';
 import FastImage from "react-native-fast-image";
 import ZoomImage from "../../components/ZoomImage";
-
+import ZoomIcon from 'react-native-vector-icons/MaterialIcons';
 
 const ViewEvents = ({ route, navigation }) => {
 
@@ -271,6 +271,9 @@ const ViewEvents = ({ route, navigation }) => {
                   resizeMethod="auto"
                   resizeMode="cover"
                 />
+                <View style={styles.zoomIconContainer}>
+                  <ZoomIcon name="zoom-out-map" size={28} />
+                </View>
               </TouchableOpacity>
             )}
           />
@@ -553,6 +556,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: verticalScale(2),
+  },
+  zoomIconContainer: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    padding: 5,
+    borderRadius: 15,
   },
   off: {
     fontSize: 13,

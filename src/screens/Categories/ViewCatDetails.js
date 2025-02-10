@@ -19,6 +19,7 @@ import FastImage from "react-native-fast-image";
 import SwiperFlatList from "react-native-swiper-flatlist";
 import { Image } from "react-native-svg";
 import ZoomImage from "../../components/ZoomImage";
+import ZoomIcon from 'react-native-vector-icons/MaterialIcons';
 
 const ViewCatDetails = ({ route }) => {
 
@@ -194,7 +195,7 @@ const ViewCatDetails = ({ route }) => {
                         paginationStyleItemActive={{ width: 10, height: 10 }}
                         data={specifcadditionalImages} // Replace this with your actual data array
                         style={{ flex: 1, alignSelf: "center" }}
-                        renderItem={({ item , index}) => (
+                        renderItem={({ item, index }) => (
                             <TouchableOpacity
                                 onPress={() => [setCurrentIndex(index), setIsCameraZoomImageModalVisible(true)]}
                                 style={[{ width: Dimensions.get('window').width, height: 300 }]}>
@@ -207,6 +208,9 @@ const ViewCatDetails = ({ route }) => {
                                     }}
                                     style={[styles.image, {}]}
                                 />
+                                <View style={styles.zoomIconContainer}>
+                                    <ZoomIcon name="zoom-out-map" size={28} />
+                                </View>
                             </TouchableOpacity>
                         )}
                     />
@@ -435,6 +439,14 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         margin: 3,
     },
+    zoomIconContainer: {
+        position: "absolute",
+        top: 10,
+        right: 10,
+        backgroundColor: "rgba(0, 0, 0, 0.4)",
+        padding: 5,
+        borderRadius: 15,
+      },
     activeDot: {
         backgroundColor: '#FF6347',
         width: 18,

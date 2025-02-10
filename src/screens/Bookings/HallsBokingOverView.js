@@ -92,7 +92,7 @@ const HallsBookingOverView = ({ route, navigation }) => {
                     <View style={styles.rowAlignCenter}>
                         <IonIcon name="time-sharp" size={18} color="green" />
                         <Text style={styles.timeText}>
-                            We'll get back within 2 hrs with booking confirmation status.
+                            We'll get back within an Hour with booking confirmation status.
                         </Text>
                     </View>
                 </View>
