@@ -114,7 +114,7 @@ const ViewEvents = ({ route, navigation }) => {
       ];
 
       setSubImages(imageUrls);
-      console.log("hall amenities", JSON.stringify(response?.data))
+      // console.log("hall amenities", JSON.stringify(response?.data))
       const amenities = response?.data?.hallAmenities[0].split(',').map((item, index) => ({
         id: (index + 1).toString(),
         name: item.trim()

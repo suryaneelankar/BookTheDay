@@ -17,6 +17,12 @@ import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import LocationPicker from '../../../components/LocationPicker';
 import DetectLocation from '../../../assets/svgs/detectLocation.svg';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import IonIcons from 'react-native-vector-icons/Ionicons';
+import Entypo from 'react-native-vector-icons/Entypo';
 import { useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../../utils/GlobalFunctions';
 
@@ -523,6 +529,39 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         });
     };
 
+     const getIcon = (name) => {
+        switch (name) {
+          case 'Parking':
+            return <FontAwesome5 name={'car'} size={24} color={'#FD813B'} />;
+          case 'Restrooms/Toilets':
+            return <FontAwesome5 name={'restroom'} size={24} color={'#FD813B'} />;
+          case 'Wheelchair access':
+            return <FontAwesome name='wheelchair' size={24} color={'#FD813B'} />;
+          case 'Tables with basic covers':
+            return <MaterialIcon name='table-restaurant' size={24} color={'#FD813B'} />;
+          case 'Power Backup':
+            return <Entypo name='power-plug' size={24} color={'#FD813B'} />;
+          case 'Chairs':
+            return <MaterialIcon name='chair' size={24} color={'#FD813B'} />;
+          case 'Coolers / Fans':
+            return <MaterialCommunityIcons name='fan' size={24} color={'#FD813B'} />;
+          case 'Air Conditioners (AC)':
+            return <MaterialCommunityIcons name='air-conditioner' size={24} color={'#FD813B'} />;
+          case 'Bedrooms':
+            return <IonIcons name={'bed-sharp'} size={24} color={'#FD813B'} />;
+          case 'Lighting':
+            return <MaterialCommunityIcons name='string-lights' size={24} color={'#FD813B'} />;
+          case 'Kitchen Space':
+            return <FontAwesome6 name={'kitchen-set'} size={24} color={'#FD813B'} />;
+          case 'Bridal Room':
+            return <IonIcons name={'bed-sharp'} size={24} color={'#FD813B'} />;
+          case 'Sound/music license':
+            return <MaterialIcon name='queue-music' size={25} color={'#FD813B'} />;
+          default:
+            return null;
+        }
+      };
+
     const RentalItemsList = () => {
 
         const toggleCollapse = () => {
@@ -534,13 +573,10 @@ const GeneralDetails = ({ isAadharUpdate }) => {
             return (
                 <TouchableOpacity style={styles.item} onPress={() => { addRentalItemOnPress(item.name) }}>
                     <View style={{ borderColor: 'green', borderWidth: 2, width: 20, height: 20, borderRadius: 5 }}>
-                        {/* <View style={{ backgroundColor: selectedItemArray.includes(item.name) ? 'green' : 'white', width: 10, height: 10, alignSelf: 'center', marginTop: 3 }}>
-
-                        </View> */}
                         {selectedItemArray.includes(item.name) ? <FontAwesome5 style={{ marginHorizontal: 1 }} name={'check'} size={14} color={'green'} /> : null}
                     </View>
                     <View style={{ flexDirection: 'row', marginHorizontal: 5, alignItems: "center" }} onPress={() => { }}>
-
+                              {getIcon(item.name)}
                         <Text style={styles.itemText}>{item.name}</Text>
                     </View>
                 </TouchableOpacity>

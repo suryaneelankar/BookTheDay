@@ -130,7 +130,7 @@ const HallsBookingOverView = ({ route, navigation }) => {
                 <View style={styles.detailsContainer}>
                     <View style={styles.rowSpaceBetween}>
                         <Text style={[styles.detailsText, styles.detailsTitle]}>Total Amount</Text>
-                        <Text style={[styles.detailsText, styles.detailsAmount]}>{totalPrice}</Text>
+                        <Text style={[ styles.detailsAmount]}>{totalPrice}</Text>
                     </View>
                     <View style={styles.rowSpaceBetween}>
                         <Text style={styles.detailsText}>Advance Amount</Text>
@@ -170,7 +170,7 @@ const HallsBookingOverView = ({ route, navigation }) => {
                     <Text style={styles.title}>Thank You!</Text>
                     <Text style={styles.subtitle}>Your Booking Has Been Initiated</Text>
                     <Text style={styles.description}>Our team is processing your request and will update you within an hour.</Text>
-                    <Text style={styles.description}>*Once your booking is approved, please complete the payment to confirm your reservation.</Text>
+                    {/* <Text style={styles.description}>*Once your booking is approved, please complete the payment to confirm your reservation.</Text> */}
                     <LinearGradient colors={['#D2453B', '#A0153E']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
@@ -340,6 +340,7 @@ const styles = StyleSheet.create({
     rowSpaceBetween: {
         flexDirection: "row",
         justifyContent: "space-between",
+        alignItems: "center",
     },
     detailsText: {
         color: 'black',
@@ -348,7 +349,7 @@ const styles = StyleSheet.create({
         fontFamily: 'ManropeRegular',
     },
     detailsTitle: {
-        marginTop: 20,
+        // marginTop: 20,
         marginVertical: 15,
     },
     detailsAmount: {

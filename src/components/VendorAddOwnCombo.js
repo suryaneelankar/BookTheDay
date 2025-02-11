@@ -220,7 +220,7 @@ const FoodMenu = ({ onSaveClick }) => {
                 keyboardType="default"
             /> */}
 
-            {/* <Dropdown
+            <Dropdown
                 style={styles.dropdown}
                 data={comboNames || []}
                 labelField="label"
@@ -234,7 +234,7 @@ const FoodMenu = ({ onSaveClick }) => {
                 placeholderStyle={styles.placeholderStyle}
                 containerStyle={styles.dropdownContainer}
                 placeholderTextColor={"#7E8389"}
-           /> */}
+           />
 
             {filteredCategories.map((category) => (
                 <View key={category.category} style={styles.categoryContainer}>

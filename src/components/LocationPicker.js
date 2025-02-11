@@ -267,8 +267,6 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
           <Text style={{ color: themevariable.Color_000000,marginTop:"20%" }}>Get Current Location</Text>
         </TouchableOpacity> : null}
 
-      {console.log('!selectedLocation is vendor::>>', !selectedLocation)}
-
       {onSelectLoc ?
         <>
 
@@ -328,6 +326,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
               onPress={() => saveLocation()}
               text={'Save Location'}
               padding={10}
+              isDisabled={region ? false : true}
             />
           </ScrollView>
         </>

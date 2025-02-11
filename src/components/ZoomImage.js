@@ -28,7 +28,7 @@ const ZoomImage = ({ visible, onClose, images, initialIndex, tokenIs }) => {
 
 
     return (
-        <Modal backdropColor="rgba(0,0,0,0.5)" isVisible={visible} onBackdropPress={onClose} style={{ margin: 0, flex: 1,}}>
+        <Modal backdropColor="rgba(0,0,0,0.5)" isVisible={visible} onBackdropPress={onClose} style={{ margin: 0, flex: 1, }}>
             <View style={{ flex: 1, backgroundColor: "#faf7f7", marginHorizontal: 20, borderRadius: 20, marginVertical: 60 }}>
                 <TouchableOpacity style={styles.closeButton} onPress={onClose}>
                     <Text style={styles.closeText}>
@@ -37,9 +37,9 @@ const ZoomImage = ({ visible, onClose, images, initialIndex, tokenIs }) => {
                 </TouchableOpacity>
 
                 <View style={styles.imageContainer}>
-                    <TouchableOpacity style={styles.arrowLeft} onPress={handlePrevious} disabled={currentIndex === 0}>
-                        <Text style={[styles.arrowText, currentIndex === 0 && styles.arrowDisabled]}>
-                            <LeftSideIcon/>
+                    <TouchableOpacity style={[styles.arrowLeft,currentIndex === 0 && styles.arrowDisabled]} onPress={handlePrevious} disabled={currentIndex === 0}>
+                        <Text style={[styles.arrowText]}>
+                            <LeftSideIcon />
                         </Text>
                     </TouchableOpacity>
                     <ImageZoom
@@ -58,11 +58,11 @@ const ZoomImage = ({ visible, onClose, images, initialIndex, tokenIs }) => {
                         />
                     </ImageZoom>
                     <TouchableOpacity
-                        style={styles.arrowRight}
+                        style={[styles.arrowRight, currentIndex === images.length - 1 && styles.arrowDisabled]}
                         onPress={handleNext}
                         disabled={currentIndex === images.length - 1}
                     >
-                        <Text style={[styles.arrowText, currentIndex === images.length - 1 && styles.arrowDisabled]}>
+                        <Text style={[styles.arrowText]}>
                             <RightSideIcon />
                         </Text>
                     </TouchableOpacity>
@@ -93,21 +93,26 @@ const styles = StyleSheet.create({
     },
     arrowLeft: {
         position: "absolute",
-        left: 10,
+        // left: 10,
         zIndex: 1,
+        backgroundColor: "#FD813B",
+        padding: 10,
     },
     arrowRight: {
         position: "absolute",
-        right: 10,
+        right: 0,
         zIndex: 1,
+        backgroundColor: "#FD813B",
+        padding: 10,
+    },
+    arrowDisabled: {
+        backgroundColor: "#A9A9A9", // darker gray color for disabled state
+        opacity: 0.5,
     },
     arrowText: {
         fontSize: 25,
         fontWeight: "bold",
         color: "black",
-    },
-    arrowDisabled: {
-        color: "lightgray",
     },
     closeButton: {
         position: "absolute",

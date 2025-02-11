@@ -222,6 +222,11 @@ const RequestConfirmation = ({ navigation, route }) => {
             console.log("accept confirm response::::::::::", response?.data);
             setIsVisible(true);
             getProductBookingDetails();
+            if(bookingStatus == 'rejected'){
+                setTimeout(() => {
+                    navigation.navigate('Events');
+                }, 3000);
+            }
         } catch (error) {
             console.log("accept::::::::::", error);
         }

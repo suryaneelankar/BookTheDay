@@ -3,9 +3,10 @@ import {View, Text, TouchableOpacity, StyleSheet, Dimensions} from 'react-native
 import LinearGradient from "react-native-linear-gradient";
 import { moderateScale, verticalScale } from "../utils/scalingMetrics";
 
-const SaveLocationButton = ({ onPress, width, text,padding }) => {
+const SaveLocationButton = ({ onPress, width, text,padding, isDisabled }) => {
+  console.log("isDisabled",isDisabled)
     return (
-      <TouchableOpacity onPress={onPress} style={styles.container} >
+      <TouchableOpacity onPress={onPress} style={styles.container} disabled={isDisabled}>
         <LinearGradient
           colors={['#D2453B', '#A0153E']}
           start={{ x: 0, y: 0 }}

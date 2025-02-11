@@ -62,7 +62,7 @@ console.log("selected iamge:::::", selectedImage, isAadharAvailable)
                         setSelectedImage(response);
                         }                    }
                         else if(userType === 'foodLicense'){
-                        selectedFoodLicenseImage(response)
+                            setSelectedFoodLicenseImage(response)
                     }
                 }
             });
@@ -96,7 +96,16 @@ console.log("selected iamge:::::", selectedImage, isAadharAvailable)
             return;
         }
         if(isAadharAvailable && !selectedImage && profileData?.kycStatus ==='onhold'){
-            Alert.alert('KYC is Under Review, Will update shortly')
+            Alert.alert(
+                'KYC is Under Review, Will update shortly',
+                '',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => navigation.goBack(),
+                    },
+                ],
+            );
             return; 
 
         }
