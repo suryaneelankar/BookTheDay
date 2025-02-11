@@ -5,9 +5,9 @@ import BookDatesButton from '../../components/GradientButton';
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL from '../../apiconfig';
 import axios from 'axios';
-import { getCurrentLoggedInVendorMobileNum, getCurrentLoggedInUserMobileNum, getLoginUserId } from '../../../redux/actions';
+import { getCurrentLoggedInVendorMobileNum, getCurrentLoggedInUserMobileNum, getLoginUserId, checkIsTokenStored } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { storeUserAuthToken, getVendorAuthToken, getUserAuthToken, storeVendorAuthToken } from '../../utils/StoreAuthToken';
+import { storeUserAuthToken, getVendorAuthToken, getUserAuthToken, storeVendorAuthToken, storeVendorMobileNumber, storeUserMobileNumber } from '../../utils/StoreAuthToken';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CustomModal from '../../components/AlertModal';
 
@@ -102,15 +102,23 @@ const LoginScreen = ({ route }) => {
                     dispatch(getLoginUserId(true));
                     dispatch(getCurrentLoggedInVendorMobileNum(phoneNumber));
                     storeVendorDeviceToken();
-                    storeVendorAuthToken(logineRes?.data?.token)
-                    navigation.navigate('Home');
+                    storeVendorAuthToken(logineRes?.data?.token);
+                    storeVendorMobileNumber(phoneNumber);
+                    if (logineRes?.data?.token) {
+                        dispatch(checkIsTokenStored(true));
+                    }
+                    // navigation.navigate('Home');
                 } else {
                     console.log('into USER LOGG');
                     storeUserDeviceToken();
                     dispatch(getLoginUserId(false));
                     dispatch(getCurrentLoggedInUserMobileNum(phoneNumber));
                     storeUserAuthToken(logineRes?.data?.token);
-                    navigation.navigate('Home');
+                    // navigation.navigate('Home');
+                    storeUserMobileNumber(phoneNumber);
+                    if (logineRes?.data?.token) {
+                        dispatch(checkIsTokenStored(true));
+                    }
                 }
             }
         } catch (error) {
@@ -185,8 +193,8 @@ const LoginScreen = ({ route }) => {
                 </View>
 
                 <TouchableOpacity
-                  onPress={() =>navigation.navigate('UserAndVendorRegister',{type: type})}
-                style={styles.checkboxContainer}>
+                    onPress={() => navigation.navigate('UserAndVendorRegister', { type: type })}
+                    style={styles.checkboxContainer}>
                     <Text style={styles.checkboxLabel}>Register</Text>
                 </TouchableOpacity>
 
@@ -248,8 +256,8 @@ const styles = StyleSheet.create({
     checkboxContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        alignSelf:"center",
-        marginTop:30
+        alignSelf: "center",
+        marginTop: 30
     },
     checkboxLabel: {
         marginLeft: 10,
@@ -257,7 +265,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: "400",
         fontFamily: 'ManropeRegular',
-        textDecorationLine:'underline'
+        textDecorationLine: 'underline'
 
     },
     button: {
