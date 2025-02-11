@@ -55,6 +55,7 @@ import VendorTersmAndCond from "../screens/VendorScreens/VendorProfile/VendorTer
 import VendorTermsAndCond from "../screens/VendorScreens/VendorProfile/VendorTermsAndCond";
 import VendorRefundPolicy from "../screens/VendorScreens/VendorProfile/VendorRefundPolicy";
 import TermsAndConditionsScreen from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
+import UserAndVendorRegister from "../screens/LandingScreen/UserAndVendorRegister";
 
 const MainNavigation = () => {
 
@@ -109,6 +110,14 @@ const MainNavigation = () => {
                 <Stack.Screen
                     name="OtpValidation"
                     component={OtpValidation}
+                    options={{
+                        // header: () => <NavigationHeader Icon={true} title="" />,
+                        headerShown: false,
+                    }}
+                />
+                 <Stack.Screen
+                    name="UserAndVendorRegister"
+                    component={UserAndVendorRegister}
                     options={{
                         // header: () => <NavigationHeader Icon={true} title="" />,
                         headerShown: false,

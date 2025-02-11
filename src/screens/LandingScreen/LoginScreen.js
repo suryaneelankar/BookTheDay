@@ -184,9 +184,11 @@ const LoginScreen = ({ route }) => {
                     </TouchableOpacity>
                 </View>
 
-                {/* <View style={styles.checkboxContainer}>
-                    <Text style={styles.checkboxLabel}>Terms And Conditions</Text>
-                </View> */}
+                <TouchableOpacity
+                  onPress={() =>navigation.navigate('UserAndVendorRegister',{type: type})}
+                style={styles.checkboxContainer}>
+                    <Text style={styles.checkboxLabel}>Register</Text>
+                </TouchableOpacity>
 
                 <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
 
@@ -246,14 +248,16 @@ const styles = StyleSheet.create({
     checkboxContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 20,
+        alignSelf:"center",
+        marginTop:30
     },
     checkboxLabel: {
         marginLeft: 10,
-        color: "#666666",
+        color: "red",
         fontSize: 12,
         fontWeight: "400",
         fontFamily: 'ManropeRegular',
+        textDecorationLine:'underline'
 
     },
     button: {
