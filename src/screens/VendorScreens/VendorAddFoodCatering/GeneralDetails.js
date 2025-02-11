@@ -538,7 +538,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         null}
 
                     <Text style={[styles.title, { marginHorizontal: 10 }]}>Pricing Details</Text>
-                    <View style={[styles.mainContainer, { paddingVertical: 0 }]}>
+                    <View style={[styles.mainContainer, { paddingVertical: 0,paddingBottom:15 }]}>
 
                         <TextField
                             label='Advance Booking Amount'
@@ -565,8 +565,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         />
                     </View>
 
-                    <Text style={[styles.title, { marginHorizontal: 10 ,marginTop:30}]}>Catering Address</Text>
-                    <View style={[styles.mainContainer, { paddingVertical: 0,bottom:10 }]}>
+                    <Text style={[styles.title, { marginHorizontal: 10 ,marginTop:30,marginBottom:15}]}>Catering Address</Text>
+                    <View style={[styles.mainContainer, { paddingVertical: 0,bottom:10,paddingBottom:15 }]}>
 
                         <Text style={styles.textInputlabel}>
                             Address<Text style={{ color: "red" }}>*</Text>

@@ -42,7 +42,7 @@ const VendorCategoryScreen = ({ navigation }) => {
             getVendorFunctionHallBookings();
             getVendorFoodCateringBookings();
             return () => console.log('Screen is unfocused');
-        }, [])
+        }, [vendorLoggedInMobileNum,])
     );
 
     useEffect(() => {
@@ -114,6 +114,7 @@ const VendorCategoryScreen = ({ navigation }) => {
 
     const getProfileData = async () => {
         const token = await getVendorAuthToken();
+        console.log("token (((((((((((", token, vendorLoggedInMobileNum)
         try {
             const response = await axios.get(`${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`, {
                 headers: { Authorization: `Bearer ${token}` },

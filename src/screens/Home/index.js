@@ -75,7 +75,7 @@ const HomeDashboard = () => {
     const [myBookings, setMyBookings] = useState();
     const [cateringBookings, setCateringBookings] = useState();
     const [hallsBookings, setHallsBookings] = useState();
-    const [showCart, setShowCart] = useState(true);
+    const [showCart, setShowCart] = useState(false);
 
 
     const bannerImages = [
@@ -121,6 +121,18 @@ const HomeDashboard = () => {
             };
         }, [])
     );
+    useFocusEffect(
+        useCallback(() => {
+             if(cateringBookings?.length + hallsBookings?.length + myBookings?.length > 0){
+                setShowCart(true)
+             }
+            // Cleanup function to run when the screen loses focus
+            return () => {
+                console.log('Screen is unfocused');
+            };
+        }, [cateringBookings, hallsBookings, myBookings])
+    );
+
 
     useFocusEffect(
         useCallback(() => {
