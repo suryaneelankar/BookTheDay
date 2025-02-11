@@ -1,12 +1,28 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
 import LinearGradient from "react-native-linear-gradient";
 import { moderateScale, verticalScale } from "../utils/scalingMetrics";
 import RightArrow from '../assets/svgs/rightSidearrowWhite.svg';
 
 const BookDatesButton = ({ onPress, width, text, padding, disabled, showIcon = true }) => {
+
+  const [loading, setLoading] = useState(false);
+
+  const handlePress = async () => {
+    if (loading) return; // Prevent multiple clicks
+    setLoading(true);
+
+    try {
+      await onPress(); // Ensure `onPress` is an async function
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <TouchableOpacity onPress={onPress} style={styles.container} disabled={disabled}>
+    <TouchableOpacity onPress={handlePress} style={styles.container} disabled={disabled}>
       <LinearGradient
         colors={['#D2453B', '#A0153E']}
         start={{ x: 0, y: 0 }}
@@ -14,14 +30,16 @@ const BookDatesButton = ({ onPress, width, text, padding, disabled, showIcon = t
         style={[styles.buttonView, { width: Dimensions.get('window').width - 50, padding: padding ? moderateScale(padding) : 0, alignSelf: 'center' }]}
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          {text === 'Book Dates' ?
-            <Text style={styles.buttonText}>{text}</Text>
-            :
-            <Text style={styles.SubmitbuttonText}>{text}</Text>
-          }
-          {showIcon ?
-            <RightArrow style={{ marginHorizontal: 10, marginTop: 2 }} />
-            : null}
+          {loading ? (
+            <ActivityIndicator color="#F4F4F6" />
+          ) : (
+            <>
+              <Text style={text === "Book Dates" ? styles.buttonText : styles.SubmitbuttonText}>
+                {text}
+              </Text>
+              {showIcon && <RightArrow style={{ marginHorizontal: 10, marginTop: 2 }} />}
+            </>
+          )}
         </View>
       </LinearGradient>
     </TouchableOpacity>
