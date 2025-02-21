@@ -49,6 +49,7 @@ import VendorRefundPolicy from "../screens/VendorScreens/VendorProfile/VendorRef
 import TermsAndConditionsScreen from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
 import { getUserAuthToken, getUserMobileNumber, getVendorAuthToken, getVendorMobileNumber } from "../utils/StoreAuthToken";
 import { ActivityIndicator, View } from "react-native";
+import UserAndVendorRegister from "../screens/LandingScreen/UserAndVendorRegister";
 
 const MainNavigation = () => {
 
@@ -128,6 +129,14 @@ const MainNavigation = () => {
             <Stack.Screen
                 name="LoginScreen"
                 component={LoginScreen}
+                options={{
+                    // header: () => <NavigationHeader Icon={true} title="" />,
+                    headerShown: false,
+                }}
+            />
+             <Stack.Screen
+                name="UserAndVendorRegister"
+                component={UserAndVendorRegister}
                 options={{
                     // header: () => <NavigationHeader Icon={true} title="" />,
                     headerShown: false,

@@ -5,9 +5,9 @@ import BookDatesButton from '../../components/GradientButton';
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL from '../../apiconfig';
 import axios from 'axios';
-import { getCurrentLoggedInVendorMobileNum, getCurrentLoggedInUserMobileNum, getLoginUserId } from '../../../redux/actions';
+import { getCurrentLoggedInVendorMobileNum, getCurrentLoggedInUserMobileNum, getLoginUserId, checkIsTokenStored } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { storeUserAuthToken, getVendorAuthToken, getUserAuthToken, storeVendorAuthToken } from '../../utils/StoreAuthToken';
+import { storeUserAuthToken, getVendorAuthToken, getUserAuthToken, storeVendorAuthToken, storeVendorMobileNumber, storeUserMobileNumber } from '../../utils/StoreAuthToken';
 import themevariable from '../../utils/themevariable';
 import CustomModal from '../../components/AlertModal';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -122,18 +122,26 @@ const UserAndVendorRegister = ({ route }) => {
                         setAuthToken(logineRes?.data?.token);
                         if (type === 'vendor') {
                             console.log('into vendor LOGG');
+                            storeVendorDeviceToken();
                             dispatch(getLoginUserId(true));
                             dispatch(getCurrentLoggedInVendorMobileNum(phoneNumber));
-                            storeVendorDeviceToken();
-                            storeVendorAuthToken(logineRes?.data?.token)
-                            navigation.navigate('Home');
+                            storeVendorAuthToken(logineRes?.data?.token);
+                            storeVendorMobileNumber(phoneNumber);
+                            if (logineRes?.data?.token) {
+                                dispatch(checkIsTokenStored(true));
+                            }
+                            // navigation.navigate('Home');
                         } else {
                             console.log('into USER LOGG');
                             storeUserDeviceToken();
                             dispatch(getLoginUserId(false));
                             dispatch(getCurrentLoggedInUserMobileNum(phoneNumber));
                             storeUserAuthToken(logineRes?.data?.token);
-                            navigation.navigate('Home');
+                            storeUserMobileNumber(phoneNumber);
+                            if (logineRes?.data?.token) {
+                                dispatch(checkIsTokenStored(true));
+                            }
+                            // navigation.navigate('Home');
                         }
                     }
                 } catch (error) {
