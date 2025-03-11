@@ -134,6 +134,14 @@ const MainNavigation = () => {
                     headerShown: false,
                 }}
             />
+             <Stack.Screen
+                name="UserAndVendorRegister"
+                component={UserAndVendorRegister}
+                options={{
+                    // header: () => <NavigationHeader Icon={true} title="" />,
+                    headerShown: false,
+                }}
+            />
             <Stack.Screen
                 name="OtpValidation"
                 component={OtpValidation}
@@ -141,14 +149,6 @@ const MainNavigation = () => {
                     // header: () => <NavigationHeader Icon={true} title="" />,
                     headerShown: false,
                 }}
-            />
-            <Stack.Screen
-                name="UserAndVendorRegister"
-                component={UserAndVendorRegister}
-                options={{
-                    // header: () => <NavigationHeader Icon={true} title="" />,
-                    headerShown: false,
-                }}  
             />
         </AuthStack.Navigator>
     );

@@ -109,25 +109,23 @@ const UserAndVendorRegister = ({ route }) => {
                             storeVendorDeviceToken();
                             dispatch(getLoginUserId(true));
                             dispatch(getCurrentLoggedInVendorMobileNum(phoneNumber));
-                            storeVendorDeviceToken();
-                            storeVendorAuthToken(logineRes?.data?.token)
-                            navigation.navigate('Home');
                             storeVendorAuthToken(logineRes?.data?.token);
                             storeVendorMobileNumber(phoneNumber);
                             if (logineRes?.data?.token) {
                                 dispatch(checkIsTokenStored(true));
                             }
+                            // navigation.navigate('Home');
                         } else {
                             console.log('into USER LOGG');
                             storeUserDeviceToken();
                             dispatch(getLoginUserId(false));
                             dispatch(getCurrentLoggedInUserMobileNum(phoneNumber));
                             storeUserAuthToken(logineRes?.data?.token);
-                            navigation.navigate('Home');
                             storeUserMobileNumber(phoneNumber);
                             if (logineRes?.data?.token) {
                                 dispatch(checkIsTokenStored(true));
                             }
+                            // navigation.navigate('Home');
                         }
                     }
                 } catch (error) {
