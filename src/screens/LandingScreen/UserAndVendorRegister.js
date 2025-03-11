@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, CheckBox } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Button, CheckBox, Alert } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import BookDatesButton from '../../components/GradientButton';
 import { useNavigation } from '@react-navigation/native';
 import BASE_URL from '../../apiconfig';
 import axios from 'axios';
-import { getCurrentLoggedInVendorMobileNum, getCurrentLoggedInUserMobileNum, getLoginUserId } from '../../../redux/actions';
+import { getCurrentLoggedInVendorMobileNum, getCurrentLoggedInUserMobileNum, getLoginUserId, checkIsTokenStored } from '../../../redux/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import { storeUserAuthToken, getVendorAuthToken, getUserAuthToken, storeVendorAuthToken } from '../../utils/StoreAuthToken';
+import { storeUserAuthToken, getVendorAuthToken, getUserAuthToken, storeVendorAuthToken, storeVendorMobileNumber, storeUserMobileNumber } from '../../utils/StoreAuthToken';
 import themevariable from '../../utils/themevariable';
 import CustomModal from '../../components/AlertModal';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -21,25 +21,17 @@ const UserAndVendorRegister = ({ route }) => {
     const [password, setPassword] = useState('');
     const [authToken, setAuthToken] = useState('');
     const dispatch = useDispatch();
-    const selectedMode = useSelector((state) => state.userId);
+    // const selectedMode = useSelector((state) => state.userId);
     const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
-    console.log("selected mode::::::::;;", selectedMode, type);
+    // console.log("selected mode::::::::;;", selectedMode, type);
     console.log('deviceFCMToken is::>>', deviceFCMToken)
     const [fieldsCheckModalVisible, setFieldsCheckModalVisible] = useState(false);
     const [error, setError] = useState("");
     const [isPasswordVisible, setPasswordVisible] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+    const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
 
-    const validateEmail = (text) => {
-        setEmail(text);
-
-        const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
-        if (text.length > 0 && !gmailRegex.test(text)) {
-            setError("Please enter a valid Gmail address");
-        } else {
-            setError("");
-        }
-    };
+    console.log("userLoggedInMobileNumis::>><><><><><>", userLoggedInMobileNum);
 
     const togglePasswordVisibility = () => {
         setPasswordVisible(!isPasswordVisible);
@@ -101,32 +93,30 @@ const UserAndVendorRegister = ({ route }) => {
             fullName: fullName,
             role: type
         }
-        console.log("payload is:::::::", payload, type);
         try {
-            const logineRes = await axios.post(`${BASE_URL}/${type}/register`, payload);
-            console.log("login  res:::::::::", logineRes?.data);
-            if (logineRes?.data?.message) {
-                // setAuthToken(logineRes?.data?.token);
-                // if (type === 'vendor') {
+            const RegisterRes = await axios.post(`${BASE_URL}/${type}/register`, payload);
+            if (RegisterRes?.data?.message) {
                 const loginPayload = {
                     mobileNumber: String(phoneNumber),
                     password: String(password)
-                    // fullName: fullName,
-                    // role: type
                 }
-                console.log("payload is:::::::", payload, type);
                 try {
                     const logineRes = await axios.post(`${BASE_URL}/${type}/login`, loginPayload);
-                    console.log("login  res:::::::::", logineRes?.data);
                     if (logineRes?.status === 200) {
                         setAuthToken(logineRes?.data?.token);
                         if (type === 'vendor') {
                             console.log('into vendor LOGG');
+                            storeVendorDeviceToken();
                             dispatch(getLoginUserId(true));
                             dispatch(getCurrentLoggedInVendorMobileNum(phoneNumber));
                             storeVendorDeviceToken();
                             storeVendorAuthToken(logineRes?.data?.token)
                             navigation.navigate('Home');
+                            storeVendorAuthToken(logineRes?.data?.token);
+                            storeVendorMobileNumber(phoneNumber);
+                            if (logineRes?.data?.token) {
+                                dispatch(checkIsTokenStored(true));
+                            }
                         } else {
                             console.log('into USER LOGG');
                             storeUserDeviceToken();
@@ -134,6 +124,10 @@ const UserAndVendorRegister = ({ route }) => {
                             dispatch(getCurrentLoggedInUserMobileNum(phoneNumber));
                             storeUserAuthToken(logineRes?.data?.token);
                             navigation.navigate('Home');
+                            storeUserMobileNumber(phoneNumber);
+                            if (logineRes?.data?.token) {
+                                dispatch(checkIsTokenStored(true));
+                            }
                         }
                     }
                 } catch (error) {
@@ -143,6 +137,13 @@ const UserAndVendorRegister = ({ route }) => {
             }
         } catch (error) {
             console.error("Error during register:", error);
+            Alert.alert(
+                'Something went wrong!',
+                'Please try again',
+                [
+                    { text: 'OK' },
+                ]
+            );
         }
 
     }
@@ -165,21 +166,7 @@ const UserAndVendorRegister = ({ route }) => {
                     value={fullName}
                     onChangeText={setFullName}
                 />
-                <Text style={styles.textLabel}>Email Address<Text style={{ color: "red" }}>*</Text></Text>
-
-                <TextInput
-                    style={[styles.input, { marginBottom: 0 }]}
-                    placeholder="Enter Email Id"
-                    value={email}
-                    onChangeText={validateEmail}
-                    placeholderTextColor={"#7E8389"}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                />
-                {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-
-                <Text style={[styles.textLabel, { marginTop: 15 }]}>Phone Number<Text style={{ color: "red" }}>*</Text></Text>
+                <Text style={[styles.textLabel, {  }]}>Phone Number<Text style={{ color: "red" }}>*</Text></Text>
 
                 <View style={styles.phoneContainer}>
                     <Text style={styles.countryCode}>+91</Text>
@@ -212,15 +199,6 @@ const UserAndVendorRegister = ({ route }) => {
                     </View>
                 </>
 
-
-                <View style={styles.checkboxContainer}>
-                    {/* <CheckBox
-                        value={isChecked}
-                        onValueChange={setIsChecked}
-                    /> */}
-                    <Text style={styles.checkboxLabel}>Terms And Conditions</Text>
-                </View>
-
                 <CustomModal
                     visible={fieldsCheckModalVisible}
                     message={'Please fill all fields'}
@@ -238,7 +216,7 @@ const UserAndVendorRegister = ({ route }) => {
                                 getCheckUserValidation()
                             }
                         }}
-                        text={'Submit'}
+                        text={'Register'}
                         padding={10}
                     />
                 </View>

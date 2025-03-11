@@ -20,7 +20,7 @@ const LocationAdded = () => {
     const dispatch = useDispatch();
     const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
     const userLocationFetched = useSelector((state) => state.userCurrentLocation);
-    console.log("user locations is::::::::::", userLocationFetched);
+    // console.log("user locations is::::::::::", userLocationFetched);
     const [selectedAddressId, setSelectedAddressId] = useState('');
     const [selectedAddressVal, setSelectedAddressVal] = useState('');
     const [selectedCurrentAddress, setSelectedCurrentAddress] = useState(false);
@@ -105,7 +105,7 @@ const LocationAdded = () => {
                 },
             });
             if (response?.data) {
-                console.log('getUserAddresses response is::', response?.data?.data)
+                // console.log('getUserAddresses response is::', response?.data?.data)
                 setAddressList(response?.data?.data?.userAddresses);
             }
         } catch (error) {

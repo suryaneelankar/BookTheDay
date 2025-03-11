@@ -4,7 +4,7 @@ import LinearGradient from "react-native-linear-gradient";
 import { moderateScale, verticalScale } from "../utils/scalingMetrics";
 import RightArrow from '../assets/svgs/rightSidearrowWhite.svg';
 
-const BookDatesButton = ({ onPress, width, text, padding, disabled, showIcon = true }) => {
+const BookDatesButton = ({ onPress, width, text, padding, disabled, showIcon = true, buttonStyle }) => {
 
   const [loading, setLoading] = useState(false);
 
@@ -22,7 +22,7 @@ const BookDatesButton = ({ onPress, width, text, padding, disabled, showIcon = t
   };
 
   return (
-    <TouchableOpacity onPress={handlePress} style={styles.container} disabled={disabled}>
+    <TouchableOpacity onPress={handlePress} style={[styles.container, buttonStyle]} disabled={disabled}>
       <LinearGradient
         colors={['#D2453B', '#A0153E']}
         start={{ x: 0, y: 0 }}
@@ -50,7 +50,7 @@ export default BookDatesButton;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
+    // backgroundColor: "white",
     paddingVertical: verticalScale(15),
     width: Dimensions.get('window').width,
     alignSelf: "center"

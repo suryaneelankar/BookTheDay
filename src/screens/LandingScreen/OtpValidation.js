@@ -16,7 +16,7 @@ const OtpValidation = ({ navigation, route }) => {
 
     const { mobileNumber,loginType } = route.params;
     const dispatch = useDispatch();
-    const selectedMode = useSelector((state) => state.userId);
+    // const selectedMode = useSelector((state) => state.userId);
     const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
     const [otp, setOtp] = useState(['', '', '', '']);
     const [otpResponse, setOtpResponse] = useState();

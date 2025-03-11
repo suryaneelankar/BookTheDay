@@ -21,12 +21,12 @@ const LoginScreen = ({ route }) => {
     const [password, setPassword] = useState('');
     const [authToken, setAuthToken] = useState('');
     const dispatch = useDispatch();
-    const selectedMode = useSelector((state) => state.userId);
+    // const selectedMode = useSelector((state) => state.userId);
     const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
     const [isPasswordVisible, setPasswordVisible] = useState(false);
 
-    console.log("selected mode::::::::;;", selectedMode, type);
-    console.log('deviceFCMToken is::>>', deviceFCMToken)
+    // console.log("selected mode::::::::;;", selectedMode, type);
+    // console.log('deviceFCMToken is::>>', deviceFCMToken)
 
     const togglePasswordVisibility = () => {
         setPasswordVisible(!isPasswordVisible);
@@ -91,10 +91,10 @@ const LoginScreen = ({ route }) => {
             // fullName: fullName,
             // role: type
         }
-        console.log("payload is:::::::", payload, type);
+        // console.log("payload is:::::::", payload, type);
         try {
             const logineRes = await axios.post(`${BASE_URL}/${type}/login`, payload);
-            console.log("login  res:::::::::", logineRes?.data);
+            // console.log("login  res:::::::::", logineRes?.data);
             if (logineRes?.status === 200) {
                 setAuthToken(logineRes?.data?.token);
                 if (type === 'vendor') {
@@ -144,23 +144,6 @@ const LoginScreen = ({ route }) => {
 
                 }
 
-                {/* <Text style={styles.textLabel}>Full Name</Text>
-
-                <TextInput
-                    style={styles.input}
-                    placeholder="your name"
-                    value={fullName}
-                    placeholderTextColor={"#7E8389"}
-                    onChangeText={setFullName}
-                /> */}
-                {/* <Text style={styles.textLabel}>Email Address</Text>
-
-                <TextInput
-                    style={styles.input}
-                    placeholder="your email id"
-                    value={email}
-                    onChangeText={setEmail}
-                /> */}
                 <Text style={styles.textLabel}>Phone Number<Text style={{ color: "red", fontSize: 14 }}> *</Text></Text>
                 <View style={styles.phoneContainer}>
                     <Text style={styles.countryCode}>+91</Text>
@@ -192,21 +175,20 @@ const LoginScreen = ({ route }) => {
                     </TouchableOpacity>
                 </View>
 
+
+                <BookDatesButton
+                    onPress={() => getCheckUserValidation()}
+                    // onPress={() => navigation.navigate('OtpValidation')}
+                    text={'Login'}
+                    padding={10}
+                    buttonStyle={{ top: 10 }}
+                />
+
                 <TouchableOpacity
                     onPress={() => navigation.navigate('UserAndVendorRegister', { type: type })}
-                    style={styles.checkboxContainer}>
-                    <Text style={styles.checkboxLabel}>Register</Text>
+                    style={styles.RegisterLabelContainer}>
+                    <Text style={styles.RegisterLabel}>Create new account</Text>
                 </TouchableOpacity>
-
-                <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
-
-                    <BookDatesButton
-                        onPress={() => getCheckUserValidation()}
-                        // onPress={() => navigation.navigate('OtpValidation')}
-                        text={'Login'}
-                        padding={10}
-                    />
-                </View>
 
                 <CustomModal
                     visible={modalVisible}
@@ -242,7 +224,8 @@ const styles = StyleSheet.create({
         color: '#000000',
         fontFamily: 'ManropeRegular',
         fontWeight: "700",
-        marginBottom: 5
+        marginBottom: 5,
+        marginTop: 20
     },
     input: {
         height: 45,
@@ -253,19 +236,18 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         color: "#333333"
     },
-    checkboxContainer: {
+    RegisterLabelContainer: {
         flexDirection: 'row',
-        alignItems: 'center',
-        alignSelf: "center",
-        marginTop: 30
+        justifyContent: "center",
+        marginTop: 50
     },
-    checkboxLabel: {
-        marginLeft: 10,
-        color: "red",
-        fontSize: 12,
+    RegisterLabel: {
+        alignSelf: "center",
+        color: "grey",
+        textDecorationLine: "underline",
+        fontSize: 14,
         fontWeight: "400",
         fontFamily: 'ManropeRegular',
-        textDecorationLine: 'underline'
 
     },
     button: {

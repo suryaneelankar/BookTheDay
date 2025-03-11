@@ -38,8 +38,11 @@ const ProfileMainScreen = () => {
       getProfileData();
     },[]);
 
+    // console.log("userLoggedInMobileNumber is::>>>",userLoggedInMobileNumber);
+
     const getProfileData = async() =>{
         const token = await getUserAuthToken();
+        // console.log("token is ::><><>",token,userLoggedInMobileNumber);
         try {
             const response = await axios.get(`${BASE_URL}/getAllUserLocations/${userLoggedInMobileNumber}`,{
                 headers: {
@@ -85,7 +88,7 @@ const ProfileMainScreen = () => {
                     /> */}
                 </View>
                 <Text style={styles.profileName}>{profileData?.fullName}</Text>
-                <Text style={styles.profileEmail}>{profileData?.email}</Text>
+                {/* <Text style={styles.profileEmail}>{profileData?.email}</Text> */}
             </View>
 
             <ScrollView style={styles.menuContainer} showsVerticalScrollIndicator={false}>
@@ -94,14 +97,12 @@ const ProfileMainScreen = () => {
                     title="My KYC"
                     isSelected={isMyAccountOpen ? true : false}
                     onPress={() => navigation.navigate('UserAadharUpload')}
-                    // onPress={() => toggleMyAccount()}
                 />
                 
                 <MenuItem icon={<DashboardIcon />}
                     title="My Orders"
                     isSelected={isMyDashboardOpen ? true : false}
                     onPress={() => navigation.navigate('ViewMyBookings')}
-                    // onPress={() => toggleMyDashboard()}
                 />
            
                 <MenuItem icon={<AboutUsIcon />} title="About Us"  onPress={() => navigation.navigate('AboutUs')}/>
@@ -109,8 +110,6 @@ const ProfileMainScreen = () => {
                 <MenuItem icon={<RefundPolicy />} title="Refund Policy"  onPress={() => navigation.navigate('RefundPolicy')}/>
                 <MenuItem icon={<LogOutIcon />} title="Log Out" 
                 onPress={async() => {
-                    // dispatch(getLoginUserId('')),
-                    // navigation.navigate('LandingScreen')
                     dispatch(checkIsTokenStored(false));
                     await removeUserAuthToken();
                     await removeUserMobileNumber();

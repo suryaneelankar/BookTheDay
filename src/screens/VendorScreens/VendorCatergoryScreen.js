@@ -111,10 +111,8 @@ const VendorCategoryScreen = ({ navigation }) => {
         }
     };
 
-
     const getProfileData = async () => {
         const token = await getVendorAuthToken();
-        console.log("token (((((((((((", token, vendorLoggedInMobileNum)
         try {
             const response = await axios.get(`${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`, {
                 headers: { Authorization: `Bearer ${token}` },
@@ -169,7 +167,7 @@ const VendorCategoryScreen = ({ navigation }) => {
 
     const renderItem = ({ item }) => { 
 
-        console.log("item cattype:::::", item?.catType,'+++', profileData?.posts?.some(post => post?.postModel === "Catering"))
+        // console.log("item cattype:::::", item?.catType,'+++', profileData?.posts?.some(post => post?.postModel === "Catering"))
         return(
 
         <TouchableOpacity

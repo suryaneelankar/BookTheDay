@@ -40,7 +40,7 @@ import CatTentHouse from '../../assets/svgs/categories/home_categories_tent_icon
 import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.svg';
 import ClothesCard from '../../assets/svgs/homeSwippers/home_shirtcard.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
-import { getCurrentLoggedInUserName, getUserLocation, setUserCurrentLocation } from "../../../redux/actions";
+import { getCurrentLoggedInUserName, getUserLocation, setUserCurrentLocation, showOrHideBottomCard } from "../../../redux/actions";
 import { useDispatch, useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
 import { isLocationEnabled } from 'react-native-android-location-enabler';
@@ -58,6 +58,7 @@ const HomeDashboard = () => {
     const userLocationFetched = useSelector((state) => state.userLocation);
     // console.log("userLocationFetched home :::::", userLocationFetched)
     const userLoggedInMobileNumber = useSelector((state) => state.userLoggedInMobileNum);
+    const showBottomCard = useSelector((state) => state.showBottomCard);
     const latitude = userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude;
     const longitude = userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
     const dispatch = useDispatch();
@@ -75,8 +76,6 @@ const HomeDashboard = () => {
     const [myBookings, setMyBookings] = useState();
     const [cateringBookings, setCateringBookings] = useState();
     const [hallsBookings, setHallsBookings] = useState();
-    const [showCart, setShowCart] = useState(false);
-
 
     const bannerImages = [
         { id: '1', image: JewelleryCard },
@@ -121,17 +120,13 @@ const HomeDashboard = () => {
             };
         }, [])
     );
-    useFocusEffect(
-        useCallback(() => {
-             if(cateringBookings?.length + hallsBookings?.length + myBookings?.length > 0){
-                setShowCart(true)
-             }
-            // Cleanup function to run when the screen loses focus
-            return () => {
-                console.log('Screen is unfocused');
-            };
-        }, [cateringBookings, hallsBookings, myBookings])
-    );
+
+    useEffect(() => {
+        if(cateringBookings?.length > 0 || hallsBookings?.length > 0 || myBookings?.length > 0){
+            console.log("cateringBookings?.length",cateringBookings?.length, hallsBookings?.length, myBookings?.length)
+            dispatch(showOrHideBottomCard(true));
+         }
+    },[])
 
 
     useFocusEffect(
@@ -146,7 +141,7 @@ const HomeDashboard = () => {
     );
 
     const getNearByEvents = async () => {
-        // console.log("latitude longitude in Home is::>>>", latitude, longitude);
+        console.log("latitude , long are::>>",latitude,longitude);
         const token = await getUserAuthToken();
         try {
             const response = await axios.get(`${BASE_URL}/getNearByFunctionHalls?latitude=${latitude}&longitude=${longitude}`, {
@@ -156,10 +151,8 @@ const HomeDashboard = () => {
             });
 
             const newFunctionHalls = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            console.log("neareby loc events in HOMEEEEEEE:::::::;", newFunctionHalls);
-            if (response?.data?.data?.length > 0) {
-                setNearByEventsData(newFunctionHalls); // Append new data
-            }
+            // console.log("neareby loc events in HOMEEEEEEE:::::::;", newFunctionHalls);
+            setNearByEventsData(newFunctionHalls);
         } catch (error) {
             console.error('Error fetching function halls:', error);
         }
@@ -240,7 +233,7 @@ const HomeDashboard = () => {
 
     const getUserAuthTokenRes = async () => {
         const token = await getUserAuthToken();
-        console.log("usertoklen", token);
+        // console.log("usertoklen", token);
     };
 
     const getProfileData = async () => {
@@ -862,15 +855,15 @@ const HomeDashboard = () => {
 
             </ScrollView>
 
-            {showCart && (
+            {showBottomCard && (
                 <FloatingCartButton 
                 totalCount={hallsBookings + cateringBookings + myBookings}
                 hallsData={hallsBookings}
                 cateringData={cateringBookings}
                 clothsData={myBookings}
                 authToken ={getUserAuth}
-                onPress={() => setShowCart(false)} 
-                onClose={() => setShowCart(false)} />
+                onPress={() =>  dispatch(showOrHideBottomCard(false))} 
+                onClose={() =>  dispatch(showOrHideBottomCard(false))} />
             )}
         </SafeAreaView>
     )

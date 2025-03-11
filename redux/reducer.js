@@ -8,6 +8,7 @@ const initialState = {
     userLoggedInName: '',
     vendorLoggedInName: '',
     checkStoredToken: false,
+    showBottomCard: false,
 
 }
 export const commonReducer = (state = initialState, action) => {
@@ -58,6 +59,11 @@ export const commonReducer = (state = initialState, action) => {
             return {
                 ...state,
                 checkStoredToken: action.payload
+            }
+        case 'SHOW_BOTTOM_CARD':
+            return {
+                ...state,
+                showBottomCard: action.payload
             }
         default:
             return state;

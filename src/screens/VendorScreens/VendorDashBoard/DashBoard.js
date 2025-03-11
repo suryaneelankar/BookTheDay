@@ -542,7 +542,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                         <View style={{ width: 2, height: '100%', backgroundColor: '#F9CD4F' }} />
                         <View>
                             <Text style={{ color: '#1A1F36', fontSize: 14, fontWeight: 700, color: '#1A1F36' }}>Current Listing</Text>
-                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 40, color: '#1A1F36', alignSelf: 'center' }}>{vendorListing?.length}</Text>
+                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 40, color: '#1A1F36', alignSelf: 'center' }}>{vendorListing?.length ? vendorListing?.length : 0}</Text>
                         </View>
                     </View>
 
