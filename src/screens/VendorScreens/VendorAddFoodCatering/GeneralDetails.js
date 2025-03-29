@@ -338,7 +338,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         formData.append('foodItems', JSON.stringify(finalCombomenu));
 
         formData.append('vendorMobileNumber', vendorMobileNumber);
-        formData.append('discountPercentage', discountPercentage);
+        // formData.append('discountPercentage', discountPercentage);
         formData.append('available', true);
         formData.append('advanceAmount', advanceAmount);
         formData.append('overTimeCharges', overTimeCharges);
