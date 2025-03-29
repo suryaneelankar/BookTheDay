@@ -119,7 +119,7 @@ const CateringsOverView = ({ route, navigation }) => {
 
                 <View style={styles.imgsection}>
                     <View style={styles.productContainer}>
-                        <FastImage source={{ uri: bookingDetails?.professionalImage?.url.replace('localhost', LocalHostUrl) }}
+                        <FastImage source={{ uri: bookingDetails?.professionalImage?.url?.replace('localhost', LocalHostUrl) }}
                             style={styles.productImage}
                             resizeMethod="resize"
                             resizeMode="cover"

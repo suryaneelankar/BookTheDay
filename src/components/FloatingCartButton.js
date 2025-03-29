@@ -27,7 +27,7 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
       advanceAmountToPay: item?.advanceAmountToPay,
       totalAmount: item?.totalAmount,
       vendorMobileNumber: item?.vendorMobileNumber,
-      image: item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url
+      image: item?.professionalImage?.url ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url
     })),
     ...(clothsData || []).map(item => ({
       name: item.productName || "Unnamed",
@@ -37,7 +37,7 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
       securityDepositAmount: item?.securityDepositAmount,
       totalAmount: item?.totalAmount,
       vendorMobileNumber: item?.vendorMobileNumber,
-      image: item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url
+      image: item?.professionalImage?.url ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url
     })),
     ...(hallsData || []).map(item => ({
       name: item.functionHallName || "Unnamed",
@@ -47,7 +47,7 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
       advanceAmountToPay: item?.advanceAmountToPay,
       totalAmount: item?.totalAmount,
       vendorMobileNumber: item?.vendorMobileNumber,
-      image: item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url
+      image: item?.professionalImage?.url ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url
     })),
   ];
 

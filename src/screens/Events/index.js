@@ -115,7 +115,9 @@ const Events = () => {
     const renderItem = ({ item }) => {
 
         const convertLocalhostUrls = (url) => {
-            return url.replace("localhost", LocalHostUrl);
+            if(url){
+            return url?.replace("localhost", LocalHostUrl);
+            }
         };
         const professionalImageUrl = convertLocalhostUrls(item?.professionalImage?.url);
 

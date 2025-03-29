@@ -33,7 +33,7 @@ const UserAadharUpload = () => {
               });
               setProfileData(response?.data?.data);
             //   setSelectedImage(response?.data?.data?.aadharImage);
-              const updatedImgUrl = response?.data?.data?.aadharImage?.url ? response?.data?.data?.aadharImage?.url.replace('localhost', LocalHostUrl) : response?.data?.data?.aadharImage?.url;
+              const updatedImgUrl = response?.data?.data?.aadharImage?.url ? response?.data?.data?.aadharImage?.url?.replace('localhost', LocalHostUrl) : response?.data?.data?.aadharImage?.url;
               setIsAadharAvailable(updatedImgUrl);
               setGetUserAuth(token);
         //   console.log("profile user res:::", updatedImgUrl);

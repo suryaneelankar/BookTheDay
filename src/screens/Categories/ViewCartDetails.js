@@ -55,7 +55,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
       });
       console.log(" selected product::::::::::", JSON.stringify(response?.data));
       setProductDetails(response?.data);
-      const updatedImgUrl = response?.data?.professionalImage?.url !== undefined ? response?.data?.professionalImage?.url.replace('localhost', LocalHostUrl) : response?.data?.professionalImage?.url;
+      const updatedImgUrl = response?.data?.professionalImage?.url !== undefined ? response?.data?.professionalImage?.url?.replace('localhost', LocalHostUrl) : response?.data?.professionalImage?.url;
       setProductImage(updatedImgUrl);
     } catch (error) {
       console.log("categories cart::::::::::", error);

@@ -207,7 +207,7 @@ const AdminDashboard = () => {
     const renderItem = ({ item }) => {
 
         const convertLocalhostUrls = (url) => {
-            return url.replace("localhost", LocalHostUrl);
+            return url?.replace("localhost", LocalHostUrl);
         };
         const imageUrls = item?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
 
@@ -265,7 +265,7 @@ const AdminDashboard = () => {
     const renderFoodCaterings = ({ item }) => {
         //    const token = await getUserAuthToken()
         const convertLocalhostUrls = (url) => {
-            return url.replace("localhost", LocalHostUrl);
+            return url?.replace("localhost", LocalHostUrl);
         };
         // console.log("insdie render item")
         const imageUrls = item?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));

@@ -351,6 +351,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
         console.log('formdata is ::>>', JSON.stringify(formData));
         const token = await getVendorAuthToken();
+        console.log("token is:", token);
         setLoading(true);
         try {
             const response = await axios.post(`${BASE_URL}/AddFoodCatering`, formData, {
