@@ -216,6 +216,7 @@ const Events = () => {
                     value={query}
                     onChangeText={handleQueryChange}  // Handle query changes
                     placeholder="Search Location..."
+                    placeholderTextColor={"#A3A3A3"}
                     flatListProps={{
                         keyExtractor: (item) => item?._id.toString(),
                         renderItem: ({ item, index }) => (

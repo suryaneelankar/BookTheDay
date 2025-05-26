@@ -26,6 +26,7 @@ const UserOTPScreen = () => {
         <View>
             <TextInput
                 placeholder='Number'
+                placeholderTextColor={"#A3A3A3"}
                 value={number}
                 keyboardType='numeric'
                 style={{ backgroundColor: '#ededed', margin: 10, color: themevariable.Color_000000 }}

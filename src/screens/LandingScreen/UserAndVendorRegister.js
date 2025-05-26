@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Button, CheckBox, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, KeyboardAvoidingView, CheckBox, Alert } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import BookDatesButton from '../../components/GradientButton';
 import { useNavigation } from '@react-navigation/native';
@@ -30,15 +30,30 @@ const UserAndVendorRegister = ({ route }) => {
     const [isPasswordVisible, setPasswordVisible] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
-
-    console.log("userLoggedInMobileNumis::>><><><><><>", userLoggedInMobileNum);
+    const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
+    const [passwordError, setPasswordError] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     const togglePasswordVisibility = () => {
         setPasswordVisible(!isPasswordVisible);
     };
 
+    const toggleConfirmPasswordVisibility = () => {
+        setIsConfirmPasswordVisible(!isConfirmPasswordVisible);
+    };
 
-    // console.log('user auth token is::>>',getVendorAuthToken());
+    const handlePasswordChange = (text) => {
+        setPassword(text);
+    };
+
+    const handleConfirmPasswordChange = (text) => {
+        setConfirmPassword(text);
+        if (password !== text) {
+            setPasswordError('Passwords do not match');
+        } else {
+            setPasswordError('');
+        }
+    };
 
     const storeUserDeviceToken = async () => {
         const payload = {
@@ -147,7 +162,7 @@ const UserAndVendorRegister = ({ route }) => {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <KeyboardAvoidingView style={styles.container}>
             <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1, paddingHorizontal: 20 }}>
 
                 <Text style={styles.title}>Register Here!</Text>
@@ -164,7 +179,7 @@ const UserAndVendorRegister = ({ route }) => {
                     value={fullName}
                     onChangeText={setFullName}
                 />
-                <Text style={[styles.textLabel, {  }]}>Phone Number<Text style={{ color: "red" }}>*</Text></Text>
+                <Text style={[styles.textLabel, {}]}>Phone Number<Text style={{ color: "red" }}>*</Text></Text>
 
                 <View style={styles.phoneContainer}>
                     <Text style={styles.countryCode}>+91</Text>
@@ -187,14 +202,31 @@ const UserAndVendorRegister = ({ route }) => {
                             placeholder="Enter Password"
                             placeholderTextColor={"#7E8389"}
                             value={password}
-                            onChangeText={setPassword}
+                            onChangeText={handlePasswordChange}
                             secureTextEntry={!isPasswordVisible} // Hide or show password based on isPasswordVisible
                         />
-
                         <TouchableOpacity onPress={togglePasswordVisibility} style={styles.eyeIcon}>
                             <Icon name={!isPasswordVisible ? 'eye-slash' : 'eye'} size={18} color="#666666" />
                         </TouchableOpacity>
                     </View>
+
+                    <Text style={[styles.textLabel]}>Confirm Password<Text style={{ color: "red" }}>*</Text></Text>
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Confirm Password"
+                            placeholderTextColor={"#7E8389"}
+                            value={confirmPassword}
+                            onChangeText={handleConfirmPasswordChange}
+                            secureTextEntry={!isConfirmPasswordVisible} // Hide or show password based on isConfirmPasswordVisible
+                        // onBlur={validatePasswords} // Validate passwords on blur
+                        />
+                        <TouchableOpacity onPress={toggleConfirmPasswordVisibility} style={styles.eyeIcon}>
+                            <Icon name={!isConfirmPasswordVisible ? 'eye-slash' : 'eye'} size={18} color="#666666" />
+                        </TouchableOpacity>
+                    </View>
+
+                    {passwordError ? <Text style={{ color: 'red' }}>{passwordError} </Text> : null}
                 </>
 
                 <CustomModal
@@ -203,7 +235,7 @@ const UserAndVendorRegister = ({ route }) => {
                     onClose={() => setFieldsCheckModalVisible(false)}
                 />
 
-                <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
+                <View style={{}}>
 
                     <BookDatesButton
                         // onPress={() => getCheckUserValidation()}
@@ -219,8 +251,14 @@ const UserAndVendorRegister = ({ route }) => {
                     />
                 </View>
 
+                <TouchableOpacity
+                    onPress={() => navigation.goBack()}
+                    style={styles.RegisterLabelContainer}>
+                    <Text style={styles.RegisterLabel}>Already have an account? Login.</Text>
+                </TouchableOpacity>
+
             </LinearGradient>
-        </SafeAreaView>
+        </KeyboardAvoidingView>
     );
 };
 
@@ -254,9 +292,20 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 10,
         top: 10,
-        // top:Dimensions.get('window').height/65
-        // top: '50%',
-        // transform: [{ translateY: -10 }],
+    },
+    RegisterLabelContainer: {
+        flexDirection: 'row',
+        justifyContent: "center",
+        marginTop: 50
+    },
+    RegisterLabel: {
+        alignSelf: "center",
+        color: "grey",
+        textDecorationLine: "underline",
+        fontSize: 14,
+        fontWeight: "400",
+        fontFamily: 'ManropeRegular',
+
     },
     phoneContainer: {
         flexDirection: 'row',

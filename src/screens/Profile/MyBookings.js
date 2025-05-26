@@ -111,8 +111,16 @@ const ViewMyBookings = () => {
     }
   };
 
+  const fetchRazorpayKey = async () => {
+    const res = await fetch(`${BASE_URL}/razorpay-key`);
+    const data = await res.json();
+    console.log('Razorpay key data is ::>>', data);
+    return data;
+  };
+
   const handlePayment = async (advanceAmount, bookingId, catType, vendorMobileNumber, productName, totalAmount) => {
     const token = await getUserAuthToken();
+    const { key, defaultMethod } = await fetchRazorpayKey();
     let initiatePaymentPayload = {
       orderAmount: advanceAmount,
       currency: 'INR',
@@ -154,16 +162,16 @@ const ViewMyBookings = () => {
             description: 'Test Transaction',
             image: 'https://your-logo-url.com/logo.png',
             currency: data.currency,
-            key: 'rzp_test_SFQjGVsyEZ2P05', // Your Razorpay Key ID
+            key: key, // Your Razorpay Key ID
             amount: data.amount, // Amount in smallest currency unit
             order_id: data.orderId, // Order ID returned from backend
             name: 'Book the day',
             prefill: {
               email: 'bookthedaytechnologies@gmail.com',
-              contact: '8297735285',
-              name: 'Surya Neelankar',
-              //   method: 'upi',  // Pre-select UPI as the payment method
-              vpa: ''
+              contact: userLoggedInMobileNum,
+              name: userLoggedInName,
+              method: defaultMethod,  // Pre-select UPI as the payment method
+              // vpa: ''
             },
             theme: { color: '#FFDB7E' }
           };

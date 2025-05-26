@@ -528,9 +528,9 @@ const VendorDashBoardTab = ({ navigation }) => {
                             <Text style={{ fontFamily: 'LeagueSpartanRegular', color: themevariable.Color_000000, }}>+91 {vendorLoggedInMobileNum}</Text>
                         </View>
                     </View>
-                    <TouchableOpacity onPress={() => navigation.navigate('AdminDashboard')}>
+                    {/* <TouchableOpacity onPress={() => navigation.navigate('AdminDashboard')}>
                         <ProfileIcon />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
 
                 <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF3CD', '#FFDB7E']} style={{ width: '90%', alignSelf: 'center', padding: 20, borderRadius: 10, marginTop: 20 }}>

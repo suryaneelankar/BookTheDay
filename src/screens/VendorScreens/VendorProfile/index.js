@@ -87,7 +87,8 @@ const VendorProfile = () => {
 
                 </View>
                 <Text style={styles.profileName}>{profileData?.fullName}</Text>
-                <Text style={styles.profileEmail}>{profileData?.email}</Text>
+                <Text style={styles.profileEmail}>+91 {vendorLoggedInMobileNum}</Text>
+
             </View>
 
             <ScrollView style={styles.menuContainer} showsVerticalScrollIndicator={false}>

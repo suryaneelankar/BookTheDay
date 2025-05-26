@@ -600,7 +600,7 @@ const HomeDashboard = () => {
                 <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1 }}>
                     <View style={styles.topContainer}>
                         <View style={styles.locationContainer}>
-                            <Text style={styles.currentLoc}>Your current location</Text>
+                            <Text style={styles.currentLoc}>Select location</Text>
                             {/* navigation.navigate('LocationAdded') */}
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <TouchableOpacity onPress={() => getLocation()} style={styles.getLoc}>
@@ -1040,8 +1040,8 @@ const styles = StyleSheet.create({
     },
     currentLoc: {
         fontFamily: 'ManropeRegular',
-        color: '#7D7F88;',
-        fontSize: 12,
+        color: '#7D7F88',
+        fontSize: 14,
         fontWeight: '400'
     },
     getLoc: {
@@ -1052,10 +1052,10 @@ const styles = StyleSheet.create({
     retrievedLoc: {
         fontFamily: 'ManropeRegular',
         color: '#1A1E25',
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: '400',
         marginHorizontal: 5,
-        // width:'60%'
+        width:'95%'
     },
     searchContainer: {
         marginHorizontal: 20,

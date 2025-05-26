@@ -84,10 +84,11 @@ const LandingScreen = () => {
                     contentContainerStyle={styles.grid}
                 /> */}
 
-                <Text style={styles.rentTitle}>Rent products & Services</Text>
-                <Text style={styles.subtitle}>Need event essentials or want to offer your services? BookTheDay lets users rent clothes & jewellery, book catering and function halls, while vendors showcase and grow their business—all in one platform!
+                <Text style={styles.rentTitle}>All the services for your special day just a click away.</Text>
+                <Text style={styles.subtitle}>Planning an event or offering services? BookTheDay lets users book halls, catering, and rentals — while vendors grow their business, all in one place.
 
                 </Text>
+                
 
             </LinearGradient>
 

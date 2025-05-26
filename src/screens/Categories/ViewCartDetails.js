@@ -145,8 +145,8 @@ const BookingDetailsScreen = ({ navigation, route }) => {
       </View>
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: "#202020" }]}>Shipping Address</Text>
-        <View style={{ flexDirection: "row" }}>
-          <Text numberOfLines={2} style={styles.address}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address}</Text>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Text numberOfLines={3} style={styles.address}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address}</Text>
           <TouchableOpacity onPress={() => { navigation.navigate('LocationAdded') }}>
             <EditButton />
           </TouchableOpacity>
@@ -237,10 +237,10 @@ const BookingDetailsScreen = ({ navigation, route }) => {
 
 
       <View style={styles.footer}>
-        <View style={styles.footerNoteView}>
+        {/* <View style={styles.footerNoteView}>
           <ExclamationIcon />
           <Text style={styles.footerNote} >Security Deposit confirms your order 90%</Text>
-        </View>
+        </View> */}
         <View style={styles.footerButtons}>
           <TouchableOpacity onPress={() => ConfirmBooking()} style={[styles.button, { backgroundColor: "#D2453B" }]}>
             <Text style={[styles.buttonText, { color: "white" }]}>Confirm Booking | {formatAmount(productDetails?.securityDepositAmount)}</Text>
@@ -281,7 +281,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
           <Text style={styles.title}>Thank You!</Text>
           <Text style={styles.subtitle}>Your Booking Has Been Initiated</Text>
           <Text style={styles.description}>Our team is processing your request and will update you within the next 1 hour.</Text>
-          <Text style={styles.description}>*Once your booking is approved, please complete the payment to confirm your reservation.</Text>
+          {/* <Text style={styles.description}>*Once your booking is approved, please complete the payment to confirm your reservation.</Text> */}
           <LinearGradient colors={['#D2453B', '#A0153E']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
@@ -316,7 +316,6 @@ const styles = StyleSheet.create({
   },
   confrimSection: {
     marginHorizontal: 20,
-    marginTop: 10
   },
   Pricesection: {
     marginBottom: 10,
@@ -344,7 +343,7 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     color: '#000000',
     fontFamily: "ManropeRegular",
-    width: "80%"
+    width: "85%",
   },
   productContainer: {
     flexDirection: 'row',
@@ -398,9 +397,9 @@ const styles = StyleSheet.create({
   },
   dateText: {
     marginLeft: 10,
-    fontSize: 12,
+    fontSize: 13,
     color: '#FE8235',
-    fontWeight: "600",
+    fontWeight: "bold",
     fontFamily: "ManropeRegular",
 
   },

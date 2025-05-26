@@ -9,6 +9,8 @@ import FocusedHomeIcon from '../assets/svgs/tabIcons/focusedHome.svg';
 import FocusedCollection from '../assets/svgs/tabIcons/focusedCollection.svg';
 import EventsIcon from '../assets/svgs/tabIcons/events.svg';
 import FocusedEvents from '../assets/svgs/tabIcons/focusedEvents.svg';
+import CateringsIcon from '../assets/svgs/tabIcons/CateringsIcon.svg';
+import FocusedCaterings from '../assets/svgs/tabIcons/FocusedCaterings.svg';
 import NavigationHeader from '../components/NavigationHeader';
 import Caterings from '../screens/Caterings';
 
@@ -53,7 +55,7 @@ const UserTabs = () => {
         component={Caterings}
         options={{
           tabBarIcon: ({ focused }) => (
-            focused ? <FocusedEvents /> : <EventsIcon />
+            focused ? <FocusedCaterings /> : <CateringsIcon />
           ),
           tabBarLabel: 'Caterings',
           tabBarShowLabel: true,

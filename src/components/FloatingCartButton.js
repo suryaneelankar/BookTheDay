@@ -91,17 +91,17 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
           console.log('razor pay data is ::>>', data);
           // Start the Razorpay payment process
           var options = {
-            description: 'Test Transaction',
+            description: 'Book the day Transaction',
             image: 'https://your-logo-url.com/logo.png',
             currency: data.currency,
-            key: 'rzp_test_SFQjGVsyEZ2P05', // Your Razorpay Key ID
+            key: 'rzp_live_7vg21QSx9265DF', // Your Razorpay Key ID
             amount: data.amount, // Amount in smallest currency unit
             order_id: data.orderId, // Order ID returned from backend
             name: 'Book the day',
             prefill: {
               email: 'bookthedaytechnologies@gmail.com',
-              contact: '8297735285',
-              name: 'Surya Neelankar',
+              contact: userLoggedInMobileNum,
+              name: userLoggedInName,
               //   method: 'upi',  // Pre-select UPI as the payment method
               vpa: ''
             },

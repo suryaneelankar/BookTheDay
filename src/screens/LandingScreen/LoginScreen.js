@@ -21,18 +21,13 @@ const LoginScreen = ({ route }) => {
     const [password, setPassword] = useState('');
     const [authToken, setAuthToken] = useState('');
     const dispatch = useDispatch();
-    // const selectedMode = useSelector((state) => state.userId);
     const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
     const [isPasswordVisible, setPasswordVisible] = useState(false);
-
-    // console.log("selected mode::::::::;;", selectedMode, type);
-    // console.log('deviceFCMToken is::>>', deviceFCMToken)
+    const [fieldsCheckModalVisible, setFieldsCheckModalVisible] = useState(false);
 
     const togglePasswordVisibility = () => {
         setPasswordVisible(!isPasswordVisible);
     };
-
-    // console.log('user auth token is::>>',getVendorAuthToken());
 
     const storeUserDeviceToken = async () => {
         const payload = {
@@ -81,20 +76,16 @@ const LoginScreen = ({ route }) => {
 
     const getCheckUserValidation = async () => {
         if (!phoneNumber || !password) {
-            Alert.alert("Please fill all feilds");
+            setFieldsCheckModalVisible(true);
             return;
         }
 
         const payload = {
             mobileNumber: String(phoneNumber),
             password: String(password)
-            // fullName: fullName,
-            // role: type
         }
-        // console.log("payload is:::::::", payload, type);
         try {
             const logineRes = await axios.post(`${BASE_URL}/${type}/login`, payload);
-            // console.log("login  res:::::::::", logineRes?.data);
             if (logineRes?.status === 200) {
                 setAuthToken(logineRes?.data?.token);
                 if (type === 'vendor') {
@@ -107,14 +98,12 @@ const LoginScreen = ({ route }) => {
                     if (logineRes?.data?.token) {
                         dispatch(checkIsTokenStored(true));
                     }
-                    // navigation.navigate('Home');
                 } else {
                     console.log('into USER LOGG');
                     storeUserDeviceToken();
                     dispatch(getLoginUserId(false));
                     dispatch(getCurrentLoggedInUserMobileNum(phoneNumber));
                     storeUserAuthToken(logineRes?.data?.token);
-                    // navigation.navigate('Home');
                     storeUserMobileNumber(phoneNumber);
                     if (logineRes?.data?.token) {
                         dispatch(checkIsTokenStored(true));
@@ -144,11 +133,16 @@ const LoginScreen = ({ route }) => {
 
                 }
 
+                <CustomModal
+                    visible={fieldsCheckModalVisible}
+                    message={'Please fill all fields'}
+                    onClose={() => setFieldsCheckModalVisible(false)}
+                />
+
                 <Text style={styles.textLabel}>Phone Number<Text style={{ color: "red", fontSize: 14 }}> *</Text></Text>
                 <View style={styles.phoneContainer}>
                     <Text style={styles.countryCode}>+91</Text>
                     <TextInput
-                        // style={styles.input}
                         style={{ color: "#333333", width: "100%" }}
                         placeholderTextColor={"#7E8389"}
                         placeholder="Enter Mobile Number"

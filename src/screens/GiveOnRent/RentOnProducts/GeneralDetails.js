@@ -624,6 +624,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     labelField="label"
                                     valueField="value"
                                     placeholder={'Select Size'}
+                                    placeholderTextColor={"#A3A3A3"}
                                     value={clothSize}
                                     containerStyle={{ borderColor: "orange", borderWidth: 1, borderRadius: 5 }}
                                     onFocus={() => setIsFocus(true)}
@@ -642,6 +643,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     labelField="label"
                                     valueField="value"
                                     placeholder="Select a color"
+                                    placeholderTextColor={"#A3A3A3"}
                                     value={selectedColor}
                                     selectedTextStyle={[styles.selectedTextStyle, { marginHorizontal: 5 }]}
                                     activeColor={'#f0e68c'}

@@ -61,7 +61,6 @@ export default VendorHowItWorks;
 
 const styles = StyleSheet.create({
     rootContainer: {
-        marginHorizontal: 20,
         marginBottom:40
     },
     howItWorksHeader: {

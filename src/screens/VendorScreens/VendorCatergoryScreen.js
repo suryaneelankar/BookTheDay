@@ -1,9 +1,12 @@
-import { StyleSheet, FlatList, TouchableOpacity, SafeAreaView, Text, View, ScrollView } from 'react-native';
+import { StyleSheet, FlatList, TouchableOpacity, SafeAreaView, Text, View, ScrollView, Image } from 'react-native';
 import themevariable from '../../utils/themevariable';
-import FunctionHallVendorImg from '../../assets/vendorIcons/functionHallVendorImgs.svg';
-import ClothVendorImg from '../../assets/vendorIcons/clothVendorImg.svg';
+import HallImage from '../../assets/HallImage1.jpeg';
+import CateringImg from '../../assets/CateringImg.jpeg';
+import ClothesImg from '../../assets/ClothesImg1.jpeg';
+import ClothesImg2 from '../../assets/ClothesImg2.jpeg';
 import CateringVendorImg from '../../assets/vendorIcons/cateringVendorImg.svg';
 import { useCallback, useEffect, useState } from 'react';
+import ProfileIcon from '../../assets/vendorIcons/profileIcon.svg'
 import { useSelector, useDispatch } from 'react-redux';
 import { getCurrentVendorLoggedInUserName } from '../../../redux/actions';
 import { useFocusEffect } from '@react-navigation/native';
@@ -12,12 +15,12 @@ import axios from 'axios';
 import { getVendorAuthToken } from '../../utils/StoreAuthToken';
 import BASE_URL from '../../apiconfig';
 import VendorHowItWorks from '../../components/VendorHowItWorks';
-import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.svg';
 // import RightSideIcon from '../../assets/profilesvgs/Chevron-Right.svg';
 import RightSideIcon from '../../assets/profilesvgs/zoomRight.svg';
 
 const VendorCategoryScreen = ({ navigation }) => {
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
+    const vendorLoggedInName = useSelector((state) => state.vendorLoggedInName);
     const [clothJewelBookingsData, setclothJewelBookingsData] = useState([]);
     const [functionHallBookingsData, setFunctionHallBookingsData] = useState([]);
     const [cateringsBookingsData, setCateringBookingsData] = useState([]);
@@ -139,56 +142,64 @@ const VendorCategoryScreen = ({ navigation }) => {
     const categoriesData = [
         {
             id: 1,
-            CatImg: FunctionHallVendorImg,
+            CatImg: HallImage,
             navScreen: 'AddFunctionalHall',
             title: 'Add Function Hall',
             description: 'Manage listings for events, celebrations, and weddings.',
-            catType:'funtionHalls'
+            catType: 'funtionHalls'
 
         },
         {
             id: 2,
-            CatImg: ClothVendorImg,
+            CatImg: ClothesImg,
             navScreen: 'RentOnProducts',
             title: 'Add Cloth & Jewels',
             description: 'List and manage your rental inventory with ease.',
-            catType:'clothsJewels'
+            catType: 'clothsJewels'
 
         },
         {
             id: 3,
-            CatImg: CateringVendorImg,
+            CatImg: CateringImg,
             navScreen: 'AddFoodCatering',
             title: 'Add Food Catering',
             description: 'Handle food orders and service requests seamlessly.',
-            catType:'caterings'
+            catType: 'caterings'
         },
     ];
 
-    const renderItem = ({ item }) => { 
+    const renderItem = ({ item }) => {
 
         // console.log("item cattype:::::", item?.catType,'+++', profileData?.posts?.some(post => post?.postModel === "Catering"))
-        return(
+        return (
 
-        <TouchableOpacity
-            style={styles.categoryCard}
-            onPress={() => {
-                const targetScreen = item.catType === 'caterings' && profileData?.posts?.some(post => post?.postModel === "Catering")
-                    ? 'EditAddFoodCateringGeneral'
-                    : item.navScreen;
-                navigation.navigate(targetScreen, { isAadharUpdate: profileData?.aadharImage?.url ? true : false });
-            }}
-        >
-            <LinearGradient colors={['#FFF5E1', '#FFE2BA']} style={styles.iconContainer}>
-                <item.CatImg width={50} height={50} />
-            </LinearGradient>
-            <View style={styles.categoryInfo}>
-                <Text style={styles.categoryTitle}>{item.title}</Text>
-                <Text style={styles.categoryDescription}>{item.description}</Text>
-            </View>
-            <RightSideIcon style={{marginLeft:10}}/>
-        </TouchableOpacity>
-    )};
+            <TouchableOpacity
+                style={styles.categoryCard}
+                onPress={() => {
+                    const targetScreen = item.catType === 'caterings' && profileData?.posts?.some(post => post?.postModel === "Catering")
+                        ? 'EditAddFoodCateringGeneral'
+                        : item.navScreen;
+                    navigation.navigate(targetScreen, { isAadharUpdate: profileData?.aadharImage?.url ? true : false });
+                }}
+            >
+                <LinearGradient colors={['#FFF5E1', '#FFE2BA']} style={styles.iconContainer}>
+                    <Image source={item.CatImg}
+                        style={{
+                            height: 130,
+                            width: 130, 
+                            borderTopLeftRadius: 15,
+                            borderBottomLeftRadius: 15
+                        }}
+                    />
+                </LinearGradient>
+                <View style={styles.categoryInfo}>
+                    <Text style={styles.categoryTitle}>{item.title}</Text>
+                    <Text style={styles.categoryDescription}>{item.description}</Text>
+                </View>
+                <RightSideIcon style={{ marginLeft: 10 }} />
+            </TouchableOpacity>
+        )
+    };
 
     return (
         <ScrollView style={styles.container}>
@@ -198,12 +209,14 @@ const VendorCategoryScreen = ({ navigation }) => {
                 colors={['#FFF7E7', '#FFF7E7']}
                 style={styles.background}
             >
-                {/* Header */}
-
                 {/* Bookings Overview */}
-                <TouchableOpacity onPress={() => navigation.navigate('Events')}  style={{ marginTop: 15, alignSelf: "center" }}>
-                    <JewelleryCard />
-                </TouchableOpacity>
+                <View style={{ flexDirection: "row", alignItems: "center", marginLeft: -15 }}>
+                    <ProfileIcon />
+                    <View>
+                        <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular', textTransform: "capitalize" }}>Hi, {vendorLoggedInName}</Text>
+                        <Text style={{ fontFamily: 'LeagueSpartanRegular', color: themevariable.Color_000000, }}>+91 {vendorLoggedInMobileNum}</Text>
+                    </View>
+                </View>
                 <View style={styles.bookingsOverview}>
                     <View style={styles.overviewCards}>
                         <View style={styles.overviewCard}>
@@ -231,7 +244,7 @@ const VendorCategoryScreen = ({ navigation }) => {
                 />
 
                 {/* Quick Tips */}
-                <View style={styles.quickTips}>
+                <View>
                     <Text style={styles.sectionTitle}>Quick Tips</Text>
                     <Text style={styles.tip}>1. Update your profile regularly to attract more customers.</Text>
                     <Text style={styles.tip}>2. Respond to inquiries quickly to improve customer satisfaction.</Text>
@@ -304,11 +317,6 @@ const styles = StyleSheet.create({
     listContainer: {
         paddingBottom: 20,
     },
-    //     #FFC19A – Slightly lighter
-    // #FFD3B6 – Medium light
-    // #FFE3D0 – Softer light
-    // #FFF0E4 – Very light pastel
-    // #FFF8F2 – Extremely light (almost white)
     categoryCard: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -323,7 +331,7 @@ const styles = StyleSheet.create({
         elevation: 3,
         borderColor: '#EDEDED',
         borderWidth: 1,
-        height:150
+        height: 150
     },
     iconContainer: {
         width: 120,
@@ -332,8 +340,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 15,
-        borderTopLeftRadius:15,
-        borderBottomLeftRadius:15
+        borderTopLeftRadius: 15,
+        borderBottomLeftRadius: 15
     },
     categoryInfo: { flex: 1 },
     categoryTitle: {
@@ -345,10 +353,6 @@ const styles = StyleSheet.create({
     categoryDescription: {
         fontSize: 14,
         color: '#333333',
-    },
-    quickTips: {
-        // marginVertical: 20,
-        marginHorizontal: 20
     },
     tip: {
         fontSize: 14,

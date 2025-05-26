@@ -13,6 +13,7 @@ const TextField = (props)=>{
                 onChangeText={onChangeHandler}
                 value={value}
                 placeholder={placeholder}
+                placeholderTextColor={"#A3A3A3"}
                 keyboardType={keyboardType}
                 multiline={true}
                 numberOfLines={4}
