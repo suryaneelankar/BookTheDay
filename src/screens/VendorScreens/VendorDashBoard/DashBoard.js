@@ -349,7 +349,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     const renderFunctionHallItem = ({ item }) => {
-        const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+        const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
 
         return (
             <TouchableOpacity
@@ -383,7 +383,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     const renderFoodCateringItem = ({ item }) => {
-        const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+        const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
 
         return (
             <TouchableOpacity
@@ -424,7 +424,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     const renderItem = ({ item }) => {
-        const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+        const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
 
         return (
             <TouchableOpacity

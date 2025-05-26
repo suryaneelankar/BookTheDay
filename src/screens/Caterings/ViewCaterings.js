@@ -78,7 +78,7 @@ const ViewCaterings = ({ route, navigation }) => {
     };
 
     const convertLocalhostUrls = (url) => {
-        return url.replace("localhost", LocalHostUrl);
+        return url?.replace("localhost", LocalHostUrl);
     };
 
     useEffect(() => {

@@ -100,7 +100,7 @@ const HallsBookingOverView = ({ route, navigation }) => {
             <ScrollView style={{}}>
 
                 <View style={styles.productContainer}>
-                    <FastImage source={{ uri: bookingDetails?.professionalImage?.url.replace('localhost', LocalHostUrl) }}
+                    <FastImage source={{ uri: bookingDetails?.professionalImage?.url?.replace('localhost', LocalHostUrl) }}
                         style={styles.productImage}
                         resizeMethod="resize"
                         resizeMode="cover"

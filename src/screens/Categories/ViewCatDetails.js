@@ -83,7 +83,7 @@ const ViewCatDetails = ({ route }) => {
             setJewelleryDetails(response?.data)
 
             const convertLocalhostUrls = (url) => {
-                return url.replace("localhost", LocalHostUrl);
+                return url?.replace("localhost", LocalHostUrl);
             };
             const professionalImageUrl = convertLocalhostUrls(response?.data?.professionalImage?.url);
             const photos = [

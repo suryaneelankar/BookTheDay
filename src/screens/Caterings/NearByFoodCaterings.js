@@ -117,7 +117,7 @@ const NearByFoodCaterings = () => {
 
     const renderFoodCaterings = ({ item }) => {
         const convertLocalhostUrls = (url) => {
-            return url.replace("localhost", LocalHostUrl);
+            return url?.replace("localhost", LocalHostUrl);
         };
         const professionalImageUrl = convertLocalhostUrls(item?.professionalImage?.url);
 

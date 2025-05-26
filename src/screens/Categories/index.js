@@ -116,7 +116,7 @@ const Categories = () => {
     }
 
     const renderJewellery = ({ item }) => {
-        const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+        const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
 
         const originalPrice = item?.rentPricePerDay;
         const discountPercentage = item?.discountPercentage;
@@ -178,7 +178,7 @@ const Categories = () => {
     }
 
     const renderClothesCat = ({ item, index }) => {
-        const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+        const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
         const originalPrice = item?.rentPricePerDay;
         const discountPercentage = item?.discountPercentage;
         const strikethroughPrice = discountPercentage
@@ -209,7 +209,7 @@ const Categories = () => {
 
     const filteredJewellery = selectedJewelFilter === 'All'
         ? jewelleryCategory
-        : jewelleryCategory.filter(item => item?.jewellaryType === selectedJewelFilter.toLowerCase());
+        : jewelleryCategory.filter(item => item?.jewellaryType.toLowerCase() === selectedJewelFilter.toLowerCase());
 
 
     return (

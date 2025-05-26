@@ -101,6 +101,7 @@ const UserAndVendorRegister = ({ route }) => {
     };
 
     const getCheckUserValidation = async () => {
+        console.log("baseurl", BASE_URL)
 
         const payload = {
             mobileNumber: String(phoneNumber),

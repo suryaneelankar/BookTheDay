@@ -92,7 +92,8 @@ const ViewEvents = ({ route, navigation }) => {
   }, []);
 
   const convertLocalhostUrls = (url) => {
-    return url.replace("localhost", LocalHostUrl);
+    console.log("urk is:::::::::::", url);
+    return url?.replace("localhost", LocalHostUrl);
   };
 
   const getEventsDetails = async () => {
@@ -107,7 +108,7 @@ const ViewEvents = ({ route, navigation }) => {
       setEventsDetails(response?.data);
 
       const professionalImageUrl = convertLocalhostUrls(response?.data?.professionalImage?.url);
-
+   
       const imageUrls = [
         professionalImageUrl, // Add professional image as the first image
         ...response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image?.url))
