@@ -188,14 +188,14 @@ const RequestConfirmation = ({ navigation, route }) => {
     }
 
     const convertUrlToIp = () => {
-        console.log('wholeBookingData is::>>>>', wholeBookingData);
+        // console.log('wholeBookingData is::>>>>', wholeBookingData);
 
         // Check if wholeBookingData is an array and has at least one item
         if (Array.isArray(wholeBookingData) && wholeBookingData.length > 0) {
             const convertedImageUrl = wholeBookingData[0]?.productImage !== undefined
                 ? wholeBookingData[0]?.productImage.replace('localhost', LocalHostUrl)
                 : wholeBookingData[0]?.productImage;
-            console.log('convertedImageUrl is::>>', convertedImageUrl);
+            // console.log('convertedImageUrl is::>>', convertedImageUrl);
             return convertedImageUrl;
         } else {
             return null;
@@ -251,17 +251,21 @@ const RequestConfirmation = ({ navigation, route }) => {
         );
     };
 
+    console.log("SelectedItemDetails are ::>>>", selectedItemDetails);
+
     const renderItem = ({ item }) => {
         return (
             <View onPress={() => { }} style={{ borderRadius: 10, backgroundColor: item?.bookingStatus == 'rejected' || item?.bookingStatus == 'approved' ? 'white' : 'white', marginHorizontal: 15, marginTop: 10, paddingHorizontal: 10, paddingVertical: 10 }}>
                 <TouchableOpacity style={{ flexDirection: "row", alignItems: 'center' }}
                     onPress={() => { actionSheetRef.current?.show(), setSelectedItemDetails(item) }}
                 >
-                    <Avatar widthDyn={61} heightDyn={61} borderRadiusDyn={8} name={item?.userFullName ? item?.userFullName : ''} imageUrl={''} token={getVendorAuth} />
+                    <Avatar widthDyn={61} heightDyn={61} borderRadiusDyn={8} name={item?.userFullName ? item?.userFullName : ''} imageUrl={convertUrlToIp()} token={getVendorAuth} />
                     <View style={{ marginLeft: 10, width: "50%" }}>
                         <Text style={{ marginTop: 5, color: "#101010", fontSize: 14, fontWeight: "500", fontFamily: "ManropeRegular", }}>{item?.productName}</Text>
                         <View style={{ marginTop: 5 }}>
-                            <Text numberOfLines={1} style={{ color: "#1A1E25", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular" }}>{item?.userAddress}</Text>
+                            {item?.userAddress ?
+                                <Text numberOfLines={1} style={{ color: "#1A1E25", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular" }}>{item?.userAddress}</Text>
+                                : null}
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
                                 <DollarIcon style={{}} />
                                 <Text style={{ color: "#4A4A4A", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", marginHorizontal: 5 }}>{formatAmount(item?.totalAmount)}</Text>
@@ -275,7 +279,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                         <TouchableOpacity
                             onPress={() => { actionSheetRef.current?.show(), setSelectedItemDetails(item) }}
                             style={{ bottom: verticalScale(25), left: verticalScale(20) }}>
-                            <Text style={{ color: "#4A4A4A", textDecorationLine: "underline", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular" }}>View Details</Text>
+                            <Text style={{ color: "#4A4A4A", textDecorationLine: "underline", marginTop: 20, fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular" }}>View Details</Text>
                         </TouchableOpacity>
 
                         {item?.bookingStatus == 'requested' ?
@@ -385,7 +389,7 @@ const RequestConfirmation = ({ navigation, route }) => {
             >
                 <View style={styles.headerContainer}>
                     <View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%",alignSelf:"center",alignItems:"center" }}>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%", alignSelf: "center", alignItems: "center" }}>
                             <Text style={styles.productNameText}>{selectedItemDetails?.productName}</Text>
                             <View style={[styles.bookingStatusContainer, {
                                 backgroundColor:
@@ -427,20 +431,20 @@ const RequestConfirmation = ({ navigation, route }) => {
                             <Text style={styles.detailsStyle}>{selectedItemDetails?.userFullName}</Text>
                         </View>
                         {selectedItemDetails?.catType === 'clothJewels' ?
-                        <> {(selectedItemDetails?.securityDepositAmountPaid > 0) && (
-                            <TouchableOpacity style={styles.detailsViewStyle} onPress={() => openDialPad(selectedItemDetails?.userMobileNumber)}>
-                                <PhoneIcon />
-                                <Text style={[styles.phoneNumDetailStyle, { textDecorationLine: "underline" }]}>{selectedItemDetails?.userMobileNumber}</Text>
-                            </TouchableOpacity>
-                        )}
-                        </> : <>
-                        {(selectedItemDetails?.advanceAmountPaid !== 0 && selectedItemDetails?.advanceAmountPaid !== undefined) && (
-                            <TouchableOpacity style={styles.detailsViewStyle} onPress={() => openDialPad(selectedItemDetails?.userMobileNumber)}>
-                                <PhoneIcon />
-                                <Text style={[styles.phoneNumDetailStyle, { textDecorationLine: "underline" }]}>{selectedItemDetails?.userMobileNumber}</Text>
-                            </TouchableOpacity>
-                        )}
-                        </>}
+                            <> {(selectedItemDetails?.securityDepositAmountPaid > 0) && (
+                                <TouchableOpacity style={styles.detailsViewStyle} onPress={() => openDialPad(selectedItemDetails?.userMobileNumber)}>
+                                    <PhoneIcon />
+                                    <Text style={[styles.phoneNumDetailStyle, { textDecorationLine: "underline" }]}>{selectedItemDetails?.userMobileNumber}</Text>
+                                </TouchableOpacity>
+                            )}
+                            </> : <>
+                                {(selectedItemDetails?.advanceAmountPaid !== 0 && selectedItemDetails?.advanceAmountPaid !== undefined) && (
+                                    <TouchableOpacity style={styles.detailsViewStyle} onPress={() => openDialPad(selectedItemDetails?.userMobileNumber)}>
+                                        <PhoneIcon />
+                                        <Text style={[styles.phoneNumDetailStyle, { textDecorationLine: "underline" }]}>{selectedItemDetails?.userMobileNumber}</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </>}
                         {(selectedItemDetails?.advanceAmountPaid !== 0 && selectedItemDetails?.userAddress) && (
                             <TouchableOpacity style={[styles.detailsViewStyle, { alignItems: "flex-start" }]} onPress={() => openMap(selectedItemDetails?.userLatitude, selectedItemDetails?.userLongitude)}>
                                 <LocationIcon />
@@ -450,13 +454,13 @@ const RequestConfirmation = ({ navigation, route }) => {
                         <View style={styles.detailsViewStyle}>
                             <AdvPayIcon />
                             {selectedItemDetails?.securityDepositAmount ?
-                            <Text style={styles.detailsStyle}>Security Deposit Paid: {formatAmount(selectedItemDetails?.securityDepositAmountPaid)}/-</Text>
-                           : <Text style={styles.detailsStyle}>Advance Paid: {formatAmount(selectedItemDetails?.advanceAmountPaid)}/-</Text>
+                                <Text style={styles.detailsStyle}>Security Deposit Paid: {formatAmount(selectedItemDetails?.securityDepositAmountPaid)}/-</Text>
+                                : <Text style={styles.detailsStyle}>Advance Paid: {formatAmount(selectedItemDetails?.advanceAmountPaid)}/-</Text>
                             }
-                           </View>
+                        </View>
                         <View style={styles.detailsViewStyle}>
                             <AdvPayIcon />
-                            <Text style={styles.detailsStyle}>Balance Payable: {formatAmount(selectedItemDetails?.totalAmount - (selectedItemDetails?.advanceAmountPaid !== undefined  ? selectedItemDetails?.advanceAmountPaid : selectedItemDetails?.securityDepositAmountPaid ))}/-</Text>
+                            <Text style={styles.detailsStyle}>Balance Payable: {formatAmount(selectedItemDetails?.totalAmount - (selectedItemDetails?.advanceAmountPaid !== undefined ? selectedItemDetails?.advanceAmountPaid : selectedItemDetails?.securityDepositAmountPaid))}/-</Text>
                         </View>
 
                         {selectedItemDetails?.bookingItem && (

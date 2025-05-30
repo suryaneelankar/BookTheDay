@@ -37,8 +37,8 @@ import CatDriver from '../../assets/svgs/categories/home_categories_driver_icon.
 import CatHalls from '../../assets/svgs/categories/home_categories_hall_icon.svg';
 import CatJewellery from '../../assets/svgs/categories/home_categories_jewellery_icon.svg';
 import CatTentHouse from '../../assets/svgs/categories/home_categories_tent_icon.svg';
-import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.svg';
-import ClothesCard from '../../assets/svgs/homeSwippers/home_shirtcard.svg';
+import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.png';
+import ClothesCard from '../../assets/svgs/homeSwippers/home_shirtcard.png';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import { getCurrentLoggedInUserName, getUserLocation, setUserCurrentLocation, showOrHideBottomCard } from "../../../redux/actions";
 import { useDispatch, useSelector } from "react-redux";
@@ -621,28 +621,14 @@ const HomeDashboard = () => {
                                 : null}
                         </Pressable>
                     </View>
-                    {/* <View style={styles.searchContainer}>
-                        <View style={styles.searchProduct}>
-                            <View style={styles.searchProHeader}>
-                                <SearchIcon style={{ marginLeft: 10 }} />
-                                <TextInput
-                                    placeholder="Search by products"
-                                    style={styles.textInput} />
-                            </View>
-                        </View>
-                        <View style={styles.filterView}>
-                            <FilterIcon />
-                        </View>
-                    </View> */}
                     <Swiper
                         autoplay
                         autoplayTimeout={3}
                         dotStyle={styles.dot}
                         activeDotStyle={styles.activeDot}
-                        style={{ height: Dimensions.get('window').height / 4, }}
+                        style={{ height: Dimensions.get('window').height / 3.5, }}
                     >
                         {bannerImages.map((item, index) => {
-                            const SvgComponent = item?.image;
                             return (
                                 <TouchableOpacity
                                     key={index}
@@ -653,20 +639,15 @@ const HomeDashboard = () => {
                                             navigation.navigate('CategoriesList', { catType: 'clothes' });
                                         }
                                     }}
+                                    style={{padding:10}}
                                 >
-                                    {/* <Image
+                                    <Image
                                     source={item?.image} 
-                                    style={{width:"90%", height:"100%", alignSelf:"center"}}/> */}
-                                    <SvgComponent
-                                        width="90%"
-                                        height="100%"
-                                        style={{ alignSelf: "center" }}
-                                    />
+                                    style={{width:"100%", height:"100%", alignSelf:"center",padding:10}}/>
                                 </TouchableOpacity>
                             );
                         })}
                     </Swiper>
-                    {/* </View> */}
 
                     <View style={styles.infoBoxContainer}>
 
@@ -718,7 +699,7 @@ const HomeDashboard = () => {
                 {nearByEventsData?.length > 0 ?
                     <>
                         <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: horizontalScale(20) }}>
-                            <Text style={styles.onDemandTextStyle}>Deals Near You</Text>
+                            <Text style={styles.onDemandTextStyle}>Function Halls Near You</Text>
                             <TouchableOpacity onPress={() => navigation.navigate('Events')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
                             </TouchableOpacity>
                         </View>
@@ -747,7 +728,7 @@ const HomeDashboard = () => {
                 {nearbyCateringsData?.length > 0 ?
                     <>
                         <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: horizontalScale(20) }}>
-                            <Text style={styles.onDemandTextStyle}>Caterings Near You..</Text>
+                            <Text style={styles.onDemandTextStyle}>Caterings Near You</Text>
                         </View>
 
                         <FlatList

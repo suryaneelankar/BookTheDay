@@ -176,6 +176,11 @@ const BookingDetailsScreen = ({ navigation, route }) => {
         </View>
       </View>
 
+      <View style={styles.footerNoteView}>
+          <ExclamationIcon />
+          <Text style={styles.footerNote} >Security Deposit will be refunded once you returned the product.</Text>
+        </View>
+
       <View style={styles.Pricesection}>
         <Text style={[styles.sectionTitle, { color: "#202020" }]}>Price Details</Text>
         <View style={styles.priceDetailRow}>
@@ -239,7 +244,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
       <View style={styles.footer}>
         {/* <View style={styles.footerNoteView}>
           <ExclamationIcon />
-          <Text style={styles.footerNote} >Security Deposit confirms your order 90%</Text>
+          <Text style={styles.footerNote} >Security Deposit will be refunded once you returned the product.</Text>
         </View> */}
         <View style={styles.footerButtons}>
           <TouchableOpacity onPress={() => ConfirmBooking()} style={[styles.button, { backgroundColor: "#D2453B" }]}>
@@ -453,18 +458,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   footerNoteView: {
-    backgroundColor: "#FFF4CF",
-    width: "100%",
+    backgroundColor: "#FFF",
+    width: "90%",
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 40
+    paddingHorizontal: 25
   },
   footerNote: {
     fontSize: 14,
-    color: '#000105',
-    backgroundColor: "#FFF4CF",
+    color: 'red',
+    backgroundColor: "#FFF",
     fontWeight: "700",
-    textAlign: "center",
+    textAlign: "left",
     marginLeft: 10
   },
   footerButtons: {

@@ -25,7 +25,6 @@ const ViewCatDetails = ({ route }) => {
 
     const [selectedOption, setSelectedOption] = useState('daily');
     const [selectedPrice, setSelectedPrice] = useState(null);
-    const [activeIndex, setActiveIndex] = useState(0);
     const navigation = useNavigation();
     const { catId, genderType } = route.params;
     const [specifcadditionalImages, setSpecificAdditionImages] = useState([]);

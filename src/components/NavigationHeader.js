@@ -17,13 +17,13 @@ const NavigationHeader = ({
      };
 
   return (
-    <View style={[styles.container,{marginRight: Icon ? horizontalScale(40) : 0} ]}>
+    <View style={[styles.container ]}>
         {Icon ?
       <Pressable style={styles.btnContainer} onPress={onPressGoBack}>
         <BackIcon/>
       </Pressable>
       : null}
-      <Text numberOfLines={1} style={styles.headerText}>
+      <Text numberOfLines={1} style={[styles.headerText, {marginRight: Icon ? horizontalScale(40) : 0,}]}>
         {title}
       </Text>
     </View>

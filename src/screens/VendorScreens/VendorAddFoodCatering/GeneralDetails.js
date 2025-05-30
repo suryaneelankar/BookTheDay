@@ -550,8 +550,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             isRequired={true}
                         />
                         <Text style={styles.commissionLabel}>Service Fee Details:</Text>
-                        <Text style={styles.discountlabel}>3% for orders below ₹10,000</Text>
-                        <Text style={styles.discountlabel}>5% for orders above ₹10,000</Text>
+                        <Text style={styles.discountlabel}>3% for all orders</Text>
+                        {/* <Text style={styles.discountlabel}>5% for orders above ₹10,000</Text> */}
 
                         {/* <Text style={styles.textInputlabel}>Discount if any</Text> */}
                         {/* {discountPercentageList()} */}

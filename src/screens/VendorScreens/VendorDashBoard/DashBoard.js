@@ -205,7 +205,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            // console.log('response is:::>>',response);
+            console.log('response is:::>>',response);
             if (response?.status == 200) {
                 showSuccessAlert();
                 getVendorListings();

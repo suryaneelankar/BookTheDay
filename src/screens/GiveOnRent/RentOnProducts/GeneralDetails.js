@@ -707,8 +707,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             ) : null
                         }
                         <Text style={styles.commissionLabel}>Service Fee Details:</Text>
-                        <Text style={styles.discountlabel}>3% for orders below ₹10,000</Text>
-                        <Text style={styles.discountlabel}>5% for orders above ₹10,000</Text>
+                        <Text style={styles.discountlabel}>3% for all orders</Text>
+                        {/* <Text style={styles.discountlabel}>5% for orders above ₹10,000</Text> */}
 
                         <TextField
                             label='Security Deposit'

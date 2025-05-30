@@ -115,8 +115,8 @@ const ViewEvents = ({ route, navigation }) => {
       ];
 
       setSubImages(imageUrls);
-      console.log("hall amenities", JSON.stringify(response?.data))
-      const amenities = response?.data?.hallAmenities[0].split(',').map((item, index) => ({
+      // console.log("hall amenities", JSON.stringify(response?.data))
+      const amenities = response?.data?.hallAmenities[0]?.split(',').map((item, index) => ({
         id: (index + 1).toString(),
         name: item.trim()
       }));
@@ -203,7 +203,7 @@ const ViewEvents = ({ route, navigation }) => {
         return <Icon name='chair' size={24} color={'#FD813B'} />;
       case 'Coolers / Fans':
         return <MaterialCommunityIcons name='fan' size={24} color={'#FD813B'} />;
-      case 'Air Conditioners':
+      case 'Air Conditioners (AC)':
         return <MaterialCommunityIcons name='air-conditioner' size={24} color={'#FD813B'} />;
       case 'Bedrooms':
         return <IonIcons name={'bed-sharp'} size={24} color={'#FD813B'} />;
@@ -538,7 +538,8 @@ const styles = StyleSheet.create({
     color: "#606060",
     fontFamily: 'ManropeRegular',
     marginTop: 5,
-    height: 30
+    height: 30,
+    textAlign: "center"
 
   },
   timeSlotText: {

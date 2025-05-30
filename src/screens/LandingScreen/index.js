@@ -1,114 +1,46 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, Dimensions } from 'react-native';
-// import CateringIcon from '../../assets/svgs/LandingScreen/cateringDash.svg';
-// import Clothes from '../../assets/svgs/LandingScreen/clothesDashboard.svg';
-// import DecorationIcon from '../../assets/svgs/LandingScreen/decorationDash.svg';
-// import DressesIcon from '../../assets/svgs/LandingScreen/dressesDash.svg';
-// import EventsMarriage from '../../assets/svgs/LandingScreen/eventsMarriage.svg';
-// import JewelleryIcon from '../../assets/svgs/LandingScreen/jewellryDash.svg';
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, SafeAreaView, Dimensions } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import GiveOnRentSub from '../../assets/SelectUserOrVendor/GiveOnRentSub.svg';
 import TakeOnRentSubImage from '../../assets/SelectUserOrVendor/takeOnRentSub.svg';
 import { useNavigation } from '@react-navigation/native';
+import BookDatesButton from '../../components/GradientButton';
+import WheelWithImageQuads from './ImageQuadrants';
+import OnboardingBGImg from '../../assets/OnboardingBGImg.png';
 
 const LandingScreen = () => {
 
-    // const items = [
-    //     { id: '1', component: <CateringIcon width="100%" height="100%" />, title: 'Catering' },
-    //     { id: '2', component: <Clothes width="100%" height="100%" />, title: 'Clothes' },
-    //     { id: '3', component: <DecorationIcon width="100%" height="100%" />, title: 'Decoration' },
-    //     { id: '4', component: <DressesIcon width="100%" height="100%" />, title: 'Dresses' },
-    //     { id: '5', component: <EventsMarriage width="100%" height="100%" />, title: 'Events' },
-    //     { id: '6', component: <JewelleryIcon width="100%" height="100%" />, title: 'Jewellery' },
-    // ];
-
-    const [selectedId, setSelectedId] = useState(null);
     const navigation = useNavigation();
 
-    const data = [
-        {
-            id: '1',
-            title: 'Take on Rent',
-            description: 'Rent the items and make it more easy',
-            buttonText: 'Start Lending',
-            SvgImage: TakeOnRentSubImage,
-            type:'user'
-        },
-        {
-            id: '2',
-            title: 'Give on Rent',
-            description: 'Rent the items and make it more Profitable',
-            buttonText: 'Start Renting',
-            SvgImage: GiveOnRentSub,
-            type:'vendor'
-        },
-    ];
-
-    const Item = ({ title, description, buttonText, SvgImage,onPress, borderColor }) => (
-        <TouchableOpacity onPress={onPress} style={[styles.card, { borderColor }]}>
-            <View style={styles.textContainer}>
-                <Text style={styles.title}>{title}</Text>
-                <Text style={styles.description}>{description}</Text>
-                <TouchableOpacity onPress={onPress} style={styles.button}>
-                    <Text style={styles.buttonText}>{buttonText}</Text>
-                </TouchableOpacity>
-            </View>
-            <View style={styles.imageContainer}>
-                <SvgImage width={100} height={100} />
-            </View>
-        </TouchableOpacity>
-    );
-
-    const handlePress = (id, typeIs) => {
-        setSelectedId(id);
-        if (id === '1') {
-            navigation.navigate('LoginScreen',{type:typeIs}); 
-        } else if (id === '2') {
-            navigation.navigate('LoginScreen',{type: typeIs});
-        }
-    };
-
     return (
-        <SafeAreaView style={styles.container}>
-            <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1 }}>
+        <ImageBackground
+            source={OnboardingBGImg} // Background image
+            style={{ flex: 1 }}
+            resizeMode="cover" // Adjust the image scaling
+        >
+            <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['transparent', 'transparent', 'transparent']} style={{ flex: 1 }}>
 
-                {/* <FlatList
-                    data={items}
-                    renderItem={({ item }) => (
-                        <View style={styles.item}>
-                            {item.component}
-                        </View>
-                    )}
-                    keyExtractor={(item) => item.id}
-                    numColumns={3}
-                    contentContainerStyle={styles.grid}
-                /> */}
+                <Text style={{ alignSelf: "center", fontSize: 24, color: "black", fontFamily: "ManropeRegular", fontWeight: 'bold', marginTop: "30%" }}>All-in-One Event Planner</Text>
 
-                <Text style={styles.rentTitle}>All the services for your special day just a click away.</Text>
-                <Text style={styles.subtitle}>Planning an event or offering services? BookTheDay lets users book halls, catering, and rentals — while vendors grow their business, all in one place.
+                <Text style={styles.rentTitle}>Plan your perfect event with just one app.</Text>
 
-                </Text>
-                
+                <WheelWithImageQuads />
 
+                <BookDatesButton
+                    onPress={() => navigation.navigate('LoginScreen', { type: "user" })}
+                    text={"Get Started"}
+                    padding={10}
+                    showIcon={true}
+                    gradientButtonStyle={styles.button}
+                />
+
+                <View style={{ position: "absolute", bottom: "4%", alignSelf: "flex-end", flexDirection: "row", right: 30 }}>
+                    <Text style={{ color: "black", fontSize: 13, fontFamily: 'ManropeRegular', }}>Offer your services? Become a vendor!</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('LoginScreen', { type: "vendor" })}>
+                        <Text style={{ color: "#D0433C", textDecorationLine: "underline", fontSize: 15, fontFamily: 'ManropeRegular', fontWeight: '700' }}>Join</Text>
+                    </TouchableOpacity>
+                </View>
             </LinearGradient>
-
-            <FlatList
-                data={data}
-                renderItem={({ item }) => (
-                    <Item
-                        title={item.title}
-                        description={item.description}
-                        buttonText={item.buttonText}
-                        SvgImage={item.SvgImage}
-                        onPress={() => handlePress(item.id, item?.type)}
-                        borderColor={selectedId === item.id ? '#FD8236' : 'lightgray'}
-                    />
-                )}
-                contentContainerStyle={{flex:1,marginTop:15}}
-                keyExtractor={item => item.id}
-            />
-
-        </SafeAreaView>
+        </ImageBackground>
     );
 };
 
@@ -116,9 +48,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "white"
-        // alignItems: 'center',
-        // justifyContent: 'center',
-        // padding: 16,
+    },
+    CircleContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     overlayContainer: {
         position: 'absolute',
@@ -129,10 +62,6 @@ const styles = StyleSheet.create({
         marginTop: 30,
         alignSelf: "center",
         alignItems: "center",
-
-        // flexDirection: 'row',
-        // flexWrap: 'wrap',
-        // justifyContent: 'space-around',
     },
     item: {
         width: "33%",
@@ -140,20 +69,24 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     rentTitle: {
-        fontSize: 24,
-        fontWeight: '700',
+        fontSize: 16,
+        fontWeight: '600',
         textAlign: 'center',
-        color: "#1A1E25",
+        color: "black",
         fontFamily: 'ManropeRegular',
-        marginTop:"40%"
+        marginTop: 10,
+        width: "80%",
+        alignSelf: "center",
+        textAlign: "center"
     },
     subtitle: {
-        fontSize: 16,
+        fontSize: 18,
         textAlign: 'center',
         color: "#7D7F88",
         fontWeight: "400",
         marginTop: 10,
-        marginHorizontal: 35
+        width: "80%",
+        alignSelf: "center",
     },
     loginButton: {
         backgroundColor: '#F04A49',
@@ -180,7 +113,6 @@ const styles = StyleSheet.create({
     },
     card: {
         flexDirection: 'row',
-        backgroundColor: 'white',
         borderRadius: 10,
         padding: 20,
         marginHorizontal: 20,
@@ -190,45 +122,42 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 10,
         elevation: 5,
-        borderWidth:1,
-        // borderColor:"lightgray"
-      },
-      textContainer: {
+    },
+    textContainer: {
         flex: 1,
-      },
-      title: {
+    },
+    title: {
         fontSize: 16,
         fontWeight: '800',
-        color:"#222831",
+        color: "#222831",
         fontFamily: 'ManropeRegular'
 
-      },
-      description: {
-        fontSize: 10,
+    },
+    description: {
+        fontSize: 13,
         color: '#7D7F88',
-        fontWeight:"400",
+        fontWeight: "400",
         marginVertical: 5,
-      },
-      button: {
-        backgroundColor: '#FD8236',
-        paddingVertical: 5,
-        borderRadius: 5,
-        marginTop: 10,
-        width:"50%",
-        alignItems:"center",
-        borderRadius:20
-      },
-      buttonText: {
+        fontWeight: '500',
+        fontFamily: 'ManropeRegular'
+    },
+    button: {
+        marginTop: 30,
+        width: "70%",
+        alignSelf: "center",
+        borderRadius: 10
+    },
+    buttonText: {
         color: '#FFFFFF',
         fontWeight: '400',
-        fontSize:12,
+        fontSize: 12,
         fontFamily: 'ManropeRegular'
 
-      },
-      imageContainer: {
+    },
+    imageContainer: {
         justifyContent: 'center',
         alignItems: 'center',
-      },
+    },
 });
 
 export default LandingScreen;

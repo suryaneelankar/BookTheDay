@@ -165,7 +165,6 @@ const MainNavigation = () => {
             }} />
             <Stack.Screen name="ViewEvents" component={ViewEvents} options={{ headerShown: true }} />
 
-
             <Stack.Screen
                 name="EditProfile"
                 component={EditProfile}

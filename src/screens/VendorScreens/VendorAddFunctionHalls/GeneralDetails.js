@@ -779,7 +779,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                 <>
                                     {(() => {
                                         const discountedPrice = perDayRentPrice - (perDayRentPrice * discountPercentage / 100);
-                                        const serviceFeePercentage = discountedPrice < 30000 ? 0.03 : 0.05; // 3% for < ₹10,000, 5% for ≥ ₹10,000
+                                        const serviceFeePercentage = 0.03; // 3% for < ₹10,000, 5% for ≥ ₹10,000
                                         const serviceFee = discountedPrice * serviceFeePercentage;
                                         const finalEarning = discountedPrice - serviceFee;
 
@@ -804,8 +804,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             ) : null
                         }
                         <Text style={styles.commissionLabel}>Service Fee Details:</Text>
-                        <Text style={styles.discountlabel}>3% for orders below ₹30,000</Text>
-                        <Text style={styles.discountlabel}>5% for orders above ₹30,000</Text>
+                        <Text style={styles.discountlabel}>3% for all orders</Text>
+                        {/* <Text style={styles.discountlabel}>5% for orders above ₹30,000</Text> */}
                         <TextField
                             label='Advance Booking Amount'
                             placeholder="Please Enter Advance Booking Amount"

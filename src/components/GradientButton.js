@@ -3,8 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator
 import LinearGradient from "react-native-linear-gradient";
 import { moderateScale, verticalScale } from "../utils/scalingMetrics";
 import RightArrow from '../assets/svgs/rightSidearrowWhite.svg';
+import Arrowright from 'react-native-vector-icons/AntDesign';
 
-const BookDatesButton = ({ onPress, width, text, padding, disabled, showIcon = true, buttonStyle }) => {
+const BookDatesButton = ({ onPress, width, text, padding, disabled, showIcon = true, buttonStyle, gradientButtonStyle }) => {
 
   const [loading, setLoading] = useState(false);
 
@@ -27,18 +28,18 @@ const BookDatesButton = ({ onPress, width, text, padding, disabled, showIcon = t
         colors={['#D2453B', '#A0153E']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
-        style={[styles.buttonView, { width: Dimensions.get('window').width - 50, padding: padding ? moderateScale(padding) : 0, alignSelf: 'center' }]}
+        style={[styles.buttonView, { width: Dimensions.get('window').width - 50, padding: padding ? moderateScale(padding) : 0, alignSelf: 'center' },gradientButtonStyle]}
       >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           {loading ? (
             <ActivityIndicator color="#F4F4F6" />
           ) : (
-            <>
+            <View style={{ flex: 1, alignItems: "center",justifyContent:"center", flexDirection: "row",position: "relative" }}>
               <Text style={text === "Book Dates" ? styles.buttonText : styles.SubmitbuttonText}>
                 {text}
               </Text>
-              {showIcon && <RightArrow style={{ marginHorizontal: 10, marginTop: 2 }} />}
-            </>
+              {showIcon && <Arrowright name='arrowright' color={'#FFF'} size={24} style={{ position: "absolute", right: 10 }} />}
+            </View>
           )}
         </View>
       </LinearGradient>
