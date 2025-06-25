@@ -212,8 +212,8 @@ const VendorCategoryScreen = ({ navigation }) => {
                 {/* Bookings Overview */}
                 <View style={{ flexDirection: "row", alignItems: "center", marginLeft: -15 }}>
                     <ProfileIcon />
-                    <View>
-                        <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular', textTransform: "capitalize" }}>Hi, {vendorLoggedInName}</Text>
+                    <View style={{ flex: 1 }}>
+                        <Text numberOfLines={2} style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular', textTransform: "capitalize" }}>Hi, {vendorLoggedInName}</Text>
                         <Text style={{ fontFamily: 'LeagueSpartanRegular', color: themevariable.Color_000000, }}>+91 {vendorLoggedInMobileNum}</Text>
                     </View>
                 </View>

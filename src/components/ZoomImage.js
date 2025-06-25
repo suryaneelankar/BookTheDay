@@ -28,25 +28,21 @@ const ZoomImage = ({ visible, onClose, images, initialIndex, tokenIs }) => {
 
 
     return (
-        <Modal backdropColor="rgba(0,0,0,0.5)" isVisible={visible} onBackdropPress={onClose} style={{ margin: 0, flex: 1,}}>
-            <View style={{ flex: 1, backgroundColor: "#faf7f7", marginHorizontal: 20, borderRadius: 20, marginVertical: 60 }}>
+        <Modal backdropColor="rgba(0,0,0,0.7)" isVisible={visible} onBackdropPress={onClose} style={{ margin: 0, flex: 1,}}>
+            <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.7)", marginVertical: 60 }}>
                 <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                    <Text style={styles.closeText}>
                         <CloseIcon />
-                    </Text>
                 </TouchableOpacity>
 
                 <View style={styles.imageContainer}>
                     <TouchableOpacity style={styles.arrowLeft} onPress={handlePrevious} disabled={currentIndex === 0}>
-                        <Text style={[styles.arrowText, currentIndex === 0 && styles.arrowDisabled]}>
-                            <LeftSideIcon/>
-                        </Text>
+                            <LeftSideIcon />
                     </TouchableOpacity>
                     <ImageZoom
                         cropWidth={screenWidth}
-                        cropHeight={screenHeight - 200}
+                        cropHeight={screenHeight}
                         imageWidth={screenWidth}
-                        imageHeight={screenHeight - 200}
+                        imageHeight={screenHeight}
                     >
                         <Image
                             source={{
@@ -62,9 +58,7 @@ const ZoomImage = ({ visible, onClose, images, initialIndex, tokenIs }) => {
                         onPress={handleNext}
                         disabled={currentIndex === images.length - 1}
                     >
-                        <Text style={[styles.arrowText, currentIndex === images.length - 1 && styles.arrowDisabled]}>
                             <RightSideIcon />
-                        </Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -75,31 +69,45 @@ const ZoomImage = ({ visible, onClose, images, initialIndex, tokenIs }) => {
 const styles = StyleSheet.create({
     imageContainer: {
         flex: 1,
-        // width: Dimensions.get("window").width,
-        // height: Dimensions.get("window").height - 80,
         justifyContent: "center",
-        // alignItems: "center",
-        // flexDirection: "row",
     },
     image: {
-        width: Dimensions.get("window").width - 100,
-        height: Dimensions.get("window").height - 200,
-        marginHorizontal: 30
-    },
-    closeText: {
-        color: "#333333",
-        fontSize: 20,
-        fontWeight: "bold",
+        width: Dimensions.get("window").width,
+        height: Dimensions.get("window").height,
     },
     arrowLeft: {
         position: "absolute",
         left: 10,
         zIndex: 1,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        padding: 10,
+        borderRadius: 20,
+        top: "50%",
+        transform: [{ translateY: -20 }],
+        justifyContent: "center",
+        alignItems: "center",
+        width: 40,
+        height: 40,
+        opacity: 0.7,
+        borderColor: "white",
+        borderWidth: 1,
     },
     arrowRight: {
         position: "absolute",
         right: 10,
         zIndex: 1,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        padding: 10,
+        borderRadius: 20,
+        top: "50%",
+        transform: [{ translateY: -20 }],
+        justifyContent: "center",
+        alignItems: "center",
+        width: 40,
+        height: 40,
+        opacity: 0.7,
+        borderColor: "white",
+        borderWidth: 1,
     },
     arrowText: {
         fontSize: 25,
@@ -111,15 +119,28 @@ const styles = StyleSheet.create({
     },
     closeButton: {
         position: "absolute",
-        top: 10,
+        top: "10%",
         right: 10,
         zIndex: 2,
-        // backgroundColor: "gray",
-        width: 40,
-        height: 40,
+        width: 32,
+        height: 32,
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 20,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        opacity: 0.7,
+        borderColor: "white",
+        borderWidth: 1,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        zIndex: 10,
+        padding: 5,
     },
 });
 

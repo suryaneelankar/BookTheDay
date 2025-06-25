@@ -47,7 +47,7 @@ const NearByFoodCaterings = () => {
                 },
             });
 
-            console.log("location select res:::::::", response);
+            // console.log("location select res:::::::", response);
             setLoactionBasedData(response?.data?.data);
         } catch (error) {
             setNearByLoading(false);

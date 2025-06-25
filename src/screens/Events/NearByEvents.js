@@ -49,7 +49,7 @@ const NearByEvents = () => {
             });
 
             const newFunctionHalls = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            console.log("neareby loc events:::::::;", newFunctionHalls)
+            // console.log("neareby loc events:::::::;", newFunctionHalls)
             if (response?.data?.data?.length > 0) {
                 setEventsData(newFunctionHalls); // Append new data
             }
@@ -69,7 +69,7 @@ const NearByEvents = () => {
                 },
             });
 
-            console.log("location select res:::::::", response);
+            // console.log("location select res:::::::", response);
             setLoactionBasedData(response?.data?.data);
         } catch (error) {
             setLoading(false);

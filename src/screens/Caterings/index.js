@@ -76,7 +76,7 @@ const Caterings = () => {
                 },
             });
 
-            console.log("location select res:::::::", response);
+            // console.log("location select res:::::::", response);
             setLoactionBasedData(response?.data?.data);
         } catch (error) {
             setLoading(false);

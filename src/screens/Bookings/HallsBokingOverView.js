@@ -129,10 +129,10 @@ const HallsBookingOverView = ({ route, navigation }) => {
 
                 <View style={styles.detailsContainer}>
                     <View style={styles.rowSpaceBetween}>
-                        <Text style={[styles.detailsText, styles.detailsTitle]}>Total Amount</Text>
+                        <Text style={[styles.detailsText]}>Total Amount</Text>
                         <Text style={[styles.detailsText, styles.detailsAmount]}>{totalPrice}</Text>
                     </View>
-                    <View style={styles.rowSpaceBetween}>
+                    <View style={[styles.rowSpaceBetween,{marginTop: 20}]}>
                         <Text style={styles.detailsText}>Advance Amount</Text>
                         <Text style={styles.detailsAmount}>{formatAmount(bookingDetails?.advanceAmount)}</Text>
                     </View>
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     },
     detailsContainer: {
         backgroundColor: 'white',
-        borderRadius: 15,
+        // borderRadius: 15,
         padding: 10,
         paddingHorizontal: 20,
     },

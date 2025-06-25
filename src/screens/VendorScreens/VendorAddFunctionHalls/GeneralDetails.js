@@ -33,7 +33,11 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         additionalImageOne: undefined,
         additionalImageTwo: undefined,
         additionalImageThree: undefined,
-        additionalImageFour: undefined
+        additionalImageFour: undefined,
+        additionalImageFive: undefined,
+        additionalImageSix: undefined,
+        additionalImageSeven: undefined,
+        additionalImageEight: undefined
     });
     const [functionHallAddress, setfunctionHallAddress] = useState('');
     const [locationLatitude, setLocationLatitude] = useState();
@@ -49,7 +53,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     const [itemPrices, setItemPrices] = useState({});
     const [selectedSeatingCapacity, setSelectedSeatingCapacity] = useState('');
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
-    const discountPercentageArr = ['0', '5', '10', '15', '20', '25' ,'30', '50'];
+    const discountPercentageArr = ['0', '5', '10', '15', '20', '25', '30', '50'];
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
 
     const [loading, setLoading] = useState(false);
@@ -71,24 +75,24 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         "Sound/music license": [{ name: 'Sound/music license', icon: 'ios-volume-high' }]
     });
 
-     const handleBackPress = () => {
-            if (isLocationPickerVisible) {
-                setLocationPickerVisible(false);
-                  // Close the modal
-                return true; // Prevent default back button behavior (i.e., exiting the app)
-            }
-            return false;  // Allow default behavior (i.e., exiting the app if the modal is not open)
+    const handleBackPress = () => {
+        if (isLocationPickerVisible) {
+            setLocationPickerVisible(false);
+            // Close the modal
+            return true; // Prevent default back button behavior (i.e., exiting the app)
+        }
+        return false;  // Allow default behavior (i.e., exiting the app if the modal is not open)
+    };
+
+    useEffect(() => {
+        // Add listener when the component is mounted
+        BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+
+        // Clean up the listener when the component is unmounted
+        return () => {
+            BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
         };
-    
-        useEffect(() => {
-            // Add listener when the component is mounted
-            BackHandler.addEventListener('hardwareBackPress', handleBackPress);
-    
-            // Clean up the listener when the component is unmounted
-            return () => {
-                BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
-            };
-        }, [isLocationPickerVisible]); 
+    }, [isLocationPickerVisible]);
 
     const foodTypes = [
         { name: 'veg', icon: VegIcon },
@@ -96,7 +100,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         { name: 'Both', icon: VegNonVegIcon }
     ]
 
-    const seatingCapacity = ['0-100', '100-200', '200-300', '300+']
+    const seatingCapacity = ['50-100', '100-200', '200-400', '400-600', '600-800', '800-1000', '1000-1200', '1200+'];
     const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
 
     const rentalItems = [
@@ -167,6 +171,22 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         {
             id: 3,
             imageUrl: SelectedUploadIcon,
+        },
+        {
+            id: 4,
+            imageUrl: SelectedUploadIcon,
+        },
+        {
+            id: 5,
+            imageUrl: SelectedUploadIcon,
+        },
+        {
+            id: 6,
+            imageUrl: SelectedUploadIcon,
+        },
+        {
+            id: 7,
+            imageUrl: SelectedUploadIcon,
         }
     ]
 
@@ -210,8 +230,16 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                     setAdditionalImages({ ...additionalImages, additionalImageTwo: response });
                 } else if (index == 2) {
                     setAdditionalImages({ ...additionalImages, additionalImageThree: response });
-                } else {
+                } else if (index == 3) {
                     setAdditionalImages({ ...additionalImages, additionalImageFour: response });
+                } else if (index == 4) {
+                    setAdditionalImages({ ...additionalImages, additionalImageFive: response });
+                } else if (index == 5) {
+                    setAdditionalImages({ ...additionalImages, additionalImageSix: response });
+                } else if (index == 6) {
+                    setAdditionalImages({ ...additionalImages, additionalImageSeven: response });
+                } else {
+                    setAdditionalImages({ ...additionalImages, additionalImageEight: response });
                 }
             }
         });
@@ -254,8 +282,40 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     style={{ borderRadius: 5 }}
                                     resizeMode='cover'
                                 />
-                                :
-                                <item.imageUrl style={{}} width={Dimensions.get('window').width / 4.8} height={100} />
+                                : additionalImages?.additionalImageFive && index == 4 ?
+                                    <Image
+                                        source={{ uri: additionalImages?.additionalImageFive?.assets[0]?.uri }}
+                                        width={Dimensions.get('window').width / 4.8}
+                                        height={100}
+                                        style={{ borderRadius: 5 }}
+                                        resizeMode='cover'
+                                    />
+                                    : additionalImages?.additionalImageSix && index == 5 ?
+                                        <Image
+                                            source={{ uri: additionalImages?.additionalImageSix?.assets[0]?.uri }}
+                                            width={Dimensions.get('window').width / 4.8}
+                                            height={100}
+                                            style={{ borderRadius: 5 }}
+                                            resizeMode='cover'
+                                        />
+                                        : additionalImages?.additionalImageSeven && index == 6 ?
+                                            <Image
+                                                source={{ uri: additionalImages?.additionalImageSeven?.assets[0]?.uri }}
+                                                width={Dimensions.get('window').width / 4.8}
+                                                height={100}
+                                                style={{ borderRadius: 5 }}
+                                                resizeMode='cover'
+                                            />
+                                            : additionalImages?.additionalImageEight && index == 7 ?
+                                                <Image
+                                                    source={{ uri: additionalImages?.additionalImageEight?.assets[0]?.uri }}
+                                                    width={Dimensions.get('window').width / 4.8}
+                                                    height={100}
+                                                    style={{ borderRadius: 5 }}
+                                                    resizeMode='cover'
+                                                />
+                                                :
+                                                <item.imageUrl style={{}} width={Dimensions.get('window').width / 4.8} height={100} />
                 }
 
             </TouchableOpacity>
@@ -264,17 +324,25 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
     const onPressSaveAndPost = async () => {
         const { finalEarningAfterDiscount, earningAmount, serviceCharges } = calculateCharges();
-        // console.log('finalEarningAfterDiscount, earningAmount, serviceCharges::>>',finalEarningAfterDiscount, earningAmount, serviceCharges);
         if (!mainImageUrl || functionHallName === '' || functionHallAreaInSft === '' ||
             selectedItemArray?.length === 0 || (perDayRentPrice === '' || perDayRentPrice === undefined) || selectedItemArray === '' || (BedRooms === '' || BedRooms === undefined) || functionHallAddress === '' || (advanceAmount === undefined || advanceAmount === '')
         ) {
             Alert.alert('Please fill Mandatory fields');
             return;
         }
+        const uploadedImagesCount = Object.values(additionalImages).filter(value => value !== undefined).length;
+
+        if (uploadedImagesCount < 4) {
+            Alert.alert('Incomplete Details', 'Please upload at least 4 images.');
+            return; // Exit immediately if the total uploaded images are less than 4
+        }
+
         for (const [key, value] of Object.entries(additionalImages)) {
-            if (value === undefined) {
-                Alert.alert('Incomplete Details', `Please fill ${key.replace('additionalImage', 'Image ')}`);
-                return;
+            if (uploadedImagesCount < 4) {
+                if (value === undefined) {
+                    Alert.alert('Incomplete Details', `Please fill ${key.replace('additionalImage', 'Image ')}`);
+                    return; // Exit immediately if any image is undefined
+                }
             }
         }
 
@@ -286,28 +354,15 @@ const GeneralDetails = ({ isAadharUpdate }) => {
             name: mainImageUrl?.assets[0]?.fileName,
         });
 
-        formData.append('additionalImages', {
-            uri: additionalImages?.additionalImageOne?.assets[0]?.uri,
-            type: additionalImages?.additionalImageOne?.assets[0]?.type,
-            name: additionalImages?.additionalImageOne?.assets[0]?.fileName,
-        });
-
-        formData.append('additionalImages', {
-            uri: additionalImages?.additionalImageTwo?.assets[0]?.uri,
-            type: additionalImages?.additionalImageTwo?.assets[0]?.type,
-            name: additionalImages?.additionalImageTwo?.assets[0]?.fileName,
-        });
-
-        formData.append('additionalImages', {
-            uri: additionalImages?.additionalImageThree?.assets[0]?.uri,
-            type: additionalImages?.additionalImageThree?.assets[0]?.type,
-            name: additionalImages?.additionalImageThree?.assets[0]?.fileName,
-        });
-
-        formData.append('additionalImages', {
-            uri: additionalImages?.additionalImageFour?.assets[0]?.uri,
-            type: additionalImages?.additionalImageFour?.assets[0]?.type,
-            name: additionalImages?.additionalImageFour?.assets[0]?.fileName,
+        Object.entries(additionalImages).forEach(([key, value]) => {
+            const imageAsset = value?.assets?.[0];
+            if (imageAsset?.uri) {
+                formData.append('additionalImages', {
+                    uri: imageAsset.uri,
+                    type: imageAsset.type,
+                    name: imageAsset.fileName,
+                });
+            }
         });
 
         const functionHallAddessIs = { "address": functionHallAddress, "city": functionHallCity, "pinCode": functionHallPinCode };
@@ -394,21 +449,21 @@ const GeneralDetails = ({ isAadharUpdate }) => {
             setDiscountPercentage(item);
             setSelectedDiscountVal(item);
         };
-    
+
         return (
             <>
                 {/* Location Picker Modal */}
-                <Modal 
-                    visible={isLocationPickerVisible} 
+                <Modal
+                    visible={isLocationPickerVisible}
                     animationType="slide"
                     onRequestClose={handleCloseLocationPicker}
                 >
-                    <LocationPicker 
-                        onLocationSelected={handleLocationSelected} 
-                        onBack={handleCloseLocationPicker} 
+                    <LocationPicker
+                        onLocationSelected={handleLocationSelected}
+                        onBack={handleCloseLocationPicker}
                     />
                 </Modal>
-    
+
                 {/* Discount Percentage List */}
                 <FlatList
                     data={discountPercentageArr}
@@ -418,7 +473,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                     renderItem={({ item }) => {
                         const isSelected = item === selectedDiscountVal;
                         const backgroundColor = isSelected ? '#FFD700' : '#FFF5E3';
-    
+
                         return (
                             <TouchableOpacity
                                 style={{
@@ -439,7 +494,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
             </>
         );
     };
-    
+
 
     const ItemList = () => {
         const screenWidth = Dimensions.get('window').width;
@@ -574,15 +629,22 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         }
 
         return (
-            <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
                 {seatingCapacity.map((item) =>
-                    <TouchableOpacity key={item} style={{
-                        borderWidth: item === selectedSeatingCapacity ? 2 : 0,
-                        borderColor: item === selectedSeatingCapacity ? '#ECA73C' : 'transparent', backgroundColor: '#FFF5E3', marginHorizontal: 10, borderRadius: 5, padding: 10
-                    }}
+                    <TouchableOpacity
+                        key={item}
+                        style={{
+                            borderWidth: item === selectedSeatingCapacity ? 2 : 0,
+                            borderColor: item === selectedSeatingCapacity ? '#ECA73C' : 'transparent',
+                            backgroundColor: '#FFF5E3',
+                            marginHorizontal: 5,
+                            marginVertical: 5, // Add vertical margin for spacing between rows
+                            borderRadius: 5,
+                            padding: 10,
+                        }}
                         onPress={() => onPressSeatingCapacity(item)}
                     >
-                        <Text style={{ color: themevariable.Color_000000, }}>{item}</Text>
+                        <Text style={{ color: themevariable.Color_000000 }}>{item}</Text>
                     </TouchableOpacity>
                 )}
             </View>
@@ -664,7 +726,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
     const calculateCharges = () => {
         const earningAmount = perDayRentPrice - (perDayRentPrice * discountPercentage / 100);
-        const serviceFeePercentage = earningAmount < 30000 ? 0.03 : 0.05; // 3% for < ₹10,000, 5% for ≥ ₹10,000
+        const serviceFeePercentage = 0.03; // 3% for < ₹10,000, 5% for ≥ ₹10,000
         const serviceCharges = earningAmount * serviceFeePercentage;
         const finalEarningAfterDiscount = earningAmount - serviceCharges;
 
@@ -681,13 +743,13 @@ const GeneralDetails = ({ isAadharUpdate }) => {
             ) :
                 <View>
                     <Modal visible={isLocationPickerVisible} animationType="slide" onRequestClose={() => handleCloseLocationPicker()}>
-                        <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker}/>
+                        <LocationPicker onLocationSelected={handleLocationSelected} onBack={handleCloseLocationPicker} />
                         {/* <Button title="Close" onPress={handleCloseLocationPicker} /> */}
                     </Modal>
 
 
 
-                    <Text style={[styles.mainHeading,{marginHorizontal:10}]}>General Details</Text>
+                    <Text style={[styles.mainHeading, { marginHorizontal: 10 }]}>General Details</Text>
                     <View style={styles.mainContainer}>
                         <ChooseFileField
                             label={'Hall Image'}
@@ -705,14 +767,14 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                 /> : null}
                         </TouchableOpacity>
 
-                        <Text style={styles.title}>Additional Images<Text style={{color:"red"}}>*</Text></Text>
-                        <Text style={styles.subTitle}>Please add up to 4 images</Text>
+                        <Text style={styles.title}>Additional Images<Text style={{ color: "red" }}>*</Text></Text>
+                        <Text style={styles.subTitle}>Please add up to 4 images atleast</Text>
                         <FlatList
                             data={data}
+                            numColumns={4}
                             renderItem={ListItem}
                             keyExtractor={item => item.id}
-                            horizontal
-                            contentContainerStyle={{ width: '100%', justifyContent: 'space-around' }}
+                            contentContainerStyle={{ width: '100%', alignItems: 'center' }}
                         />
                         <TextField
                             label='Hall Name'
@@ -736,7 +798,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             isDescriptionField={true}
                         />
 
-                        <Text style={styles.labelText}>Seating Capacity pax<Text style={{color:"red"}}>*</Text></Text>
+                        <Text style={styles.labelText}>Seating Capacity pax<Text style={{ color: "red" }}>*</Text></Text>
                         {seatingCapacityList()}
 
                         <TextField
@@ -758,13 +820,13 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         />
 
 
-                        <Text style={styles.labelText}>Available Hall Amenities<Text style={{color:"red"}}>*</Text></Text>
+                        <Text style={styles.labelText}>Available Hall Amenities<Text style={{ color: "red" }}>*</Text></Text>
                         {RentalItemsList()}
                         {ItemList()}
 
                     </View>
-                    <Text style={[styles.title,{marginHorizontal:10}]}>Pricing Details<Text style={{color:"red"}}>*</Text></Text>
-                    <View style={[styles.mainContainer,{paddingVertical:0}]}>
+                    <Text style={[styles.title, { marginHorizontal: 10 }]}>Pricing Details<Text style={{ color: "red" }}>*</Text></Text>
+                    <View style={[styles.mainContainer, { paddingVertical: 0 }]}>
 
                         <TextField
                             label='Per Day Charge (₹/ Per Day)'
@@ -826,10 +888,10 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         <Text style={styles.textInputlabel}>Discount if any</Text>
                         {discountPercentageList()}
                     </View>
-                    <Text style={[styles.title,{marginHorizontal:10,marginTop:25}]}>Item Available Address</Text>
+                    <Text style={[styles.title, { marginHorizontal: 10, marginTop: 25 }]}>Item Available Address</Text>
                     <View style={styles.mainContainer}>
 
-                        <Text style={[styles.textInputlabel,{marginTop:0}]}>
+                        <Text style={[styles.textInputlabel, { marginTop: 0 }]}>
                             Address<Text style={{ color: "red" }}>*</Text>
                         </Text>
                         <TouchableOpacity onPress={handleOpenLocationPicker} style={[styles.textTnputView, { height: 100, flexDirection: "row", }]}>
@@ -840,7 +902,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     placeholder="Please Enter Address"
                                     placeholderTextColor={"#7E8389"}
                                     keyboardType={'default'}
-                                    style={{ height: '100%', textAlignVertical: 'top', padding: 10,color:"#333333" }}
+                                    style={{ height: '100%', textAlignVertical: 'top', padding: 10, color: "#333333" }}
                                     multiline={true}
                                     numberOfLines={4}
                                     editable={false}
@@ -930,7 +992,8 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         alignSelf: 'center',
-
+        marginHorizontal: 3,
+        marginTop: 20
     },
     dropdown: {
         height: 50,

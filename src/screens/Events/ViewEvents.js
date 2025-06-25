@@ -26,8 +26,6 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import IonIcons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
-import ImageZoom from 'react-native-image-pan-zoom';
-import FastImage from "react-native-fast-image";
 import ZoomImage from "../../components/ZoomImage";
 import ZoomIcon from 'react-native-vector-icons/MaterialIcons';
 
@@ -315,7 +313,7 @@ const ViewEvents = ({ route, navigation }) => {
           <View style={{ marginTop: 20, marginBottom: 10 }}>
             <Text style={styles.title}>Description:</Text>
             <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#8B8B8B", fontWeight: "400", marginTop: 4, marginBottom: 10 }}>{HallDescription}</Text>
-            <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#8B8B8B", fontWeight: "400", marginTop: 4 }}>{eventsDetails?.description}</Text>
+            <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#FD813B", fontWeight: "400", marginTop: 4 }}>{eventsDetails?.description}</Text>
           </View>
 
 

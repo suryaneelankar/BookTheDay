@@ -60,7 +60,6 @@ const Events = () => {
 
             const newFunctionHalls = Array.isArray(response?.data?.data) ? response?.data?.data : [];
             setTotalEventPages(response?.data?.totalPages);
-            // console.log('resp is::>>>', response?.data);
             if (response?.data?.data?.length > 0) {
                 setEventsData((prevData) => [...prevData, ...newFunctionHalls]); // Append new data
                 setCurrentPage(page);
@@ -83,7 +82,7 @@ const Events = () => {
                 },
             });
 
-            console.log("location select res:::::::", response);
+            // console.log("location select res:::::::", response);
             setLoactionBasedData(response?.data?.data);
         } catch (error) {
             setLoading(false);
@@ -190,7 +189,6 @@ const Events = () => {
         count = query ? (locationBasedData?.length) : (eventsData?.length);
         return count;
     };
-    console.log("selected query is:::::::", query)
     const handleQueryChange = (text) => {
         setQuery(text);
         if (text.length > 0) {
@@ -252,7 +250,7 @@ const Events = () => {
 
             <View style={{ marginTop: 60, marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
                 <View>
-                    <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
+                    <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>All Function Halls</Text>
                     <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "400", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Function Halls in Hyderabad</Text>
                 </View>
                 <TouchableOpacity style={{ marginTop: 15, height: "50%", backgroundColor: "#FF990066", flexDirection: "row", paddingHorizontal: 5, paddingVertical: 3, borderRadius: 5, alignItems: "center" }} onPress={() => navigation.navigate('NearByEvents')}>

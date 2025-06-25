@@ -287,7 +287,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
     const calculateCharges = () => {
         const earningAmount = perDayRentPrice - (perDayRentPrice * discountPercentage / 100);
-        const serviceFeePercentage = earningAmount < 10000 ? 0.03 : 0.05; // 3% for < ₹10,000, 5% for ≥ ₹10,000
+        const serviceFeePercentage = 0.03; // 3% for < ₹10,000, 5% for ≥ ₹10,000
         const serviceCharges = earningAmount * serviceFeePercentage;
         const finalEarningAfterDiscount = earningAmount - serviceCharges;
 
@@ -682,7 +682,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                 <>
                                     {(() => {
                                         const discountedPrice = perDayRentPrice - (perDayRentPrice * discountPercentage / 100);
-                                        const serviceFeePercentage = discountedPrice < 10000 ? 0.03 : 0.05; // 3% for < ₹10,000, 5% for ≥ ₹10,000
+                                        const serviceFeePercentage = 0.03; // 3% for < ₹10,000, 5% for ≥ ₹10,000
                                         const serviceFee = discountedPrice * serviceFeePercentage;
                                         const finalEarning = discountedPrice - serviceFee;
 
