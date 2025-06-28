@@ -116,7 +116,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       const response = await fetch(url);
       const result = await response.json();
 
-      console.log('result is::>>', JSON.stringify(result));
+      // console.log('result is::>>', JSON.stringify(result));
 
       if (result?.predictions) {
         setPlaces(result?.predictions);
@@ -213,8 +213,10 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       region,
       subDivisionArea
     };
+    // console.log("locationData is::>>", locationData,'+++++++', selectedLocation, '+++++++', completeAddress,'+++++', label);
     onLocationSelected(locationData, completeAddress, label);
   };
+
 
   const fetchPlaceDetails = async (placeId) => {
     const apiKey = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo';
@@ -225,7 +227,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       const result = await response.json();
 
       if (result.result) {
-        console.log('result.result is::>>>', result.result)
+        // console.log('result.result is::>>>', JSON.stringify(result.result));
         const { lat, lng } = result.result.geometry.location;
         setSelectedLocation({ latitude: lat, longitude: lng });
         const name = result?.result?.name ? `${result?.result?.name}, ` : "";
@@ -236,6 +238,25 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
           latitudeDelta: 0.015,
           longitudeDelta: 0.0121,
         });
+        const addressComponents = result.result.address_components;
+        const subdivisionArea = addressComponents.find(component =>
+            component.types.includes('sublocality_level_1') // Adjust type based on desired subdivision
+        )?.long_name;
+
+        // console.log('Subdivision Area tested:', subdivisionArea);
+
+        ///////////////////////////
+
+        const postalCodeComponent = addressComponents.find(component =>
+          component.types.includes("postal_code")
+        );
+        setPinCode(postalCodeComponent?.long_name || "Postal code not found");
+
+        const subDivisionAreaCodeComponent = addressComponents.find(component =>
+          component.types.includes("sublocality_level_1")
+        );
+        setSubDivisionArea(subDivisionAreaCodeComponent?.long_name || "");
+        ///////////////////////////
         // alert(`Latitude: ${lat}, Longitude: ${lng}`); // Display or store this data as needed
       }
     } catch (error) {

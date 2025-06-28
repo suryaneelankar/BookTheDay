@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, Image, StyleSheet, Dimensions, ScrollView, Button, TouchableOpacity, FlatList } from "react-native";
+import {Alert, Text, View, Image, Linking, StyleSheet, Dimensions, ScrollView, Button, TouchableOpacity, FlatList } from "react-native";
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import axios from "axios";
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
@@ -30,7 +30,7 @@ import ZoomImage from "../../components/ZoomImage";
 import ZoomIcon from 'react-native-vector-icons/MaterialIcons';
 
 const ViewEvents = ({ route, navigation }) => {
-
+  const [showModal, setShowModal] = useState(false);
   const [eventsDetails, setEventsDetails] = useState([])
   const [selectedStartDate, setSelectedStartDate] = useState('');
   const [selectedEndDate, setSelectedEndDate] = useState('');
@@ -105,8 +105,10 @@ const ViewEvents = ({ route, navigation }) => {
       });
       setEventsDetails(response?.data);
 
+      // console.log("events resp details::::::::::", JSON.stringify(response?.data));
+
       const professionalImageUrl = convertLocalhostUrls(response?.data?.professionalImage?.url);
-   
+
       const imageUrls = [
         professionalImageUrl, // Add professional image as the first image
         ...response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image?.url))
@@ -244,6 +246,23 @@ const ViewEvents = ({ route, navigation }) => {
 
   }
 
+  const handleOpenURL = () => {
+      setShowModal(false); // Close the modal
+      Linking.openURL(`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${eventsDetails?.latitude},${eventsDetails?.longitude}`);
+  };
+
+  const showAlert = () => {
+    Alert.alert(
+        "Open Street View",
+        "You are about to open the Street View in your browser. You can return to the app manually after viewing the link.",
+        [
+            { text: "Cancel", style: "cancel" },
+            { text: "Open", onPress: handleOpenURL }
+        ],
+        { cancelable: true }
+    );
+};
+
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <ScrollView style={{ backgroundColor: "white", marginBottom: 30 }}>
@@ -299,6 +318,13 @@ const ViewEvents = ({ route, navigation }) => {
             <MapMarkIcon style={{ marginTop: 2 }} />
             <Text style={{ color: "#939393", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', marginLeft: 5 }}>{eventsDetails?.functionHallAddress?.address}</Text>
           </View>
+          <View style={{ flexDirection: "row", marginTop: 10, alignItems: "center" }}>
+            <TouchableOpacity onPress={showAlert}>
+                <Text style={{ color: "#FD813B", fontSize: 12, fontWeight: "400", textDecorationLine: "underline", fontFamily: 'ManropeRegular', marginLeft: 5 }}>
+                    Street View
+                </Text>
+            </TouchableOpacity>
+        </View>
 
           <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 15 }}>
             < View style={{}}>

@@ -16,7 +16,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
   const [pinCode, setPinCode] = useState('');
   const [label, setLabel] = useState('Home');
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [onSelectLoc,setOnSelectLoc] = useState(false);
+  const [onSelectLoc, setOnSelectLoc] = useState(false);
   const [searchLocation, setSearchLocation] = useState();
 
   const [places, setPlaces] = useState([]);
@@ -217,10 +217,10 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       const result = await response.json();
 
       if (result.result) {
-        console.log('result.result is::>>>',result.result)
+        // console.log('result.result is in user::>>>', result.result)
         const { lat, lng } = result.result.geometry.location;
         setSelectedLocation({ latitude: lat, longitude: lng });
-        const name  = result?.result?.name ? `${result?.result?.name}, ` : "";
+        const name = result?.result?.name ? `${result?.result?.name}, ` : "";
         setCompleteAddress(`${name}${result?.result?.formatted_address}`);
         setRegion({
           latitude: lat,
@@ -228,6 +228,23 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
           latitudeDelta: 0.015,
           longitudeDelta: 0.0121,
         });
+        /////
+        const addressComponents = result.result.address_components;
+
+
+        ///////////////////////////
+
+        const postalCodeComponent = addressComponents.find(component =>
+          component.types.includes("postal_code")
+        );
+        setPinCode(postalCodeComponent?.long_name || "Postal code not found");
+
+        const subDivisionAreaCodeComponent = addressComponents.find(component =>
+          component.types.includes("sublocality_level_1")
+        );
+        setSubDivisionArea(subDivisionAreaCodeComponent?.long_name || "");
+        // console.log('Subdivision Area from user tested:', subDivisionAreaCodeComponent?.long_name);
+        /////
         // alert(`Latitude: ${lat}, Longitude: ${lng}`); // Display or store this data as needed
       }
     } catch (error) {
@@ -240,7 +257,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       {/* {console.log('places is::>>',places)} */}
 
 
-      <View style={{width:"95%",marginTop: 10, flexDirection: "row", alignSelf: "center" ,alignItems:"center",justifyContent:"space-between"}}>
+      <View style={{ width: "95%", marginTop: 10, flexDirection: "row", alignSelf: "center", alignItems: "center", justifyContent: "space-between" }}>
         <TouchableOpacity onPress={() => onBack()}>
           <Iconleftcircle name='leftcircle' color={'#494a49'} size={33} />
         </TouchableOpacity>
@@ -255,7 +272,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
         />
       </View>
 
-      {console.log('!selectedLocation is::>>',!selectedLocation)}
+      {/* {console.log('!selectedLocation is::>>', !selectedLocation)} */}
 
       {onSelectLoc ?
         <>
@@ -326,7 +343,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
           data={places}
           keyExtractor={(item) => item.place_id}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.listItem} onPress={() => {setOnSelectLoc(true),setSearchText(item.description),fetchPlaceDetails(item.place_id)}}>
+            <TouchableOpacity style={styles.listItem} onPress={() => { setOnSelectLoc(true), setSearchText(item.description), fetchPlaceDetails(item.place_id) }}>
               <Text style={styles.placeText}>{item.description}</Text>
             </TouchableOpacity>
           )}
@@ -374,7 +391,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 8,
     backgroundColor: "#F0F5FA",
-    color:themevariable.Color_000000,
+    color: themevariable.Color_000000,
   },
   locationInput: {
     height: 50,
@@ -385,7 +402,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#F0F5FA",
     width: "90%",
-    color:themevariable.Color_000000,
+    color: themevariable.Color_000000,
   },
   searchInput: {
     height: 50,

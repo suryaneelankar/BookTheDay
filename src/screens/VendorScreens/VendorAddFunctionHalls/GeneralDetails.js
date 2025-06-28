@@ -714,7 +714,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         setLocationCountyVal(location?.subDivisionArea);
         setLocationLatitude(location?.region?.latitude || 17.4021);
         setLocationLongitude(location?.region?.longitude || 78.4840);
-        setfunctionHallCity(location?.address?.city);
+        setfunctionHallCity(location?.subDivisionArea || '');
         setfunctionHallPinCode(location.pinCode);
         setLocationPickerVisible(false); // Hide the LocationPicker after selection
     };
