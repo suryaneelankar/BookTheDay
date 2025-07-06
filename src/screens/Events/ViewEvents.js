@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {Alert, Text, View, Image, Linking, StyleSheet, Dimensions, ScrollView, Button, TouchableOpacity, FlatList } from "react-native";
+import { Alert, Text, View, Image, TextInput, Linking, StyleSheet, Dimensions, ScrollView, Button, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
 import { SwiperFlatList } from 'react-native-swiper-flatlist';
 import axios from "axios";
 import BASE_URL, { LocalHostUrl } from "../../apiconfig";
@@ -37,6 +37,7 @@ const ViewEvents = ({ route, navigation }) => {
   const [isCalendarVisible, setCalendarVisible] = useState(false);
   const [noOfDays, setNoOfDays] = useState();
   const [subImages, setSubImages] = useState([]);
+  const [menuImages, setMenuImages] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const [isTimeSlotModalVisible, setTimeSlotModalVisible] = useState(false);
@@ -48,7 +49,11 @@ const ViewEvents = ({ route, navigation }) => {
   const { categoryId } = route.params;
 
   const [isCameraZoomImageModalVisible, setIsCameraZoomImageModalVisible] = useState(false);
+  const [isMenuImageModalVisible, setIsMenuImageModalVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [menuImageCurrentIndex, setMenuImageCurrentIndex] = useState(0);
+  const [menuQuantities, setMenuQuantities] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const HallDescription = 'Transform your special occasions into unforgettable memories with our exquisite function hall rentals! Whether you are hosting a grand wedding, a lively birthday bash, or a corporate event, our halls offer the perfect blend of elegance and comfort. With spacious layouts, stunning décor, and top-notch amenities, your guests will be impressed from the moment they arrive. Book with us today and let us help you create an event that exceeds all expectations!'
 
@@ -90,11 +95,106 @@ const ViewEvents = ({ route, navigation }) => {
   }, []);
 
   const convertLocalhostUrls = (url) => {
-    console.log("urk is:::::::::::", url);
+    console.log("url is:::::::::::", url);
     return url?.replace("localhost", LocalHostUrl);
   };
 
+  const handleQuantityChange = (menuType, value) => {
+    if (/^\d*$/.test(value)) {
+      setMenuQuantities(prev => ({
+        ...prev,
+        [menuType]: value
+      }));
+    }
+  };
+
+  const getMenuTypeTotal = (menuType) => {
+    const qty = parseInt(menuQuantities[menuType] || '0', 10);
+    const menu = menuImages.find(img => img.menuType === menuType);
+    const price = menu ? parseInt(menu.menuPrice || '0', 10) : 0;
+    return qty * price;
+  };
+
+
+  const menuTypes = [...new Set((menuImages || []).map(img => img.menuType))];
+  const totalAmountWithMenu = menuTypes.reduce((sum, type) => {
+    return sum + getMenuTypeTotal(type);
+  }, 0);
+
+
+  // Calculate total amount for all menu types
+  const totalAdvacneAmountAfterPercentageCalculation = (totalAmountWithMenu * eventsDetails?.advanceAmountInPercentageForMenu) / 100;
+
+  const CateringMenuSection = () => {
+
+    if (menuImages.length === 0) return null;
+
+    return (
+      <View style={styles.menuContainer}>
+        <Text style={{ fontSize: 16, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular', marginBottom: 12 }}>In House Catering Menu</Text>
+        <FlatList
+          data={menuImages}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item, index) => item._id || index.toString()}
+          renderItem={({ item, index }) => (
+            <TouchableOpacity
+              onPress={() => [setMenuImageCurrentIndex(index), setIsMenuImageModalVisible(true)]}
+              style={[{ height: 310, width: Dimensions.get("window").width }]}
+            >
+              <View style={styles.menuCard}>
+                <Image
+                  source={{
+                    uri: item.url,
+                    // headers: { Authorization: `Bearer ${getUserAuth}` }
+                  }}
+                  resizeMethod="auto"
+                  resizeMode="cover"
+                  style={styles.menuImageStyle}
+                />
+                <View style={{
+                  padding: 8,
+                  justifyContent: "space-between",
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.25,
+                  borderWidth: 1,
+                  borderColor: '#E0E0E0', borderBottomLeftRadius: 10,
+                  borderBottomRightRadius: 10,
+                  marginRight: 39,
+                }}>
+                  <View style={{
+                    justifyContent: "space-between",
+                    flexDirection: "row"
+                  }}>
+
+                    <Text style={styles.menuTypeStyle}>{item.menuType}</Text>
+                    <Text style={styles.menuPriceStyle}>₹ {item.menuPrice}/-</Text>
+                  </View>
+                  <TextInput
+                    style={{
+                      borderWidth: 1,
+                      borderColor: '#FD813B',
+                      borderRadius: 5,
+                      padding: 8,
+                      marginTop: 8,
+                    }}
+                    placeholderTextColor={"#939393"}
+                    placeholder="Enter number of plates"
+                    keyboardType="numeric"
+                    value={menuQuantities[item.menuType] || ''}
+                    onChangeText={value => handleQuantityChange(item.menuType, value)}
+                  />
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+    );
+  };
+
   const getEventsDetails = async () => {
+    setLoading(true);
     const token = await getUserAuthToken();
     setGetUserAuth(token);
     try {
@@ -105,16 +205,25 @@ const ViewEvents = ({ route, navigation }) => {
       });
       setEventsDetails(response?.data);
 
-      // console.log("events resp details::::::::::", JSON.stringify(response?.data));
+      console.log("events resp details::::::::::", JSON.stringify(response?.data));
 
-      const professionalImageUrl = convertLocalhostUrls(response?.data?.professionalImage?.url);
+      const professionalImageUrl = response?.data?.professionalImage?.url;
 
       const imageUrls = [
         professionalImageUrl, // Add professional image as the first image
-        ...response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image?.url))
+        ...response?.data?.additionalImages.flat().map(image => image?.url)
       ];
 
       setSubImages(imageUrls);
+
+      const menuImagesArr = response?.data?.menuImages
+        ?.flat()
+        .map(image => ({
+          url: image?.url,
+          menuType: image?.menuType,
+          menuPrice: image?.menuPrice,
+        }));
+      setMenuImages(menuImagesArr);
       // console.log("hall amenities", JSON.stringify(response?.data))
       const amenities = response?.data?.hallAmenities[0]?.split(',').map((item, index) => ({
         id: (index + 1).toString(),
@@ -125,15 +234,17 @@ const ViewEvents = ({ route, navigation }) => {
     } catch (error) {
       console.log("events error::::::::::", error);
 
+    } finally {
+      setLoading(false); // Stop loader
     }
   }
 
   function formatAmount(amount) {
-    const amountStr = `${amount}`;
-    const [integerPart, decimalPart] = amountStr.split('.');
-    const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    const formattedAmount = decimalPart ? `${formattedIntegerPart}.${decimalPart}` : formattedIntegerPart;
-    return `₹${formattedAmount}`;
+    const formatted = new Intl.NumberFormat('en-IN', {
+      maximumFractionDigits: 0,
+    }).format(amount);
+
+    return `₹ ${formatted}`; // Note the space after ₹
   }
 
 
@@ -247,21 +358,29 @@ const ViewEvents = ({ route, navigation }) => {
   }
 
   const handleOpenURL = () => {
-      setShowModal(false); // Close the modal
-      Linking.openURL(`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${eventsDetails?.latitude},${eventsDetails?.longitude}`);
+    setShowModal(false); // Close the modal
+    Linking.openURL(`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${eventsDetails?.latitude},${eventsDetails?.longitude}`);
   };
 
   const showAlert = () => {
     Alert.alert(
-        "Open Street View",
-        "You are about to open the Street View in your browser. You can return to the app manually after viewing the link.",
-        [
-            { text: "Cancel", style: "cancel" },
-            { text: "Open", onPress: handleOpenURL }
-        ],
-        { cancelable: true }
+      "Open Street View",
+      "You are about to open the Street View in your browser. You can return to the app manually after viewing the link.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Open", onPress: handleOpenURL }
+      ],
+      { cancelable: true }
     );
-};
+  };
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white' }}>
+        <ActivityIndicator size="large" color="#FD813B" />
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -284,7 +403,7 @@ const ViewEvents = ({ route, navigation }) => {
                 style={[{ width: Dimensions.get('window').width, height: 300 }]}>
                 <Image source={{
                   uri: item,
-                  headers: { Authorization: `Bearer ${getUserAuth}` }
+                  // headers: { Authorization: `Bearer ${getUserAuth}` }
                 }} style={styles.image}
                   resizeMethod="auto"
                   resizeMode="cover"
@@ -305,13 +424,28 @@ const ViewEvents = ({ route, navigation }) => {
           tokenIs={getUserAuth}
         />
 
+        <ZoomImage
+          visible={isMenuImageModalVisible}
+          onClose={() => setIsMenuImageModalVisible(false)}
+          images={(menuImages || []).map(img => img.url)}
+          initialIndex={menuImageCurrentIndex}
+          tokenIs={getUserAuth}
+        />
+
 
         <View style={{ flex: 1, marginTop: 10, marginHorizontal: 20 }}>
 
           <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-            <Text style={{ fontSize: 20, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular', width: "70%" }}>{eventsDetails?.functionHallName}</Text>
-            <Text style={{ color: "#202020", fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular' }}> {formatAmount(eventsDetails?.rentPricePerDay)}/day</Text>
-
+            <Text style={{ fontSize: 20, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular', width: "55%" }}>{eventsDetails?.functionHallName}</Text>
+            <Text style={{ color: "#FD813B", fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular' }}>
+              {menuImages?.length > 0
+                ? 'Menu based'
+                : <>
+                  {formatAmount(eventsDetails?.rentPricePerDay)}
+                  <Text style={{ fontWeight: "400", fontFamily: 'ManropeRegular' }}>/day</Text>
+                </>
+              }
+            </Text>
           </View>
 
           <View style={{ flexDirection: "row", marginTop: 15, alignItems: "flex-start" }}>
@@ -320,11 +454,11 @@ const ViewEvents = ({ route, navigation }) => {
           </View>
           <View style={{ flexDirection: "row", marginTop: 10, alignItems: "center" }}>
             <TouchableOpacity onPress={showAlert}>
-                <Text style={{ color: "#FD813B", fontSize: 12, fontWeight: "400", textDecorationLine: "underline", fontFamily: 'ManropeRegular', marginLeft: 5 }}>
-                    Street View
-                </Text>
+              <Text style={{ color: "#FD813B", fontSize: 12, fontWeight: "400", textDecorationLine: "underline", fontFamily: 'ManropeRegular', marginLeft: 5 }}>
+                Street View
+              </Text>
             </TouchableOpacity>
-        </View>
+          </View>
 
           <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 15 }}>
             < View style={{}}>
@@ -341,7 +475,9 @@ const ViewEvents = ({ route, navigation }) => {
             <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#8B8B8B", fontWeight: "400", marginTop: 4, marginBottom: 10 }}>{HallDescription}</Text>
             <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#FD813B", fontWeight: "400", marginTop: 4 }}>{eventsDetails?.description}</Text>
           </View>
-
+          {menuImages?.length > 0 && (
+            CateringMenuSection()
+          )}
 
           <View style={{ borderColor: "#F1F1F1", borderWidth: 1, width: "100%", marginTop: 5 }} />
 
@@ -384,7 +520,9 @@ const ViewEvents = ({ route, navigation }) => {
             </TouchableOpacity>
           </View>
 
-
+          <View>
+            <Text style={{ marginTop: 20, fontWeight: "900", color: "#121212", fontSize: 18, fontFamily: 'ManropeRegular' }}>Booking Summary</Text>
+          </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
 
             <Text style={[styles.title, { marginTop: 10 }]}>Total Days :</Text>
@@ -392,14 +530,37 @@ const ViewEvents = ({ route, navigation }) => {
           </View>
 
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, }}>
-            <Text style={[styles.title, { marginTop: 10 }]}>Advance Amount :</Text>
-            <Text style={[styles.title, { marginTop: 10, fontWeight: "600" }]}>{formatAmount(eventsDetails?.advanceAmount)}</Text>
+            <Text style={[styles.title, { marginTop: 10 }]}>{menuImages?.length > 0 ? 'Advance Amount Percentage % :' : 'Advance Amount :'}</Text>
+            <Text style={[styles.title, { marginTop: 10, fontWeight: "600" }]}>{menuImages?.length > 0 ? `${eventsDetails?.advanceAmountInPercentageForMenu} %` : formatAmount(eventsDetails?.advanceAmount)}</Text>
           </View>
 
+          {menuImages?.length > 0 && (Number(totalAdvacneAmountAfterPercentageCalculation)) > 0 ?
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
+              <View>
+                <Text style={[styles.title, { marginTop: 10 }]}>Advacne Payable :</Text>
+                <Text style={[styles.title, { marginTop: 10 }]}>{`${eventsDetails?.advanceAmountInPercentageForMenu}% of Total Amount`}</Text>
+              </View>
+              <Text style={[styles.title, { marginTop: 10, fontWeight: "600" }]}>
+                {formatAmount(Number(totalAdvacneAmountAfterPercentageCalculation) || 0)}
+              </Text>
+            </View>
+            : null}
+
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, marginBottom: "20%" }}>
-            <Text style={[styles.title, { marginTop: 10 }]}>Total Price :</Text>
-            <Text style={[styles.title, { marginTop: 10, fontWeight: "600" }]}>{formatAmount(eventsDetails?.rentPricePerDay)}</Text>
+            {(totalAmountWithMenu > 0 || eventsDetails?.rentPricePerDay > 0) ?
+              <>
+                <Text style={[styles.title, { marginTop: 10 }]}>Total Price :</Text>
+                <Text style={[styles.title, { marginTop: 10, fontWeight: "600" }]}>
+                  {menuImages?.length > 0
+                    ? formatAmount(totalAmountWithMenu > 0 ? totalAmountWithMenu : 0)
+                    : formatAmount(eventsDetails?.rentPricePerDay || 0)}
+                </Text>
+              </>
+              : null}
+
           </View>
+
+
         </View>
 
         <Modal
@@ -501,13 +662,39 @@ const ViewEvents = ({ route, navigation }) => {
           onClose={() => setModalVisible(false)}
         />
       </ScrollView>
-
+      {console.log('totalAdvacneAmountAfterPercentageCalculation is ::>>', totalAdvacneAmountAfterPercentageCalculation)}
       <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
         <BookDatesButton
 
           onPress={() => {
+            const selectedMenus = menuImages
+            .map(menu => {
+              const qty = parseInt(menuQuantities[menu.menuType] || '0', 10);
+              if (qty > 0) {
+                return {
+                  menuType: menu.menuType,
+                  price: menu.menuPrice,
+                  plateCount: qty
+                };
+              }
+              return null;
+            })
+            .filter(Boolean);
+            console.log("selectedMenus are::>>", selectedMenus);
+            if (menuImages?.length > 0 && totalAdvacneAmountAfterPercentageCalculation == 0) {
+              setModalMessage("Select number of plates you need to place the order");
+              setModalVisible(true);
+              return;
+            }
             if (selectedTimeSlot && selectedDate) {
-              navigation.navigate('HallsBookingOverView', { categoryId: categoryId, timeSlot: selectedTimeSlot, bookingDate: moment(selectedDate).format('DD-MM-YYYY'), totalPrice: `${formatAmount(eventsDetails?.rentPricePerDay)}` })
+              navigation.navigate('HallsBookingOverView', {
+                categoryId: categoryId,
+                timeSlot: selectedTimeSlot,
+                bookingDate: moment(selectedDate).format('DD-MM-YYYY'),
+                totalPrice: `${menuImages?.length > 0 ? (totalAmountWithMenu > 0 ? totalAmountWithMenu : 0) : eventsDetails?.rentPricePerDay}`,
+                advanceAmount: `${menuImages?.length > 0 ? (Number(totalAdvacneAmountAfterPercentageCalculation) || 0) : (eventsDetails?.advanceAmount)}`,
+                selectedMenus: selectedMenus,
+              })
             } else if (!selectedDate) {
               setModalMessage("Please select the Dates");
               setModalVisible(true);
@@ -516,7 +703,7 @@ const ViewEvents = ({ route, navigation }) => {
               setModalVisible(true);
             }
           }}
-          text={`${formatAmount(eventsDetails?.advanceAmount)} View Cart`}
+          text={menuImages?.length > 0 ? `${formatAmount(Number(totalAdvacneAmountAfterPercentageCalculation) || 0)} View Cart` : `${formatAmount(eventsDetails?.advanceAmount)} View Cart`}
           padding={10}
         />
       </View>
@@ -532,6 +719,53 @@ const styles = StyleSheet.create({
     height: 200, // Adjust the height as needed
   },
   container: { flex: 1, backgroundColor: 'white' },
+  menuContainer: {
+    marginTop: 8,
+    width: Dimensions.get("window").width,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  menuCard: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    shadowColor: '#000',
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.25,
+    // shadowRadius: 3.84,
+    // borderWidth: 1,
+    // borderColor: '#E0E0E0',
+    // overflow: 'hidden',
+    // elevation: 2,
+    // width: Dimensions.get("window").width - 20,
+    // alignSelf: 'center',
+    // alignItems: 'center',
+  },
+  menuImageStyle: {
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    width: "90%",
+    height: 200,
+    // padding: 16,
+    resizeMode: 'cover',
+  },
+  menuTypeStyle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#121212',
+    fontFamily: 'ManropeRegular',
+  },
+  menuPriceStyle: {
+    fontSize: 16,
+    color: '#FD813B',
+    fontWeight: '800',
+    fontFamily: 'ManropeRegular',
+    textAlign: 'right',
+    alignSelf: 'flex-end',
+    marginRight: 10,
+  },
   text: { fontSize: 12, textAlign: 'center' },
   title: {
     fontFamily: 'ManropeRegular',

@@ -112,17 +112,18 @@ const Events = () => {
     );
 
     const renderItem = ({ item }) => {
+        // console.log("item:::::::", item);
 
-        const convertLocalhostUrls = (url) => {
-            if(url){
-            return url?.replace("localhost", LocalHostUrl);
-            }
-        };
-        const professionalImageUrl = convertLocalhostUrls(item?.professionalImage?.url);
+        // const convertLocalhostUrls = (url) => {
+        //     if (url) {
+        //         return url?.replace("localhost", LocalHostUrl);
+        //     }
+        // };
+        const professionalImageUrl = item?.professionalImage?.url;
 
         const imageUrls = [
             professionalImageUrl, // Add professional image as the first image
-            ...item?.additionalImages.flat().map(image => convertLocalhostUrls(image?.url))
+            ...item?.additionalImages.flat().map(image => image?.url)
         ];
         return (
             <View style={{ flex: 1, borderRadius: 20 }}>
@@ -157,11 +158,13 @@ const Events = () => {
                             <Text style={{ color: '#101010', fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular" }} >{item?.functionHallName}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
                                 <LocationMarkIcon />
-                                <Text numberOfLines={1} ellipsizeMode='tail' style={{ width: "90%", fontWeight: '400', marginHorizontal: 5, color: '#939393', fontSize: 13, fontFamily: "ManropeRegular" }}>{item?.county == 'undefined' ? item?.functionHallAddress?.address : item?.county}</Text>
+                                <Text numberOfLines={1} ellipsizeMode='tail' style={{ width: "100%", fontWeight: '400', marginHorizontal: 5, color: '#939393', fontSize: 13, fontFamily: "ManropeRegular" }}>{item?.county !== 'undefined' ? item?.functionHallAddress?.address : item?.county}</Text>
                             </View>
                         </View>
                         <View>
-                            <Text style={{ fontWeight: '800', color: '#202020', fontSize: 14, fontFamily: "ManropeRegular" }}>{formatAmount(item?.rentPricePerDay)}<Text style={{ color: '#202020', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}> /day</Text></Text>
+                            {item?.menuImages && item?.menuImages?.length > 0 ? <Text style={{ color: '#FD813B', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "600" }}>Menu based</Text> :
+                                <Text style={{ fontWeight: '800', color: '#FD813B', fontSize: 14, fontFamily: "ManropeRegular" }}>{formatAmount(item?.rentPricePerDay)}<Text style={{ color: '#FD813B', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}> /day</Text></Text>
+                            }
                         </View>
                     </View>
 
@@ -220,7 +223,7 @@ const Events = () => {
                     flatListProps={{
                         keyExtractor: (item) => item?._id.toString(),
                         renderItem: ({ item, index }) => (
-                            <TouchableOpacity style={{marginHorizontal:10 }} onPress={() => handleSelect(item?.value)}>
+                            <TouchableOpacity style={{ marginHorizontal: 10 }} onPress={() => handleSelect(item?.value)}>
                                 <Text style={{ padding: 10, color: "#000000", fontSize: 12, fontFamily: "ManropeRegular", marginVertical: 5 }}>{item?.value}</Text>
                                 {index !== filteredData.length - 1 && (
                                     <View style={{ borderBottomWidth: 1, borderBottomColor: "#ccc", marginHorizontal: 10 }} />

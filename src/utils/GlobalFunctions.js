@@ -1,10 +1,10 @@
-const formatAmount = (amount) => {
-    const amountStr = `${amount}`;
-    const [integerPart, decimalPart] = amountStr.split('.');
-    const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    const formattedAmount = decimalPart ? `${formattedIntegerPart}.${decimalPart}` : formattedIntegerPart;
-    return `₹ ${formattedAmount}`;
-}
+function formatAmount(amount) {
+    const formatted = new Intl.NumberFormat('en-IN', {
+      maximumFractionDigits: 0,
+    }).format(amount);
+    
+    return `₹ ${formatted}`; // Note the space after ₹
+  }
 
 const formatDate = (dateString) => {
     const date = new Date(dateString);

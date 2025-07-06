@@ -81,14 +81,14 @@ const ViewCatDetails = ({ route }) => {
             console.log("categories each ::::::::::", JSON.stringify(response?.data));
             setJewelleryDetails(response?.data)
 
-            const convertLocalhostUrls = (url) => {
-                return url?.replace("localhost", LocalHostUrl);
-            };
-            const professionalImageUrl = convertLocalhostUrls(response?.data?.professionalImage?.url);
+            // const convertLocalhostUrls = (url) => {
+            //     return url?.replace("localhost", LocalHostUrl);
+            // };
+            const professionalImageUrl = response?.data?.professionalImage?.url;
             const photos = [
                 { uri: professionalImageUrl }, // Add professional image as the first image
                 ...response?.data?.additionalImages.flat().map(image => ({
-                    uri: convertLocalhostUrls(image?.url)
+                    uri: image?.url
                 }))
             ];
             setSpecificAdditionImages(photos);

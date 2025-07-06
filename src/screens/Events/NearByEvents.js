@@ -100,15 +100,18 @@ const NearByEvents = () => {
 
     const renderItem = ({ item }) => {
 
-        const convertLocalhostUrls = (url) => {
-            return url?.replace("localhost", LocalHostUrl);
-        };
-        const professionalImageUrl = convertLocalhostUrls(item?.professionalImage?.url);
+        // console.log('items in nearby is::>>',item?.menuImages);
+
+        // const convertLocalhostUrls = (url) => {
+        //     return url?.replace("localhost", LocalHostUrl);
+        // };
+        const professionalImageUrl = item?.professionalImage?.url;
 
         const imageUrls = [
-            professionalImageUrl, // Add professional image as the first image
-            ...item?.additionalImages.flat().map(image => convertLocalhostUrls(image?.url))
+            professionalImageUrl,
+            ...item?.additionalImages.flat().map(image => image?.url)
         ];
+        console.log("imageUrls ::", imageUrls);
         return (
             <View style={{ flex: 1, borderRadius: 20 }}>
                 <View style={[styles.container]}>
@@ -128,7 +131,7 @@ const NearByEvents = () => {
                             >
                                 <FastImage source={{
                                     uri: itemData,
-                                    headers: { Authorization: `Bearer ${getUserAuth}` }
+                                    // headers: { Authorization: `Bearer ${getUserAuth}` }
                                 }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
@@ -146,7 +149,9 @@ const NearByEvents = () => {
                             </View>
                         </View>
                         <View>
-                            <Text style={{ fontWeight: '800', color: '#202020', fontSize: 14, fontFamily: "ManropeRegular" }}>{formatAmount(item?.rentPricePerDay)}<Text style={{ color: '#202020', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}> /day</Text></Text>
+                            {item?.menuImages && item?.menuImages.length > 0 ? <Text style={{ color: '#FD813B', fontFamily: "ManropeRegular", fontSize: 14, fontWeight: "700" }}>Menu based</Text> :
+                                <Text style={{ fontWeight: '800', color: '#FD813B', fontSize: 14, fontFamily: "ManropeRegular" }}>{formatAmount(item?.rentPricePerDay)}<Text style={{ color: '#FD813B', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}> /day</Text></Text>
+                            }
                         </View>
                     </View>
 
@@ -239,7 +244,7 @@ const NearByEvents = () => {
                 </TouchableOpacity>
             </View> */}
 
-            <View style={{marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
+            <View style={{ marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
                 <View>
                     <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
                     <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "400", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Function Halls in Hyderabad</Text>

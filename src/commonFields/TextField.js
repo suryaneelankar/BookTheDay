@@ -4,10 +4,12 @@ const TextField = (props)=>{
     const { placeholder,onChangeHandler,keyboardType,value,label,isRequired, isDescriptionField = false} = props
     return(
         <View style={styles.inputContainer}>
+            {label &&
             <Text style={styles.label}>
                 {label}
                 {isRequired && <Text style={styles.isRequired}>*</Text>}
             </Text>
+            }
             <TextInput
                 style={[styles.input,{height: isDescriptionField ? 100 : 50,textAlignVertical: isDescriptionField ? 'top' : 'center'}]}
                 onChangeText={onChangeHandler}

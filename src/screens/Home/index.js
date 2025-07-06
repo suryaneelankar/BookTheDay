@@ -122,11 +122,11 @@ const HomeDashboard = () => {
     );
 
     useEffect(() => {
-        if(cateringBookings?.length > 0 || hallsBookings?.length > 0 || myBookings?.length > 0){
-            console.log("cateringBookings?.length",cateringBookings?.length, hallsBookings?.length, myBookings?.length)
+        if (cateringBookings?.length > 0 || hallsBookings?.length > 0 || myBookings?.length > 0) {
+            console.log("cateringBookings?.length", cateringBookings?.length, hallsBookings?.length, myBookings?.length)
             dispatch(showOrHideBottomCard(true));
-         }
-    },[])
+        }
+    }, [])
 
 
     useFocusEffect(
@@ -141,7 +141,7 @@ const HomeDashboard = () => {
     );
 
     const getNearByEvents = async () => {
-        console.log("latitude , long are::>>",latitude,longitude);
+        console.log("latitude , long are::>>", latitude, longitude);
         const token = await getUserAuthToken();
         try {
             const response = await axios.get(`${BASE_URL}/getNearByFunctionHalls?latitude=${latitude}&longitude=${longitude}`, {
@@ -151,7 +151,7 @@ const HomeDashboard = () => {
             });
 
             const newFunctionHalls = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            // console.log("neareby loc events in HOMEEEEEEE:::::::;", newFunctionHalls);
+            console.log("neareby loc events in HOMEEEEEEE:::::::;", newFunctionHalls);
             setNearByEventsData(newFunctionHalls);
         } catch (error) {
             console.error('Error fetching function halls:', error);
@@ -406,7 +406,7 @@ const HomeDashboard = () => {
     }
 
     const renderNewlyAddedDetails = ({ item }) => {
-        const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+        const updatedImgUrl = item?.professionalImage?.url;
 
         const originalPrice = item?.rentPricePerDay;
         const discountPercentage = item?.discountPercentage;
@@ -421,9 +421,7 @@ const HomeDashboard = () => {
                     style={{ elevation: 5, width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginEnd: 10 }}>
                     <FastImage source={{
                         uri: updatedImgUrl,
-                        headers: { Authorization: `Bearer ${getUserAuth}` }
-
-
+                        // headers: { Authorization: `Bearer ${getUserAuth}` }
                     }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '90%', alignSelf: "center", marginTop: 5, height: Dimensions.get('window').height / 5 }}
                     />
                     <View style={{ marginTop: 15, marginHorizontal: 6 }}>
@@ -440,9 +438,8 @@ const HomeDashboard = () => {
     }
 
 
-    const renderItem = ({ item }) => {
-
-        const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+    const renderItem = ({ item, index }) => {
+        const updatedImgUrl = item?.professionalImage?.url;
         return (
             <View style={{}}>
                 <TouchableOpacity
@@ -450,15 +447,16 @@ const HomeDashboard = () => {
                     style={{ marginBottom: 5, elevation: 5, backgroundColor: "white", width: Dimensions.get('window').width / 1.3, alignSelf: 'center', borderRadius: 8, marginHorizontal: 16, marginTop: 15, height: 'auto' }}>
                     <FastImage source={{
                         uri: updatedImgUrl,
-                        headers: { Authorization: `Bearer ${getUserAuth}` }
+                        // headers: { Authorization: `Bearer ${getUserAuth}` }
                     }}
                         style={{ borderRadius: 8, width: '95%', padding: 90, alignSelf: "center", marginTop: 8 }}
                     />
-                    <View style={{ marginTop: 15, justifyContent: 'space-between', }}>
-
+                    <View style={{ marginTop: 15, justifyContent: 'space-between' }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignSelf: 'center', alignItems: 'center' }}>
                             <Text style={{ fontWeight: '700', color: '#131313', fontSize: 16, fontFamily: 'InterBold', width: '48%' }}>{item?.functionHallName}</Text>
-                            <Text style={{ fontWeight: '700', color: themevariable.Color_B46609, fontSize: 18, fontFamily: 'InterBold' }}>{formatAmount(item?.rentPricePerDay)}/day</Text>
+                            {item?.menuImages && item?.menuImages?.length > 0 ? <Text style={{ fontWeight: '600', color: "#FD813B", fontSize: 18, fontFamily: 'ManropeRegular' }}>Menu based</Text> :
+                                <Text style={{ fontWeight: '700', color: "#FD813B", fontSize: 18, fontFamily: 'ManropeRegular' }}>{formatAmount(item?.rentPricePerDay)}/day</Text>
+                            }
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignSelf: 'center', alignItems: 'center' }}>
                             <View style={{ flexDirection: 'row', }}>
@@ -500,7 +498,7 @@ const HomeDashboard = () => {
 
     const renderCaterings = ({ item }) => {
 
-        const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+        const updatedImgUrl = item?.professionalImage?.url;
         return (
             <View style={{}}>
                 <TouchableOpacity
@@ -508,7 +506,7 @@ const HomeDashboard = () => {
                     style={{ marginBottom: 5, elevation: 5, backgroundColor: "white", width: Dimensions.get('window').width / 1.3, alignSelf: 'center', borderRadius: 8, marginHorizontal: 16, marginTop: 15, height: 'auto' }}>
                     <FastImage source={{
                         uri: updatedImgUrl,
-                        headers: { Authorization: `Bearer ${getUserAuth}` }
+                        // headers: { Authorization: `Bearer ${getUserAuth}` }
                     }}
                         style={{ borderRadius: 8, width: '95%', padding: 90, alignSelf: "center", marginTop: 8 }}
                     />
@@ -639,11 +637,11 @@ const HomeDashboard = () => {
                                             navigation.navigate('CategoriesList', { catType: 'clothes' });
                                         }
                                     }}
-                                    style={{padding:10}}
+                                    style={{ padding: 10 }}
                                 >
                                     <Image
-                                    source={item?.image} 
-                                    style={{width:"100%", height:"100%", alignSelf:"center",padding:10}}/>
+                                        source={item?.image}
+                                        style={{ width: "100%", height: "100%", alignSelf: "center", padding: 10 }} />
                                 </TouchableOpacity>
                             );
                         })}
@@ -700,8 +698,6 @@ const HomeDashboard = () => {
                     <>
                         <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: horizontalScale(20) }}>
                             <Text style={styles.onDemandTextStyle}>Function Halls Near You</Text>
-                            <TouchableOpacity onPress={() => navigation.navigate('Events')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
-                            </TouchableOpacity>
                         </View>
 
                         <FlatList
@@ -837,14 +833,14 @@ const HomeDashboard = () => {
             </ScrollView>
 
             {showBottomCard && (
-                <FloatingCartButton 
-                totalCount={hallsBookings + cateringBookings + myBookings}
-                hallsData={hallsBookings}
-                cateringData={cateringBookings}
-                clothsData={myBookings}
-                authToken ={getUserAuth}
-                onPress={() =>  dispatch(showOrHideBottomCard(false))} 
-                onClose={() =>  dispatch(showOrHideBottomCard(false))} />
+                <FloatingCartButton
+                    totalCount={hallsBookings + cateringBookings + myBookings}
+                    hallsData={hallsBookings}
+                    cateringData={cateringBookings}
+                    clothsData={myBookings}
+                    authToken={getUserAuth}
+                    onPress={() => dispatch(showOrHideBottomCard(false))}
+                    onClose={() => dispatch(showOrHideBottomCard(false))} />
             )}
         </SafeAreaView>
     )
@@ -1036,7 +1032,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: '400',
         marginHorizontal: 5,
-        width:'95%'
+        width: '95%'
     },
     searchContainer: {
         marginHorizontal: 20,

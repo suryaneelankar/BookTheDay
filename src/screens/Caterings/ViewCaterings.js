@@ -96,11 +96,11 @@ const ViewCaterings = ({ route, navigation }) => {
             });
             // console.log("catering view details ::::::::::", JSON.stringify(response?.data));
             setEventsDetails(response?.data);
-            const professionalImageUrl = convertLocalhostUrls(response?.data?.professionalImage?.url);
+            const professionalImageUrl = response?.data?.professionalImage?.url;
 
             const imageUrls = [
                 professionalImageUrl, // Add professional image as the first image
-                ...response?.data?.additionalImages.flat().map(image => convertLocalhostUrls(image?.url))
+                ...response?.data?.additionalImages.flat().map(image => image?.url)
             ];
 
             setSubImages(imageUrls);

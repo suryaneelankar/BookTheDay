@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, Modal, TextInput, ScrollView, ActivityIndicator, BackHandler } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Switch, Image, Dimensions, TouchableOpacity, Alert, Modal, TextInput, ScrollView, ActivityIndicator, BackHandler } from 'react-native';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
+import ChooseMenuField from '../../../commonFields/ChooseMenuField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
 import SelectedUploadIcon from '../../../assets/svgs/selectedUploadIcon.svg';
@@ -39,14 +40,24 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         additionalImageSeven: undefined,
         additionalImageEight: undefined
     });
+    const [menuImages, setMenuImages] = useState({
+        menuImageOne: undefined,
+        menuImageTwo: undefined,
+        menuImageThree: undefined,
+        menuImageFour: undefined,
+        menuImageFive: undefined,
+        menuImageSix: undefined,
+        menuImageSeven: undefined,
+        menuImageEight: undefined
+    });
     const [functionHallAddress, setfunctionHallAddress] = useState('');
     const [locationLatitude, setLocationLatitude] = useState();
     const [locationLongitude, setLocationLongitude] = useState();
     const [locationCountyVal, setLocationCountyVal] = useState();
     const [functionHallCity, setfunctionHallCity] = useState('');
     const [functionHallPinCode, setfunctionHallPinCode] = useState();
-    const [perDayRentPrice, setPerDayRentPrice] = useState();
-    const [advanceAmount, setAdvanceAmount] = useState();
+    const [perDayRentPrice, setPerDayRentPrice] = useState(0);
+    const [advanceAmount, setAdvanceAmount] = useState(0);
     const [discountPercentage, setDiscountPercentage] = useState(0);
     const [overTimeCharges, setOverTimeCharges] = useState();
     const [selectedItemArray, setSelectedItemArray] = useState([]);
@@ -55,9 +66,23 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
     const discountPercentageArr = ['0', '5', '10', '15', '20', '25', '30', '50'];
     const [selectedDiscountVal, setSelectedDiscountVal] = useState();
+    const [menuAvailable, setMenuAvailable] = useState(false);
+    const [basicNonVegPrice, setBasicNonVegPrice] = useState(0);
+    const [basicVegPrice, setBasicVegPrice] = useState(0);
+    const [premiumVegPrice, setPremiumVegPrice] = useState(0);
+    const [premiumNonVegPrice, setPremiumNonVegPrice] = useState(0);
+    const [eliteNonVegPrice, setEliteNonVegPrice] = useState(0);
+    const [eliteVegPrice, setEliteVegPrice] = useState(0);
+    const [basicVegMenuName, setBasicVegMenuName] = useState('');
+    const [premiumVegMenuName, setPremiumVegMenuName] = useState('');
+    const [eliteVegMenuName, setEliteVegMenuName] = useState('');
+    const [basicNonVegMenuName, setBasicNonVegMenuName] = useState('');
+    const [premiumNonVegMenuName, setPremiumNonVegMenuName] = useState('');
+    const [eliteNonVegMenuName, setEliteNonVegMenuName] = useState('');
+    const [advanceAmountPercentage, setAdvanceAmountPercentage] = useState(0);
 
     const [loading, setLoading] = useState(false);
-    const [functionHallAreaInSft, setfunctionHallAreaInSft] = useState();
+    const [functionHallAreaInSft, setfunctionHallAreaInSft] = useState('');
 
     const [rentalItemPricingDetails, setRentalItemPricingDetails] = useState({
         "Tables with basic covers": [{ "itemName": "Tables with basic covers", "perDayPrice": 0 }],
@@ -155,6 +180,10 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         setfunctionHallPinCode(value);
     }
 
+    const onChangeAdvanceAmountPercentage = (value) => {
+        setAdvanceAmountPercentage(value);
+    }
+
     const data = [
         {
             id: 0,
@@ -245,8 +274,148 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         });
     };
 
-    const ListItem = ({ item, index }) => {
+    const onChangeBasicVegMenuName = (value) => {
+        setBasicVegMenuName(value);
+        setMenuImages({
+            ...menuImages,
+            menuImageOne: {
+                ...menuImages.menuImageOne,
+                menuType: value,
+            },
+        });
+    }
 
+    const onChangePremiumVegMenuName = (value) => {
+        setPremiumVegMenuName(value);
+        setMenuImages({
+            ...menuImages,
+            menuImageTwo: {
+                ...menuImages.menuImageTwo,
+                menuType: value,
+            },
+        });
+    }
+
+    const onChangeEliteVegMenuName = (value) => {
+        setEliteVegMenuName(value);
+        setMenuImages({
+            ...menuImages,
+            menuImageThree: {
+                ...menuImages.menuImageThree,
+                menuType: value,
+            },
+        });
+    }
+
+    const onChangeBasicNonVegMenuName = (value) => {
+        setBasicNonVegMenuName(value);
+        setMenuImages({
+            ...menuImages,
+            menuImageFour: {
+                ...menuImages.menuImageFour,
+                menuType: value,
+            },
+        });
+    }
+
+    const onChangePremiumNonVegMenuName = (value) => {
+        setPremiumNonVegMenuName(value);
+        setMenuImages({
+            ...menuImages,
+            menuImageFive: {
+                ...menuImages.menuImageFive,
+                menuType: value,
+            },
+        });
+    }
+
+    const onChangeEliteNonVegMenuName = (value) => {
+        setEliteNonVegMenuName(value);
+        setMenuImages({
+            ...menuImages,
+            menuImageSix: {
+                ...menuImages.menuImageSix,
+                menuType: value,
+            },
+        });
+    }
+
+    const openGalleryOrCameraForMenuImages = async (index) => {
+        const options = {
+            mediaType: 'photo',
+            maxWidth: 1920,
+            maxHeight: 1920,
+            quality: 1,
+        };
+        launchImageLibrary(options, (response) => {
+            // console.log('Response = ', response);
+            if (response.didCancel) {
+                console.log('User cancelled image picker');
+            } else if (response.errorCode) {
+                console.log('ImagePicker Error: ', response.errorMessage);
+            } else {
+                if (index == 0) {
+                    setMenuImages({
+                        ...menuImages,
+                        menuImageOne: {
+                            assets: response.assets, // or just response if that's your structure
+                            menuType: basicVegMenuName,
+                            menuPrice: basicVegPrice, // replace with your price variable
+                        },
+                    });
+                } else if (index == 1) {
+                    setMenuImages({
+                        ...menuImages,
+                        menuImageTwo: {
+                            assets: response.assets, // or just response if that's your structure
+                            menuType: premiumVegMenuName,
+                            menuPrice: premiumVegPrice, // replace with your price variable
+                        },
+                    });
+
+                } else if (index == 2) {
+                    setMenuImages({
+                        ...menuImages,
+                        menuImageThree: {
+                            assets: response.assets, // or just response if that's your structure
+                            menuType: eliteVegMenuName,
+                            menuPrice: eliteVegPrice, // replace with your price variable
+                        },
+                    });
+                }
+                else if (index == 3) {
+                    setMenuImages({
+                        ...menuImages,
+                        menuImageFour: {
+                            assets: response.assets, // or just response if that's your structure
+                            menuType: basicNonVegMenuName,
+                            menuPrice: basicNonVegPrice, // replace with your price variable
+                        },
+                    });
+                } else if (index == 4) {
+                    setMenuImages({
+                        ...menuImages,
+                        menuImageFive: {
+                            assets: response.assets, // or just response if that's your structure
+                            menuType: premiumNonVegMenuName,
+                            menuPrice: premiumNonVegPrice, // replace with your price variable
+                        },
+                    });
+                } else if (index == 5) {
+                    setMenuImages({
+                        ...menuImages,
+                        menuImageSix: {
+                            assets: response.assets, // or just response if that's your structure
+                            menuType: eliteNonVegMenuName,
+                            menuPrice: eliteNonVegPrice, // replace with your price variable
+                        },
+                    });
+                }
+            }
+        });
+    }
+
+    const ListItem = ({ item, index }) => {
         return (
             <TouchableOpacity style={styles.imageContainer} onPress={() => { openGalleryOrCameraForAdditonalImages(index) }}>
                 {additionalImages &&
@@ -325,11 +494,51 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     const onPressSaveAndPost = async () => {
         const { finalEarningAfterDiscount, earningAmount, serviceCharges } = calculateCharges();
         if (!mainImageUrl || functionHallName === '' || functionHallAreaInSft === '' ||
-            selectedItemArray?.length === 0 || (perDayRentPrice === '' || perDayRentPrice === undefined) || selectedItemArray === '' || (BedRooms === '' || BedRooms === undefined) || functionHallAddress === '' || (advanceAmount === undefined || advanceAmount === '')
+            selectedItemArray?.length === 0 || selectedItemArray === '' || functionHallAddress === ''
         ) {
             Alert.alert('Please fill Mandatory fields');
             return;
         }
+        // console.log('menuAvailable is::>>>',menuAvailable);
+        if (!menuAvailable) {
+            if ((perDayRentPrice === 0 || perDayRentPrice === undefined) || (advanceAmount === undefined || advanceAmount === 0)) {
+                Alert.alert('Please fill Per Day Rent Price & Advance amount');
+                return;
+            }
+        } else {
+            if ((basicVegPrice === 0 || basicVegPrice === undefined) || (advanceAmountPercentage === 0 || advanceAmountPercentage === undefined)) {
+                Alert.alert('Please fill Veg Menu Price & Advance percentage');
+                return;
+            }
+        }
+
+        if (basicVegPrice > 0 && basicVegMenuName === '') {
+            setBasicVegMenuName('Basic Veg Menu');
+        }
+        if (premiumVegPrice > 0 && premiumVegMenuName === '') {
+            setPremiumVegMenuName('Premium Veg Menu');
+        }
+        if (eliteVegPrice > 0 && eliteVegMenuName === '') {
+            setEliteVegMenuName('Elite Veg Menu');
+        }
+        if (basicNonVegPrice > 0 && basicNonVegMenuName === '') {
+            setBasicNonVegMenuName('Basic Non Veg Menu');
+        }
+        if (premiumNonVegPrice > 0 && premiumNonVegMenuName === '') {
+            setPremiumNonVegMenuName('Premium Non Veg Menu');
+        }
+        if (eliteNonVegPrice > 0 && eliteNonVegMenuName === '') {
+            setEliteNonVegMenuName('Elite Non Veg Menu');
+        }
+
+        Object.entries(menuImages).forEach(([key, value]) => {
+            console.log('value is ::>>', value);
+            if (value?.menuPrice && (!value?.assets || value.assets.length === 0)) {
+                Alert.alert('Missing Image', `Please upload an image for menu.`);
+                return;
+            }
+        });
+
         const uploadedImagesCount = Object.values(additionalImages).filter(value => value !== undefined).length;
 
         if (uploadedImagesCount < 4) {
@@ -365,10 +574,32 @@ const GeneralDetails = ({ isAadharUpdate }) => {
             }
         });
 
+
+        const menuImageMetaData = [];
+
+        Object.entries(menuImages).forEach(([key, value]) => {
+            const imageAsset = value?.assets?.[0];
+            if (imageAsset?.uri) {
+                formData.append('menuImages', {
+                    uri: imageAsset.uri,
+                    type: imageAsset.type,
+                    name: imageAsset.fileName,
+                });
+
+                // Save related metadata separately
+                menuImageMetaData.push({
+                    fileName: imageAsset.fileName,
+                    menuType: value?.menuType || "",
+                    menuPrice: value?.menuPrice || 0,
+                });
+            }
+        });
+
+        formData.append('menuImagesMeta', JSON.stringify(menuImageMetaData));
+
         const functionHallAddessIs = { "address": functionHallAddress, "city": functionHallCity, "pinCode": functionHallPinCode };
         formData.append('serviceType', 'driver');
         formData.append('description', productDescription);
-        // formData.append('subscriptionChargesPerMonth', perMonthRentPrice);
         formData.append('hallAmenities', selectedItemArray);
         formData.append('functionHallName', functionHallName);
         formData.append('rentPricePerDay', perDayRentPrice);
@@ -377,6 +608,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         formData.append('functionHallAddress', JSON.stringify(functionHallAddessIs));
         formData.append('vendorMobileNumber', vendorMobileNumber);
         formData.append('advanceAmount', advanceAmount);
+        formData.append('advanceAmountInPercentageForMenu', advanceAmountPercentage);
         formData.append('discountPercentage', discountPercentage);
         formData.append('seatingCapacity', selectedSeatingCapacity);
         formData.append('accepted', false);
@@ -723,16 +955,94 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         setLocationPickerVisible(false);
     };
 
+    const handleMenuAvailableSwitch = () => {
+        setMenuAvailable(!menuAvailable);
+        if (!menuAvailable) {
+            setAdvanceAmount(0); // If switching to true, set advance amount to 0
+            setPerDayRentPrice(0);
+        } else {
+            setAdvanceAmountPercentage(0); // If switching to false, set advance amount percentage to 0
+        }
+    };
+
 
     const calculateCharges = () => {
-        const earningAmount = perDayRentPrice - (perDayRentPrice * discountPercentage / 100);
-        const serviceFeePercentage = 0.03; // 3% for < ₹10,000, 5% for ≥ ₹10,000
-        const serviceCharges = earningAmount * serviceFeePercentage;
-        const finalEarningAfterDiscount = earningAmount - serviceCharges;
+        let earningAmount = perDayRentPrice - (perDayRentPrice * discountPercentage / 100);
+        let serviceFeePercentage = 0.03; // 3% for < ₹10,000, 5% for ≥ ₹10,000
+        let serviceCharges = earningAmount * serviceFeePercentage;
+        let finalEarningAfterDiscount = earningAmount - serviceCharges;
+        if (menuAvailable) {
+            finalEarningAfterDiscount = 0;
+            earningAmount = 0;
+            serviceCharges = 0;
+        }
 
         return { finalEarningAfterDiscount, earningAmount, serviceCharges }
 
     }
+
+    const menuTypes = [
+        {
+            key: 'menuImageOne',
+            label: 'Basic Veg',
+            icon: 'veg',
+            priceSetter: setBasicVegPrice,
+            menuName: basicVegMenuName,
+            menuNameSetter: onChangeBasicVegMenuName,
+            imageIndex: 0,
+            imageObj: menuImages?.menuImageOne,
+        },
+        {
+            key: 'menuImageTwo',
+            label: 'Premium Veg',
+            icon: 'veg',
+            priceSetter: setPremiumVegPrice,
+            menuName: premiumVegMenuName,
+            menuNameSetter: onChangePremiumVegMenuName,
+            imageIndex: 1,
+            imageObj: menuImages?.menuImageTwo,
+        },
+        {
+            key: 'menuImageThree',
+            label: 'Elite Veg',
+            icon: 'veg',
+            priceSetter: setEliteVegPrice,
+            menuName: eliteVegMenuName,
+            menuNameSetter: onChangeEliteVegMenuName,
+            imageIndex: 2,
+            imageObj: menuImages?.menuImageThree,
+        },
+        {
+            key: 'menuImageFour',
+            label: 'Basic Non-Veg',
+            icon: 'non-veg',
+            priceSetter: setBasicNonVegPrice,
+            menuName: basicNonVegMenuName,
+            menuNameSetter: onChangeBasicNonVegMenuName,
+            imageIndex: 3,
+            imageObj: menuImages?.menuImageFour,
+        },
+        {
+            key: 'menuImageFive',
+            label: 'Premium Non-Veg',
+            icon: 'non-veg',
+            priceSetter: setPremiumNonVegPrice,
+            menuName: premiumNonVegMenuName,
+            menuNameSetter: onChangePremiumNonVegMenuName,
+            imageIndex: 4,
+            imageObj: menuImages?.menuImageFive,
+        },
+        {
+            key: 'menuImageSix',
+            label: 'Elite Non-Veg',
+            icon: 'non-veg',
+            priceSetter: setEliteNonVegPrice,
+            menuName: eliteNonVegMenuName,
+            menuNameSetter: onChangeEliteNonVegMenuName,
+            imageIndex: 5,
+            imageObj: menuImages?.menuImageSix,
+        },
+    ];
 
     return (
         <View style={{ flex: 1, backgroundColor: "#EBEDF3", paddingHorizontal: 10 }}>
@@ -763,6 +1073,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     source={{ uri: mainImageUrl?.assets[0].uri }}
                                     width={'100%'}
                                     height={300}
+                                    style={{ borderRadius: 5 }}
                                     resizeMode='cover'
                                 /> : null}
                         </TouchableOpacity>
@@ -824,19 +1135,82 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         {RentalItemsList()}
                         {ItemList()}
 
+                        <View style={{ transform: [{ scale: 1.0 }], width: "100%", flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Text style={{ alignSelf: "center", fontWeight: "800", fontSize: 15, fontFamily: 'ManropeRegular', color: "black" }}>Do you have in house catering?</Text>
+                            <Switch
+                                trackColor={{ false: '#3e3e3e', true: '#FD813B' }}
+                                thumbColor={menuAvailable ? '#ECA73C' : '#FD813B'}
+                                ios_backgroundColor="#3e3e3e"
+                                // onValueChange={() => setMenuAvailable(!menuAvailable)}
+                                onValueChange={handleMenuAvailableSwitch}
+                                style={{ marginLeft: 10 }}
+                                value={menuAvailable}
+                            />
+                        </View>
+                        {menuAvailable && (
+                            <View>
+                                <Text style={styles.subTitle}>Please upload menu images if you have in house catering</Text>
+                                {menuTypes.map((type, idx) => (
+                                    <View key={type.key}>
+                                        <ChooseMenuField
+                                            label={type.label}
+                                            isRequired={false}
+                                            placeholder={`Enter ${type.label} Price`}
+                                            showIcon={true}
+                                            IconName={type.icon}
+                                            onChangeTextValue={text => {
+                                                type.priceSetter(text);
+                                                setMenuImages(prev => ({
+                                                    ...prev,
+                                                    [type.key]: {
+                                                        ...prev[type.key],
+                                                        menuPrice: text,
+                                                    },
+                                                }));
+                                            }}
+                                            onPressChooseFile={() => openGalleryOrCameraForMenuImages(type.imageIndex)}
+                                        />
+                                        <View style={{ bottom: 15 }}>
+                                            <TextField
+                                                label=""
+                                                placeholder="Please Enter Menu Name"
+                                                value={type.menuName}
+                                                onChangeHandler={type.menuNameSetter}
+                                                isRequired={false}
+                                            />
+                                        </View>
+                                        <TouchableOpacity onPress={() => openGalleryOrCameraForMenuImages(type.imageIndex)}>
+                                            {type.imageObj?.assets && (
+                                                <Image
+                                                    source={{ uri: type.imageObj.assets[0]?.uri }}
+                                                    width={'100%'}
+                                                    height={300}
+                                                    style={{ borderRadius: 5, marginTop: 0 }}
+                                                    resizeMode="cover"
+                                                />
+                                            )}
+                                        </TouchableOpacity>
+                                    </View>
+                                ))}
+                            </View>
+                        )}
+
                     </View>
                     <Text style={[styles.title, { marginHorizontal: 10 }]}>Pricing Details<Text style={{ color: "red" }}>*</Text></Text>
                     <View style={[styles.mainContainer, { paddingVertical: 0 }]}>
-
-                        <TextField
-                            label='Per Day Charge (₹/ Per Day)'
-                            placeholder="Please Enter per Day Charge"
-                            value={perDayRentPrice}
-                            onChangeHandler={onChangePerDayRentPrice}
-                            keyboardType='number-pad'
-                            isRequired={true}
-                        />
-                        {
+                        {!menuAvailable ? (
+                            <TextField
+                                label='Per Day Charge (₹/ Per Day)'
+                                placeholder="Please Enter per Day Charge"
+                                value={perDayRentPrice}
+                                onChangeHandler={onChangePerDayRentPrice}
+                                keyboardType='number-pad'
+                                isRequired={true}
+                            />)
+                            :
+                            null
+                        }
+                        {!menuAvailable ? (
                             !isNaN(perDayRentPrice - (perDayRentPrice * discountPercentage / 100)) && perDayRentPrice ? (
                                 <>
                                     {(() => {
@@ -864,18 +1238,30 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     })()}
                                 </>
                             ) : null
-                        }
+                        ) : null}
                         <Text style={styles.commissionLabel}>Service Fee Details:</Text>
                         <Text style={styles.discountlabel}>3% for all orders</Text>
                         {/* <Text style={styles.discountlabel}>5% for orders above ₹30,000</Text> */}
-                        <TextField
-                            label='Advance Booking Amount'
-                            placeholder="Please Enter Advance Booking Amount"
-                            value={advanceAmount}
-                            onChangeHandler={onChangeAdvanceAmount}
-                            keyboardType='number-pad'
-                            isRequired={true}
-                        />
+
+                        {!menuAvailable ? (
+                            <TextField
+                                label='Advance Booking Amount'
+                                placeholder="Please Enter Advance Booking Amount"
+                                value={advanceAmount}
+                                onChangeHandler={onChangeAdvanceAmount}
+                                keyboardType='number-pad'
+                                isRequired={true}
+                            />)
+                            :
+                            <TextField
+                                label='Advance Amount Percentage ( % )'
+                                placeholder="Please Enter Advance Amount Percentage %"
+                                value={advanceAmountPercentage}
+                                onChangeHandler={onChangeAdvanceAmountPercentage}
+                                keyboardType='number-pad'
+                                isRequired={true}
+                            />
+                        }
                         <TextField
                             label='Over Time Charges / hr'
                             placeholder="Please Enter OverTime Charges"

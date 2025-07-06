@@ -290,7 +290,7 @@ const ViewMyBookings = () => {
 
 
   const renderItem = ({ item }) => {
-    const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+    const updatedImgUrl = item?.professionalImage?.url;
 
     return (
       <View style={styles.card}>

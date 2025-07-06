@@ -84,7 +84,7 @@ const CategoriesList = ({ route }) => {
     const navigation = useNavigation();
 
     const renderItem = ({ item }) => {
-        const updatedImgUrl = item?.professionalImage?.url ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+        const updatedImgUrl = item?.professionalImage?.url;
 
         // console.log('gendertype is::>>>>',item?.genderType);
         const originalPrice = item?.rentPricePerDay;

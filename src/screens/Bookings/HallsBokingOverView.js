@@ -20,12 +20,14 @@ import ThumsUpIcon from '../../assets/svgs/thumsupIcon.svg';
 
 const HallsBookingOverView = ({ route, navigation }) => {
 
-    const { categoryId, timeSlot, bookingDate, totalPrice } = route.params;
+    const { categoryId, timeSlot, bookingDate, totalPrice, advanceAmount, selectedMenus } = route.params;
     const [bookingDetails, setBookingDetails] = useState([]);
     const [bookingDone, setBookingDone] = useState(false);
     const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
     const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
     const userLoggedInName = useSelector((state) => state.userLoggedInName);
+
+    console.log('Number(advanceAmount) is::', Number(advanceAmount),advanceAmount);
 
     useEffect(() => {
         getEventsDetails();
@@ -57,7 +59,8 @@ const HallsBookingOverView = ({ route, navigation }) => {
             userMobileNumber: userLoggedInMobileNum,
             bookingTime: timeSlot,
             userFullName: userLoggedInName,
-            advanceAmountToPay: bookingDetails?.advanceAmount,
+            advanceAmountToPay:  advanceAmount.replace(/[^\d]/g, ''),
+            foodMenuSelectedByUser: selectedMenus,
         }
         console.log("payload is:::::::", payload);
         try {
@@ -100,14 +103,14 @@ const HallsBookingOverView = ({ route, navigation }) => {
             <ScrollView style={{}}>
 
                 <View style={styles.productContainer}>
-                    <FastImage source={{ uri: bookingDetails?.professionalImage?.url?.replace('localhost', LocalHostUrl) }}
+                    <FastImage source={{ uri: bookingDetails?.professionalImage?.url }}
                         style={styles.productImage}
                         resizeMethod="resize"
                         resizeMode="cover"
                     />
                     <View style={{ marginTop: 20 }}>
                         <Text style={styles.productTitle}>{bookingDetails?.functionHallName}</Text>
-                        <Text style={styles.productPrice}><Text style={styles.productPriceperDay}>Advance Amount  </Text>{formatAmount(bookingDetails?.advanceAmount)}</Text>
+                        <Text style={styles.productPrice}><Text style={styles.productPriceperDay}>Advance Amount  </Text>{formatAmount(advanceAmount)}</Text>
                         <View >
                             <View style={styles.dateContainer}>
                                 <CalendarIcon />
@@ -130,11 +133,11 @@ const HallsBookingOverView = ({ route, navigation }) => {
                 <View style={styles.detailsContainer}>
                     <View style={styles.rowSpaceBetween}>
                         <Text style={[styles.detailsText]}>Total Amount</Text>
-                        <Text style={[styles.detailsText, styles.detailsAmount]}>{totalPrice}</Text>
+                        <Text style={[styles.detailsText, styles.detailsAmount]}>{formatAmount(totalPrice)}</Text>
                     </View>
                     <View style={[styles.rowSpaceBetween,{marginTop: 20}]}>
                         <Text style={styles.detailsText}>Advance Amount</Text>
-                        <Text style={styles.detailsAmount}>{formatAmount(bookingDetails?.advanceAmount)}</Text>
+                        <Text style={styles.detailsAmount}>{formatAmount(advanceAmount)}</Text>
                     </View>
                 </View>
             </ScrollView>
@@ -150,7 +153,6 @@ const HallsBookingOverView = ({ route, navigation }) => {
                 animationInTiming={500}
                 style={{
                     flex: 1,
-                    // bottom: "10%"
                 }}
                 onBackButtonPress={() => {
                     setThankYouCardVisible(false)

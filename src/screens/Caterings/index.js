@@ -123,14 +123,14 @@ const Caterings = () => {
     };
 
     const renderFoodCaterings = ({ item }) => {
-        const convertLocalhostUrls = (url) => {
-            return url?.replace("localhost", LocalHostUrl);
-        };
-        const professionalImageUrl = convertLocalhostUrls(item?.professionalImage?.url);
+        // const convertLocalhostUrls = (url) => {
+        //     return url?.replace("localhost", LocalHostUrl);
+        // };
+        const professionalImageUrl = item?.professionalImage?.url;
 
         const imageUrls = [
             professionalImageUrl, // Add professional image as the first image
-            ...item?.additionalImages.flat().map(image => convertLocalhostUrls(image?.url))
+            ...item?.additionalImages.flat().map(image => image?.url)
         ];
         // const imageUrls = item?.additionalImages.flat().map(image => convertLocalhostUrls(image.url));
         return (

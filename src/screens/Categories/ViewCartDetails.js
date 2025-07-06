@@ -55,7 +55,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
       });
       console.log(" selected product::::::::::", JSON.stringify(response?.data));
       setProductDetails(response?.data);
-      const updatedImgUrl = response?.data?.professionalImage?.url !== undefined ? response?.data?.professionalImage?.url?.replace('localhost', LocalHostUrl) : response?.data?.professionalImage?.url;
+      const updatedImgUrl = response?.data?.professionalImage?.url;
       setProductImage(updatedImgUrl);
     } catch (error) {
       console.log("categories cart::::::::::", error);
@@ -157,7 +157,7 @@ const BookingDetailsScreen = ({ navigation, route }) => {
         <View style={styles.productContainer}>
           <FastImage source={{
             uri: productImage,
-            headers: { Authorization: `Bearer ${getUserAuth}` }
+            // headers: { Authorization: `Bearer ${getUserAuth}` }
           }} style={styles.productImage} />
           <View style={styles.productDetails}>
             <Text style={styles.productTitle}>{productDetails?.productName}</Text>

@@ -303,9 +303,9 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     const renderVendorList = async ({ item }) => {
-        const token = await getVendorAuthToken();
+        // const token = await getVendorAuthToken();
 
-        const convertedImageUrl = item?.productImage !== undefined ? item?.productImage.replace('localhost', LocalHostUrl) : item?.productImage;
+        const convertedImageUrl = item?.productImage;
         return (
             <TouchableOpacity
                 style={{ opacity: item?.available === true ? 1 : 0.5, backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10, }}
@@ -316,7 +316,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                         style={{ width: '95%', height: 200, borderRadius: 10 }}
                         source={{
                             uri: convertedImageUrl,
-                            headers: { Authorization: `Bearer ${token}` }
+                            // headers: { Authorization: `Bearer ${token}` }
                         }}
                     />
                     <Text style={styles.productName}>{capitalizeFirstLetters(item?.productName)}</Text>
@@ -349,7 +349,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     const renderFunctionHallItem = ({ item }) => {
-        const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+        const convertedImageUrl = item?.professionalImage?.url;
 
         return (
             <TouchableOpacity
@@ -358,7 +358,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <FastImage source={{
                         uri: convertedImageUrl,
-                        headers: { Authorization: `Bearer ${getVendorAuth}` }
+                        // headers: { Authorization: `Bearer ${getVendorAuth}` }
                     }} style={{ width: 60, height: 60 }}
                     />
                     <View style={{ margin: 10 }}>
@@ -383,7 +383,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     const renderFoodCateringItem = ({ item }) => {
-        const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+        const convertedImageUrl = item?.professionalImage?.url;
 
         return (
             <TouchableOpacity
@@ -392,7 +392,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <FastImage source={{
                         uri: convertedImageUrl,
-                        headers: { Authorization: `Bearer ${getVendorAuth}` }
+                        // headers: { Authorization: `Bearer ${getVendorAuth}` }
                     }} style={{ width: 60, height: 60 }}
                     />
                     <View style={{ margin: 10 }}>
@@ -424,7 +424,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     const renderItem = ({ item }) => {
-        const convertedImageUrl = item?.professionalImage?.url !== undefined ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url;
+        const convertedImageUrl = item?.professionalImage?.url;
 
         return (
             <TouchableOpacity
@@ -433,7 +433,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <FastImage source={{
                         uri: convertedImageUrl,
-                        headers: { Authorization: `Bearer ${getVendorAuth}` }
+                        // headers: { Authorization: `Bearer ${getVendorAuth}` }
                     }} style={{ width: 60, height: 60 }}
                     />
                     <View style={{ margin: 10 }}>

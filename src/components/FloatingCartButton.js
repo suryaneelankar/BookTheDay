@@ -27,7 +27,7 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
       advanceAmountToPay: item?.advanceAmountToPay,
       totalAmount: item?.totalAmount,
       vendorMobileNumber: item?.vendorMobileNumber,
-      image: item?.professionalImage?.url ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url
+      image: item?.professionalImage?.url
     })),
     ...(clothsData || []).map(item => ({
       name: item.productName || "Unnamed",
@@ -37,7 +37,7 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
       securityDepositAmount: item?.securityDepositAmount,
       totalAmount: item?.totalAmount,
       vendorMobileNumber: item?.vendorMobileNumber,
-      image: item?.professionalImage?.url ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url
+      image: item?.professionalImage?.url
     })),
     ...(hallsData || []).map(item => ({
       name: item.functionHallName || "Unnamed",
@@ -47,11 +47,19 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
       advanceAmountToPay: item?.advanceAmountToPay,
       totalAmount: item?.totalAmount,
       vendorMobileNumber: item?.vendorMobileNumber,
-      image: item?.professionalImage?.url ? item?.professionalImage?.url?.replace('localhost', LocalHostUrl) : item?.professionalImage?.url
+      image: item?.professionalImage?.url
     })),
   ];
 
+  const fetchRazorpayKey = async () => {
+    const res = await fetch(`${BASE_URL}/razorpay-key`);
+    const data = await res.json();
+    console.log('Razorpay key data is ::>>', data);
+    return data;
+  };
+
   const handlePayment = async (advanceAmount, bookingId, catType, vendorMobileNumber, productName, totalAmount) => {
+    const { key, defaultMethod } = await fetchRazorpayKey();
     const token = authToken;
     let initiatePaymentPayload = {
       orderAmount: advanceAmount,
@@ -94,7 +102,7 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
             description: 'Book the day Transaction',
             image: 'https://your-logo-url.com/logo.png',
             currency: data.currency,
-            key: 'rzp_live_7vg21QSx9265DF', // Your Razorpay Key ID
+            key: key, // Your Razorpay Key ID
             amount: data.amount, // Amount in smallest currency unit
             order_id: data.orderId, // Order ID returned from backend
             name: 'Book the day',
@@ -102,8 +110,8 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
               email: 'bookthedaytechnologies@gmail.com',
               contact: userLoggedInMobileNum,
               name: userLoggedInName,
-              //   method: 'upi',  // Pre-select UPI as the payment method
-              vpa: ''
+              method: defaultMethod,  // Pre-select UPI as the payment method
+              // vpa: ''
             },
             theme: { color: '#FFDB7E' }
           };
