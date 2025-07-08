@@ -144,7 +144,7 @@ const Events = () => {
                             >
                                 <FastImage source={{
                                     uri: itemData,
-                                    headers: { Authorization: `Bearer ${getUserAuth}` }
+                                    // headers: { Authorization: `Bearer ${getUserAuth}` }
                                 }} style={styles.image} />
                             </TouchableOpacity>
                         ))}

@@ -192,9 +192,7 @@ const RequestConfirmation = ({ navigation, route }) => {
 
         // Check if wholeBookingData is an array and has at least one item
         if (Array.isArray(wholeBookingData) && wholeBookingData.length > 0) {
-            const convertedImageUrl = wholeBookingData[0]?.productImage !== undefined
-                ? wholeBookingData[0]?.productImage.replace('localhost', LocalHostUrl)
-                : wholeBookingData[0]?.productImage;
+            const convertedImageUrl =  wholeBookingData[0]?.productImage;
             // console.log('convertedImageUrl is::>>', convertedImageUrl);
             return convertedImageUrl;
         } else {
@@ -530,7 +528,7 @@ const RequestConfirmation = ({ navigation, route }) => {
                     </Modal>
                     <FastImage source={{
                         uri: convertUrlToIp(),
-                        headers: { Authorization: `Bearer ${getVendorAuth}` }
+                        // headers: { Authorization: `Bearer ${getVendorAuth}` }
                     }} style={{ width: '90%', alignSelf: 'center', height: 200, borderRadius: 10 }}
                     />
                     <Text style={{ color: '#121212', width: '90%', alignSelf: 'center', fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 16, marginTop: 10 }}>Product Availability</Text>

@@ -18,7 +18,7 @@ const updatedImgUrl = imageUrl !== undefined ? imageUrl : null;
   return (
     <View style={[styles.container,{width:widthDyn, height:heightDyn, borderRadius:borderRadiusDyn}]}>
       {updatedImgUrl ? (
-        <FastImage source={{ uri: updatedImgUrl,headers: { Authorization: `Bearer ${token}` } }} style={[styles.image, { width: widthDyn, height: heightDyn, borderRadius: borderRadiusDyn }]} />
+        <FastImage source={{ uri: updatedImgUrl }} style={[styles.image, { width: widthDyn, height: heightDyn, borderRadius: borderRadiusDyn }]} />
       ) : (
         <Svg height="100" width="100">
           <Circle cx="50" cy="50" r="50" fill="orange" />

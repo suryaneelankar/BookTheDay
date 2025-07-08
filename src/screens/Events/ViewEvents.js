@@ -474,6 +474,7 @@ const ViewEvents = ({ route, navigation }) => {
             <Text style={styles.title}>Description:</Text>
             <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#8B8B8B", fontWeight: "400", marginTop: 4, marginBottom: 10 }}>{HallDescription}</Text>
             <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#FD813B", fontWeight: "400", marginTop: 4 }}>{eventsDetails?.description}</Text>
+            <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#FD813B", fontWeight: "400", marginTop: 4 }}>{eventsDetails?.functionHallAreaInSft? `* Hall Area: ${eventsDetails?.functionHallAreaInSft} Sqft` : ''}</Text>
           </View>
           {menuImages?.length > 0 && (
             CateringMenuSection()

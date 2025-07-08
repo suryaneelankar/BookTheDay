@@ -303,7 +303,7 @@ const ViewCaterings = ({ route, navigation }) => {
                                 style={[{ width: Dimensions.get('window').width, height: 300 }]}>
                                 <Image source={{
                                     uri: item,
-                                    headers: { Authorization: `Bearer ${getUserAuth}` }
+                                    // headers: { Authorization: `Bearer ${getUserAuth}` }
                                 }} style={styles.image}
                                     resizeMethod="auto"
                                     resizeMode="cover"

@@ -230,7 +230,7 @@ const AdminDashboard = () => {
                             >
                                 <FastImage source={{
                                     uri: itemData,
-                                    headers: { Authorization: `Bearer ${getVendorAuth}` }
+                                    // headers: { Authorization: `Bearer ${getVendorAuth}` }
                                 }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
@@ -289,7 +289,7 @@ const AdminDashboard = () => {
                             >
                                 <FastImage source={{
                                     uri: itemData,
-                                    headers: { Authorization: `Bearer ${getVendorAuth}` }
+                                    // headers: { Authorization: `Bearer ${getVendorAuth}` }
                                 }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
@@ -345,7 +345,7 @@ const AdminDashboard = () => {
                             >
                                 <FastImage source={{
                                     uri: itemData,
-                                    headers: { Authorization: `Bearer ${getVendorAuth}` }
+                                    // headers: { Authorization: `Bearer ${getVendorAuth}` }
                                 }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
@@ -403,8 +403,7 @@ const AdminDashboard = () => {
             {/* <Image source={{ uri: item?.aadharImage?.url?.replace('localhost', LocalHostUrl)  }} style={styles.aadharImage} /> */}
             <FastImage
              source={{
-             uri: item?.aadharImage?.url?.replace('localhost', LocalHostUrl),
-             headers: { Authorization: `Bearer ${getVendorAuth}` }
+             uri: item?.aadharImage?.url,
              }} style={styles.aadharImage} />
              </View>
 

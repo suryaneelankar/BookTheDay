@@ -130,7 +130,7 @@ const Categories = () => {
                     style={{ width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto' }}>
                     <FastImage source={{
                         uri: updatedImgUrl,
-                        headers: { Authorization: `Bearer ${getUserAuth}` }
+                        // headers: { Authorization: `Bearer ${getUserAuth}` }
                     }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '100%', height: Dimensions.get('window').height / 5 }}
                     />
                     {item?.discountPercentage ?
@@ -191,7 +191,7 @@ const Categories = () => {
                     // resizeMode="contain"
                     style={{ alignSelf: "center" , width:"100%", height:220, borderTopLeftRadius:10,borderTopRightRadius:10}} source={{
                         uri: updatedImgUrl,
-                        headers: { Authorization: `Bearer ${getUserAuth}` }
+                        // headers: { Authorization: `Bearer ${getUserAuth}` }
                     }} />
                     <Text numberOfLines={1} style={styles.productName}>{capitalizeFirstLetters(item?.productName)}</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, justifyContent: 'space-between', width: '90%', bottom: 5 }}>

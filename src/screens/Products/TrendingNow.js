@@ -54,9 +54,7 @@ const TrendingNow = ({ data, textHeader , token}) => {
                 <TouchableOpacity
                     onPress={() => navigation.navigate('ViewCatDetails', { catId: item?._id })}
                     style={{ width: Dimensions.get('window').width / 2.8, alignSelf: 'center', borderRadius: 8, backgroundColor: 'white', height: 'auto', marginLeft: 16 }}>
-                    <FastImage  source={{ uri: updatedImgUrl ,
-                        headers:{Authorization : `Bearer ${token}`}
-                    }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '90%', alignSelf: "center", marginTop: 5, height: Dimensions.get('window').height / 5 }}
+                    <FastImage  source={{ uri: updatedImgUrl }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '90%', alignSelf: "center", marginTop: 5, height: Dimensions.get('window').height / 5 }}
                     />
                     <View style={{ marginTop: 15, marginHorizontal: 6 }}>
                         <Text numberOfLines={2} style={{ fontWeight: '600', color: '#000000', fontSize: 12, fontFamily: 'ManropeRegular' }}>{item?.productName}</Text>

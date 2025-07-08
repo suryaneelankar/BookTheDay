@@ -149,7 +149,7 @@ console.log("selected iamge:::::", selectedImage, isAadharAvailable)
                             <FastImage
                                 source={{
                                     uri: isAadharAvailable,
-                                    headers: { Authorization: `Bearer ${getVendorAuth}` }
+                                    // headers: { Authorization: `Bearer ${getVendorAuth}` }
 
                         }} style={styles.image} /> :
                         <FastImage 

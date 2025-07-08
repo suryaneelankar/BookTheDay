@@ -47,7 +47,7 @@ const ZoomImage = ({ visible, onClose, images, initialIndex, tokenIs }) => {
                         <Image
                             source={{
                                 uri: images[currentIndex],
-                                headers: { Authorization: `Bearer ${tokenIs}` }
+                                // headers: { Authorization: `Bearer ${tokenIs}` }
                             }}
                             style={styles.image}
                             resizeMode="contain"

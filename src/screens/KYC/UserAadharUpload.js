@@ -128,7 +128,7 @@ const UserAadharUpload = () => {
                         // <></>
                         <FastImage 
                         source={{ uri: isAadharAvailable,
-                            headers:{Authorization : `Bearer ${getUserAuth}`}
+                            // headers:{Authorization : `Bearer ${getUserAuth}`}
 
                         }} style={styles.image} />
                          : 

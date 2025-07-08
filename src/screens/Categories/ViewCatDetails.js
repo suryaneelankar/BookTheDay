@@ -203,7 +203,7 @@ const ViewCatDetails = ({ route }) => {
                                     resizeMode="contain"
                                     source={{
                                         uri: item?.uri, // Make sure this points to the right data
-                                        headers: { Authorization: `Bearer ${getUserAuth}` }
+                                        // headers: { Authorization: `Bearer ${getUserAuth}` }
                                     }}
                                     style={[styles.image, {}]}
                                 />

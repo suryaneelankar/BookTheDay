@@ -93,7 +93,7 @@ const ViewTrendingDetails = ({ route }) => {
           renderItem={({ item }) => (
             <View style={[{ width: Dimensions.get('window').width, justifyContent: 'center', height: 400 }]}>
               <Image source={{ uri: item,
-                headers:{Authorization : `Bearer ${getUserAuth}`}
+                // headers:{Authorization : `Bearer ${getUserAuth}`}
                }} style={styles.image}
                 resizeMethod="auto"
                 resizeMode="contain"

@@ -299,7 +299,7 @@ const ViewMyBookings = () => {
             <View style={{ width: "35%", alignItems: "center" }}>
               <FastImage resizeMode='contain' source={{
                 uri: updatedImgUrl,
-                headers: { Authorization: `Bearer ${getUserAuth}` }
+                // headers: { Authorization: `Bearer ${getUserAuth}` }
               }} style={styles.cardImage} />
               <Text style={[styles.cardTitle, { marginTop: 5 }]}>{formatAmount(item?.totalAmount)}</Text>
             </View>

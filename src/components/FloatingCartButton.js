@@ -208,7 +208,7 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
             {/* Image & Info */}
             <FastImage source={{
               uri: item?.image,
-              headers: { Authorization: `Bearer ${authToken}` }
+              // headers: { Authorization: `Bearer ${authToken}` }
 
 
             }}

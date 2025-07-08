@@ -99,7 +99,7 @@ const CategoriesList = ({ route }) => {
                     style={{ elevation: 5, width: Dimensions.get('window').width / 2.3, margin: 5, borderRadius: 8, backgroundColor: 'white', height: 'auto', borderColor: "#d9d9d9", borderWidth: 1 }}>
                     <FastImage source={{
                         uri: updatedImgUrl,
-                        headers: { Authorization: `Bearer ${getUserAuth}` }
+                        // headers: { Authorization: `Bearer ${getUserAuth}` }
                     }} style={{ borderTopLeftRadius: 8, borderTopRightRadius: 8, width: '100%', height: Dimensions.get('window').height / 5 }}
                     />
                     {item?.discountPercentage ?
