@@ -82,8 +82,8 @@ android {
         applicationId "com.book_the_day"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 9
-        versionName "1.9"
+        versionCode 20
+        versionName "2.0"
     }
     signingConfigs {
         debug {
