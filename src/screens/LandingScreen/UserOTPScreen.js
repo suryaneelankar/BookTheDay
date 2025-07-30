@@ -1,0 +1,51 @@
+import React, { useEffect, useState } from 'react';
+import { OTPWidget } from '@msg91comm/sendotp-react-native';
+import { View, TextInput, TouchableOpacity, Text } from "react-native";
+import themevariable from '../../utils/themevariable';
+
+
+const widgetId = "346c70705566333632373330";
+const tokenAuth = "436669TfIot32ZJOj67605d73P1";
+
+const UserOTPScreen = () => {
+    useEffect(() => {
+        OTPWidget.initializeWidget(widgetId, tokenAuth); //Widget initialization
+    }, [])
+
+    const [number, setNumber] = useState('');
+
+    const handleSendOtp = async () => {
+        const data = {
+            identifier: '918919075651'
+        }
+        const response = await OTPWidget.sendOTP(data);
+        console.log("otp response********",response);  
+    }
+
+    return (
+        <View>
+            <TextInput
+                placeholder='Number'
+                placeholderTextColor={"#A3A3A3"}
+                value={number}
+                keyboardType='numeric'
+                style={{ backgroundColor: '#ededed', margin: 10, color: themevariable.Color_000000 }}
+                onChangeText={(text) => {
+                    setNumber(text)
+                }}
+            />
+            <TouchableOpacity
+                // style={styles.button}
+                onPress={()=>{
+                    handleSendOtp()
+                }}
+            >
+                <Text>
+                    Send OTP
+                </Text>
+            </TouchableOpacity>
+        </View>
+    );
+}
+    
+export default UserOTPScreen;

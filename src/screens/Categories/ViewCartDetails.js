@@ -1,0 +1,585 @@
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Alert } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import EditButton from '../../assets/svgs/categories/editButton.svg';
+import CalendarIcon from '../../assets/svgs/calendarOrangeIcon.svg';
+// import CartBanner from '../../assets/svgs/cartBanner.svg';
+import ExclamationIcon from '../../assets/svgs/exclamationmark.svg';
+import Modal from 'react-native-modal';
+import themevariable from '../../utils/themevariable';
+import LeftArrow from '../../assets/svgs/leftarrowWhite.svg';
+import BASE_URL, { LocalHostUrl } from '../../apiconfig';
+import axios from 'axios';
+import { formatAmount } from '../../utils/GlobalFunctions';
+import moment from 'moment';
+import { getUserAuthToken } from '../../utils/StoreAuthToken';
+import { useSelector } from 'react-redux';
+import FastImage from 'react-native-fast-image';
+import ThumsUpIcon from '../../assets/svgs/thumsupIcon.svg';
+import CheckMark from '../../assets/svgs/greenChecked.svg'
+import { useFocusEffect } from '@react-navigation/native';
+
+const BookingDetailsScreen = ({ navigation, route }) => {
+
+
+  const userLocationFetched = useSelector((state) => state.userLocation);
+  const userLoggedInName = useSelector((state) => state.userLoggedInName);
+  const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
+  const [productDetails, setProductDetails] = useState();
+  const [productImage, setProductImage] = useState();
+  const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
+  const [getUserAuth, setGetUserAuth] = useState('');
+  const [isAadharAvailable, setIsAadharAvailable] = useState();
+  const { catId, NumOfDays, isDayOrMonthly, startDate, endDate, monthlyPrice } = route.params;
+
+  useFocusEffect(
+    useCallback(() => {
+      getSelectedProductDetails();
+      getProfileData();
+      // Cleanup function to run when the screen loses focus
+      return () => {
+        console.log('Screen is unfocused');
+      };
+    }, [])
+  );
+
+  const getSelectedProductDetails = async () => {
+    console.log("IAM CALLING INSIDE CART")
+    const token = await getUserAuthToken();
+    setGetUserAuth(token);
+    try {
+      const response = await axios.get(`${BASE_URL}/getClothJewelsById/${catId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(" selected product::::::::::", JSON.stringify(response?.data));
+      setProductDetails(response?.data);
+      const updatedImgUrl = response?.data?.professionalImage?.url;
+      setProductImage(updatedImgUrl);
+    } catch (error) {
+      console.log("categories cart::::::::::", error);
+    }
+  };
+  console.log("endadate:", endDate)
+  const getProfileData = async () => {
+    const token = await getUserAuthToken();
+    try {
+      console.log("vendou num:", userLoggedInMobileNum)
+      const response = await axios.get(`${BASE_URL}/getAllUserLocations/${userLoggedInMobileNum}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setIsAadharAvailable(response?.data?.data?.aadharImage?.url ? true : false);
+    } catch (error) {
+      console.log("profile::::::::::", error);
+    }
+  }
+
+
+  const formatDateRange = (startDate, endDate) => {
+    const start = moment(startDate).format('DD MMM YYYY');
+    const end = moment(endDate).format('DD MMM YYYY');
+    return `${start} - ${end}`;
+  };
+
+  const calculateTotalPrice = () => {
+    // {isDayOrMonthly === 'daily' ? NumOfDays : 30}
+    if (isDayOrMonthly === 'daily') {
+      const days = NumOfDays;
+      const rentPricePerDay = productDetails?.rentPricePerDay;
+      return days * rentPricePerDay;
+    } else {
+      return monthlyPrice;
+    }
+  };
+
+  const ConfirmBooking = async () => {
+    const token = await getUserAuthToken();
+    if (!isAadharAvailable) {
+      Alert.alert("Please Upload Aadhar Image");
+      return;
+    }
+    const userDeliveryLocationSaved = userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address;
+
+    if(!userDeliveryLocationSaved) {
+      Alert.alert("Please enter a delivery location.");
+      return;
+  }
+  
+    const payload = {
+      productId: catId,
+      startDate: moment(startDate).format('DD MMMM YYYY'),
+      endDate: endDate ? moment(endDate).format('DD MMMM YYYY') : moment(startDate).format('DD MMMM YYYY'),
+      numOfDays: NumOfDays,
+      totalAmount: calculateTotalPrice(),
+      userMobileNumber: userLoggedInMobileNum,
+      userDeliveryLocation: userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address,
+      userFullName: userLoggedInName,
+      userDeliveryLocationLatitude: userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude,
+      userDeliveryLocationLongitude: userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
+    }
+    console.log("clothesjewels", payload);
+    try {
+      const bookingResponse = await axios.post(`${BASE_URL}/create-cloth-jewel-booking`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (bookingResponse?.status === 201) {
+        setThankYouCardVisible(true)
+      }
+    } catch (error) {
+      console.error("Error during cloth jewel booking:", error);
+    }
+  }
+
+  return (
+    <ScrollView style={styles.container}>
+      <View style={{ flexDirection: "row", alignItems: "center", }}>
+        <TouchableOpacity onPress={() => navigation.pop(2)}>
+          <LeftArrow style={{ marginTop: 3, marginHorizontal: 50 }} />
+        </TouchableOpacity>
+
+      </View>
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: "#202020" }]}>Shipping Address</Text>
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Text numberOfLines={3} style={styles.address}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address}</Text>
+          <TouchableOpacity onPress={() => { navigation.navigate('LocationAdded') }}>
+            <EditButton />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={[styles.imgsection]}>
+        <View style={styles.productContainer}>
+          <FastImage source={{
+            uri: productImage,
+            // headers: { Authorization: `Bearer ${getUserAuth}` }
+          }} style={styles.productImage} />
+          <View style={styles.productDetails}>
+            <Text style={styles.productTitle}>{productDetails?.productName}</Text>
+            {productDetails?.categoryType === 'clothes' ?
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+              <View style={[styles.colorCircle, { backgroundColor: productDetails?.color, borderRadius: 10 }]} />
+              <Text style={styles.productSubTitle}>Size: {productDetails?.size}</Text>
+            </View> : null}
+            <Text style={styles.productPrice}>{formatAmount(productDetails?.rentPricePerDay)}<Text style={styles.productPriceperDay}>/day</Text></Text>
+            <View style={styles.dateContainer}>
+              <CalendarIcon />
+              {/* <Icon name="calendar-outline" size={14} color="#FFB156" /> */}
+              <Text style={styles.dateText}>{formatDateRange(startDate, endDate ? endDate : startDate)}</Text>
+            </View>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.footerNoteView}>
+          <ExclamationIcon />
+          <Text style={styles.footerNote} >Security Deposit will be refunded once you returned the product.</Text>
+        </View>
+
+      <View style={styles.Pricesection}>
+        <Text style={[styles.sectionTitle, { color: "#202020" }]}>Price Details</Text>
+        <View style={styles.priceDetailRow}>
+          <Text style={styles.priceDetailLabel}>Rent / Day</Text>
+          <Text style={styles.priceDetailValue}>{formatAmount(productDetails?.rentPricePerDay)}</Text>
+        </View>
+        <View style={{ width: "100%", borderColor: "#D8D8D8", borderWidth: 0.5, marginBottom: 5 }} />
+        <View style={styles.priceDetailRow}>
+          <Text style={styles.priceDetailLabel}>No. rental days</Text>
+          <Text style={styles.priceDetailValue}>{isDayOrMonthly === 'daily' ? NumOfDays : 30} days</Text>
+        </View>
+        <View style={styles.priceDetailRow}>
+          <Text style={styles.priceDetailLabel}>Total rent to be paid</Text>
+          <Text style={styles.priceDetailValue}>{formatAmount(calculateTotalPrice())}</Text>
+        </View>
+        {/* <View style={styles.priceDetailRow}>
+          <Text style={styles.priceDetailLabel}>Delivery charges</Text>
+          <Text style={styles.priceDetailValue}>₹ 400</Text>
+        </View> */}
+        <View style={{ width: "100%", borderColor: "#D8D8D8", borderWidth: 0.5, marginBottom: 5 }} />
+        <View style={styles.priceDetailRow}>
+          <View style={{}}>
+            <Text style={styles.priceDetailLabel}>Grand Total</Text>
+            <Text style={styles.note}>*Inclusive of all taxes and GST</Text>
+          </View>
+          <Text style={styles.finalpriceDetailValue}>{formatAmount(calculateTotalPrice())}</Text>
+        </View>
+      </View>
+
+      <View style={styles.confrimSection}>
+        <Text style={styles.sectionTitle}>Confirm Your Booking</Text>
+        <View style={{ borderColor: "#FD813B", borderWidth: 1.5, marginTop: 10, marginHorizontal: 5 }} />
+
+        <View style={{ backgroundColor: "white", borderRadius: 10, elevation: 3, paddingHorizontal: 5 }}>
+          <View style={styles.priceDetailRow}>
+            <Text style={styles.priceDetailLabel}>Security deposit</Text>
+            <Text style={styles.priceDetailValue}>{formatAmount(productDetails?.securityDepositAmount)}</Text>
+          </View>
+          <View style={styles.priceDetailRow}>
+            <Text style={styles.priceDetailLabel}>
+              Aadhar Proof <Text style={{ color: "red", fontSize: 18 }}>*</Text>
+            </Text>
+            {isAadharAvailable ?
+              <CheckMark /> :
+              <TouchableOpacity onPress={() => { navigation.navigate('UserAadharUpload') }}>
+                <Text style={{ color: "#FD813B", fontSize: 14, fontWeight: "700", fontFamily: "ManropeRegular", }}>UPLOAD</Text>
+              </TouchableOpacity>
+            }
+          </View>
+          <View style={{ width: "90%", borderColor: "#D8D8D8", borderWidth: 0.5, marginVertical: 5, alignSelf: "center" }} />
+          <View style={styles.priceDetailRow}>
+            <Text style={styles.priceDetailLabel}>Total Deposit</Text>
+            <Text style={styles.priceDetailValue}>{formatAmount(productDetails?.securityDepositAmount)}</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* <CartBanner style={{ alignSelf: "center", marginTop: 20 }} /> */}
+
+
+      <View style={styles.footer}>
+        {/* <View style={styles.footerNoteView}>
+          <ExclamationIcon />
+          <Text style={styles.footerNote} >Security Deposit will be refunded once you returned the product.</Text>
+        </View> */}
+        <View style={styles.footerButtons}>
+          <TouchableOpacity onPress={() => ConfirmBooking()} style={[styles.button, { backgroundColor: "#D2453B" }]}>
+            <Text style={[styles.buttonText, { color: "white" }]}>Confirm Booking | {formatAmount(productDetails?.securityDepositAmount)}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <Modal
+        isVisible={thankyouCardVisible}
+        onBackdropPress={() => setThankYouCardVisible(false)}
+        backdropOpacity={0.9}
+        backdropColor={themevariable.Color_000000}
+        hideModalContentWhileAnimating={true}
+        animationOutTiming={500}
+        backdropTransitionInTiming={500}
+        backdropTransitionOutTiming={500}
+        animationInTiming={500}
+        style={{
+          flex: 1,
+          bottom: "10%"
+        }}
+        onBackButtonPress={() => {
+          setThankYouCardVisible(false)
+        }}
+        animationOut={'slideOutDown'}
+        animationType={'slideInUp'}
+      >
+        <View style={styles.Thankcontainer}>
+          <LinearGradient colors={['#D2453B', '#A0153E']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={{ width: "55%", }}>
+            {/* <View style={{borderWidth:4, width:"50%", }}/> */}
+          </LinearGradient>
+          <View style={{ height: 120 }}>
+            <ThumsUpIcon />
+          </View>
+          <Text style={styles.title}>Thank You!</Text>
+          <Text style={styles.subtitle}>Your Booking Has Been Initiated</Text>
+          <Text style={styles.description}>Our team is processing your request and will update you within the next 1 hour.</Text>
+          {/* <Text style={styles.description}>*Once your booking is approved, please complete the payment to confirm your reservation.</Text> */}
+          <LinearGradient colors={['#D2453B', '#A0153E']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.doneButton}>
+            <TouchableOpacity onPress={() => [setThankYouCardVisible(false),
+            navigation.navigate('Categories')
+            ]}>
+              <Text style={styles.doneButtonText}>Done</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+        </View>
+
+      </Modal>
+
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white"
+  },
+  section: {
+    backgroundColor: '#F9F9F9',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginBottom: 8,
+    borderRadius: 8,
+    marginHorizontal: 20,
+    marginTop: 10
+  },
+  confrimSection: {
+    marginHorizontal: 20,
+  },
+  Pricesection: {
+    marginBottom: 10,
+    marginHorizontal: 20,
+    marginTop: 15
+  },
+  imgsection: {
+    backgroundColor: 'white',
+    paddingHorizontal: 5,
+    paddingVertical: 5,
+    marginBottom: 8,
+    borderRadius: 8,
+    marginHorizontal: 20,
+    marginTop: 10,
+    elevation: 1.5
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: "#FD813B",
+    fontFamily: "ManropeRegular",
+  },
+  address: {
+    fontSize: 14,
+    fontWeight: "400",
+    color: '#000000',
+    fontFamily: "ManropeRegular",
+    width: "85%",
+  },
+  productContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  productImage: {
+    width: Dimensions.get('window').width / 4,
+    height: Dimensions.get('window').height / 6,
+    borderRadius: 8,
+    marginRight: 16,
+  },
+  productDetails: {
+    flex: 1,
+  },
+  productTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: "#100D25",
+    fontFamily: "ManropeRegular",
+  },
+  productSubTitle: {
+    fontSize: 14,
+    color: '#000000',
+    fontFamily: "ManropeRegular",
+    fontWeight: "500",
+    marginHorizontal: 10
+    // marginTop: 2,
+
+  },
+  productPrice: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#202020',
+    fontFamily: "ManropeRegular",
+    marginTop: 10,
+  },
+  productPriceperDay: {
+    fontSize: 18,
+    fontWeight: '400',
+    color: '#202020',
+    fontFamily: "ManropeRegular",
+  },
+  colorCircle: {
+    width: 20,
+    height: 20,
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  dateText: {
+    marginLeft: 10,
+    fontSize: 13,
+    color: '#FE8235',
+    fontWeight: "bold",
+    fontFamily: "ManropeRegular",
+
+  },
+  priceDetailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: 5,
+    marginVertical: 5
+  },
+  priceDetailLabel: {
+    fontSize: 15,
+    color: '#000000',
+    fontWeight: "400",
+    fontFamily: "ManropeRegular",
+  },
+  priceDetailValue: {
+    fontSize: 15,
+    color: '#000000',
+    fontWeight: "400",
+    fontFamily: "ManropeRegular",
+  },
+  finalpriceDetailValue: {
+    fontSize: 16,
+    color: '#1A1E25',
+    fontWeight: "800",
+    fontFamily: "ManropeRegular",
+  },
+  note: {
+    fontSize: 10,
+    color: '##ADADAD',
+    fontWeight: "400",
+    fontFamily: "ManropeRegular",
+  },
+  bannerImage: {
+    width: '100%',
+    height: 100,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  bannerText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  bannerSubText: {
+    fontSize: 12,
+    color: '#7E7E7E',
+  },
+  footer: {
+    backgroundColor: '#FFF',
+    marginTop: 8,
+    borderRadius: 8,
+  },
+  footerNoteView: {
+    backgroundColor: "#FFF",
+    width: "90%",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 25
+  },
+  footerNote: {
+    fontSize: 14,
+    color: 'red',
+    backgroundColor: "#FFF",
+    fontWeight: "700",
+    textAlign: "left",
+    marginLeft: 10
+  },
+  footerButtons: {
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    paddingVertical: 15,
+    alignSelf: "center",
+  },
+  button: {
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 8,
+    borderColor: "#D2453B",
+    borderWidth: 1,
+    width: "95%"
+
+  },
+  payLaterButton: {
+
+  },
+  confirmBookingButton: {
+    backgroundColor: '#D9534F',
+  },
+  buttonText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#D2453B',
+    fontFamily: "ManropeRegular",
+
+  },
+  Thankcontainer: {
+    marginTop: 30,
+    alignItems: 'center',
+    backgroundColor: 'white',
+    // paddingVertical: 50,
+    marginHorizontal: 20,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  iconContainer: {
+    margin: 20
+  },
+  iconBackground: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#FFD700',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  icon: {
+    width: 40,
+    height: 40,
+  },
+  badgeContainer: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  title: {
+    fontSize: 27,
+    fontWeight: '800',
+    marginBottom: 10,
+    color: "#333333",
+    fontFamily: "ManropeRegular",
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#FF730D',
+    fontWeight: "500",
+    fontFamily: "ManropeRegular",
+    marginBottom: 10,
+  },
+  description: {
+    fontSize: 14,
+    textAlign: 'center',
+    color: '#677294',
+    marginBottom: 20,
+    fontWeight: "500",
+    fontFamily: "ManropeRegular",
+    marginHorizontal: 20
+  },
+  doneButton: {
+    width: '100%',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  doneButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+});
+
+export default BookingDetailsScreen;

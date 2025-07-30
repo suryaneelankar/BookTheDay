@@ -1,0 +1,510 @@
+import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import axios from 'axios';
+import BASE_URL, { LocalHostUrl } from "../../apiconfig";
+import Icon from 'react-native-vector-icons/AntDesign';
+import IonIcon from 'react-native-vector-icons/Ionicons';
+import BookDatesButton from "../../components/GradientButton";
+import Modal from 'react-native-modal';
+import themevariable from "../../utils/themevariable";
+import LinearGradient from "react-native-linear-gradient";
+import { getUserAuthToken } from "../../utils/StoreAuthToken";
+import { useSelector } from "react-redux";
+import FastImage from "react-native-fast-image";
+import EditButton from '../../assets/svgs/categories/editButton.svg';
+import CalendarIcon from '../../assets/svgs/calendarOrangeIcon.svg';
+import { formatAmount } from "../../utils/GlobalFunctions";
+import ServiceTime from '../../assets/svgs/serviceTime.svg';
+import ThumsUpIcon from '../../assets/svgs/thumsupIcon.svg';
+
+const CateringsOverView = ({ route, navigation }) => {
+
+    const { categoryId, timeSlot, bookingDate, totalPrice, cateringItems } = route.params;
+    const [bookingDetails, setBookingDetails] = useState([]);
+    const [bookingDone, setBookingDone] = useState(false);
+    const [thankyouCardVisible, setThankYouCardVisible] = useState(false);
+    const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
+    const userLocationFetched = useSelector((state) => state.userLocation);
+    const userLoggedInName = useSelector((state) => state.userLoggedInName);
+
+    useEffect(() => {
+        getEventsDetails();
+    }, []);
+
+    const getEventsDetails = async () => {
+        const token = await getUserAuthToken();
+        try {
+            const response = await axios.get(`${BASE_URL}/getCateringDetailsById/${categoryId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log(" caterings over view ::::::::::", JSON.stringify(response?.data));
+            setBookingDetails(response?.data)
+        } catch (error) {
+            console.log("caterings error::::::::::", error);
+        }
+    };
+
+    const ConfirmBooking = async () => {
+        const token = await getUserAuthToken();
+        const transformedData = cateringItems.map(item => ({
+            subMenuId: item?._id,
+            numOfPlatesOrdered: item?.totalPrice / item?.perPlateCost,
+        }));
+        const payload = {
+            productId: categoryId,
+            startDate: bookingDate,
+            endDate: bookingDate,
+            numOfDays: 1,
+            totalAmount: totalPrice.replace(/[^\d]/g, ''),
+            bookingMenuIds: transformedData,
+            userMobileNumber: userLoggedInMobileNum,
+            bookingTime: timeSlot,
+            userDeliveryLocation: userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address,
+            advanceAmountToPay: bookingDetails?.advanceAmount,
+            userFullName: userLoggedInName,
+            userDeliveryLocationLatitude: userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude,
+            userDeliveryLocationLongitude: userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
+
+        }
+        console.log("payload is:::::::", payload);
+        try {
+            const bookingResponse = await axios.post(`${BASE_URL}/create-food-catering-booking`, payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log("booking res:::::::::", bookingResponse);
+            if (bookingResponse?.status === 201) {
+                setThankYouCardVisible(true);
+
+            }
+        } catch (error) {
+            console.error("Error during food catering booking:", error);
+        }
+    }
+
+    return (
+        <View style={{ flex: 1, backgroundColor: "white" }}>
+
+            <View style={styles.section}>
+                <Text style={[styles.sectionTitle, { color: "#202020" }]}>Shipping Address</Text>
+                <View style={{ flexDirection: "row" }}>
+                    <Text numberOfLines={2} style={styles.address}>{userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address}</Text>
+                    <TouchableOpacity onPress={() => { navigation.navigate('LocationAdded') }}>
+                        <EditButton />
+                    </TouchableOpacity>
+                </View>
+            </View>
+            <ScrollView style={{ marginBottom: "20%" }}>
+
+                {bookingDone ? (
+                <View style={styles.bookingContainer}>
+                    <View style={styles.bookingrow}>
+                        <Icon name="exclamationcircleo" size={18} color="grey" />
+                        <Text style={styles.bookingheading}>Confirmation Pending</Text>
+                    </View>
+                    <Text style={styles.bookingmessage}>
+                        We're waiting for {bookingDetails?.title} to confirm your booking request.
+                    </Text>
+                    <View style={styles.bookingrow}>
+                        <IonIcon name="time-sharp" size={18} color="green" />
+                        <Text style={styles.bookingtimeMessage}>
+                            We'll get back within an Hour with booking confirmation status.
+                        </Text>
+                    </View>
+                </View>
+                ) : null}
+
+                <View style={styles.imgsection}>
+                    <View style={styles.productContainer}>
+                        <FastImage source={{ uri: bookingDetails?.professionalImage?.url }}
+                            style={styles.productImage}
+                            resizeMethod="resize"
+                            resizeMode="cover"
+                        />
+                        <View style={styles.productDetails}>
+                            <Text style={styles.productTitle}>{bookingDetails?.foodCateringName}</Text>
+                            <Text style={styles.productPrice}><Text style={styles.productPriceperDay}>Advance Amount  </Text>{formatAmount(bookingDetails?.advanceAmount)}</Text>
+                            <View >
+                                <View style={styles.dateContainer}>
+                                    <CalendarIcon />
+                                    <Text style={styles.dateText}>{bookingDate}</Text>
+                                </View>
+                                <View style={styles.dateContainer}>
+                                    <ServiceTime />
+                                    <Text style={styles.dateText}>{timeSlot}</Text>
+                                </View>
+
+
+                            </View>
+                        </View>
+                    </View>
+
+                    <Text style={{ color: '#000000', fontSize: 16, fontWeight: "700", fontFamily: 'ManropeRegular', marginVertical: 15 }}>Package selected</Text>
+                    <FlatList
+                        data={cateringItems}
+                        keyExtractor={item => item?._id}
+                        renderItem={({ item, index }) => {
+                            const numOfPlates = item?.totalPrice / item?.perPlateCost;
+                            const itemPairs = [];
+                            for (let i = 0; i < item?.items?.length; i += 2) {
+                                itemPairs.push(item?.items?.slice(i, i + 2));
+                            }
+                            return (
+                                <View style={{ paddingHorizontal: 10, justifyContent: "space-between" }}>
+                                    <View style={{ flexDirection: "row", marginVertical: 5 }}>
+                                        <Text style={styles.comboText} >{item.title}</Text>
+                                        <Text style={styles.comboText} >{numOfPlates} Plates</Text>
+                                    </View>
+                                    <View>
+                                        {itemPairs.map((pair, index) => (
+                                            <View key={index} style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                                                {/* First Column Item */}
+                                                <Text style={{ flex: 1, color: "gray" }}>• {pair[0]}</Text>
+                                                {/* Second Column Item (if available) */}
+                                                {pair[1] && <Text style={{ flex: 1, color: "gray" }}>• {pair[1]}</Text>}
+                                            </View>
+                                        ))}
+                                    </View>
+                                    {index < itemPairs?.length - 1 && (
+                                        <View
+                                            style={{
+                                                borderBottomWidth: 1,
+                                                borderColor: 'lightgray',
+                                                borderStyle: 'dotted',
+                                            }}
+                                        />
+                                    )}
+                                </View>
+                            );
+                        }}
+                    />
+
+                    <Text style={{ marginTop: 20, color: 'black', fontSize: 18, fontWeight: "700", fontFamily: 'ManropeRegular', marginVertical: 15 }}>Price Details</Text>
+                    <FlatList
+                        data={cateringItems}
+                        keyExtractor={item => item?._id}
+                        renderItem={({ item }) => {
+                            const numOfPlates = item?.totalPrice / item?.perPlateCost;
+
+                            // Split the items array into pairs for two-column layout
+                            const itemPairs = [];
+                            for (let i = 0; i < item?.items?.length; i += 2) {
+                                itemPairs.push(item?.items?.slice(i, i + 2));
+                            }
+
+                            return (
+                                <View style={{ paddingHorizontal: 10, marginBottom: 10 }}>
+                                    {/* Title and Number of Plates */}
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                                        <Text style={styles.comboPriceText}>{item?.title}</Text>
+                                    </View>
+
+                                    {/* Combo Summary UI */}
+                                    <View style={{ paddingVertical: 5 }}>
+                                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
+                                            <Text style={styles.comboPriceMainText}>Per Plate Cost:</Text>
+                                            <Text style={styles.comboPriceSubText}>{formatAmount(item.perPlateCost)}</Text>
+                                        </View>
+                                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
+                                            <Text style={styles.comboPriceMainText}>Number of Plates:</Text>
+                                            <Text style={styles.comboPriceSubText}>{numOfPlates}</Text>
+                                        </View>
+                                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}>
+                                            <Text style={styles.comboPriceMainText}>Total Price:</Text>
+                                            <Text style={styles.comboPriceSubText}>{formatAmount(item.totalPrice)}</Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            );
+                        }}
+                    />
+
+                    <View>
+                        <View style={styles.row}>
+                            <Text style={[styles.text, styles.label]}>Total Amount</Text>
+                            <Text style={[styles.text, styles.value]}>{totalPrice?.toLocaleString('en-IN')}</Text>
+                        </View>
+                        <View style={styles.row}>
+                            <Text style={[styles.text, styles.label]}>Advance Amount</Text>
+                            <Text style={[styles.text, styles.value]}>
+                            {formatAmount(bookingDetails?.advanceAmount)}
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+            </ScrollView>
+            <Modal
+                isVisible={thankyouCardVisible}
+                onBackdropPress={() => setThankYouCardVisible(false)}
+                backdropOpacity={0.9}
+                backdropColor={themevariable.Color_000000}
+                hideModalContentWhileAnimating={true}
+                animationOutTiming={500}
+                backdropTransitionInTiming={500}
+                backdropTransitionOutTiming={500}
+                animationInTiming={500}
+                style={{
+                    flex: 1,
+                    // bottom: "10%"
+                }}
+                onBackButtonPress={() => {
+                    setThankYouCardVisible(false)
+                }}
+                animationOut={'slideOutDown'}
+                animationType={'slideInUp'}
+            >
+                <View style={styles.Thankcontainer}>
+                    <LinearGradient colors={['#D2453B', '#A0153E']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={{ width: "55%", padding: 4, }}>
+                    </LinearGradient>
+                    <View style={{ height: 120 }}>
+                        <ThumsUpIcon />
+                    </View>
+                    <Text style={styles.title}>Thank You!</Text>
+                    <Text style={styles.subtitle}>Your Booking Has Been Initiated.</Text>
+                    <Text style={styles.description}>Our team is processing your request and will update you within the next 1 hour.</Text>
+                    {/* <Text style={styles.description}>*Once your booking is approved, please complete the payment to confirm your reservation.</Text> */}
+                    <LinearGradient colors={['#D2453B', '#A0153E']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.doneButton}>
+                        <TouchableOpacity onPress={() => [setThankYouCardVisible(false), setBookingDone(true), navigation.navigate('Home')]}>
+                            <Text style={styles.doneButtonText}>Done</Text>
+                        </TouchableOpacity>
+                    </LinearGradient>
+                </View>
+
+            </Modal>
+
+            <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
+                {!bookingDone ?
+                    <BookDatesButton
+                        onPress={() => [ConfirmBooking()]}
+                        text={'Confirm Booking'}
+                        padding={10}
+                    /> : null}
+            </View>
+        </View>
+    )
+}
+
+export default CateringsOverView;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 16
+    },
+    item: {
+        backgroundColor: '#f9f9f9',
+
+    },
+    imgsection: {
+        backgroundColor: 'white',
+        paddingHorizontal: 5,
+        paddingVertical: 5,
+        borderRadius: 10,
+        marginHorizontal: 20,
+        marginTop: 10,
+        elevation: 15
+    },
+    sectionTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: "#FD813B",
+        fontFamily: "ManropeRegular",
+    },
+    address: {
+        fontSize: 14,
+        fontWeight: "400",
+        color: '#000000',
+        fontFamily: "ManropeRegular",
+        width: "80%"
+    },
+    section: {
+        backgroundColor: '#F9F9F9',
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        marginBottom: 8,
+        borderRadius: 8,
+        marginHorizontal: 20,
+        marginTop: 10
+    },
+    dateContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 8,
+    },
+    productContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    productImage: {
+        width: Dimensions.get('window').width / 4,
+        height: Dimensions.get('window').height / 6,
+        borderRadius: 8,
+        marginRight: 16,
+    },
+    productDetails: {
+        flex: 1,
+    },
+    productTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: "#100D25",
+        fontFamily: "ManropeRegular",
+    },
+    productPrice: {
+        fontSize: 14,
+        fontWeight: '800',
+        color: '#202020',
+        fontFamily: "ManropeRegular",
+    },
+    dateText: {
+        marginLeft: 10,
+        fontSize: 13,
+        color: '#FE8235',
+        fontWeight: "600",
+        fontFamily: "ManropeRegular",
+
+    },
+    productPriceperDay: {
+        fontSize: 12,
+        fontWeight: '400',
+        color: '#202020',
+        fontFamily: "ManropeRegular",
+
+    },
+    comboText: {
+        width: "80%", fontSize: 14,
+        fontWeight: '700',
+        color: "#FD813B",
+        fontFamily: "ManropeRegular",
+    },
+    comboPriceText: {
+        width: "80%",
+        fontSize: 14,
+        fontWeight: '700',
+        color: "#FD813B",
+        fontFamily: "ManropeRegular",
+    },
+    comboPriceMainText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: "#000000",
+        fontFamily: "ManropeRegular",
+    },
+    comboPriceSubText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: "#000000",
+        fontFamily: "ManropeRegular",
+    },
+    Thankcontainer: {
+        marginTop: 30,
+        alignItems: 'center',
+        backgroundColor: 'white',
+        // paddingVertical: 50,
+        marginHorizontal: 20,
+        paddingHorizontal: 15,
+        borderRadius: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 5,
+        elevation: 5,
+    },
+    icon: {
+        width: 40,
+        height: 40,
+    },
+    title: {
+        fontSize: 27,
+        fontWeight: '800',
+        marginBottom: 10,
+        color: "#333333",
+        fontFamily: "ManropeRegular",
+        marginTop: 20
+    },
+    subtitle: {
+        fontSize: 14,
+        color: '#FF730D',
+        fontWeight: "500",
+        fontFamily: "ManropeRegular",
+        marginBottom: 10,
+    },
+    description: {
+        fontSize: 14,
+        textAlign: 'center',
+        color: '#677294',
+        marginBottom: 20,
+        fontWeight: "500",
+        fontFamily: "ManropeRegular",
+        marginHorizontal: 20
+    },
+    doneButton: {
+        width: '100%',
+        padding: 15,
+        borderRadius: 10,
+        marginBottom: 10,
+    },
+    doneButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    row: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginVertical: 15,
+    },
+    text: {
+        color: "black",
+        fontSize: 18,
+        fontFamily: "ManropeRegular",
+    },
+    label: {
+        fontWeight: "500",
+    },
+    value: {
+        fontWeight: "700",
+    },
+    bookingContainer: {
+        backgroundColor: "#fdf5e6",
+        borderRadius: 15,
+        padding: 10,
+        marginTop: 20,
+        width: "90%",
+        alignSelf: "center",
+      },
+      bookingrow: {
+        flexDirection: "row",
+        alignItems: "center",
+      },
+      bookingheading: {
+        color: "black",
+        fontWeight: "bold",
+        fontSize: 16,
+        marginHorizontal: 10,
+      },
+      bookingmessage: {
+        color: "black",
+        fontWeight: "400",
+        fontSize: 13,
+        marginTop: 15,
+      },
+      bookingtimeMessage: {
+        color: "green",
+        fontWeight: "800",
+        fontSize: 13,
+        marginTop: 10,
+        marginHorizontal: 10,
+      },
+
+});
+

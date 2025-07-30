@@ -1,0 +1,592 @@
+import React, { useState, useEffect } from "react";
+import { View, Text, SafeAreaView, ScrollView, Alert, TouchableOpacity, Dimensions, StyleSheet, Animated } from "react-native";
+import { formatAmount } from "../../utils/GlobalFunctions";
+import PricingOptions from "../../components/PriceOptions";
+import BookDatesButton from "../../components/GradientButton";
+import { useNavigation } from "@react-navigation/native";
+import { horizontalScale, moderateScale, verticalScale, width } from "../../utils/scalingMetrics";
+import themevariable from "../../utils/themevariable";
+import Modal from 'react-native-modal';
+import { Calendar } from "react-native-calendars";
+import TruestedMarkOrange from '../../assets/svgs/trustedOrange.svg';
+import ProductInfoCard from "../../components/ProductInfoCard";
+import axios from "axios";
+import BASE_URL, { LocalHostUrl } from "../../apiconfig";
+import LeftArrow from '../../assets/svgs/leftarrowWhite.svg';
+import moment from "moment";
+import { getUserAuthToken } from "../../utils/StoreAuthToken";
+import FastImage from "react-native-fast-image";
+import SwiperFlatList from "react-native-swiper-flatlist";
+import { Image } from "react-native-svg";
+import ZoomImage from "../../components/ZoomImage";
+import ZoomIcon from 'react-native-vector-icons/MaterialIcons';
+
+const ViewCatDetails = ({ route }) => {
+
+    const [selectedOption, setSelectedOption] = useState('daily');
+    const [selectedPrice, setSelectedPrice] = useState(null);
+    const navigation = useNavigation();
+    const { catId, genderType } = route.params;
+    const [specifcadditionalImages, setSpecificAdditionImages] = useState([]);
+    const [specifcZoomImages, setSpecifcZoomImages] = useState([]);
+
+    const touchCoordinates = new Animated.Value(0);
+    const [jewelleryDetails, setJewelleryDetails] = useState()
+    const [isVisible, setIsVisible] = useState(false);
+    const [selectedRange, setSelectedRange] = useState({
+        startDate: '',
+        endDate: '',
+    });
+    const [numberOfDays, setNumberOfDays] = useState(0);
+    const [getUserAuth, setGetUserAuth] = useState('');
+    const [isCameraZoomImageModalVisible, setIsCameraZoomImageModalVisible] = useState(false);
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const womenSizes = [
+        { size: 'XS', bust: 32, waist: 26, hip: 34 },
+        { size: 'S', bust: 34, waist: 28, hip: 36 },
+        { size: 'M', bust: 36, waist: 30, hip: 38 },
+        { size: 'L', bust: 38, waist: 32, hip: 40 },
+        { size: 'XL', bust: 40, waist: 34, hip: 42 },
+        { size: 'XXL', bust: 42, waist: 36, hip: 44 },
+        { size: 'XXXL', bust: 44, waist: 38, hip: 46 },
+    ];
+
+    const menSizes = [
+        { size: 'XS', chest: '34-36', waist: '28-30' },
+        { size: 'S', chest: '36-38', waist: '30-32' },
+        { size: 'M', chest: '38-40', waist: '32-34' },
+        { size: 'L', chest: '40-42', waist: '34-36' },
+        { size: 'XL', chest: '42-44', waist: '36-38' },
+        { size: 'XXL', chest: '44-46', waist: '38-40' },
+        { size: 'XXXL', chest: '46-48', waist: '40-42' },
+    ];
+
+    const defaultDescription = 'Elevate your style without the commitment! Discover our curated collection of premium, designer, and trendy outfits for every occasion—whether its a wedding, party, corporate event, or casual outing. With our hassle-free rental process, you can enjoy high-quality garments at a fraction of the cost. Choose from an array of sizes and styles to suit your unique taste, all cleaned and prepped for a fresh, fabulous look. Renting your favorite pieces has never been easier or more sustainable!'
+
+
+    useEffect(() => {
+        getCategoriesDetails();
+    }, []);
+
+    const getCategoriesDetails = async () => {
+        const token = await getUserAuthToken();
+        setGetUserAuth(token);
+        try {
+            const response = await axios.get(`${BASE_URL}/getClothJewelsById/${catId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log("categories each ::::::::::", JSON.stringify(response?.data));
+            setJewelleryDetails(response?.data)
+
+            // const convertLocalhostUrls = (url) => {
+            //     return url?.replace("localhost", LocalHostUrl);
+            // };
+            const professionalImageUrl = response?.data?.professionalImage?.url;
+            const photos = [
+                { uri: professionalImageUrl }, // Add professional image as the first image
+                ...response?.data?.additionalImages.flat().map(image => ({
+                    uri: image?.url
+                }))
+            ];
+            setSpecificAdditionImages(photos);
+            const imageArray = photos.map(item => item.uri);
+            setSpecifcZoomImages(imageArray);
+
+        } catch (error) {
+            console.log("categories::::::::::", error);
+        }
+    }
+    console.log("photos is::::::", specifcadditionalImages)
+
+    const onDayPress = (day) => {
+        const { startDate, endDate } = selectedRange;
+
+        if (selectedOption === 'monthly') {
+            // Set start date and end date to 30 days after start date for monthly option
+            const endDate = moment(day.dateString).add(29, 'days').format('YYYY-MM-DD');
+            setSelectedRange({ startDate: day.dateString, endDate });
+            //   setNumberOfDays(31); // 30 days + 1 to include both start and end date
+        } else {
+            // If start date is not set or both dates are set, set the start date
+            if (!startDate || (startDate && endDate)) {
+                setSelectedRange({ startDate: day.dateString, endDate: '' });
+                setNumberOfDays(1); // Reset number of days when selecting a new start date
+            } else if (startDate && !endDate) {
+                // Ensure the end date is after the start date
+                if (moment(day.dateString).isAfter(moment(startDate))) {
+                    setSelectedRange({ startDate, endDate: day.dateString });
+                    const days = moment(day.dateString).diff(moment(startDate), 'days') + 1; // Include both start and end dates
+                    setNumberOfDays(days);
+                } else {
+                    Alert.alert('Invalid date selection', 'End date must be after start date.');
+                }
+            }
+        }
+    };
+
+    const getMarkedDates = () => {
+        const { startDate, endDate } = selectedRange;
+        if (!startDate) {
+            return {};
+        }
+
+        let markedDates = {
+            [startDate]: {
+                startingDay: true,
+                color: '#FFC107',
+                textColor: 'white',
+            },
+        };
+
+        if (endDate) {
+            markedDates[endDate] = {
+                endingDay: true,
+                color: '#FFC107',
+                textColor: 'white',
+            };
+
+            // Add dates between startDate and endDate
+            let currentDate = new Date(startDate);
+            while (currentDate < new Date(endDate)) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                const dateString = currentDate.toISOString().split('T')[0];
+                if (dateString !== endDate) {
+                    markedDates[dateString] = {
+                        color: '#FFE082',
+                        textColor: 'white',
+                    };
+                }
+            }
+        } else {
+            markedDates[startDate].endingDay = true;
+        }
+
+        return markedDates;
+    };
+
+    const handleSelect = (option, price) => {
+        console.log("SELECTED PRIVE TAG::::::", option, price)
+        setSelectedOption(option);
+        setSelectedPrice(price);
+    };
+
+    const handleBookDatesPress = () => {
+        setIsVisible(true)
+    };
+
+
+    return (
+        <SafeAreaView style={{ flex: 1 }}>
+            <ScrollView style={{ marginBottom: '15%' }}>
+                <View style={{ backgroundColor: "white", }}>
+
+                    <SwiperFlatList
+                        index={0}
+                        paginationDefaultColor="white"
+                        paginationActiveColor="#FF6347"
+                        showPagination={true}
+                        paginationStyle={{ bottom: Dimensions.get('window').height / 6 }}
+                        paginationStyleItem={{ alignSelf: 'center' }}
+                        paginationStyleItemInactive={{ width: 7, height: 7 }}
+                        paginationStyleItemActive={{ width: 10, height: 10 }}
+                        data={specifcadditionalImages} // Replace this with your actual data array
+                        style={{ flex: 1, alignSelf: "center" }}
+                        renderItem={({ item, index }) => (
+                            <TouchableOpacity
+                                onPress={() => [setCurrentIndex(index), setIsCameraZoomImageModalVisible(true)]}
+                                style={[{ width: Dimensions.get('window').width, height: 300 }]}>
+
+                                <FastImage
+                                    resizeMode="contain"
+                                    source={{
+                                        uri: item?.uri, // Make sure this points to the right data
+                                        // headers: { Authorization: `Bearer ${getUserAuth}` }
+                                    }}
+                                    style={[styles.image, {}]}
+                                />
+                                <View style={styles.zoomIconContainer}>
+                                    <ZoomIcon name="zoom-out-map" size={28} />
+                                </View>
+                            </TouchableOpacity>
+                        )}
+                    />
+
+                    <ZoomImage
+                        visible={isCameraZoomImageModalVisible}
+                        onClose={() => setIsCameraZoomImageModalVisible(false)}
+                        images={specifcZoomImages || []}
+                        initialIndex={currentIndex}
+                        tokenIs={getUserAuth}
+                    />
+
+
+                    <View style={{ marginHorizontal: 20, flexDirection: "row", alignItems: "center", justifyContent: "space-between", }}>
+                        <Text style={{ color: "#100D25", fontSize: 20, fontWeight: "700", fontFamily: "ManropeRegular", }}>{jewelleryDetails?.productName}</Text>
+                        <Text style={{ color: "#100D25", fontSize: 18, fontWeight: "700", fontFamily: "ManropeRegular", }}>{formatAmount(jewelleryDetails?.rentPricePerDay)}/day</Text>
+                    </View>
+
+                    <View style={{ marginBottom: 20, marginHorizontal: 20, flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                        {jewelleryDetails?.categoryType !== 'jewels' ?
+                            <Text style={{ color: "#9095A6", fontSize: 14, fontWeight: "500", fontFamily: "ManropeRegular", }}>Size : {jewelleryDetails?.size}</Text>
+                            : null}
+                        <View style={{ flexDirection: "row", backgroundColor: "#FFF8F0", paddingVertical: 5, paddingHorizontal: 10, borderRadius: 10 }}>
+                            <TruestedMarkOrange />
+                            <Text style={{ marginLeft: 5, color: "#FD813B", fontSize: 11, fontWeight: "800", fontFamily: "ManropeRegular", }}>Trusted Lender</Text>
+                        </View>
+
+                    </View>
+
+                    <View style={styles.priceDetailRow}>
+                        <Text style={styles.priceDetailLabel}>Security deposit</Text>
+                        <Text style={styles.priceDetailValue}>{formatAmount(jewelleryDetails?.securityDepositAmount)}</Text>
+                    </View>
+
+                </View>
+                <View style={{ borderRadius: 10, backgroundColor: "white", marginHorizontal: 15, marginTop: 15, paddingHorizontal: 20, paddingVertical: 20 }}>
+                    <Text style={{ color: "#121212", fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular", }}>Description</Text>
+                    <Text style={{ marginBottom: 20, marginTop: 5, color: "#393C47", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>{defaultDescription}</Text>
+                    <Text style={{ marginBottom: 20, marginTop: 5, color: "#393C47", fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular", }}>{jewelleryDetails?.description}</Text>
+                    {jewelleryDetails?.categoryType !== 'jewels' ?
+                        <ProductInfoCard color={jewelleryDetails?.color} size={jewelleryDetails?.size} />
+                        : null}
+                </View>
+
+                {jewelleryDetails?.categoryType !== 'jewels' ?
+
+                    <View style={{ width: '92%', alignSelf: 'center', marginTop: 20 }}>
+                        <View style={styles.headerRow}>
+                            <Text style={styles.headerText}>Size</Text>
+                            <Text style={styles.headerText}>{genderType == 'womens' ? 'Bust (inches)' : 'Chest (inches)'}</Text>
+                            <Text style={styles.headerText}>Waist (inches)</Text>
+                            {genderType == 'womens' && <Text style={styles.headerText}>Hip (inches)</Text>}
+                        </View>
+
+                        {/* Dynamically render the appropriate size chart */}
+                        {(genderType == 'mens' ? menSizes : womenSizes).map((item, index) => (
+                            <View key={index} style={styles.dataRow}>
+                                <Text style={styles.cellText}>{item.size}</Text>
+                                <Text style={styles.cellText}>{genderType == 'womens' ? item.bust : item.chest}</Text>
+                                <Text style={styles.cellText}>{item.waist}</Text>
+                                {genderType == 'womens' && <Text style={styles.cellText}>{item.hip}</Text>}
+                            </View>
+                        ))}
+                    </View> : null}
+                <View style={{ marginTop: 10, marginBottom: 20 }}>
+                    <PricingOptions
+                        onSelect={handleSelect}
+                        dailyPrice={jewelleryDetails?.rentPricePerDay}
+                        buttonText={'Per Day Chargers'}
+                        labelText={'Daily'}
+                    />
+                    <PricingOptions
+                        onSelect={handleSelect}
+                        dailyPrice={jewelleryDetails?.securityDepositAmount}
+                        buttonText={'Security Deposit'}
+                        labelText={'Deposit'}
+                    />
+                </View>
+            </ScrollView>
+
+            <View style={{ position: 'absolute', bottom: 0 }}>
+                <BookDatesButton onPress={handleBookDatesPress} text={'Book Dates'} padding={12} />
+            </View>
+
+
+            <Modal
+                isVisible={isVisible}
+                // onBackdropPress={() =>  navigation.goBack()}
+                backdropOpacity={0.9}
+                backdropColor={themevariable.Color_000000}
+                hideModalContentWhileAnimating={true}
+                animationOutTiming={500}
+                backdropTransitionInTiming={500}
+                backdropTransitionOutTiming={500}
+                animationInTiming={500}
+                style={{
+                    flex: 1,
+                    width: "100%",
+                    alignSelf: "center"
+                    // top: 20,
+                    // margin: 0,
+                }}
+                onBackButtonPress={() => {
+                    navigation.goBack()
+                }}
+                animationOut={'slideOutDown'}
+                animationType={'slideInUp'}
+            >
+                <View style={{ flex: 1, }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", }}>
+                        <TouchableOpacity onPress={() => setIsVisible(false)}>
+                            <LeftArrow style={{ marginTop: 3, marginHorizontal: 50 }} />
+                        </TouchableOpacity>
+                        <Text style={{ color: "#FFFFFF", fontSize: 20, fontWeight: "800", fontFamily: "ManropeRegular", }}>Select Date & Time</Text>
+
+                    </View>
+
+                    <Calendar
+                        onDayPress={onDayPress}
+                        headerStyle={{ backgroundColor: '#FDEEBC' }}
+                        markedDates={getMarkedDates()}
+                        markingType="period"
+                        minDate={moment().format('YYYY-MM-DD')} // Disable past dates
+                        theme={{
+                            arrowColor: 'black',
+                            todayTextColor: '#ED5065',
+                            selectedDayBackgroundColor: '#FFC107',
+                        }}
+                        style={{ marginTop: 20, marginHorizontal: 25, borderRadius: 10 }}
+                    />
+
+                    <Animated.View
+                        style={{
+                            flex: 1,
+                            top: touchCoordinates,
+                            bottom: 0,
+                        }}>
+                        <View
+                            onStartShouldSetResponder={() => true}
+                            onResponderMove={e => {
+                                touchCoordinates.setValue(e.nativeEvent.pageY - 30);
+                            }}
+                            onResponderRelease={e => {
+                                if (e.nativeEvent.pageY > 500) {
+                                    setIsVisible(false)
+                                }
+                                Animated.spring(touchCoordinates, {
+                                    toValue: 0,
+                                    delay: 50,
+                                    useNativeDriver: false,
+                                }).start();
+                            }}
+                        >
+                        </View>
+                        <View style={{
+                            flex: 1,
+                            // borderRadius: moderateScale(10),
+                            borderTopLeftRadius: moderateScale(10),
+                            borderTopRightRadius: moderateScale(10),
+                            backgroundColor: themevariable.Color_FFFFFF,
+                            paddingHorizontal: horizontalScale(20),
+                            paddingVertical: verticalScale(20),
+                            width: "100%",
+                            bottom: 0,
+                            position: 'absolute',
+                            // marginTop: 100,
+                            shadowColor: '#000000',
+                            shadowOffset: {
+                                width: 0,
+                                height: 2,
+                            },
+                            shadowOpacity: 0.17,
+                            shadowRadius: 2.54,
+                            alignSelf: 'center',
+                            alignItems: 'center',
+                            bottom: -20
+                            //  top: 0
+                        }}>
+
+                            <BookDatesButton onPress={() => {
+                                setIsVisible(false),
+                                    navigation.navigate("BookingDetailsScreen", { catId: catId, NumOfDays: numberOfDays, isDayOrMonthly: selectedOption, monthlyPrice: jewelleryDetails?.rentPricePerMonth, startDate: selectedRange?.startDate, endDate: selectedRange?.endDate })
+                            }}
+                                text={'Submit'} padding={10} />
+                        </View>
+
+
+                    </Animated.View>
+
+                </View>
+
+            </Modal>
+
+        </SafeAreaView >
+    )
+}
+
+export default ViewCatDetails;
+
+const styles = StyleSheet.create({
+    infoBoxContainer: {
+        flexDirection: "row",
+        width: "90%",
+        justifyContent: "space-between",
+        marginTop: 15
+    },
+    verticalLine: {
+        backgroundColor: "#E4E4E4",
+        height: "80%",
+        width: 1.5,
+        alignSelf: "center"
+    },
+    container: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        marginHorizontal: 15,
+        marginTop: 15,
+        marginBottom: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 10
+    },
+    dot: {
+        backgroundColor: '#DCD7FD',
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        margin: 3,
+    },
+    zoomIconContainer: {
+        position: "absolute",
+        top: 10,
+        right: 10,
+        backgroundColor: "rgba(0, 0, 0, 0.4)",
+        padding: 5,
+        borderRadius: 15,
+      },
+    activeDot: {
+        backgroundColor: '#FF6347',
+        width: 18,
+        height: 8,
+        borderRadius: 4,
+        margin: 3,
+    },
+    priceDetailValue: {
+        fontSize: 15,
+        color: '#000000',
+        fontWeight: "400",
+        fontFamily: "ManropeRegular",
+    },
+    priceDetailRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginHorizontal: 20,
+        marginBottom: 10
+    },
+    priceDetailLabel: {
+        fontSize: 15,
+        color: '#000000',
+        fontWeight: "400",
+        fontFamily: "ManropeRegular",
+    },
+    detailsContainer: {
+        flex: 1,
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#000',
+    },
+    size: {
+        fontSize: 14,
+        color: '#7E7E7E',
+    },
+    priceContainer: {
+        alignItems: 'flex-end',
+    },
+    price: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#000',
+    },
+    trustedLender: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFF4EB',
+        paddingVertical: 4,
+        paddingHorizontal: 8,
+        borderRadius: 4,
+        marginTop: 4,
+    },
+    trustedLenderText: {
+        marginLeft: 4,
+        fontSize: 12,
+        color: '#FC823D',
+    },
+    title: {
+        fontSize: 17,
+        fontWeight: '700',
+        marginBottom: 10,
+        color: '#121212',
+        fontFamily: "ManropeRegular",
+    },
+    wrapper: {
+        height: Dimensions.get('window').height / 3.1,
+    },
+    slide: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+    },
+    image: {
+        height: '100%',
+        borderRadius: 10,
+    },
+    paginationContainer: {
+        position: 'absolute',
+        bottom: 5,
+        right: 5,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+    },
+    counterText: {
+        color: '#fff',
+        fontSize: 14,
+    },
+    buttonContainer: {
+        borderRadius: 25,
+        overflow: 'hidden',
+        marginHorizontal: 20,
+        marginVertical: 10,
+    },
+    gradient: {
+        paddingVertical: 15,
+        paddingHorizontal: 30,
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    sizeContainer: {
+        padding: 10,
+        backgroundColor: '#f8f9fa',
+    },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        backgroundColor: '#FFF4CF',
+        borderColor: '#FFDA56',
+        borderWidth: 1,
+        padding: 10,
+        borderRadius: 5,
+    },
+    headerText: {
+        fontWeight: 'bold',
+        fontSize: 16,
+        flex: 1,
+        textAlign: 'center',
+        color: "#333333"
+    },
+    dataRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        backgroundColor: '#fff',
+        padding: 10,
+        marginTop: 5,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+    },
+    cellText: {
+        fontSize: 14,
+        flex: 1,
+        textAlign: 'center',
+        color: "#666666"
+    },
+})
