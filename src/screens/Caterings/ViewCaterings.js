@@ -537,7 +537,7 @@ const ViewCaterings = ({ route, navigation }) => {
                             setModalVisible(true);
                         }
                     }}
-                    text={itemsWithTotalPrice?.length > 0 ? `${formatAmount(eventsDetails?.advanceAmount)}   View Cart` : "View Cart"}
+                    text={"View Cart"}
                     padding={10}
                 />
             </View>

@@ -164,11 +164,9 @@ const VendorDashBoardTab = ({ navigation }) => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            // console.log('resp getVendorFunctionHallBookings ::>>', response?.data?.data);
-            // Filter bookings where isActiveBooking is true
-            const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
+            const activeBookings = response?.data?.data.filter((booking) => booking.bookingStatus !== "cancelled");
+            console.log('activeBookings is ::>>', activeBookings);
             const outputData = consolidateFunctionHallsDataByProductId(activeBookings);
-            // const outputData = consolidateFunctionHallsDataByProductId(response?.data?.data);
             setFunctionHallBookingsData(outputData);
 
         } catch (error) {
@@ -351,15 +349,17 @@ const VendorDashBoardTab = ({ navigation }) => {
     const renderFunctionHallItem = ({ item }) => {
         const convertedImageUrl = item?.professionalImage?.url;
 
+        console.log('item is::>>', item);
+
         return (
+  
             <TouchableOpacity
                 onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId, catEndPoint: allCatProductDetailEndpoints?.functionhalls })}
-                style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
+                style={{ flexDirection: 'row', padding: 8, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between',borderRadius: 8 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <FastImage source={{
                         uri: convertedImageUrl,
-                        // headers: { Authorization: `Bearer ${getVendorAuth}` }
-                    }} style={{ width: 60, height: 60 }}
+                    }} style={{ width: 70, height: 70,borderTopLeftRadius:6, borderBottomLeftRadius:6 }}
                     />
                     <View style={{ margin: 10 }}>
                         <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{item?.productName} </Text>

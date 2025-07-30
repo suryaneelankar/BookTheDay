@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions, Alert } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import BookDatesButton from '../../components/GradientButton';
@@ -24,33 +24,35 @@ const LoginScreen = ({ route }) => {
     const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
     const [isPasswordVisible, setPasswordVisible] = useState(false);
     const [fieldsCheckModalVisible, setFieldsCheckModalVisible] = useState(false);
+    const token = useSelector((state) => state.authToken);
+    const [userOrVendorAuthToken, setUserOrVendorAuthToken] = useState('');
 
     const togglePasswordVisibility = () => {
         setPasswordVisible(!isPasswordVisible);
     };
 
-    const storeUserDeviceToken = async () => {
-        const payload = {
-            mobileNumber: String(phoneNumber),
-            fcmToken: deviceFCMToken
-        }
-        console.log("payload is:::::::", payload, type);
-        const token = await getUserAuthToken();
-        console.log("LOgin screen sycan", token)
-        try {
-            const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            // console.log("userTokenRes  res:::::::::", userTokenRes);
-            if (userTokenRes?.status === 200) {
-
-            }
-        } catch (error) {
-            console.error("Error during add user token :", error);
-        }
-    }
+    // const storeUserDeviceToken = async () => {
+    //     const payload = {
+    //         mobileNumber: String(phoneNumber),
+    //         fcmToken: deviceFCMToken
+    //     }
+    //     console.log("payload is:::::::", payload, type);
+    //     const token = await getUserAuthToken();
+    //     console.log("LOgin screen scan", token);
+    //     try {
+    //         const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload, {
+    //             headers: {
+    //                 Authorization: `Bearer ${userOrVendorAuthToken}`,
+    //             },
+    //         });
+    //         console.log("userTokenRes  res:::::::::", userTokenRes);
+    //         if (userTokenRes?.status === 200) {
+    //             console.warn("successfully logged fcm token:", userTokenRes?.data?.message);
+    //         }
+    //     } catch (error) {
+    //         console.error("Error during add user token 1 :", error);
+    //     }
+    // }
 
     const storeVendorDeviceToken = async () => {
         const payload = {
@@ -92,7 +94,7 @@ const LoginScreen = ({ route }) => {
                     console.log('into vendor LOGG');
                     dispatch(getLoginUserId(true));
                     dispatch(getCurrentLoggedInVendorMobileNum(phoneNumber));
-                    storeVendorDeviceToken();
+                    // storeVendorDeviceToken();
                     storeVendorAuthToken(logineRes?.data?.token);
                     storeVendorMobileNumber(phoneNumber);
                     if (logineRes?.data?.token) {
@@ -100,7 +102,7 @@ const LoginScreen = ({ route }) => {
                     }
                 } else {
                     console.log('into USER LOGG');
-                    storeUserDeviceToken();
+                    // storeUserDeviceToken();
                     dispatch(getLoginUserId(false));
                     dispatch(getCurrentLoggedInUserMobileNum(phoneNumber));
                     storeUserAuthToken(logineRes?.data?.token);

@@ -72,6 +72,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       }
     } catch (error) {
       console.log("Error:", error.message);
+      getPermissions();
     }
   };
 

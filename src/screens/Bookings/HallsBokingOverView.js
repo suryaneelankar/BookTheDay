@@ -16,7 +16,7 @@ import { formatAmount } from "../../utils/GlobalFunctions";
 import ServiceTime from '../../assets/svgs/serviceTime.svg';
 import CalendarIcon from '../../assets/svgs/calendarOrangeIcon.svg';
 import MapMarkIcon from '../../assets/svgs/orangeMapMark.svg';
-import ThumsUpIcon from '../../assets/svgs/thumsupIcon.svg';
+import CheckIcon from '../../assets/svgs/CheckIcon.svg';
 
 const HallsBookingOverView = ({ route, navigation }) => {
 
@@ -166,12 +166,13 @@ const HallsBookingOverView = ({ route, navigation }) => {
                         end={{ x: 1, y: 0 }}
                         style={{ width: "55%", padding: 4, }}>
                     </LinearGradient>
-                    <View style={{ height: 120 }}>
-                        <ThumsUpIcon />
+                    <View style={{ height: 100,top: 25 }}>
+                        <CheckIcon />
                     </View>
-                    <Text style={styles.title}>Thank You!</Text>
-                    <Text style={styles.subtitle}>Your Booking Has Been Initiated</Text>
-                    <Text style={styles.description}>Our team is processing your request and will update you within an hour.</Text>
+                    {/* <Text style={styles.title}>Thank You!</Text> */}
+                    <Text style={styles.title}>Request Sent </Text>
+                    <Text style={styles.subtitle}>Your Booking Request Has Been Initiated</Text>
+                    <Text style={styles.description}>Our team is currently processing your request. You’ll receive an update within the hour.</Text>
                     {/* <Text style={styles.description}>*Once your booking is approved, please complete the payment to confirm your reservation.</Text> */}
                     <LinearGradient colors={['#D2453B', '#A0153E']}
                         start={{ x: 0, y: 0 }}

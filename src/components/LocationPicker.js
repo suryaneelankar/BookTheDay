@@ -72,7 +72,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       };
       setOnSelectLoc(true);
     } catch (error) {
-      console.log("Error:", error.message);
+      console.log("Error msg location:", error.message);
     }
   };
 

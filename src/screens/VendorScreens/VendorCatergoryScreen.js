@@ -33,6 +33,7 @@ const VendorCategoryScreen = ({ navigation }) => {
     const [totalBookings, setTotalBookings] = useState(0);
     const [completed, setCompleted] = useState(0);
     const [pending, setPending] = useState(0);
+    const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
 
 
     const dispatch = useDispatch();
@@ -59,7 +60,31 @@ const VendorCategoryScreen = ({ navigation }) => {
 
         setCompleted(completedCount?.length);
         setPending(pendingCount?.length);
+        storeVendorDeviceToken();
     }, [functionHallBookingsData, cateringsBookingsData, clothJewelBookingsData]);
+
+
+    const storeVendorDeviceToken = async () => {
+        const vendorMobileNumber = vendorLoggedInMobileNum;
+        const payload = {
+            mobileNumber: String(vendorMobileNumber),
+            fcmToken: deviceFCMToken
+        }
+        const token = await getVendorAuthToken();
+        try {
+            const vendorTokenRes = await axios.post(`${BASE_URL}/addVendorFCMToken`, payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`, 
+                },
+            });
+            console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
+            if (vendorTokenRes?.status === 200) {
+               console.warn("Vendor token added successfully:", vendorTokenRes?.data?.message);
+            }
+        } catch (error) {
+            console.error("Error during add vendor token:", error);
+        }
+    }
 
     const getVendorClothJewelBookings = async () => {
         const vendorMobileNumber = vendorLoggedInMobileNum;

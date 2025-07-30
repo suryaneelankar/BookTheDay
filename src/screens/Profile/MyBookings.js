@@ -1,20 +1,21 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, ScrollView, Dimensions, Alert, Linking } from 'react-native';
+import React, { useCallback, useRef, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, ScrollView, Dimensions, Alert, Linking, TextInput } from 'react-native';
 import BASE_URL, { LocalHostUrl } from '../../apiconfig';
 import axios from 'axios';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
 import FastImage from 'react-native-fast-image';
 import { formatAmount } from '../../utils/GlobalFunctions';
-import { colors } from 'react-native-swiper-flatlist/src/themes';
-import LinearGradient from 'react-native-linear-gradient';
 import RazorpayCheckout from 'react-native-razorpay';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import StepIndicator from 'react-native-step-indicator';
 import { useSelector } from 'react-redux';
 import PaymentConfirmationModal from '../../components/PaymentConfirmationModal';
 import LocationIcon from '../../assets/vendorIcons/locationIcon.svg';
-
-
+import PayNowButton from './PayNowButton';
+import ActionSheet from 'react-native-actions-sheet';
+import FloatingCloseButton from '../Events/floatingCloseButton';
+import moment from 'moment';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const ViewMyBookings = () => {
   const [myBookings, setMyBookings] = useState();
@@ -26,6 +27,22 @@ const ViewMyBookings = () => {
   const userLoggedInName = useSelector((state) => state.userLoggedInName);
   const [selectedObjectedforPayment, setSelectedObjectedforPayment] = useState();
   const [paymentModal, setPaymentModal] = useState(false);
+  const actionSheetRef = useRef(null);
+  const [selectedReason, setSelectedReason] = useState('');
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
+  const [otherReasonText, setOtherReasonText] = useState('');
+  const [isChecked, setIsChecked] = useState(false);
+
+  const cancellationReasons = [
+    'Change in event plans',
+    'Found a better venue',
+    'Price too high',
+    'Need to reschedule',
+    'Want to modify the package',
+    'Personal emergency',
+    'Booked by mistake',
+    'Other (Please specify...)',
+  ];
 
   const labels = ["Initiated", "Confirmed", "Payment Done"];
   const customStyles = {
@@ -110,6 +127,58 @@ const ViewMyBookings = () => {
       console.log("My Bookings data error>>::", error);
     }
   };
+
+  // cancel-function-hall-booking
+
+  const cancelFunctionHallBooking = async (bookingId) => {
+    const token = await getUserAuthToken();
+    const reasonToSend = selectedReason === "Other" ? otherReasonText : selectedReason;
+
+    const bookingParams = {
+      bookingId: bookingId,
+      cancelReason: reasonToSend,
+    };
+
+    console.log('bookingParams is ::>>', bookingParams);
+
+    try {
+      const cancelBookingResp = await axios.post(
+        `${BASE_URL}/cancel-function-hall-booking`,
+        bookingParams,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      console.log("cancelBookingResp RES:::::::::", JSON.stringify(cancelBookingResp?.data));
+      if (cancelBookingResp?.data?.status === 200) {
+        actionSheetRef.current?.hide();
+        Alert.alert(
+          "Success",
+          "Booking cancelled successfully!",
+          [
+            {
+              text: "Ok", onPress: () => {
+                setSelectedBookingId(null);
+                setSelectedReason('');
+                setOtherReasonText('');
+                getHallsBookings();
+                setIsChecked(false);
+              }
+            }
+          ],
+          { cancelable: false }
+        );
+      }
+    } catch (error) {
+      Alert.alert("Error", error?.response?.data?.message || "Something went wrong while cancelling the booking");
+      console.log("cancelBookingResp error>>::", error?.response?.data || error);
+    }
+  };
+
 
   const fetchRazorpayKey = async () => {
     const res = await fetch(`${BASE_URL}/razorpay-key`);
@@ -252,23 +321,6 @@ const ViewMyBookings = () => {
     };
   };
 
-  const payDetails = (catType, advanceAmountToPay, totalAmount, securityDepositAmount) => {
-    let currentPayableAmount = 0;
-
-    if (catType === "functionHalls") {
-      const serviceFeePercentage = totalAmount > 30000 ? 0.05 : 0.03; // 5% for > 30k, 3% for ≤ 30k
-      currentPayableAmount = advanceAmountToPay + (totalAmount * serviceFeePercentage);
-    } else if (catType === "caterings") {
-      const serviceFeePercentage = totalAmount > 10000 ? 0.05 : 0.03; // 5% for > 10k, 3% for ≤ 10k
-      currentPayableAmount = totalAmount * serviceFeePercentage;
-    } else if (catType === "clothJewels") {
-      const serviceFeePercentage = totalAmount > 10000 ? 0.05 : 0.03; // 5% for > 10k, 3% for ≤ 10k
-      currentPayableAmount = securityDepositAmount + (totalAmount * serviceFeePercentage);
-    }
-
-    return currentPayableAmount;
-  };
-
   const openMap = (lat, lon) => {
     const url = Platform.select({
       ios: `maps:0,0?q=${lat},${lon}`, // Apple Maps for iOS
@@ -277,20 +329,15 @@ const ViewMyBookings = () => {
     Linking.openURL(url);
   };
 
-  const openDialPad = (number) => {
-    if (Platform.OS === 'ios') {
-      number = `telprompt:${number}`;
-    }
-    else {
-      number = `tel:${number}`;
-    }
-    Linking.openURL(number);
-  }
-
-
-
   const renderItem = ({ item }) => {
     const updatedImgUrl = item?.professionalImage?.url;
+
+    const bookingDate = item?.startDate; // e.g., "24 April 2025"
+    const today = moment();
+    const parsedBookingDate = moment(bookingDate, 'DD MMMM YYYY');
+    const diffInDays = parsedBookingDate.diff(today, 'days');
+
+    const canCancel = diffInDays >= 7 && (item.bookingStatus !== 'cancelled') && (item.bookingStatus !== 'rejected');
 
     return (
       <View style={styles.card}>
@@ -299,7 +346,6 @@ const ViewMyBookings = () => {
             <View style={{ width: "35%", alignItems: "center" }}>
               <FastImage resizeMode='contain' source={{
                 uri: updatedImgUrl,
-                // headers: { Authorization: `Bearer ${getUserAuth}` }
               }} style={styles.cardImage} />
               <Text style={[styles.cardTitle, { marginTop: 5 }]}>{formatAmount(item?.totalAmount)}</Text>
             </View>
@@ -307,20 +353,30 @@ const ViewMyBookings = () => {
               <Text style={styles.cardTitle}>{item?.catType === 'caterings' ? item?.foodCateringName : item?.catType === 'functionHalls' ? item?.functionHallName : item?.productName} </Text>
               <Text style={styles.cardBalanceAmount}>{item?.catType === 'caterings' || item?.catType === 'functionHalls'
                 ? item?.advanceAmountPaid > 0
-                  ? 'Advance Paid:'
-                  : 'Advance Amount:'
+                  ? 'Advance Paid: '
+                  : 'Advance Amount: '
                 : item?.securityDepositAmountPaid > 0
-                  ? 'Security Paid:'
-                  : 'Security Deposit:'} {formatAmount(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount)}</Text>
-              {/* <Text style={styles.cardBalanceAmount}>{ (item?.catType === 'caterings' || item?.catType === 'functionHalls') ? 'Advance Amount:' : 'Security Deposit'} {formatAmount(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount)}</Text> */}
+                  ? 'Security Paid: '
+                  : 'Security Deposit: '}
+                <Text style={{ fontWeight: 'bold', color: '#2E7D32', fontFamily: 'ManropeBold' }}>
+                  <Text>{formatAmount(item?.advanceAmountToPay ? item?.advanceAmountToPay : item?.securityDepositAmount)}</Text>
+                </Text>
+              </Text>
 
-              {/* <Text style={styles.cardBalanceAmount}>Current Payable Amount: {payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)}</Text> */}
-              {/* <Text style={styles.cardBalanceAmount}>Balance Amount: {formatAmount(item?.advanceAmountToPay ? (item?.totalAmount - payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)) : (item?.totalAmount - payDetails(item?.catType, item?.advanceAmountToPay, item?.totalAmount, item?.securityDepositAmount)))}</Text> */}
-
-              <Text style={styles.cardBalanceAmount}>Balance Amount: {formatAmount(item?.advanceAmountToPay ? (item?.totalAmount - item?.advanceAmountToPay) : (item?.totalAmount - item?.securityDepositAmount))}</Text>
-
-              <Text style={styles.startDate}> Start Date: {item?.startDate}</Text>
-              <Text style={styles.startDate}> End Date: {item?.endDate}</Text>
+              <Text style={styles.cardBalanceAmount}>Balance Amount:
+                <Text>{' '}</Text>
+                <Text style={{ fontWeight: 'bold', color: '#C62828', fontFamily: 'ManropeBold' }}>
+                  {formatAmount(item?.advanceAmountToPay ? ` ${(item?.totalAmount - item?.advanceAmountToPay)}` : `  ${(item?.totalAmount - item?.securityDepositAmount)}`)}
+                </Text>
+              </Text>
+              {item?.catType === 'caterings' || item?.catType === 'functionHalls' ?
+                <Text style={styles.startDate}>Booking Date: <Text style={{ fontWeight: 'bold', color: '#2E7D32', fontFamily: 'ManropeBold' }}>{item?.startDate}</Text></Text> :
+                <>
+                  <Text style={styles.startDate}> Start Date: {item?.startDate}</Text>
+                  <Text style={styles.startDate}> End Date: {item?.endDate}</Text>
+                </>
+              }
+              <Text style={[styles.startDate, { marginTop: 5 }]}>Booking Id: {item?.bookingId}</Text>
 
               <Text style={styles.cardSubtitle}>{item.role}</Text>
             </View>
@@ -346,23 +402,44 @@ const ViewMyBookings = () => {
         />
 
         <View style={styles.cardFooter}>
-          <TouchableOpacity onPress={() => openDialPad('8297735285')}>
-            <Text style={[styles.cardStatus, { borderWidth: 1, borderColor: "gray", paddingHorizontal: 20, fontSize: 11, color: "#666666" }]}>
-              NEED HELP?
+          <TouchableOpacity style={{ backgroundColor: "#fff", }}
+            // onPress={() => cancelFunctionHallBooking(item?.bookingId)}
+            onPress={() => { setSelectedBookingId(item.bookingId); actionSheetRef.current?.show() }}
+            disabled={canCancel ? false : true} // Disable if not cancelable or not in requested/approved status
+            activeOpacity={canCancel ? 1 : 0.5} // Add this line to change opacity on press
+          >
+            <Text style={[styles.cardStatus, { borderWidth: 1, borderColor: canCancel ? "#A0153E" : "#999", paddingHorizontal: 20, fontSize: 11, color: canCancel ? "#A0153E" : "#999" }]}>
+              Cancel Booking
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            disabled={item.bookingStatus !== 'approved'}
-            onPress={() => { setPaymentModal(true), setSelectedObjectedforPayment(item) }}>
-            <LinearGradient colors={item.bookingStatus === 'approved' ? ['#FE7939', '#FE7939'] : ['#B0B0B0', '#B0B0B0']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.doneButton}>
+          <PayNowButton
+            onPress={() => {
+              console.log('selected item is::>>>',item);
+              const yourObjectWithDetails = {
+                totalAmount: item?.totalAmount,
+                advanceAmountToPay: item?.advanceAmountToPay,
+                securityDepositAmount: item?.securityDepositAmount,
+                vendorName: item?.vendorName ?? item?.functionHallName ?? item?.foodCateringName ?? item?.productName,
+                bookingId: item?.bookingId,
+                productName: item?.productName ?? item?.functionHallName ?? item?.foodCateringName,
+                startDate: item?.startDate,
+                endDate: item?.endDate,
+                catType: item?.catType,
+                vendorMobileNumber: item?.vendorMobileNumber,
+                foodCateringName: item?.foodCateringName ?? '',
+                functionHallName: item?.functionHallName ?? '',
 
-              <Text style={styles.doneButtonText}>Pay Now</Text>
-
-            </LinearGradient>
-          </TouchableOpacity>
+              };
+              navigation.navigate('BookingReview', {
+              selectedBooking: yourObjectWithDetails
+            })
+            // setSelectedObjectedforPayment(item);
+          }
+        }
+            text={'Pay Now'}
+            showIcon={false}
+          // disabled={item.bookingStatus !== 'approved'}
+          />
         </View>
       </View>
     )
@@ -383,8 +460,183 @@ const ViewMyBookings = () => {
     }
   };
 
+  // const TotalAmountToShow = () => {
+  //   const advance = selectedObjectedforPayment?.advanceAmountToPay;
+  //   const deposit = selectedObjectedforPayment?.securityDepositAmount;
+
+  //   const amountToShow =
+  //     advance !== null && advance !== undefined
+  //       ? advance > 10000
+  //         ? 10000
+  //         : advance
+  //       : deposit > 10000
+  //         ? 10000
+  //         : deposit;
+
+  //   return formatAmount(amountToShow);
+  // };
+
+
+
+  // const isCancelable = dayjs(item.bookingDate).diff(dayjs(), 'day') >= 7;
+
   return (
     <SafeAreaView style={styles.container}>
+      <ActionSheet
+        ref={actionSheetRef}
+        statusBarTranslucent
+        closeOnPressBack
+        defaultOverlayOpacity={0.5}
+        height={Dimensions.get("window").height - 20}
+        containerStyle={styles.actionSheetContainer}
+      >
+        <View>
+          <FloatingCloseButton onPress={() => actionSheetRef.current?.hide()} />
+        </View>
+        <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+
+          <View style={{ padding: 16 }}>
+            <Text style={[styles.cardStatus, { fontSize: 16, color: "#000000" }]}>
+              Choose the reason for cancellation
+            </Text>
+            {cancellationReasons.map((reason, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => setSelectedReason(reason)}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginVertical: 8,
+                }}
+              >
+                <View
+                  style={{
+                    height: 20,
+                    width: 20,
+                    borderRadius: 10,
+                    borderWidth: 2,
+                    borderColor: '#A0153E',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: 10,
+                  }}
+                >
+                  {selectedReason === reason && (
+                    <View
+                      style={{
+                        height: 10,
+                        width: 10,
+                        borderRadius: 5,
+                        backgroundColor: '#A0153E',
+                      }}
+                    />
+                  )}
+                </View>
+                <Text style={{ color: "#4D4D4D", fontSize: 16, fontWeight: "500", fontFamily: 'ManropeRegular' }}>{reason}</Text>
+              </TouchableOpacity>
+            ))}
+            {selectedReason === 'Other (Please specify...)' && (
+              <>
+                <Text style={{ color: "#666666", fontSize: 16, fontWeight: "500", fontFamily: 'ManropeRegular' }}>Please specify the reason</Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Please specify your reason"
+                  value={otherReasonText}
+                  onChangeText={setOtherReasonText}
+                />
+              </>
+            )}
+          </View>
+
+          <View style={{ flexDirection: 'row', width: "90%", alignSelf: "center" }}>
+            <TouchableOpacity onPress={() => setIsChecked(!isChecked)}>
+              <View style={{ flexDirection: "row" }}>
+                <View
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderWidth: 1,
+                    borderColor: 'black',
+                    backgroundColor: isChecked ? '#4CAF50' : '#fff',
+                    justifyContent: 'center',
+                    borderRadius: 5
+                  }}
+                >
+                  {isChecked && <Icon name="check" size={16} style={{ marginLeft: 3 }} color="white" />}
+                </View>
+                <Text style={{ color: "#4D4D4D", fontSize: 16, fontWeight: "500", fontFamily: 'ManropeRegular', marginLeft: 10 }}>
+                  I agree that the advance amount is <Text style={{ fontWeight: 'bold', fontFamily: 'ManropeBold' }}>non-refundable</Text> upon cancellation.
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#A0153E',
+              padding: 12,
+              borderRadius: 8,
+              marginTop: 20,
+              alignItems: 'center',
+              width: "80%",
+              alignSelf: "center",
+              opacity: selectedReason && selectedBookingId ? 1 : 0.5, // Disable button if no reason or booking ID is selected
+            }}
+            disabled={!selectedReason || !selectedBookingId}
+            onPress={() => {
+              if (selectedReason === "Other (Please specify...)" && !otherReasonText.trim()) {
+                Alert.alert(
+                  "Alert",
+                  "Please enter your custom reason!",
+                  [
+                    {
+                      text: "Ok", onPress: () => {
+                      }
+                    }
+                  ],
+                  { cancelable: false }
+                );
+                return;
+              }
+              if (isChecked === false) {
+                Alert.alert(
+                  "Alert",
+                  "Please agree the terms & conditions upon cancellation.",
+                  [
+                    {
+                      text: "Ok", onPress: () => {
+                      }
+                    }
+                  ],
+                  { cancelable: false }
+                );
+                return;
+              }
+              if (selectedReason) {
+                // Are you sure? This will cancel your booking and apply the refund policy mentioned
+                Alert.alert(
+                  "Alert",
+                  "Are you sure you want to cancel the booking? This will apply the refund policy mentioned.",
+                  [
+                    {
+                      text: "Cancel", onPress: () => { }
+                    },
+                    {
+                      text: "Yes", onPress: () => {
+                        cancelFunctionHallBooking(selectedBookingId);
+                      }
+                    }
+                  ],
+                  { cancelable: false }
+                );
+              }
+            }}
+          >
+
+            <Text style={{ color: '#fff', fontWeight: 'bold' }}>Confirm Cancellation</Text>
+          </TouchableOpacity>
+
+        </ScrollView>
+      </ActionSheet>
       {(myBookings?.length > 0 || cateringBookings?.length > 0 || hallsBookings?.length > 0) ?
         <ScrollView style={{ flex: 1 }}>
           {myBookings?.length > 0 ?
@@ -423,13 +675,92 @@ const ViewMyBookings = () => {
               />
             </> : null}
 
-          <PaymentConfirmationModal
+          {/* <PaymentConfirmationModal
             visible={paymentModal}
-            message={`Redirecting you to Pay Advance Amount: ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount)} \n \n \n Balance Payable Amount: ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? (selectedObjectedforPayment?.totalAmount - selectedObjectedforPayment?.advanceAmountToPay) : (selectedObjectedforPayment?.totalAmount - selectedObjectedforPayment?.securityDepositAmount))}`}
-            // message={`Redirecting you to Pay Advance Amount: ${formatAmount(payDetails(selectedObjectedforPayment?.catType, selectedObjectedforPayment?.advanceAmountToPay, selectedObjectedforPayment?.totalAmount, selectedObjectedforPayment?.securityDepositAmount))} \n \n \n Balance Payable Amount: ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? (selectedObjectedforPayment?.totalAmount - payDetails(selectedObjectedforPayment?.catType, selectedObjectedforPayment?.advanceAmountToPay, selectedObjectedforPayment?.totalAmount, selectedObjectedforPayment?.securityDepositAmount)) : (selectedObjectedforPayment?.totalAmount - payDetails(selectedObjectedforPayment?.catType, selectedObjectedforPayment?.advanceAmountToPay, selectedObjectedforPayment?.totalAmount, selectedObjectedforPayment?.securityDepositAmount)))}`}
+            // message={`Redirecting you to Pay Advance Amount: ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount)} \n \n \n Balance Payable Amount: ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? (selectedObjectedforPayment?.totalAmount - selectedObjectedforPayment?.advanceAmountToPay) : (selectedObjectedforPayment?.totalAmount - selectedObjectedforPayment?.securityDepositAmount))}`}
+            message={
+              // UPI transactions are limited to ₹50,000. You’ll pay ₹50,000 now via UPI.
+              // Please pay the remaining ₹{advanceAmount - 50000} directly to the vendor offline.
+              selectedObjectedforPayment?.advanceAmountToPay > 50000 || selectedObjectedforPayment?.securityDepositAmount > 50000 ?
+                <Text style={{ textAlign: 'center', fontSize: 16, color: '#333', fontFamily: 'ManropeRegular' }}>
+                  <Text>You’re being redirected to pay the partial advance amount to block the date:</Text>
+                  {'\n\n'}
+                  <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#2E7D32', fontFamily: 'ManropeBold' }}>
+                    {' '}
+                    {TotalAmountToShow()}
+                  </Text>
+                  <></>
+
+                  {'\n\n'}
+                  Remaining balance payable at the venue:
+                  {'\n\n'}
+                  <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#C62828', fontFamily: 'ManropeBold' }}>
+                    {' '}
+                    {formatAmount(
+                      selectedObjectedforPayment?.advanceAmountToPay
+                        ? selectedObjectedforPayment?.totalAmount -
+                        selectedObjectedforPayment?.advanceAmountToPay
+                        : selectedObjectedforPayment?.totalAmount -
+                        selectedObjectedforPayment?.securityDepositAmount
+                    )}
+                  </Text>
+
+                  {'\n\n'}
+                  Remaining balance payable at the venue:
+                  {'\n\n'}
+                  <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#C62828', fontFamily: 'ManropeBold' }}>
+                    {' '}
+                    {formatAmount(
+                      selectedObjectedforPayment?.advanceAmountToPay
+                        ? selectedObjectedforPayment?.totalAmount -
+                        selectedObjectedforPayment?.advanceAmountToPay
+                        : selectedObjectedforPayment?.totalAmount -
+                        selectedObjectedforPayment?.securityDepositAmount
+                    )}
+                  </Text>
+                  {'\n\n'}
+                  {/* Note: ₹10,000 is paid to block the date. The remaining advance must be paid offline to the vendor at least 7 days before the booking date to confirm the booking */}
+                  {/* <Text style={{ fontSize: 14, color: '#555', fontFamily: 'ManropeRegular' }}>
+                    Please ensure to pay the remaining amount offline to the vendor directly.
+                  </Text> */}
+                {/* </Text> 
+                :
+                <Text style={{ textAlign: 'center', fontSize: 16, color: '#333', fontFamily: 'ManropeRegular' }}>
+                  <Text>You’re being redirected to pay the advance amount:</Text>
+                  {'\n\n'}
+                  <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#2E7D32', fontFamily: 'ManropeBold' }}>
+                    {' '}
+                    {formatAmount(
+                      selectedObjectedforPayment?.advanceAmountToPay
+                        ? selectedObjectedforPayment?.advanceAmountToPay
+                        : selectedObjectedforPayment?.securityDepositAmount
+                    )}
+                  </Text>
+                  : <></>
+
+                  {'\n\n'}
+                  Remaining balance payable at the venue:
+                  {'\n\n'}
+                  <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#C62828', fontFamily: 'ManropeBold' }}>
+                    {' '}
+                    {formatAmount(
+                      selectedObjectedforPayment?.advanceAmountToPay
+                        ? selectedObjectedforPayment?.totalAmount -
+                        selectedObjectedforPayment?.advanceAmountToPay
+                        : selectedObjectedforPayment?.totalAmount -
+                        selectedObjectedforPayment?.securityDepositAmount
+                    )}
+                  </Text>
+                  {'\n\n'}
+                  <Text style={{ fontSize: 14, color: '#555', fontFamily: 'ManropeRegular' }}>
+                    Please ensure to pay the remaining amount offline to the vendor directly.
+                  </Text>
+                </Text>
+            }
+
             onSubmit={() => [setPaymentModal(false), handlePayment(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount, selectedObjectedforPayment?.bookingId, selectedObjectedforPayment?.catType, selectedObjectedforPayment?.vendorMobileNumber, selectedObjectedforPayment?.catType === 'caterings' ? selectedObjectedforPayment?.foodCateringName : selectedObjectedforPayment?.catType === 'functionHalls' ? selectedObjectedforPayment?.functionHallName : selectedObjectedforPayment?.productName, selectedObjectedforPayment?.totalAmount)]}
             onClose={() => setPaymentModal(false)}
-          />
+          /> */}
 
         </ScrollView>
         :
@@ -465,7 +796,20 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     fontFamily: 'ManropeRegular'
   },
-
+  actionSheetContainer: {
+    backgroundColor: 'white',
+    paddingBottom: 20,
+    height: Dimensions.get('window').height / 1.6,
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10
+  },
+  textInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 8,
+    marginTop: 10,
+    borderRadius: 6,
+  },
   cardContent: {
     marginTop: 10,
     marginBottom: 15
@@ -507,8 +851,8 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginHorizontal: 15,
     alignSelf: "center",
-    width: "65%",
-    justifyContent: "space-around",
+    width: "90%",
+    justifyContent: "space-between",
     paddingBottom: 15,
   },
   cardRating: {
@@ -520,8 +864,8 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "400",
     fontFamily: 'ManropeRegular',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingVertical: 8,
+    // paddingHorizontal: 10,
     alignSelf: "flex-start",
   },
   doneButton: {

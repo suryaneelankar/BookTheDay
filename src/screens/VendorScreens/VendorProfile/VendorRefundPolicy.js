@@ -14,15 +14,35 @@ const VendorRefundPolicy = ({ navigation }) => {
                 Refunds are subject to the specific cancellation and refund policies of each vendor listed on the Book The Day app. Book The Day acts as a platform to facilitate bookings, and while we strive to ensure a smooth experience, the final decision regarding refunds rests with the individual vendors. We recommend reviewing the vendor's refund and cancellation terms displayed at the time of booking.
             </Text>
 
+            
+
+
             <Text style={styles.subHeader}>2. Cancellation Refunds</Text>
             <Text style={styles.paragraph}>
-                <Text style={styles.bold}>Function Hall Bookings:</Text> Cancellations made 30 days or more before the event date may be eligible for a full or partial refund, depending on the vendor's policy. Cancellations made less than 30 days before the event may incur a cancellation fee, and refunds may be limited.
+                <Text style={styles.bold}>Function Hall Bookings:</Text> Advance Payment is Non-Refundable: Once the advance is paid to confirm your booking, it cannot be refunded under any circumstances.
             </Text>
+
+            <Text style={styles.paragraph}>
+                <Text style={styles.bold}>Cancellation Timeline:</Text> If you cancel the booking, even days/weeks in advance, the advance amount will not be returned.
+            </Text>
+
+            <Text style={styles.paragraph}>
+                <Text style={styles.bold}>Change of Date:</Text> In some cases, rescheduling may be possible based on vendor availability, but this is subject to approval and does not guarantee refund or credit if there is no availability for the new date.
+            </Text>
+
+            <Text style={styles.paragraph}>
+                <Text style={styles.bold}>Vendor Cancellation:</Text> If the vendor cancels for any reason, the full amount (including advance) will be refunded to the customer.
+            </Text>
+
+            <Text style={styles.paragraph}>
+                <Text style={styles.bold}>Disputes:</Text> All refund-related disputes are handled as per our Terms of Service.
+            </Text>
+
             <Text style={styles.paragraph}>
                 <Text style={styles.bold}>Catering Services:</Text> Cancellations made at least 14 days in advance may qualify for a full refund. Partial refunds may be issued if canceled within 14 days, subject to vendor terms. Cancellations within 7 days of the event may not be eligible for a refund due to advance preparation costs.
             </Text>
             <Text style={styles.paragraph}>
-                <Text style={styles.bold}>Clothing and Jewelry Rentals:</Text> Cancellations made within 7 days of the scheduled rental date may not be eligible for a refund. Any cancellations prior to this period may qualify for a full or partial refund, as determined by the vendor.
+                <Text style={styles.bold}>Clothing and Jewellery Rentals:</Text> Cancellations made within 7 days of the scheduled rental date may not be eligible for a refund. Any cancellations prior to this period may qualify for a full or partial refund, as determined by the vendor.
             </Text>
 
             <Text style={styles.subHeader}>3. No-Show Policy</Text>

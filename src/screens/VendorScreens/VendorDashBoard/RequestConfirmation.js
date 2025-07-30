@@ -21,7 +21,7 @@ import PhoneIcon from '../../../assets/vendorIcons/phoneIcon.svg';
 import AdvPayIcon from '../../../assets/vendorIcons/advPayIcon.svg';
 import FastImage from "react-native-fast-image";
 import { verticalScale } from "../../../utils/scalingMetrics";
-import ThumsUpIcon from '../../../assets/svgs/thumsupIcon.svg';
+import CheckIcon from '../../../assets/svgs/CheckIcon.svg';
 
 const RequestConfirmation = ({ navigation, route }) => {
     const { productId, catEndPoint } = route?.params;
@@ -510,9 +510,9 @@ const RequestConfirmation = ({ navigation, route }) => {
                                 style={{ width: "55%", padding: 4, }}>
                                 {/* <View style={{borderWidth:4, width:"50%", }}/> */}
                             </LinearGradient>
-                            <View style={{ height: 120 }}>
-                                <ThumsUpIcon />
-                            </View>
+                          <View style={{ height: 100, top: 25 }}>
+                                     <CheckIcon />
+                                   </View>
                             <Text style={styles.title}>Thank You!</Text>
                             <Text style={styles.description}>Our team will update the information to the customer and will get back in an Hour</Text>
                             <LinearGradient colors={['#D2453B', '#A0153E']}

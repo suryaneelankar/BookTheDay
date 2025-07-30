@@ -474,7 +474,7 @@ const ViewEvents = ({ route, navigation }) => {
             <Text style={styles.title}>Description:</Text>
             <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#8B8B8B", fontWeight: "400", marginTop: 4, marginBottom: 10 }}>{HallDescription}</Text>
             <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#FD813B", fontWeight: "400", marginTop: 4 }}>{eventsDetails?.description}</Text>
-            <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#FD813B", fontWeight: "400", marginTop: 4 }}>{eventsDetails?.functionHallAreaInSft? `* Hall Area: ${eventsDetails?.functionHallAreaInSft} Sqft` : ''}</Text>
+            <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#FD813B", fontWeight: "400", marginTop: 4 }}>{eventsDetails?.functionHallAreaInSft ? `* Hall Area: ${eventsDetails?.functionHallAreaInSft} Sqft` : ''}</Text>
           </View>
           {menuImages?.length > 0 && (
             CateringMenuSection()
@@ -669,18 +669,18 @@ const ViewEvents = ({ route, navigation }) => {
 
           onPress={() => {
             const selectedMenus = menuImages
-            .map(menu => {
-              const qty = parseInt(menuQuantities[menu.menuType] || '0', 10);
-              if (qty > 0) {
-                return {
-                  menuType: menu.menuType,
-                  price: menu.menuPrice,
-                  plateCount: qty
-                };
-              }
-              return null;
-            })
-            .filter(Boolean);
+              .map(menu => {
+                const qty = parseInt(menuQuantities[menu.menuType] || '0', 10);
+                if (qty > 0) {
+                  return {
+                    menuType: menu.menuType,
+                    price: menu.menuPrice,
+                    plateCount: qty
+                  };
+                }
+                return null;
+              })
+              .filter(Boolean);
             console.log("selectedMenus are::>>", selectedMenus);
             if (menuImages?.length > 0 && totalAdvacneAmountAfterPercentageCalculation == 0) {
               setModalMessage("Select number of plates you need to place the order");
@@ -697,14 +697,14 @@ const ViewEvents = ({ route, navigation }) => {
                 selectedMenus: selectedMenus,
               })
             } else if (!selectedDate) {
-              setModalMessage("Please select the Dates");
+              setModalMessage("Please select the Date");
               setModalVisible(true);
             } else if (!selectedTimeSlot) {
               setModalMessage("Please select the Time Slot");
               setModalVisible(true);
             }
           }}
-          text={menuImages?.length > 0 ? `${formatAmount(Number(totalAdvacneAmountAfterPercentageCalculation) || 0)} View Cart` : `${formatAmount(eventsDetails?.advanceAmount)} View Cart`}
+          text={'View Cart'}
           padding={10}
         />
       </View>

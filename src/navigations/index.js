@@ -50,6 +50,7 @@ import TermsAndConditionsScreen from "../screens/Profile/ProfileSubScreens/Terms
 import { getUserAuthToken, getUserMobileNumber, getVendorAuthToken, getVendorMobileNumber } from "../utils/StoreAuthToken";
 import { ActivityIndicator, View } from "react-native";
 import UserAndVendorRegister from "../screens/LandingScreen/UserAndVendorRegister";
+import BookingReview from "../screens/Profile/BookingReview";
 
 const MainNavigation = () => {
 
@@ -63,7 +64,7 @@ const MainNavigation = () => {
 
     useEffect(() => {
         getToken();
-    }, [checkIfAnyTokenStored,switchtab,loading]);
+    }, [checkIfAnyTokenStored, switchtab, loading]);
 
     const getToken = async () => {
         const fcmToken = await messaging().getToken();
@@ -76,27 +77,25 @@ const MainNavigation = () => {
         console.log("user token for auto login is ::>>>>", userToken);
         console.log("vendorToken token for auto login is ::>>>>", vendorToken);
         console.log("switch tab id:::::::::::", switchtab);
-        if(userToken || vendorToken){
+        if (userToken || vendorToken) {
             dispatch(checkIsTokenStored(true));
             setLoading(false);
 
-        }else{
+        } else {
             dispatch(checkIsTokenStored(false));
             setLoading(false);
-
         }
 
-        console.log("checkIfAnyTokenStored is ::>>>",checkIfAnyTokenStored);
-        if(vendorToken){
+        console.log("checkIfAnyTokenStored is ::>>>", checkIfAnyTokenStored);
+        if (vendorToken) {
             dispatch(getLoginUserId(true));
             dispatch(getCurrentLoggedInVendorMobileNum(vendorMobileNumber));
             return;
         }
-        if(userToken){
+        if (userToken) {
             dispatch(getLoginUserId(false));
             dispatch(getCurrentLoggedInUserMobileNum(userMobileNumber));
-
-            return; 
+            return;
         }
     }
 
@@ -116,7 +115,7 @@ const MainNavigation = () => {
 
     const AuthNavigator = () => (
         <AuthStack.Navigator
-        initialRouteName="LandingScreen"
+            initialRouteName="LandingScreen"
         >
             <Stack.Screen
                 name="LandingScreen"
@@ -134,7 +133,7 @@ const MainNavigation = () => {
                     headerShown: false,
                 }}
             />
-             <Stack.Screen
+            <Stack.Screen
                 name="UserAndVendorRegister"
                 component={UserAndVendorRegister}
                 options={{
@@ -155,7 +154,7 @@ const MainNavigation = () => {
 
     const HomeNavigator = () => (
         <HomeStack.Navigator
-        initialRouteName="Home"
+            initialRouteName="Home"
         >
             <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
             <Stack.Screen name="ViewTrendingDetails" component={ViewTrendingDetails} options={{ headerShown: true }} />
@@ -178,6 +177,15 @@ const MainNavigation = () => {
                 component={ViewMyBookings}
                 options={{
                     header: () => <NavigationHeader Icon={true} title="My Bookings" />,
+                    headerShown: true,
+                }}
+            />
+
+            <Stack.Screen
+                name="BookingReview"
+                component={BookingReview}
+                options={{
+                    header: () => <NavigationHeader Icon={true} title="Review Your Booking" />,
                     headerShown: true,
                 }}
             />

@@ -111,7 +111,7 @@ const NearByEvents = () => {
             professionalImageUrl,
             ...item?.additionalImages.flat().map(image => image?.url)
         ];
-        console.log("imageUrls ::", imageUrls);
+        // console.log("imageUrls ::", imageUrls);
         return (
             <View style={{ flex: 1, borderRadius: 20 }}>
                 <View style={[styles.container]}>

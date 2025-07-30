@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, KeyboardAvoidingView, CheckBox, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, KeyboardAvoidingView, Alert } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import BookDatesButton from '../../components/GradientButton';
 import { useNavigation } from '@react-navigation/native';
@@ -74,7 +74,7 @@ const UserAndVendorRegister = ({ route }) => {
 
             }
         } catch (error) {
-            console.error("Error during add user token :", error);
+            console.error("Error during add user token 3 :", error);
         }
     };
 

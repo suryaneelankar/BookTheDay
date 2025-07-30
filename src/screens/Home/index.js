@@ -30,13 +30,9 @@ import TrendingJewellery from '../../assets/svgs/trendingNow/home_trendingnow_je
 import TrendingNecklace from '../../assets/svgs/trendingNow/home_trendingnow_necklaces.svg';
 import TrendingTshirt from '../../assets/svgs/trendingNow/home_trendingnow_tshirt.svg';
 import CatCatering from '../../assets/svgs/categories/home_categories_catering_icon.svg';
-import CatChef from '../../assets/svgs/categories/home_categories_chef_icon.svg';
 import CatClothes from '../../assets/svgs/categories/home_categories_clothes_icon.svg';
-import CatDecoration from '../../assets/svgs/categories/home_categories_decoration_icon.svg';
-import CatDriver from '../../assets/svgs/categories/home_categories_driver_icon.svg';
 import CatHalls from '../../assets/svgs/categories/home_categories_hall_icon.svg';
 import CatJewellery from '../../assets/svgs/categories/home_categories_jewellery_icon.svg';
-import CatTentHouse from '../../assets/svgs/categories/home_categories_tent_icon.svg';
 import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.png';
 import ClothesCard from '../../assets/svgs/homeSwippers/home_shirtcard.png';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
@@ -48,7 +44,6 @@ import { promptForEnableLocationIfNeeded } from 'react-native-android-location-e
 import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
 import VegIcon from '../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
-import NotificationIcon from 'react-native-vector-icons/Ionicons';
 import DistanceIcon from '../../assets/svgs/distanceIcon.svg';
 import FloatingCartButton from "../../components/FloatingCartButton";
 
@@ -76,6 +71,9 @@ const HomeDashboard = () => {
     const [myBookings, setMyBookings] = useState();
     const [cateringBookings, setCateringBookings] = useState();
     const [hallsBookings, setHallsBookings] = useState();
+
+    const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
+    const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
 
     const bannerImages = [
         { id: '1', image: JewelleryCard },
@@ -122,11 +120,36 @@ const HomeDashboard = () => {
     );
 
     useEffect(() => {
+        storeUserDeviceToken();
         if (cateringBookings?.length > 0 || hallsBookings?.length > 0 || myBookings?.length > 0) {
             console.log("cateringBookings?.length", cateringBookings?.length, hallsBookings?.length, myBookings?.length)
             dispatch(showOrHideBottomCard(true));
         }
     }, [])
+
+    const storeUserDeviceToken = async () => {
+
+        const payload = {
+            mobileNumber: String(userLoggedInMobileNum),
+            fcmToken: deviceFCMToken
+        }
+        // console.log("payload is:::::::", payload, type);
+        const token = await getUserAuthToken();
+        console.log("LOgin screen scan", token);
+        try {
+            const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log("userTokenRes  res:::::::::", userTokenRes);
+            if (userTokenRes?.status === 200) {
+                console.warn("successfully logged fcm token:", userTokenRes?.data?.message);
+            }
+        } catch (error) {
+            console.error("Error during add user token 1 :", error);
+        }
+    }
 
 
     useFocusEffect(
@@ -151,7 +174,7 @@ const HomeDashboard = () => {
             });
 
             const newFunctionHalls = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            console.log("neareby loc events in HOMEEEEEEE:::::::;", newFunctionHalls);
+            // console.log("neareby loc events in HOMEEEEEEE:::::::;", newFunctionHalls);
             setNearByEventsData(newFunctionHalls);
         } catch (error) {
             console.error('Error fetching function halls:', error);
@@ -341,7 +364,7 @@ const HomeDashboard = () => {
                 dispatch(setUserCurrentLocation(data?.results[0]));
             }
         } catch (error) {
-            console.error("Error:", error);
+            console.error("Error: location 1", error);
         }
     };
 
@@ -694,10 +717,15 @@ const HomeDashboard = () => {
                     <TrendingNow data={discountProducts} textHeader={'Live Offers!'} token={getUserAuth} />
                     :
                     null}
+
                 {nearByEventsData?.length > 0 ?
                     <>
                         <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: horizontalScale(20) }}>
-                            <Text style={styles.onDemandTextStyle}>Function Halls Near You</Text>
+                            <Text style={styles.onDemandTextStyle}>Halls Near You</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('NearByEvents')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                                <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See Nearby</Text>
+                                <RightArrowIcon width={25} height={25} />
+                            </TouchableOpacity>
                         </View>
 
                         <FlatList
