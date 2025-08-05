@@ -15,7 +15,7 @@ const ThankYouCard = () => {
         </View>
       </View>
       <Text style={styles.title}>Thank You!</Text>
-      <Text style={styles.subtitle}>Your Booking Has Been Initiated</Text>
+      <Text style={styles.subtitle}>Your Booking Request Has Been Initiated</Text>
       <Text style={styles.description}>Our team is processing your request and will update you within an hour.</Text>
       <LinearGradient colors={['#FF6F61', '#D72E8A']} style={styles.doneButton}>
         <TouchableOpacity>

@@ -8,12 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* BookTheDayTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* BookTheDayTests.m */; };
+		0AFCFC108C659C49898CD613 /* libPods-BookTheDay.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 743D05A6BE0B188DA70843D2 /* libPods-BookTheDay.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		15628D72AEB3D2CC25EDF377 /* libPods-BookTheDay-BookTheDayTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 847E6E4EC58652C25DC5D70A /* libPods-BookTheDay-BookTheDayTests.a */; };
 		24E5385B93C8EC0B82FF2228 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 19D006B3A62B601BC9F34862 /* PrivacyInfo.xcprivacy */; };
-		3E9054831BC0325B6F91A989 /* libPods-BookTheDay.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0355716B8C43ABB66D4BF8D6 /* libPods-BookTheDay.a */; };
-		5C994B4DED157CFCA8A58E05 /* libPods-BookTheDay-BookTheDayTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1805C077766ABF55EFE9E1A0 /* libPods-BookTheDay-BookTheDayTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -31,7 +31,7 @@
 		00E356EE1AD99517003FC87E /* BookTheDayTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BookTheDayTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* BookTheDayTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BookTheDayTests.m; sourceTree = "<group>"; };
-		0355716B8C43ABB66D4BF8D6 /* libPods-BookTheDay.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BookTheDay.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0DDF8AE68FD39D2410D268CD /* Pods-BookTheDay-BookTheDayTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BookTheDay-BookTheDayTests.release.xcconfig"; path = "Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests.release.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* BookTheDay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BookTheDay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = BookTheDay/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = BookTheDay/AppDelegate.mm; sourceTree = "<group>"; };
@@ -39,33 +39,33 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = BookTheDay/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = BookTheDay/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = BookTheDay/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		1805C077766ABF55EFE9E1A0 /* libPods-BookTheDay-BookTheDayTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BookTheDay-BookTheDayTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		18AEFE742E3A7A1A0029290C /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AntDesign.ttf; sourceTree = "<group>"; };
-		18AEFE752E3A7A1A0029290C /* Entypo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Entypo.ttf; sourceTree = "<group>"; };
-		18AEFE762E3A7A1A0029290C /* EvilIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = EvilIcons.ttf; sourceTree = "<group>"; };
-		18AEFE772E3A7A1A0029290C /* Feather.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Feather.ttf; sourceTree = "<group>"; };
-		18AEFE782E3A7A1A0029290C /* FontAwesome.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome.ttf; sourceTree = "<group>"; };
-		18AEFE792E3A7A1A0029290C /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Brands.ttf; sourceTree = "<group>"; };
-		18AEFE7A2E3A7A1A0029290C /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Regular.ttf; sourceTree = "<group>"; };
-		18AEFE7B2E3A7A1A0029290C /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Solid.ttf; sourceTree = "<group>"; };
-		18AEFE7C2E3A7A1A0029290C /* FontAwesome6_Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome6_Brands.ttf; sourceTree = "<group>"; };
-		18AEFE7D2E3A7A1A0029290C /* FontAwesome6_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome6_Regular.ttf; sourceTree = "<group>"; };
-		18AEFE7E2E3A7A1A0029290C /* FontAwesome6_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome6_Solid.ttf; sourceTree = "<group>"; };
-		18AEFE7F2E3A7A1A0029290C /* Fontisto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fontisto.ttf; sourceTree = "<group>"; };
-		18AEFE802E3A7A1A0029290C /* Foundation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Foundation.ttf; sourceTree = "<group>"; };
-		18AEFE812E3A7A1A0029290C /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Ionicons.ttf; sourceTree = "<group>"; };
-		18AEFE822E3A7A1A0029290C /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialCommunityIcons.ttf; sourceTree = "<group>"; };
-		18AEFE832E3A7A1A0029290C /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialIcons.ttf; sourceTree = "<group>"; };
-		18AEFE842E3A7A1A0029290C /* Octicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Octicons.ttf; sourceTree = "<group>"; };
-		18AEFE852E3A7A1A0029290C /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleLineIcons.ttf; sourceTree = "<group>"; };
-		18AEFE862E3A7A1A0029290C /* Zocial.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Zocial.ttf; sourceTree = "<group>"; };
+		18EDB0A32E3B552D00E0A4F1 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
+		18EDB0A42E3B552D00E0A4F1 /* Feather.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
+		18EDB0A52E3B552D00E0A4F1 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
+		18EDB0A62E3B552D00E0A4F1 /* Foundation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Foundation.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Foundation.ttf"; sourceTree = "<group>"; };
+		18EDB0A72E3B552D00E0A4F1 /* FontAwesome6_Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome6_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Brands.ttf"; sourceTree = "<group>"; };
+		18EDB0A82E3B552D00E0A4F1 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome5_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
+		18EDB0A92E3B552D00E0A4F1 /* EvilIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
+		18EDB0AA2E3B552D00E0A4F1 /* FontAwesome.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
+		18EDB0AB2E3B552D00E0A4F1 /* FontAwesome6_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome6_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Solid.ttf"; sourceTree = "<group>"; };
+		18EDB0AC2E3B552E00E0A4F1 /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
+		18EDB0AD2E3B552E00E0A4F1 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
+		18EDB0AE2E3B552E00E0A4F1 /* Entypo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
+		18EDB0AF2E3B552E00E0A4F1 /* FontAwesome6_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome6_Regular.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome6_Regular.ttf"; sourceTree = "<group>"; };
+		18EDB0B02E3B552E00E0A4F1 /* Zocial.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
+		18EDB0B12E3B552E00E0A4F1 /* Fontisto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Fontisto.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf"; sourceTree = "<group>"; };
+		18EDB0B22E3B552E00E0A4F1 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
+		18EDB0B32E3B552E00E0A4F1 /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
+		18EDB0B42E3B552E00E0A4F1 /* Octicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
+		18EDB0B52E3B552F00E0A4F1 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		19D006B3A62B601BC9F34862 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = BookTheDay/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		3B4990A8FE5FBF3D8CAC30D6 /* Pods-BookTheDay-BookTheDayTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BookTheDay-BookTheDayTests.release.xcconfig"; path = "Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests.release.xcconfig"; sourceTree = "<group>"; };
-		558AFCC3C36DC56E6538F6E0 /* Pods-BookTheDay.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BookTheDay.release.xcconfig"; path = "Target Support Files/Pods-BookTheDay/Pods-BookTheDay.release.xcconfig"; sourceTree = "<group>"; };
+		1AF3F60B804792C2F5BFD254 /* Pods-BookTheDay-BookTheDayTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BookTheDay-BookTheDayTests.debug.xcconfig"; path = "Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests.debug.xcconfig"; sourceTree = "<group>"; };
+		3DAAC8AA3E1EF6719FFF0299 /* Pods-BookTheDay.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BookTheDay.release.xcconfig"; path = "Target Support Files/Pods-BookTheDay/Pods-BookTheDay.release.xcconfig"; sourceTree = "<group>"; };
+		743D05A6BE0B188DA70843D2 /* libPods-BookTheDay.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BookTheDay.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = BookTheDay/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		DC075BB3B1DA66B1D553FE16 /* Pods-BookTheDay.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BookTheDay.debug.xcconfig"; path = "Target Support Files/Pods-BookTheDay/Pods-BookTheDay.debug.xcconfig"; sourceTree = "<group>"; };
+		847E6E4EC58652C25DC5D70A /* libPods-BookTheDay-BookTheDayTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BookTheDay-BookTheDayTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		99E6F0DA8EA543AD9F60449C /* Pods-BookTheDay.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BookTheDay.debug.xcconfig"; path = "Target Support Files/Pods-BookTheDay/Pods-BookTheDay.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		F7FD6DB4C93B18722B1D7837 /* Pods-BookTheDay-BookTheDayTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BookTheDay-BookTheDayTests.debug.xcconfig"; path = "Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,7 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5C994B4DED157CFCA8A58E05 /* libPods-BookTheDay-BookTheDayTests.a in Frameworks */,
+				15628D72AEB3D2CC25EDF377 /* libPods-BookTheDay-BookTheDayTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,7 +81,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3E9054831BC0325B6F91A989 /* libPods-BookTheDay.a in Frameworks */,
+				0AFCFC108C659C49898CD613 /* libPods-BookTheDay.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,25 +116,6 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 				19D006B3A62B601BC9F34862 /* PrivacyInfo.xcprivacy */,
-				18AEFE742E3A7A1A0029290C /* AntDesign.ttf */,
-				18AEFE752E3A7A1A0029290C /* Entypo.ttf */,
-				18AEFE762E3A7A1A0029290C /* EvilIcons.ttf */,
-				18AEFE772E3A7A1A0029290C /* Feather.ttf */,
-				18AEFE782E3A7A1A0029290C /* FontAwesome.ttf */,
-				18AEFE792E3A7A1A0029290C /* FontAwesome5_Brands.ttf */,
-				18AEFE7A2E3A7A1A0029290C /* FontAwesome5_Regular.ttf */,
-				18AEFE7B2E3A7A1A0029290C /* FontAwesome5_Solid.ttf */,
-				18AEFE7C2E3A7A1A0029290C /* FontAwesome6_Brands.ttf */,
-				18AEFE7D2E3A7A1A0029290C /* FontAwesome6_Regular.ttf */,
-				18AEFE7E2E3A7A1A0029290C /* FontAwesome6_Solid.ttf */,
-				18AEFE7F2E3A7A1A0029290C /* Fontisto.ttf */,
-				18AEFE802E3A7A1A0029290C /* Foundation.ttf */,
-				18AEFE812E3A7A1A0029290C /* Ionicons.ttf */,
-				18AEFE822E3A7A1A0029290C /* MaterialCommunityIcons.ttf */,
-				18AEFE832E3A7A1A0029290C /* MaterialIcons.ttf */,
-				18AEFE842E3A7A1A0029290C /* Octicons.ttf */,
-				18AEFE852E3A7A1A0029290C /* SimpleLineIcons.ttf */,
-				18AEFE862E3A7A1A0029290C /* Zocial.ttf */,
 			);
 			name = BookTheDay;
 			sourceTree = "<group>";
@@ -143,8 +124,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				0355716B8C43ABB66D4BF8D6 /* libPods-BookTheDay.a */,
-				1805C077766ABF55EFE9E1A0 /* libPods-BookTheDay-BookTheDayTests.a */,
+				743D05A6BE0B188DA70843D2 /* libPods-BookTheDay.a */,
+				847E6E4EC58652C25DC5D70A /* libPods-BookTheDay-BookTheDayTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -159,12 +140,32 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				18EDB0AC2E3B552E00E0A4F1 /* AntDesign.ttf */,
+				18EDB0AE2E3B552E00E0A4F1 /* Entypo.ttf */,
+				18EDB0A92E3B552D00E0A4F1 /* EvilIcons.ttf */,
+				18EDB0A42E3B552D00E0A4F1 /* Feather.ttf */,
+				18EDB0AA2E3B552D00E0A4F1 /* FontAwesome.ttf */,
+				18EDB0B22E3B552E00E0A4F1 /* FontAwesome5_Brands.ttf */,
+				18EDB0A82E3B552D00E0A4F1 /* FontAwesome5_Regular.ttf */,
+				18EDB0A32E3B552D00E0A4F1 /* FontAwesome5_Solid.ttf */,
+				18EDB0A72E3B552D00E0A4F1 /* FontAwesome6_Brands.ttf */,
+				18EDB0AF2E3B552E00E0A4F1 /* FontAwesome6_Regular.ttf */,
+				18EDB0AB2E3B552D00E0A4F1 /* FontAwesome6_Solid.ttf */,
+				18EDB0B12E3B552E00E0A4F1 /* Fontisto.ttf */,
+				18EDB0A62E3B552D00E0A4F1 /* Foundation.ttf */,
+				18EDB0A52E3B552D00E0A4F1 /* Ionicons.ttf */,
+				18EDB0AD2E3B552E00E0A4F1 /* MaterialCommunityIcons.ttf */,
+				18EDB0B32E3B552E00E0A4F1 /* MaterialIcons.ttf */,
+				18EDB0B42E3B552E00E0A4F1 /* Octicons.ttf */,
+				18EDB0B52E3B552F00E0A4F1 /* SimpleLineIcons.ttf */,
+				18EDB0B02E3B552E00E0A4F1 /* Zocial.ttf */,
 				13B07FAE1A68108700A75B9A /* BookTheDay */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* BookTheDayTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				D9828C4899694E1280E1967B /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -183,12 +184,19 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				DC075BB3B1DA66B1D553FE16 /* Pods-BookTheDay.debug.xcconfig */,
-				558AFCC3C36DC56E6538F6E0 /* Pods-BookTheDay.release.xcconfig */,
-				F7FD6DB4C93B18722B1D7837 /* Pods-BookTheDay-BookTheDayTests.debug.xcconfig */,
-				3B4990A8FE5FBF3D8CAC30D6 /* Pods-BookTheDay-BookTheDayTests.release.xcconfig */,
+				99E6F0DA8EA543AD9F60449C /* Pods-BookTheDay.debug.xcconfig */,
+				3DAAC8AA3E1EF6719FFF0299 /* Pods-BookTheDay.release.xcconfig */,
+				1AF3F60B804792C2F5BFD254 /* Pods-BookTheDay-BookTheDayTests.debug.xcconfig */,
+				0DDF8AE68FD39D2410D268CD /* Pods-BookTheDay-BookTheDayTests.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		D9828C4899694E1280E1967B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -198,12 +206,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "BookTheDayTests" */;
 			buildPhases = (
-				E17A0BEB784E2220D5D97C35 /* [CP] Check Pods Manifest.lock */,
+				CDA4AF1D491A958E14F49663 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				B449FC281C04CB4AB64B785A /* [CP] Embed Pods Frameworks */,
-				1F1C34E2EB4F4A8053A5757A /* [CP] Copy Pods Resources */,
+				D8C3EEC4BF8A551020B3250F /* [CP] Embed Pods Frameworks */,
+				E66396D451AB8892EB1E8C91 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -219,13 +227,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "BookTheDay" */;
 			buildPhases = (
-				9D5BF6D07A8B66314FC43650 /* [CP] Check Pods Manifest.lock */,
+				3B5D182C6E230C305803702D /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				5ABFD857B0BE211513AF44C5 /* [CP] Embed Pods Frameworks */,
-				C009C286DCF9714E126A3571 /* [CP] Copy Pods Resources */,
+				036AFC62CE0ABB7785682E8A /* [CP] Embed Pods Frameworks */,
+				499FF32FC47627C88E2A13BD /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -309,24 +317,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		1F1C34E2EB4F4A8053A5757A /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		5ABFD857B0BE211513AF44C5 /* [CP] Embed Pods Frameworks */ = {
+		036AFC62CE0ABB7785682E8A /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -343,7 +334,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BookTheDay/Pods-BookTheDay-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		9D5BF6D07A8B66314FC43650 /* [CP] Check Pods Manifest.lock */ = {
+		3B5D182C6E230C305803702D /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -365,24 +356,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B449FC281C04CB4AB64B785A /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C009C286DCF9714E126A3571 /* [CP] Copy Pods Resources */ = {
+		499FF32FC47627C88E2A13BD /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -399,7 +373,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BookTheDay/Pods-BookTheDay-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		E17A0BEB784E2220D5D97C35 /* [CP] Check Pods Manifest.lock */ = {
+		CDA4AF1D491A958E14F49663 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -419,6 +393,40 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D8C3EEC4BF8A551020B3250F /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E66396D451AB8892EB1E8C91 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BookTheDay-BookTheDayTests/Pods-BookTheDay-BookTheDayTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -454,7 +462,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F7FD6DB4C93B18722B1D7837 /* Pods-BookTheDay-BookTheDayTests.debug.xcconfig */;
+			baseConfigurationReference = 1AF3F60B804792C2F5BFD254 /* Pods-BookTheDay-BookTheDayTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -481,7 +489,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3B4990A8FE5FBF3D8CAC30D6 /* Pods-BookTheDay-BookTheDayTests.release.xcconfig */;
+			baseConfigurationReference = 0DDF8AE68FD39D2410D268CD /* Pods-BookTheDay-BookTheDayTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -505,7 +513,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DC075BB3B1DA66B1D553FE16 /* Pods-BookTheDay.debug.xcconfig */;
+			baseConfigurationReference = 99E6F0DA8EA543AD9F60449C /* Pods-BookTheDay.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -532,7 +540,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 558AFCC3C36DC56E6538F6E0 /* Pods-BookTheDay.release.xcconfig */;
+			baseConfigurationReference = 3DAAC8AA3E1EF6719FFF0299 /* Pods-BookTheDay.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

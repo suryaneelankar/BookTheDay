@@ -25,7 +25,7 @@ const VendorTabs = () => {
           tabBarInactiveTintColor: '#AAAEBB', // Change the inactive tab color
           tabBarStyle: {
             backgroundColor: 'white',
-            height: 60,
+            height: 90,
             position: 'absolute',
           },
         };
@@ -41,6 +41,9 @@ const VendorTabs = () => {
           headerShown: false,
           tabBarLabel: 'Services',
           tabBarShowLabel: true,
+           tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
           header: () => <NavigationHeader Icon={false} title="" />,
 
         })}
@@ -54,6 +57,9 @@ const VendorTabs = () => {
           ),
           headerShown: false,
           tabBarLabel: 'Home',
+           tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
           tabBarShowLabel: true
         })}
       />
@@ -67,6 +73,9 @@ const VendorTabs = () => {
           ),
           headerShown: false,
           tabBarLabel: 'Profile',
+           tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
           tabBarShowLabel: true,
 
         })}

@@ -15,7 +15,7 @@ import moment from 'moment';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
 import { useSelector } from 'react-redux';
 import FastImage from 'react-native-fast-image';
-import ThumsUpIcon from '../../assets/svgs/thumsupIcon.svg';
+import CheckIcon from '../../assets/svgs/CheckIcon.svg';
 import CheckMark from '../../assets/svgs/greenChecked.svg'
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -103,11 +103,11 @@ const BookingDetailsScreen = ({ navigation, route }) => {
     }
     const userDeliveryLocationSaved = userLocationFetched?.formatted_address ? userLocationFetched?.formatted_address : userLocationFetched?.address;
 
-    if(!userDeliveryLocationSaved) {
+    if (!userDeliveryLocationSaved) {
       Alert.alert("Please enter a delivery location.");
       return;
-  }
-  
+    }
+
     const payload = {
       productId: catId,
       startDate: moment(startDate).format('DD MMMM YYYY'),
@@ -162,10 +162,10 @@ const BookingDetailsScreen = ({ navigation, route }) => {
           <View style={styles.productDetails}>
             <Text style={styles.productTitle}>{productDetails?.productName}</Text>
             {productDetails?.categoryType === 'clothes' ?
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
-              <View style={[styles.colorCircle, { backgroundColor: productDetails?.color, borderRadius: 10 }]} />
-              <Text style={styles.productSubTitle}>Size: {productDetails?.size}</Text>
-            </View> : null}
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+                <View style={[styles.colorCircle, { backgroundColor: productDetails?.color, borderRadius: 10 }]} />
+                <Text style={styles.productSubTitle}>Size: {productDetails?.size}</Text>
+              </View> : null}
             <Text style={styles.productPrice}>{formatAmount(productDetails?.rentPricePerDay)}<Text style={styles.productPriceperDay}>/day</Text></Text>
             <View style={styles.dateContainer}>
               <CalendarIcon />
@@ -177,9 +177,9 @@ const BookingDetailsScreen = ({ navigation, route }) => {
       </View>
 
       <View style={styles.footerNoteView}>
-          <ExclamationIcon />
-          <Text style={styles.footerNote} >Security Deposit will be refunded once you returned the product.</Text>
-        </View>
+        <ExclamationIcon />
+        <Text style={styles.footerNote} >Security Deposit will be refunded once you returned the product.</Text>
+      </View>
 
       <View style={styles.Pricesection}>
         <Text style={[styles.sectionTitle, { color: "#202020" }]}>Price Details</Text>
@@ -280,11 +280,11 @@ const BookingDetailsScreen = ({ navigation, route }) => {
             style={{ width: "55%", }}>
             {/* <View style={{borderWidth:4, width:"50%", }}/> */}
           </LinearGradient>
-          <View style={{ height: 120 }}>
-            <ThumsUpIcon />
+          <View style={{ height: 100, top: 25 }}>
+            <CheckIcon />
           </View>
           <Text style={styles.title}>Thank You!</Text>
-          <Text style={styles.subtitle}>Your Booking Has Been Initiated</Text>
+          <Text style={styles.subtitle}>Your Booking Request Has Been Initiated</Text>
           <Text style={styles.description}>Our team is processing your request and will update you within the next 1 hour.</Text>
           {/* <Text style={styles.description}>*Once your booking is approved, please complete the payment to confirm your reservation.</Text> */}
           <LinearGradient colors={['#D2453B', '#A0153E']}

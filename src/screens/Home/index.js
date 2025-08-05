@@ -30,13 +30,9 @@ import TrendingJewellery from '../../assets/svgs/trendingNow/home_trendingnow_je
 import TrendingNecklace from '../../assets/svgs/trendingNow/home_trendingnow_necklaces.svg';
 import TrendingTshirt from '../../assets/svgs/trendingNow/home_trendingnow_tshirt.svg';
 import CatCatering from '../../assets/svgs/categories/home_categories_catering_icon.svg';
-import CatChef from '../../assets/svgs/categories/home_categories_chef_icon.svg';
 import CatClothes from '../../assets/svgs/categories/home_categories_clothes_icon.svg';
-import CatDecoration from '../../assets/svgs/categories/home_categories_decoration_icon.svg';
-import CatDriver from '../../assets/svgs/categories/home_categories_driver_icon.svg';
 import CatHalls from '../../assets/svgs/categories/home_categories_hall_icon.svg';
 import CatJewellery from '../../assets/svgs/categories/home_categories_jewellery_icon.svg';
-import CatTentHouse from '../../assets/svgs/categories/home_categories_tent_icon.svg';
 import JewelleryCard from '../../assets/svgs/homeSwippers/home_jewellerycard.png';
 import ClothesCard from '../../assets/svgs/homeSwippers/home_shirtcard.png';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
@@ -48,7 +44,6 @@ import { promptForEnableLocationIfNeeded } from 'react-native-android-location-e
 import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
 import VegIcon from '../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
-import NotificationIcon from 'react-native-vector-icons/Ionicons';
 import DistanceIcon from '../../assets/svgs/distanceIcon.svg';
 import FloatingCartButton from "../../components/FloatingCartButton";
 import Geolocation from 'react-native-geolocation-service';
@@ -77,6 +72,9 @@ const HomeDashboard = () => {
     const [myBookings, setMyBookings] = useState();
     const [cateringBookings, setCateringBookings] = useState();
     const [hallsBookings, setHallsBookings] = useState();
+
+    const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
+    const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
 
     const bannerImages = [
         { id: '1', image: JewelleryCard },
@@ -123,11 +121,36 @@ const HomeDashboard = () => {
     );
 
     useEffect(() => {
+        storeUserDeviceToken();
         if (cateringBookings?.length > 0 || hallsBookings?.length > 0 || myBookings?.length > 0) {
             console.log("cateringBookings?.length", cateringBookings?.length, hallsBookings?.length, myBookings?.length)
             dispatch(showOrHideBottomCard(true));
         }
     }, [])
+
+    const storeUserDeviceToken = async () => {
+
+        const payload = {
+            mobileNumber: String(userLoggedInMobileNum),
+            fcmToken: deviceFCMToken
+        }
+        // console.log("payload is:::::::", payload, type);
+        const token = await getUserAuthToken();
+        console.log("LOgin screen scan", token);
+        try {
+            const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log("userTokenRes  res:::::::::", userTokenRes);
+            if (userTokenRes?.status === 200) {
+                console.warn("successfully logged fcm token:", userTokenRes?.data?.message);
+            }
+        } catch (error) {
+            console.error("Error during add user token 1 :", error);
+        }
+    }
 
 
     useFocusEffect(
@@ -152,7 +175,7 @@ const HomeDashboard = () => {
             });
 
             const newFunctionHalls = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            console.log("neareby loc events in HOMEEEEEEE:::::::;", newFunctionHalls);
+            // console.log("neareby loc events in HOMEEEEEEE:::::::;", newFunctionHalls);
             setNearByEventsData(newFunctionHalls);
         } catch (error) {
             console.error('Error fetching function halls:', error);
@@ -312,8 +335,27 @@ const HomeDashboard = () => {
     }
 
 
+    // useEffect(() => {
+    //     getPermissions();
+    // }, []);
+
     useEffect(() => {
-        getPermissions();
+        let isMounted = true;
+        const pollLocation = async () => {
+            while (isMounted && (!userLocationFetched?.address && !userLocationFetched?.formatted_address)) {
+                const location = await getPermissions(); // should dispatch inside this
+                await new Promise((resolve) => setTimeout(resolve, 4000)); // wait before next try
+            }
+        };
+        pollLocation();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [userLocationFetched]);
+
+    useEffect(() => {
+        getiOSLocation();
     }, []);
 
 
@@ -342,7 +384,7 @@ const HomeDashboard = () => {
                 dispatch(setUserCurrentLocation(data?.results[0]));
             }
         } catch (error) {
-            console.error("Error:", error);
+            console.error("Error: location 1", error);
         }
     };
 
@@ -383,27 +425,53 @@ const HomeDashboard = () => {
         }
     };
 
-    const getiOSLocation = () => {
-        if (Platform.OS === 'ios') {
-            Geolocation.requestAuthorization('whenInUse'); // optional
-        }
-
-        Geolocation.getCurrentPosition(
-            position => {
-                console.log('Latitude:', position.coords.latitude);
-                console.log('Longitude:', position.coords.longitude);
-            },
-            error => {
-                console.error('Location error:', error);
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 15000,
-                maximumAge: 10000,
-                forceRequestLocation: true,
-            },
-        );
+const getiOSLocation = async () => {
+    if (Platform.OS === 'ios') {
+        await Geolocation.requestAuthorization('whenInUse'); // optional
     }
+
+    Geolocation.getCurrentPosition(
+        async position => {
+            try {
+                console.log('Current position of iOS:', position);
+                const { latitude, longitude } = position.coords;
+                console.log('Latitude:', latitude);
+                console.log('Longitude:', longitude);
+
+                const apiKey = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo';  // Replace with your API key
+                const response = await fetch(
+                    `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
+                );
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const formattedAddress = data?.results[0]?.formatted_address;
+                console.log('Formatted Address:', formattedAddress, 'data:', data);
+
+                if (formattedAddress) {
+                    setAddress(formattedAddress);
+                    dispatch(getUserLocation(data.results[0]));
+                    dispatch(setUserCurrentLocation(data.results[0]));
+                }
+            } catch (error) {
+                console.error('Error fetching address:', error);
+            }
+        },
+        error => {
+            console.error('Location error:', error);
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 10000,
+            forceRequestLocation: true,
+        }
+    );
+};
+
 
     const getPermissions = async () => {
         try {
@@ -497,7 +565,7 @@ const HomeDashboard = () => {
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.seatingCapacity} pax</Text>
                         </View>
-                        {item?.distance ?
+                        {item?.distance !== null && item?.distance !== undefined ?
                             <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, marginHorizontal: 5, paddingVertical: 5, alignItems: "center" }}>
                                 <DistanceIcon />
                                 <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>{item?.distance?.toFixed(1)}  km</Text>
@@ -506,13 +574,10 @@ const HomeDashboard = () => {
                         <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.bedRooms} Rooms</Text>
                         </View>
-                        {!item?.distance ?
-                            <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
-
-                                <Text style={{}}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
-                                <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'veg' ? 'VEG' : 'NON-VEG'}</Text>
-                            </View>
-                            : null}
+                        {/* <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
+                            <Text style={{}}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
+                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'veg' ? 'VEG' : 'NON-VEG'}</Text>
+                        </View> */}
                     </View>
                 </TouchableOpacity>
             </View>
@@ -617,12 +682,11 @@ const HomeDashboard = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-            <ScrollView style={{ marginBottom: 70 }} >
+            <ScrollView style={{ marginBottom: 70 }} showsVerticalScrollIndicator={false}>
                 <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1 }}>
                     <View style={styles.topContainer}>
                         <View style={styles.locationContainer}>
                             <Text style={styles.currentLoc}>Select location</Text>
-                            {/* navigation.navigate('LocationAdded') */}
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <TouchableOpacity onPress={() => getLocation()} style={styles.getLoc}>
                                     <LocationMarkIcon />
@@ -717,10 +781,15 @@ const HomeDashboard = () => {
                     <TrendingNow data={discountProducts} textHeader={'Live Offers!'} token={getUserAuth} />
                     :
                     null}
+
                 {nearByEventsData?.length > 0 ?
                     <>
                         <View style={{ flexDirection: 'row', width: '88%', alignSelf: 'center', justifyContent: 'space-between', marginTop: horizontalScale(20) }}>
-                            <Text style={styles.onDemandTextStyle}>Function Halls Near You</Text>
+                            <Text style={styles.onDemandTextStyle}>Halls Near You</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('NearByEvents')} style={{ flexDirection: 'row', alignSelf: 'flex-end' }}>
+                                <Text style={[styles.onDemandTextStyle, { marginHorizontal: 5 }]}>See Nearby</Text>
+                                <RightArrowIcon width={25} height={25} />
+                            </TouchableOpacity>
                         </View>
 
                         <FlatList

@@ -1,4 +1,4 @@
-import { StyleSheet, FlatList, TouchableOpacity, SafeAreaView, Text, View, ScrollView, Image } from 'react-native';
+import { StyleSheet, FlatList, TouchableOpacity, SafeAreaView, Text, View, ScrollView, Image, Platform } from 'react-native';
 import themevariable from '../../utils/themevariable';
 import HallImage from '../../assets/HallImage1.jpeg';
 import CateringImg from '../../assets/CateringImg.jpeg';
@@ -33,6 +33,7 @@ const VendorCategoryScreen = ({ navigation }) => {
     const [totalBookings, setTotalBookings] = useState(0);
     const [completed, setCompleted] = useState(0);
     const [pending, setPending] = useState(0);
+    const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
 
 
     const dispatch = useDispatch();
@@ -59,7 +60,31 @@ const VendorCategoryScreen = ({ navigation }) => {
 
         setCompleted(completedCount?.length);
         setPending(pendingCount?.length);
+        storeVendorDeviceToken();
     }, [functionHallBookingsData, cateringsBookingsData, clothJewelBookingsData]);
+
+
+    const storeVendorDeviceToken = async () => {
+        const vendorMobileNumber = vendorLoggedInMobileNum;
+        const payload = {
+            mobileNumber: String(vendorMobileNumber),
+            fcmToken: deviceFCMToken
+        }
+        const token = await getVendorAuthToken();
+        try {
+            const vendorTokenRes = await axios.post(`${BASE_URL}/addVendorFCMToken`, payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
+            if (vendorTokenRes?.status === 200) {
+                console.warn("Vendor token added successfully:", vendorTokenRes?.data?.message);
+            }
+        } catch (error) {
+            console.error("Error during add vendor token:", error);
+        }
+    }
 
     const getVendorClothJewelBookings = async () => {
         const vendorMobileNumber = vendorLoggedInMobileNum;
@@ -186,7 +211,7 @@ const VendorCategoryScreen = ({ navigation }) => {
                     <Image source={item.CatImg}
                         style={{
                             height: 130,
-                            width: 130, 
+                            width: 130,
                             borderTopLeftRadius: 15,
                             borderBottomLeftRadius: 15
                         }}
@@ -210,7 +235,7 @@ const VendorCategoryScreen = ({ navigation }) => {
                 style={styles.background}
             >
                 {/* Bookings Overview */}
-                <View style={{ flexDirection: "row", alignItems: "center", marginLeft: -15 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", marginLeft: -15, marginTop: Platform.OS === "ios" ? 50 : 0 }}>
                     <ProfileIcon />
                     <View style={{ flex: 1 }}>
                         <Text numberOfLines={2} style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular', textTransform: "capitalize" }}>Hi, {vendorLoggedInName}</Text>

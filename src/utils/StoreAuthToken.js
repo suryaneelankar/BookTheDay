@@ -14,9 +14,10 @@ export const getUserAuthToken = async () => {
   try {
     const credentials = await Keychain.getGenericPassword();
     if (credentials && credentials.username === 'userToken') {
+        // console.log('credentials password is :::>>>', credentials.password);
         return credentials.password;
       }
-    return null;
+      return credentials.password;
   } catch (error) {
     console.error('Error retrieving the token securely', error);
     return null;

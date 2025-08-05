@@ -111,7 +111,7 @@ const NearByEvents = () => {
             professionalImageUrl,
             ...item?.additionalImages.flat().map(image => image?.url)
         ];
-        console.log("imageUrls ::", imageUrls);
+        // console.log("imageUrls ::", imageUrls);
         return (
             <View style={{ flex: 1, borderRadius: 20 }}>
                 <View style={[styles.container]}>
@@ -157,26 +157,28 @@ const NearByEvents = () => {
 
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', flexShrink: 1 }}>
                         {/* Other Views */}
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
                             <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.seatingCapacity} pax</Text>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
-                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.bedRooms} Rooms</Text>
+                            <DistanceIcon />
+                            <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400", marginHorizontal: 5 }}>
+                                {item?.distance !== undefined && item?.distance !== null ? `${item.distance.toFixed(1)} km` : 'N/A'}</Text>
                         </View>
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
-                            <Text>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
+                            {item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}
                             <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>
                                 {item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'veg' ? 'VEG' : 'NON-VEG'}
                             </Text>
                         </View>
                     </View>
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', flexShrink: 1, marginTop: 5 }}>
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 5, paddingVertical: 5, marginTop: 5, alignItems: "center" }}>
-                            <DistanceIcon />
-                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>
-                                {item?.distance !== undefined && item?.distance !== null ? `${item.distance.toFixed(1)} km` : 'N/A'}</Text>
-                        </View>
-                    </View>
+                    {item?.bedRooms > 0 &&
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', flexShrink: 1, marginTop: 5 }}>
+                            <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 20, paddingHorizontal: 5, paddingVertical: 5, marginTop: 5, alignItems: "center" }}>
+                                <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400", padding: 4 }}>
+                                    {item?.bedRooms} {item?.bedRooms > 1 ? 'Rooms' : 'Room'}</Text>
+                            </View>
+                        </View>}
 
                 </TouchableOpacity>
             </View>
@@ -210,40 +212,6 @@ const NearByEvents = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
-            {/* <View style={styles.autocompleteContainer}>
-                <Autocomplete
-                    data={dropdownVisible && filteredData?.length > 0 ? filteredData : []}  // Conditionally hide results based on dropdownVisible
-                    value={query}
-                    onChangeText={handleQueryChange}  // Handle query changes
-                    placeholder="Search Location..."
-                    flatListProps={{
-                        keyExtractor: (item) => item?._id.toString(),
-                        renderItem: ({ item }) => (
-                            <TouchableOpacity onPress={() => handleSelect(item?.value)}>
-                                <Text style={{ padding: 10, fontSize: 12, color: "#000000", fontFamily: "ManropeRegular" }}>{item?.value}</Text>
-                            </TouchableOpacity>
-                        ),
-                    }}
-                    inputContainerStyle={{
-                        borderRadius: 15,
-                        height: 50,
-                        width: "90%",
-                        alignSelf: "center",
-                        marginTop: 10,
-                        backgroundColor: "#E3E3E7",
-
-                    }}
-                    style={{ marginTop: 3, borderRadius: 15, width: "90%", alignSelf: "center", backgroundColor: "#E3E3E7" }}
-                    hideResults={dropdownVisible === false || filteredData.length === 0}  // Hide results initially and when dropdownVisible is false
-                />
-                <TouchableOpacity style={{ position: 'absolute', justifyContent: 'flex-end', right: 30, marginTop: 20 }} onPress={() => {
-                    setQuery(''); // Clear the input value
-                    // You can also set dropdownVisible to false if needed
-                }}>
-                    <IonIcon name="close-circle" size={24} color="gray" style={{ marginTop: 0 }} />
-                </TouchableOpacity>
-            </View> */}
-
             <View style={{ marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
                 <View>
                     <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>

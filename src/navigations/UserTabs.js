@@ -26,13 +26,13 @@ const UserTabs = () => {
           tabBarShowLabel: false,
           tabBarStyle: {
             backgroundColor: 'white',
-            height: 60,
+            height: 90,
             position: 'absolute',
           },
           tabBarActiveTintColor: '#ED9D20',
           tabBarInactiveTintColor: '#AAAEBB',
           tabBarLabelStyle: {
-            fontSize: 12, fontWeight: "400",
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
           },
         };
       }}>
@@ -45,6 +45,9 @@ const UserTabs = () => {
             focused ? <FocusedHomeIcon /> : <HomeIcon />
           ),
           tabBarLabel: 'Home',
+           tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
           tabBarShowLabel: true,
           headerShown: false,
         }}
@@ -58,9 +61,12 @@ const UserTabs = () => {
             focused ? <FocusedCaterings /> : <CateringsIcon />
           ),
           tabBarLabel: 'Caterings',
+           tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
           tabBarShowLabel: true,
-          header: () => <NavigationHeader Icon={false} title="Catering Services" />,
-          headerShown: false,
+          header: () => <NavigationHeader Icon={false} title="" />,
+          headerShown: true,
         }}
       />
 
@@ -73,8 +79,11 @@ const UserTabs = () => {
           ),
           tabBarLabel: 'Collections',
           tabBarShowLabel: true,
-          header: () => <NavigationHeader Icon={false} title="Products" />,
-          headerShown: false,
+           tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
+          header: () => <NavigationHeader Icon={false} title="" />,
+          headerShown: true,
         }}
       />
 
@@ -87,8 +96,11 @@ const UserTabs = () => {
           ),
           tabBarLabel: 'Events',
           tabBarShowLabel: true,
-          header: () => <NavigationHeader Icon={false} title="Event Management" />,
-          headerShown: false,
+           tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
+          header: () => <NavigationHeader Icon={false} title="" />,
+          headerShown: true,
         }}
       />
 

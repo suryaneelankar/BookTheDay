@@ -248,7 +248,13 @@ const Caterings = () => {
                         style={{ marginTop: 3, borderRadius: 15, width: "90%", alignSelf: "center", backgroundColor: "#E3E3E7" }}
                         hideResults={dropdownVisible === false || filteredData.length === 0}  // Hide results initially and when dropdownVisible is false
                     />
-                    <TouchableOpacity style={{ position: 'absolute', justifyContent: 'flex-end', right: 30, marginTop: 20 }} onPress={() => {
+                    <TouchableOpacity style={{
+                        position: 'absolute',
+                        right: 20,
+                        top: 22,
+                        zIndex: 10, // Ensures it's above other components
+                        elevation: 5
+                    }} onPress={() => {
                         setQuery(''); // Clear the input value
                     }}>
                         <IonIcon name="close-circle" size={24} color="gray" style={{ marginTop: 0 }} />
@@ -280,7 +286,7 @@ const Caterings = () => {
                             <Text style={{ color: "#333333", fontSize: 14, fontWeight: "400", fontFamily: 'ManropeRegular', }}>No Caterings found</Text>
                         </View>
                     }
-                    contentContainerStyle={{}}
+                    contentContainerStyle={{ paddingBottom: 80 }}
                 />
             </View>
         </SafeAreaView>
@@ -302,11 +308,13 @@ const styles = StyleSheet.create({
     autocompleteContainer: {
         flex: 1,
         left: 0,
-        position: 'absolute',
+        width: '95%',
+        alignSelf: 'center',
+        // position: 'absolute',
         right: 0,
         top: 0,
         zIndex: 1,
-        flexDirection: 'row',
+        // flexDirection: 'row',
     },
     strickedoffer: {
         fontSize: 12,

@@ -1,36 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+"http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>UIAppFonts</key>
-    <array>
-    <string>MaterialIcons.ttf</string>
-    <string>SimpleLineIcons.ttf</string>
-	<string>AntDesign.ttf</string>
-    <string>Entypo.ttf</string>
-	<string>EvilIcons.ttf</string>
-    <string>Feather.ttf</string>
-	<string>FontAwesome5_Brands.ttf</string>
-    <string>FontAwesome.ttf</string>
-	<string>FontAwesome5_Regular.ttf</string>
-    <string>FontAwesome5_Solid.ttf</string>
-	<string>FontAwesome6_Brands.ttf</string>
-    <string>FontAwesome6_Regular.ttf</string>
-    <string>FontAwesome6_Solid.ttf</string>
-    <string>Fontisto.ttf</string>
-	<string>Foundation.ttf</string>
-    <string>Ionicons.ttf</string>
-	<string>MaterialCommunityIcons.ttf</string>
-    <string>MaterialIcons.ttf</string>
-	<string>Octicons.ttf</string>
-    <string>Zocial.ttf</string>
-    </array>
 	<key>NSLocationWhenInUseUsageDescription</key>
-    <string>Booktheday app needs access to your location.</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Booktheday app needs access to your location.</string>
+	<string>Booktheday app needs access to your location.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Booktheday app needs access to your location.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-    <string>This app uses your location to provide services.</string>
+	<string>This app uses your location to provide services.</string>
 
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
@@ -54,21 +32,24 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+
+	<!-- Fixed NSAppTransportSecurity block -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
-    <key>NSExceptionDomains</key>
-    <dict>
-    <key>65.1.241.243</key>
-     <dict>
-     <key>NSExceptionAllowsInsecureHTTPLoads</key>
-     <true/>
-     <key>NSIncludesSubdomains</key>
-     <true/>
-     </dict>
-     </dict>
-    </dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>65.1.241.243</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
+
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -83,5 +64,34 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>ManropeRegular.ttf</string>
+		<string>PoppinsRegular.ttf</string>
+		<string>InterRegular.ttf</string>
+		<string>InterMedium.ttf</string>
+		<string>InterSemiBold.ttf</string>
+		<string>InterBold.ttf</string>
+		<string>LeagueSpartanRegular.ttf</string>
+		<string>MaterialIcons.ttf</string>
+		<string>SimpleLineIcons.ttf</string>
+		<string>AntDesign.ttf</string>
+		<string>Entypo.ttf</string>
+		<string>EvilIcons.ttf</string>
+		<string>Feather.ttf</string>
+		<string>FontAwesome5_Brands.ttf</string>
+		<string>FontAwesome.ttf</string>
+		<string>FontAwesome5_Regular.ttf</string>
+		<string>FontAwesome5_Solid.ttf</string>
+		<string>FontAwesome6_Brands.ttf</string>
+		<string>FontAwesome6_Regular.ttf</string>
+		<string>FontAwesome6_Solid.ttf</string>
+		<string>Fontisto.ttf</string>
+		<string>Foundation.ttf</string>
+		<string>Ionicons.ttf</string>
+		<string>MaterialCommunityIcons.ttf</string>
+		<string>Octicons.ttf</string>
+		<string>Zocial.ttf</string>
+	</array>
 </dict>
 </plist>

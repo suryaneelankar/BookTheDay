@@ -56,7 +56,7 @@ const MyTransactions = () => {
     const TransactionItem = ({ item }) => {
         if (!item) return null; // Ensure item is valid
 
-        return item?.paymentStatus === "success" ? (
+        return (
             <View style={styles.transactionItemContainer}>
                   <Text style={[styles.transactionOrderId,{color:"#666666",marginBottom:10}]}>
                         Order Id: {item?.OrderId || "N/A"}
@@ -68,7 +68,14 @@ const MyTransactions = () => {
                     <Text style={styles.transactionDate}>
                         {item?.createdAt ? formatDateToDMY(item?.createdAt) : "Date Unavailable"}
                     </Text>
-                    <Text style={styles.transactionOrderId}>Booked by: {item?.userFullName}</Text>
+                    <Text style={{...styles.transactionStatus, color: item?.paymentStatus === "success" ? "#1BB003" : "#E64A19" }}>
+                        {item?.paymentStatus ? item?.paymentStatus.charAt(0).toUpperCase() + item?.paymentStatus.slice(1) : "Status Unavailable"}
+                    </Text>
+                    {/* <Text style={styles.transactionOrderId}>User Name: {item?.userFullName}</Text> */}
+                    <Text style={styles.userDetails}>
+                        Booked By: {item?.userFullName || "N/A"}
+                    </Text>
+
                     {/* <Text style={styles.transactionOrderId}>User Mobile.No: {item?.userMobileNumber}</Text> */}
                 </View>
                 <Text
@@ -82,7 +89,7 @@ const MyTransactions = () => {
             </View>
            
             </View>
-        ) : null;
+        );
     };
 
 
@@ -90,7 +97,7 @@ const MyTransactions = () => {
         <View style={styles.container}>
             <FlatList
                showsVerticalScrollIndicator={false}
-                data={transactionsData.filter((item) => item.paymentStatus === 'success')}
+                data={transactionsData}
                 keyExtractor={(item) => item?._id || Math.random().toString()}
                 renderItem={({ item }) => <TransactionItem item={item} />}
                 ListEmptyComponent={() => (
@@ -112,7 +119,8 @@ const styles = StyleSheet.create({
     },
     transactionItem: {
         flexDirection: 'row',
-        marginBottom:10
+        marginBottom:10,
+
         // alignItems: 'center',
         // backgroundColor: '#FFF4CD',
         // borderRadius: 8,
@@ -134,6 +142,12 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 3,
+        marginHorizontal: 10,
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        backgroundColor: '#FFF5E3',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
     },
     orderIcon: {
         marginRight: 12,
@@ -148,14 +162,35 @@ const styles = StyleSheet.create({
         fontStyle: 'italic', // Added italic style for date
         marginBottom: 4,
     },
+    userDetails: {
+        fontSize: 14,
+        color: '#222222',
+        marginBottom: 4,
+        fontFamily: 'ManropeRegular',
+        textTransform: 'capitalize', // Ensures user details are displayed in lowercase
+    },
     transactionOrderId: {
         fontSize: 14,
-        fontWeight: 'bold',
-        color: '#3E4A68',
+        color: '#222222',
+        fontFamily: 'ManropeRegular',
+        marginBottom: 4,
+        textTransform: 'capitalize', // Uncomment if you want to force uppercase
+    },
+    transactionStatus: {
+        fontSize: 12,
+        color: '#A0A4B8',
+        marginBottom: 4,
+        fontFamily: 'ManropeRegular',
     },
     transactionAmount: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: 'ManropeRegular',
+        alignSelf: 'flex-end',
+        // marginLeft: 'auto', // Aligns the amount to the right
+        // marginTop: 4,
+        // textAlign: 'right', // Aligns the text to the right
+        // width: '30%', // Adjusts the width to fit the amount
+
     },
 });
 

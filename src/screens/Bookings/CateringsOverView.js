@@ -15,7 +15,7 @@ import EditButton from '../../assets/svgs/categories/editButton.svg';
 import CalendarIcon from '../../assets/svgs/calendarOrangeIcon.svg';
 import { formatAmount } from "../../utils/GlobalFunctions";
 import ServiceTime from '../../assets/svgs/serviceTime.svg';
-import ThumsUpIcon from '../../assets/svgs/thumsupIcon.svg';
+import CheckIcon from '../../assets/svgs/CheckIcon.svg';
 
 const CateringsOverView = ({ route, navigation }) => {
 
@@ -100,21 +100,21 @@ const CateringsOverView = ({ route, navigation }) => {
             <ScrollView style={{ marginBottom: "20%" }}>
 
                 {bookingDone ? (
-                <View style={styles.bookingContainer}>
-                    <View style={styles.bookingrow}>
-                        <Icon name="exclamationcircleo" size={18} color="grey" />
-                        <Text style={styles.bookingheading}>Confirmation Pending</Text>
-                    </View>
-                    <Text style={styles.bookingmessage}>
-                        We're waiting for {bookingDetails?.title} to confirm your booking request.
-                    </Text>
-                    <View style={styles.bookingrow}>
-                        <IonIcon name="time-sharp" size={18} color="green" />
-                        <Text style={styles.bookingtimeMessage}>
-                            We'll get back within an Hour with booking confirmation status.
+                    <View style={styles.bookingContainer}>
+                        <View style={styles.bookingrow}>
+                            <Icon name="exclamationcircleo" size={18} color="grey" />
+                            <Text style={styles.bookingheading}>Confirmation Pending</Text>
+                        </View>
+                        <Text style={styles.bookingmessage}>
+                            We're waiting for {bookingDetails?.title} to confirm your booking request.
                         </Text>
+                        <View style={styles.bookingrow}>
+                            <IonIcon name="time-sharp" size={18} color="green" />
+                            <Text style={styles.bookingtimeMessage}>
+                                We'll get back within an Hour with booking confirmation status.
+                            </Text>
+                        </View>
                     </View>
-                </View>
                 ) : null}
 
                 <View style={styles.imgsection}>
@@ -230,7 +230,7 @@ const CateringsOverView = ({ route, navigation }) => {
                         <View style={styles.row}>
                             <Text style={[styles.text, styles.label]}>Advance Amount</Text>
                             <Text style={[styles.text, styles.value]}>
-                            {formatAmount(bookingDetails?.advanceAmount)}
+                                {formatAmount(bookingDetails?.advanceAmount)}
                             </Text>
                         </View>
                     </View>
@@ -262,11 +262,11 @@ const CateringsOverView = ({ route, navigation }) => {
                         end={{ x: 1, y: 0 }}
                         style={{ width: "55%", padding: 4, }}>
                     </LinearGradient>
-                    <View style={{ height: 120 }}>
-                        <ThumsUpIcon />
+                    <View style={{ height: 100, top: 25 }}>
+                        <CheckIcon />
                     </View>
                     <Text style={styles.title}>Thank You!</Text>
-                    <Text style={styles.subtitle}>Your Booking Has Been Initiated.</Text>
+                    <Text style={styles.subtitle}>Your Booking Request Has Been Initiated.</Text>
                     <Text style={styles.description}>Our team is processing your request and will update you within the next 1 hour.</Text>
                     {/* <Text style={styles.description}>*Once your booking is approved, please complete the payment to confirm your reservation.</Text> */}
                     <LinearGradient colors={['#D2453B', '#A0153E']}
@@ -481,30 +481,30 @@ const styles = StyleSheet.create({
         marginTop: 20,
         width: "90%",
         alignSelf: "center",
-      },
-      bookingrow: {
+    },
+    bookingrow: {
         flexDirection: "row",
         alignItems: "center",
-      },
-      bookingheading: {
+    },
+    bookingheading: {
         color: "black",
         fontWeight: "bold",
         fontSize: 16,
         marginHorizontal: 10,
-      },
-      bookingmessage: {
+    },
+    bookingmessage: {
         color: "black",
         fontWeight: "400",
         fontSize: 13,
         marginTop: 15,
-      },
-      bookingtimeMessage: {
+    },
+    bookingtimeMessage: {
         color: "green",
         fontWeight: "800",
         fontSize: 13,
         marginTop: 10,
         marginHorizontal: 10,
-      },
+    },
 
 });
 

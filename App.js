@@ -16,6 +16,7 @@ import { Provider } from "react-redux";
 import MainNavigation from './src/navigations';
 // import SplashScreen from 'react-native-splash-screen';
 import RazorpayCheckout from 'react-native-razorpay';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const App = () => {
 
@@ -63,9 +64,11 @@ const App = () => {
   // }, []);
 
   return (
-    <Provider store={store}>
-      <MainNavigation />
-    </Provider>
+   <SafeAreaProvider>
+      <Provider store={store}>
+        <MainNavigation />
+      </Provider>
+    </SafeAreaProvider>
   )
 }
 

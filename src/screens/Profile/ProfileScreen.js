@@ -100,7 +100,7 @@ const ProfileMainScreen = () => {
                 />
                 
                 <MenuItem icon={<DashboardIcon />}
-                    title="My Orders"
+                    title="My Bookings"
                     isSelected={isMyDashboardOpen ? true : false}
                     onPress={() => navigation.navigate('ViewMyBookings')}
                 />

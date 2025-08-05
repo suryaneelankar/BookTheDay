@@ -1,14 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons';
+import * as Animatable from 'react-native-animatable';
+
+const { width } = Dimensions.get('window');
 
 const PaymentFailedScreen = () => {
   const navigation = useNavigation();
 
   const handleRetry = () => {
-    // navigation.navigate('ViewMyBookings');
     navigation.goBack();
   };
 
@@ -18,30 +20,37 @@ const PaymentFailedScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Failure Icon */}
-      <View style={styles.iconContainer}>
-        <Icon name="close-circle-outline" size={110} color="#E63946" />
-      </View>
+      <Animatable.View
+        animation="fadeInDown"
+        delay={100}
+        style={styles.card}
+        useNativeDriver
+      >
+        {/* Icon */}
+        <Animatable.View animation="shake" delay={300} useNativeDriver>
+          <Icon name="close-circle" size={100} color="#E63946" style={styles.icon} />
+        </Animatable.View>
 
-      {/* Failure Text */}
-      <Text style={styles.failedText}>Payment Unsuccessful</Text>
+        {/* Header */}
+        <Text style={styles.failedText}>Payment Failed</Text>
 
-      {/* Description */}
-      <Text style={styles.descriptionText}>
-        Oops! We couldn’t process your payment. Please try again.
-      </Text>
+        {/* Description */}
+        <Text style={styles.descriptionText}>
+          Oops! Your payment couldn’t be completed. This might be due to transaction limits or technical issues.
+        </Text>
 
-      {/* Retry Payment Button (Gradient Red) */}
-      <LinearGradient colors={['#D32F2F', '#9B0000']} style={styles.retryButton}>
-        <TouchableOpacity style={styles.buttonContent} onPress={handleRetry}>
-          <Text style={styles.retryButtonText}>Try Again</Text>
+        {/* Retry Button */}
+        <LinearGradient colors={['#D32F2F', '#9B0000']} style={styles.retryButton}>
+          <TouchableOpacity onPress={handleRetry} style={styles.buttonContent} activeOpacity={0.8}>
+            <Text style={styles.retryButtonText}>Try Again</Text>
+          </TouchableOpacity>
+        </LinearGradient>
+
+        {/* Home Button */}
+        <TouchableOpacity onPress={handleHome} style={styles.homeButton} activeOpacity={0.8}>
+          <Text style={styles.homeButtonText}>Back to Home</Text>
         </TouchableOpacity>
-      </LinearGradient>
-
-      {/* Home Button (White with Red Border) */}
-      <TouchableOpacity style={styles.homeButton} onPress={handleHome} activeOpacity={0.8}>
-        <Text style={styles.homeButtonText}>Back to Home</Text>
-      </TouchableOpacity>
+      </Animatable.View>
     </View>
   );
 };
@@ -49,69 +58,69 @@ const PaymentFailedScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: 'center',
+    backgroundColor: '#FFF5F5',
+    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FAFAFA',
     paddingHorizontal: 20,
-    paddingVertical:30
   },
-  iconContainer: {
-    marginBottom: 25,
-    shadowColor: '#D32F2F',
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
+  card: {
+    backgroundColor: '#FFFFFF',
+    width: width * 0.9,
+    padding: 25,
+    borderRadius: 20,
+    alignItems: 'center',
     elevation: 5,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+  },
+  icon: {
+    marginBottom: 15,
   },
   failedText: {
-    fontSize: 26,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: '700',
     color: '#D32F2F',
     marginBottom: 10,
   },
   descriptionText: {
     fontSize: 16,
-    color: '#555',
+    color: '#666',
     textAlign: 'center',
-    marginBottom: 35,
-    paddingHorizontal: 15,
     lineHeight: 24,
+    marginBottom: 30,
+    paddingHorizontal: 5,
   },
   retryButton: {
-    borderRadius: 12,
-    width: '80%',
+    width: '100%',
+    borderRadius: 10,
     overflow: 'hidden',
+    marginBottom: 15,
     elevation: 4,
   },
   buttonContent: {
-    paddingVertical: 15,
+    paddingVertical: 14,
     alignItems: 'center',
   },
   retryButtonText: {
-    color: '#FFF', // White Text
-    fontSize: 17,
-    fontWeight: 'bold',
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   homeButton: {
-    backgroundColor: '#FFFFFF', // White Background
-    paddingVertical: 14,
-    paddingHorizontal: 50,
-    borderRadius: 12,
+    borderColor: '#D32F2F',
     borderWidth: 2,
-    borderColor: '#D32F2F', // Red Border
+    borderRadius: 10,
+    paddingVertical: 14,
+    width: '100%',
     alignItems: 'center',
-    width: '80%',
-    marginTop: 10,
-    elevation: 3,
-    shadowColor: '#D32F2F',
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 5,
+    backgroundColor: '#FFFFFF',
   },
   homeButtonText: {
-    color: '#D32F2F', // Red Text
-    fontSize: 17,
-    fontWeight: 'bold',
+    color: '#D32F2F',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

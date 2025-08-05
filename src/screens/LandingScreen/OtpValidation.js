@@ -116,7 +116,7 @@ const OtpValidation = ({ navigation, route }) => {
 
             }
         } catch (error) {
-            console.error("Error during add user token :", error);
+            console.error("Error during add user token 2 :", error);
         }
     };
 
