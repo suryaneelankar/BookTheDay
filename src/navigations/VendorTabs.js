@@ -9,6 +9,7 @@ import FocusedHomeIcon from '../assets/svgs/tabIcons/focusedHome.svg';
 import ActiveForm from '../assets/svgs/activeVendorServiceFormIcon.svg';
 import InActiveForm from '../assets/svgs/vendorServiceFormIcon.svg';
 import VendorProfile from '../screens/VendorScreens/VendorProfile';
+import { Platform } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
@@ -25,7 +26,7 @@ const VendorTabs = () => {
           tabBarInactiveTintColor: '#AAAEBB', // Change the inactive tab color
           tabBarStyle: {
             backgroundColor: 'white',
-            height: 60,
+            height: Platform.OS === 'ios' ? 90 : 60,
             position: 'absolute',
           },
         };
@@ -42,7 +43,9 @@ const VendorTabs = () => {
           tabBarLabel: 'Services',
           tabBarShowLabel: true,
           header: () => <NavigationHeader Icon={false} title="" />,
-
+          tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
         })}
       />
       <Tab.Screen
@@ -54,7 +57,10 @@ const VendorTabs = () => {
           ),
           headerShown: false,
           tabBarLabel: 'Home',
-          tabBarShowLabel: true
+          tabBarShowLabel: true,
+          tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
         })}
       />
 
@@ -68,7 +74,9 @@ const VendorTabs = () => {
           headerShown: false,
           tabBarLabel: 'Profile',
           tabBarShowLabel: true,
-
+          tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
         })}
       />
 

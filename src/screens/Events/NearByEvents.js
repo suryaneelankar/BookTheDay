@@ -157,11 +157,13 @@ const NearByEvents = () => {
 
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', flexShrink: 1 }}>
                         {/* Other Views */}
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
+                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
                             <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.seatingCapacity} pax</Text>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
-                            <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.bedRooms} Rooms</Text>
+                            <DistanceIcon />
+                            <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400", marginHorizontal: 5 }}>
+                                {item?.distance !== undefined && item?.distance !== null ? `${item.distance.toFixed(1)} km` : 'N/A'}</Text>
                         </View>
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
                             <Text>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
@@ -170,13 +172,13 @@ const NearByEvents = () => {
                             </Text>
                         </View>
                     </View>
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', flexShrink: 1, marginTop: 5 }}>
-                        <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 5, paddingVertical: 5, marginTop: 5, alignItems: "center" }}>
-                            <DistanceIcon />
-                            <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}>
-                                {item?.distance !== undefined && item?.distance !== null ? `${item.distance.toFixed(1)} km` : 'N/A'}</Text>
-                        </View>
-                    </View>
+                    {item?.bedRooms > 0 &&
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', flexShrink: 1, marginTop: 5 }}>
+                            <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 20, paddingHorizontal: 5, paddingVertical: 5, marginTop: 5, alignItems: "center" }}>
+                                <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400", padding: 4 }}>
+                                    {item?.bedRooms} {item?.bedRooms > 1 ? 'Rooms' : 'Room'}</Text>
+                            </View>
+                        </View>}
 
                 </TouchableOpacity>
             </View>

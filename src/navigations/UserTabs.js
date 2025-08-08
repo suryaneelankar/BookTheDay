@@ -13,6 +13,7 @@ import CateringsIcon from '../assets/svgs/tabIcons/CateringsIcon.svg';
 import FocusedCaterings from '../assets/svgs/tabIcons/FocusedCaterings.svg';
 import NavigationHeader from '../components/NavigationHeader';
 import Caterings from '../screens/Caterings';
+import { Platform } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
@@ -26,13 +27,13 @@ const UserTabs = () => {
           tabBarShowLabel: false,
           tabBarStyle: {
             backgroundColor: 'white',
-            height: 60,
+            height: Platform.OS === 'ios' ? 90 : 60,
             position: 'absolute',
           },
           tabBarActiveTintColor: '#ED9D20',
           tabBarInactiveTintColor: '#AAAEBB',
           tabBarLabelStyle: {
-            fontSize: 12, fontWeight: "400",
+            fontSize: 12, fontWeight: "400",fontFamily: "ManropeRegular"
           },
         };
       }}>
@@ -47,6 +48,9 @@ const UserTabs = () => {
           tabBarLabel: 'Home',
           tabBarShowLabel: true,
           headerShown: false,
+          tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
         }}
       />
 
@@ -61,6 +65,9 @@ const UserTabs = () => {
           tabBarShowLabel: true,
           header: () => <NavigationHeader Icon={false} title="Catering Services" />,
           headerShown: false,
+          tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
         }}
       />
 
@@ -75,6 +82,9 @@ const UserTabs = () => {
           tabBarShowLabel: true,
           header: () => <NavigationHeader Icon={false} title="Products" />,
           headerShown: false,
+          tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
         }}
       />
 
@@ -89,6 +99,9 @@ const UserTabs = () => {
           tabBarShowLabel: true,
           header: () => <NavigationHeader Icon={false} title="Event Management" />,
           headerShown: false,
+          tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
         }}
       />
 

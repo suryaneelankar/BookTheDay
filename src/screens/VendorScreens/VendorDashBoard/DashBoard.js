@@ -18,6 +18,9 @@ import { getVendorAuthToken } from "../../../utils/StoreAuthToken";
 import { useFocusEffect } from "@react-navigation/native";
 import FastImage from 'react-native-fast-image';
 import DeleteIcon from '../../../assets/svgs/deleteIcon.svg';
+import CalendarIcon from '../../../assets/svgs/calendarOrangeIcon.svg';
+import ServiceTime from '../../../assets/svgs/serviceTime.svg';
+const moment = require('moment');
 
 const VendorDashBoardTab = ({ navigation }) => {
 
@@ -164,10 +167,20 @@ const VendorDashBoardTab = ({ navigation }) => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            const activeBookings = response?.data?.data.filter((booking) => booking.bookingStatus !== "cancelled");
+            const activeBookings = response?.data?.data || []
             console.log('activeBookings is ::>>', activeBookings);
-            const outputData = consolidateFunctionHallsDataByProductId(activeBookings);
-            setFunctionHallBookingsData(outputData);
+            // const outputData = consolidateFunctionHallsDataByProductId(activeBookings);
+
+            const today = new Date();
+            const oneMonthAgo = moment().subtract(1, 'months').startOf('day').toDate();
+            oneMonthAgo.setMonth(today.getMonth() - 1);
+
+            const filteredData = activeBookings.filter(item => {
+                const bookingDate = moment(item?.startDate, 'DD MMM YYYY').toDate();
+                return bookingDate >= oneMonthAgo;
+            });
+            console.log('filteredData is ::>>', filteredData);
+            setFunctionHallBookingsData(filteredData);
 
         } catch (error) {
             console.log("functionHallBookingsGotForVendor error::::::::::", error);
@@ -203,7 +216,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            console.log('response is:::>>',response);
+            console.log('response is:::>>', response);
             if (response?.status == 200) {
                 showSuccessAlert();
                 getVendorListings();
@@ -347,38 +360,147 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     const renderFunctionHallItem = ({ item }) => {
-        const convertedImageUrl = item?.professionalImage?.url;
-
-        console.log('item is::>>', item);
-
         return (
-  
             <TouchableOpacity
-                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId, catEndPoint: allCatProductDetailEndpoints?.functionhalls })}
-                style={{ flexDirection: 'row', padding: 8, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between',borderRadius: 8 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <FastImage source={{
-                        uri: convertedImageUrl,
-                    }} style={{ width: 70, height: 70,borderTopLeftRadius:6, borderBottomLeftRadius:6 }}
-                    />
-                    <View style={{ margin: 10 }}>
-                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{item?.productName} </Text>
-                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.totalAmount)}</Text>
+                onPress={() =>
+                    navigation.navigate('RequestConfirmation', {
+                        productId: item?.productId,
+                        catEndPoint: allCatProductDetailEndpoints?.functionhalls,
+                        catType: "functionhalls",
+                        bookingId: item?.bookingId
+                    })
+                }
+                style={{
+                    flexDirection: 'row',
+                    backgroundColor:
+                        item?.bookingStatus === 'requested' ? '#FFF9DB' : // darker beige for contrast
+                            item?.bookingStatus === 'approved' ? '#FFF8F0' :
+                                item?.bookingStatus === 'rejected' ? '#FDEDED' :
+                                    item?.bookingStatus === 'cancelled' ? '#CCCCCC' :
+                                        item?.bookingStatus === 'payment successful' ? '#E8F6E8' :
+                                            '#FFF8F0',
+                    borderRadius: 12,
+                    // marginVertical: 8,
+                    // marginHorizontal: 16,
+                    padding: 10,
+                    shadowColor: '#000',
+                    shadowOpacity: 0.05,
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowRadius: 4,
+                    elevation: 2,
+                    alignItems: 'center',
+                }}
+            >
+                {/* Left - Image */}
+                <FastImage
+                    source={{ uri: item?.professionalImage?.url }}
+                    style={{
+                        width: 70,
+                        height: 70,
+                        borderRadius: 10,
+                        marginRight: 12,
+                    }}
+                />
+
+                {/* Right - Info */}
+                <View style={{ flex: 1 }}>
+                    {/* Hall Name */}
+                    <Text
+                        style={{
+                            fontSize: 15,
+                            fontWeight: '600',
+                            color: '#1A1F36',
+                            fontFamily: 'ManropeRegular',
+                            marginBottom: 4,
+                        }}
+                        numberOfLines={1}
+                    >
+                        {item?.userFullName}
+                    </Text>
+
+                    {/* Booking Date & Time */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
+                        <CalendarIcon />
+                        <Text
+                            style={{
+                                fontSize: 14,
+                                color: '#555',
+                                fontFamily: 'ManropeRegular',
+                                marginBottom: 4,
+                            }}
+                        >
+                            {' '} {item?.startDate} {'    '}
+                        </Text>
+                        <ServiceTime />
+                        <Text
+                            style={{
+                                fontSize: 14,
+                                color: '#555',
+                                fontFamily: 'ManropeRegular',
+                                marginBottom: 4,
+                            }}
+                        >
+                            {' '} {item?.bookingTime}
+                        </Text>
                     </View>
-                </View>
-                <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', height: 35, borderRadius: 5, position: 'absolute', right: 10 }}>
-                    <Text style={{ color: '#FD813B', marginHorizontal: 5 }}>{item?.count == 1 ? '1 Request ' : `${item?.count} Requests `}</Text>
-                    {item?.count == 1 ? <PersonOne /> :
-                        <>
-                            <PersonOne style={{ marginRight: -10 }} />
-                            <PersonTwo style={{ marginRight: -10 }} />
-                            <PersonThree />
-                        </>}
-                    <ArrowRight style={{ marginTop: 3, marginHorizontal: 10 }} />
-                </View>
 
 
+                    {/* Bottom Row - Status & Total */}
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                        }}
+                    >
+
+                        <Text
+                            style={{
+                                fontSize: 14,
+                                fontWeight: '600',
+                                color: '#FD813B',
+                                fontFamily: 'ManropeRegular',
+                            }}
+                        >
+                            ₹ {item?.totalAmount?.toLocaleString()}
+                        </Text>
+
+                        <Text
+                            style={{
+                                fontSize: 12,
+                                fontWeight: '500',
+                                backgroundColor:
+                                    item?.bookingStatus === 'requested' ? '#FFF9DB' : // darker beige for contrast
+                                        item?.bookingStatus === 'approved' ? '#FFF8F0' :
+                                            item?.bookingStatus === 'rejected' ? '#FDEDED' :
+                                                item?.bookingStatus === 'cancelled' ? '#CCCCCC' :
+                                                    item?.bookingStatus === 'payment successful' ? '#E8F6E8' :
+                                                        '#FFF8F0',
+
+                                color:
+                                    item?.bookingStatus === 'requested' ? '#8A6E00' : // dark olive/brown
+                                        item?.bookingStatus === 'approved' ? 'orange' :
+                                            item?.bookingStatus === 'rejected' ? '#EF0000' :
+                                                item?.bookingStatus === 'cancelled' ? 'grey' :
+                                                    item?.bookingStatus === 'payment successful' ? '#1B5E20' : // dark green
+                                                        '#57A64F',
+                                paddingHorizontal: 10,
+                                paddingVertical: 4,
+                                borderRadius: 20,
+                                overflow: 'hidden',
+                                fontFamily: 'ManropeRegular',
+                                textTransform: 'capitalize'
+                            }}
+                        >
+                            {item?.bookingStatus}
+                        </Text>
+
+                    </View>
+
+                </View>
+                <ArrowRight style={{ marginTop: 3, marginHorizontal: 10 }} />
             </TouchableOpacity>
+
         )
     }
 
@@ -387,7 +509,7 @@ const VendorDashBoardTab = ({ navigation }) => {
 
         return (
             <TouchableOpacity
-                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId, catEndPoint: allCatProductDetailEndpoints?.foodcatering })}
+                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId, catEndPoint: allCatProductDetailEndpoints?.foodcatering, catType: "catering", bookingId: item?.bookingId })}
                 style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <FastImage source={{
@@ -428,7 +550,7 @@ const VendorDashBoardTab = ({ navigation }) => {
 
         return (
             <TouchableOpacity
-                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId, catEndPoint: allCatProductDetailEndpoints?.clothjewels })}
+                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId, catEndPoint: allCatProductDetailEndpoints?.clothjewels, catType: "clothjewels", bookingId: item?.bookingId })}
                 style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <FastImage source={{
@@ -512,7 +634,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     };
 
     const ItemSeparator = () => {
-        return <View style={{ width: '80%', alignSelf: 'center', height: 1, backgroundColor: 'gray' }} />;
+        return <View style={{ width: '90%', alignSelf: 'center', height: 1, backgroundColor: 'gray' }} />;
     };
 
 
@@ -521,7 +643,7 @@ const VendorDashBoardTab = ({ navigation }) => {
             <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFF7E7']} style={{ flex: 1 }}>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', justifyContent: "space-between" }}>
-                    <View style={{ flexDirection: "row" , alignItems:"center"}}>
+                    <View style={{ flexDirection: "row", alignItems: "center" }}>
                         <ProfileIcon style={{}} />
                         <View>
                             <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular', textTransform: "capitalize" }}>Hi, {vendorLoggedInName}</Text>

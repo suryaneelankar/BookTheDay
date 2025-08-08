@@ -61,7 +61,8 @@ export default VendorHowItWorks;
 
 const styles = StyleSheet.create({
     rootContainer: {
-        marginBottom:40
+        marginBottom:40,
+        paddingBottom: 80
     },
     howItWorksHeader: {
         color: themevariable.Color_333333,

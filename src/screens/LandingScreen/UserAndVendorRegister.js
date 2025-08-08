@@ -91,7 +91,7 @@ const UserAndVendorRegister = ({ route }) => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
+            // console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
             if (vendorTokenRes?.status === 200) {
 
             }

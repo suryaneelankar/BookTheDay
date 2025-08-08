@@ -109,9 +109,9 @@ const HomeDashboard = () => {
             getUserAuthTokenRes();
             getProfileData();
             getAllCaterings(currentPage);
-            getHallsBookings();
-            getMyBookings();
-            getCateringsBookings();
+            // getHallsBookings();
+            // getMyBookings();
+            // getCateringsBookings();
             // Cleanup function to run when the screen loses focus
             return () => {
                 console.log('Screen is unfocused');
@@ -199,59 +199,59 @@ const HomeDashboard = () => {
         }
     }
 
-    const getMyBookings = async () => {
-        const token = await getUserAuthToken();
-        setGetUserAuth(token);
-        try {
-            const response = await axios.get(`${BASE_URL}/getUserClothJewelBookings`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            // console.log("BOOKINGS RES:::::::::", JSON.stringify(response?.data));
-            const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved");
+    // const getMyBookings = async () => {
+    //     const token = await getUserAuthToken();
+    //     setGetUserAuth(token);
+    //     try {
+    //         const response = await axios.get(`${BASE_URL}/getUserClothJewelBookings`, {
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`,
+    //             },
+    //         });
+    //         // console.log("BOOKINGS RES:::::::::", JSON.stringify(response?.data));
+    //         const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved");
 
-            setMyBookings(countApproved)
-        } catch (error) {
-            console.log("My Bookings data error>>::", error);
-        }
-    };
+    //         setMyBookings(countApproved)
+    //     } catch (error) {
+    //         console.log("My Bookings data error>>::", error);
+    //     }
+    // };
 
-    const getCateringsBookings = async () => {
-        const token = await getUserAuthToken();
-        try {
-            const response = await axios.get(`${BASE_URL}/getUserFoodCateringBookings`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            // console.log("catering BOOKINGS RES:::::::::", JSON.stringify(response?.data))
-            const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved");
+    // const getCateringsBookings = async () => {
+    //     const token = await getUserAuthToken();
+    //     try {
+    //         const response = await axios.get(`${BASE_URL}/getUserFoodCateringBookings`, {
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`,
+    //             },
+    //         });
+    //         // console.log("catering BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+    //         const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved");
 
-            setCateringBookings(countApproved);
+    //         setCateringBookings(countApproved);
 
-        } catch (error) {
-            console.log("My Bookings data error>>::", error);
-        }
-    };
+    //     } catch (error) {
+    //         console.log("My Bookings data error>>::", error);
+    //     }
+    // };
 
-    const getHallsBookings = async () => {
-        const token = await getUserAuthToken();
-        try {
-            const response = await axios.get(`${BASE_URL}/getUserFunctionHallBookings`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            // console.log("Funtional halls BOOKINGS RES:::::::::", JSON.stringify(response?.data))
-            const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved");
+    // const getHallsBookings = async () => {
+    //     const token = await getUserAuthToken();
+    //     try {
+    //         const response = await axios.get(`${BASE_URL}/getUserFunctionHallBookings`, {
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`,
+    //             },
+    //         });
+    //         console.log("Funtional halls BOOKINGS RES:::::::::Trying to call this api")
+    //         const countApproved = response?.data?.data?.filter((item) => item.bookingStatus === "approved");
 
-            setHallsBookings(countApproved);
+    //         setHallsBookings(countApproved);
 
-        } catch (error) {
-            console.log("My Bookings data error>>::", error);
-        }
-    };
+    //     } catch (error) {
+    //         console.log("My Bookings data error>>::", error);
+    //     }
+    // };
 
 
     const getUserAuthTokenRes = async () => {
@@ -277,7 +277,7 @@ const HomeDashboard = () => {
     }
 
 
-    const getAllEvents = async (page) => {
+    const getAllEvents = async (page) => { 
         const token = await getUserAuthToken();
         try {
             const response = await axios.get(`${BASE_URL}/getAllFunctionHalls?page=${page}&limit=10`, {
@@ -484,7 +484,7 @@ const HomeDashboard = () => {
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '95%', alignSelf: 'center', alignItems: 'center' }}>
                             <View style={{ flexDirection: 'row', }}>
                                 <FontAwesome name={"map-marker"} color={themevariable.Color_777777} size={20} style={{ marginTop: 5 }} />
-                                {item?.distance ?
+                                {item?.distance !== null && item?.distance !== undefined ?
                                     <Text style={{ fontWeight: '500', marginHorizontal: 5, color: themevariable.Color_777777, fontSize: 13, marginTop: 5, fontFamily: 'InterBold', }}>{item?.county}</Text>
                                     :
                                     <Text numberOfLines={2} style={{ fontWeight: '500', marginHorizontal: 5, color: themevariable.Color_777777, fontSize: 13, marginTop: 5, fontFamily: 'InterBold', bottom: 3 }}>{item?.functionHallAddress?.address}</Text>
@@ -506,13 +506,6 @@ const HomeDashboard = () => {
                         <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.bedRooms} Rooms</Text>
                         </View>
-                        {!item?.distance ?
-                            <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
-
-                                <Text style={{}}>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
-                                <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>{item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'veg' ? 'VEG' : 'NON-VEG'}</Text>
-                            </View>
-                            : null}
                     </View>
                 </TouchableOpacity>
             </View>
@@ -617,7 +610,7 @@ const HomeDashboard = () => {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
-            <ScrollView style={{ marginBottom: 70 }} >
+            <ScrollView style={{ marginBottom: 70 }} showsVerticalScrollIndicator={false}>
                 <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1 }}>
                     <View style={styles.topContainer}>
                         <View style={styles.locationContainer}>
@@ -860,7 +853,7 @@ const HomeDashboard = () => {
 
             </ScrollView>
 
-            {showBottomCard && (
+            {/* {showBottomCard && (
                 <FloatingCartButton
                     totalCount={hallsBookings + cateringBookings + myBookings}
                     hallsData={hallsBookings}
@@ -869,7 +862,7 @@ const HomeDashboard = () => {
                     authToken={getUserAuth}
                     onPress={() => dispatch(showOrHideBottomCard(false))}
                     onClose={() => dispatch(showOrHideBottomCard(false))} />
-            )}
+            )} */}
         </SafeAreaView>
     )
 }

@@ -47,7 +47,11 @@ const BookingReview = ({ navigation, route }) => {
         } else {
             fixedTokenAmount = 10000;
         }
-    }     
+    }   
+    
+    if (advanceAmountToPay < 10000) {
+        fixedTokenAmount = advanceAmountToPay;
+    }
 
     const remainingAdvance = (advanceAmountToPay || securityDepositAmount || 0) - fixedTokenAmount;
     const remainingAmount = totalAmount - (advanceAmountToPay || securityDepositAmount || 0);
@@ -371,6 +375,11 @@ const styles = StyleSheet.create({
     checkRow: {
         flexDirection: 'row',
         alignItems: 'flex-start',
+        alignSelf: 'center',
+        padding: 10,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#ddd',
         // alignItems: 'center',
         // marginVertical: 15,
         backgroundColor: "#fff",
@@ -391,6 +400,7 @@ const styles = StyleSheet.create({
     checkText: {
         fontSize: 13,
         color: '#C62828',
+        alignSelf: "center",
         // marginTop: 8,
         fontFamily: 'ManropeRegular',
         width: "90%"

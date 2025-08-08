@@ -21,6 +21,7 @@ import BASE_URL from '../../../apiconfig';
 import { useSelector, useDispatch } from 'react-redux';
 import { checkIsTokenStored, getLoginUserId } from '../../../../redux/actions';
 import ProfileDefaultIcon from 'react-native-vector-icons/EvilIcons';
+import DashboardIcon from '../../../assets/profilesvgs/dashboard.svg';
 
 
 const VendorProfile = () => {
@@ -105,7 +106,7 @@ const VendorProfile = () => {
                 />
                 <MenuItem
                     icon={<TransactionIcon />}
-                    title="My Transaction"
+                    title="My Transactions"
                     onPress={() => navigation.navigate("MyTransactions")}
                 />
 

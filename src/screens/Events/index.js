@@ -316,9 +316,7 @@ const Events = () => {
                             <Text style={{ marginHorizontal: 2, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.bedRooms} Rooms</Text>
                         </View>
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
-                            <Text>
-                                {item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}
-                            </Text>
+                            {item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}
                             <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>
                                 {item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'veg' ? 'VEG' : 'NON-VEG'}
                             </Text>
@@ -345,7 +343,7 @@ const Events = () => {
                         borderRadius: 5,
                         padding: 10,
                     }}
-                    disabled= {switchCateringVal ? true : false}
+                    disabled={switchCateringVal ? true : false}
                     onPress={() => {
                         setSelectedChip(item);
                         setSelectedPriceRange('');
@@ -357,8 +355,8 @@ const Events = () => {
         </View>
     );
 
-    console.log('switchCateringVal is :::>>>>',switchCateringVal);
-    
+    console.log('switchCateringVal is :::>>>>', switchCateringVal);
+
     const renderPriceRanges = () => (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', padding: 10 }}>
             {priceRanges.map((item) =>
@@ -374,7 +372,7 @@ const Events = () => {
                         padding: 10,
                         opacity: switchCateringVal ? 0.5 : 1,
                     }}
-                    disabled= {switchCateringVal ? true : false}
+                    disabled={switchCateringVal ? true : false}
                     onPress={() => {
                         setSelectedPriceRange(item);
                         setSelectedChip('');
@@ -410,7 +408,7 @@ const Events = () => {
 
     const onChangeSwitchCateringVal = (val) => {
         setSwitchCateringVal(val);
-        if(val){
+        if (val) {
             setSelectedChip('');
             setSelectedPriceRange('');
         }
@@ -558,12 +556,12 @@ const Events = () => {
                         backgroundColor: "#E3E3E7",
                     }}
                     textInputProps={{
-                          color: "red", // Change this to your desired entered text color
-                          fontSize: 14,
-                          fontFamily: "ManropeRegular",
-                          paddingHorizontal: 10,
-                      }}
-                    style={{ marginTop: 3, borderRadius: 15, width: "90%", alignSelf: "center", backgroundColor: "#E3E3E7",color: "#000000", }}
+                        color: "red", // Change this to your desired entered text color
+                        fontSize: 14,
+                        fontFamily: "ManropeRegular",
+                        paddingHorizontal: 10,
+                    }}
+                    style={{ marginTop: 3, borderRadius: 15, width: "90%", alignSelf: "center", backgroundColor: "#E3E3E7", color: "#000000", }}
                     hideResults={dropdownVisible === false || filteredData.length === 0}
                 />
                 <TouchableOpacity style={{ position: 'absolute', justifyContent: 'flex-end', right: 30, marginTop: 20 }} onPress={() => setQuery('')}>
@@ -690,12 +688,14 @@ const styles = StyleSheet.create({
     },
     autocompleteContainer: {
         flex: 1,
-        left: 0,
+        // left: 0,
         position: 'absolute',
-        right: 0,
-        top: 0,
+        // right: 0,
+        // top: 0,
         zIndex: 1,
         flexDirection: 'row',
+        width: "95%",
+        alignSelf: "center",
     },
 });
 

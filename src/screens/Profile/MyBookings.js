@@ -106,7 +106,7 @@ const ViewMyBookings = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("catering BOOKINGS RES:::::::::", JSON.stringify(response?.data))
+      // console.log("catering BOOKINGS RES:::::::::", JSON.stringify(response?.data))
       setCateringBookings(response?.data?.data)
     } catch (error) {
       console.log("My Bookings data error>>::", error);
@@ -438,7 +438,7 @@ const ViewMyBookings = () => {
         }
             text={'Pay Now'}
             showIcon={false}
-          // disabled={item.bookingStatus !== 'approved'}
+            disabled={item.bookingStatus !== 'approved'}
           />
         </View>
       </View>
@@ -565,7 +565,7 @@ const ViewMyBookings = () => {
                   {isChecked && <Icon name="check" size={16} style={{ marginLeft: 3 }} color="white" />}
                 </View>
                 <Text style={{ color: "#4D4D4D", fontSize: 16, fontWeight: "500", fontFamily: 'ManropeRegular', marginLeft: 10 }}>
-                  I agree that the advance amount is <Text style={{ fontWeight: 'bold', fontFamily: 'ManropeBold' }}>non-refundable</Text> upon cancellation.
+                  I agree that the advance amount paid is <Text style={{ fontWeight: 'bold', fontFamily: 'ManropeBold' }}>non-refundable</Text> upon cancellation.
                 </Text>
               </View>
             </TouchableOpacity>

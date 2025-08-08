@@ -77,9 +77,9 @@ const VendorCategoryScreen = ({ navigation }) => {
                     Authorization: `Bearer ${token}`, 
                 },
             });
-            console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
+            // console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
             if (vendorTokenRes?.status === 200) {
-               console.warn("Vendor token added successfully:", vendorTokenRes?.data?.message);
+               console.log("Vendor token added successfully:", vendorTokenRes?.data?.message);
             }
         } catch (error) {
             console.error("Error during add vendor token:", error);
