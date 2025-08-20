@@ -53,7 +53,7 @@ const VendorDashBoardTab = ({ navigation }) => {
 
     const getVendorAuthTokenRes = async () => {
         const token = await getVendorAuthToken();
-        console.log("VendorAuthToken", token);
+        console.log("VendorAuthToken is::*****************************", token);
     };
 
     const getTotalVendorEarnings = async () => {
@@ -130,8 +130,9 @@ const VendorDashBoardTab = ({ navigation }) => {
                     catType: item?.postId?.catType
                 };
             });
-            setVendorListings(result);
-            // console.log('result is ::>>',result);
+            const filteredResult = result.filter((item) => item?.productName);
+            setVendorListings(filteredResult);
+            // console.log('result setVendorListings is ::>>',result);
 
         } catch (error) {
             console.log("listing error::::::::::", error);
@@ -168,7 +169,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                 },
             });
             const activeBookings = response?.data?.data || []
-            console.log('activeBookings is ::>>', activeBookings);
+            // console.log('activeBookings is ::>>', activeBookings);
             // const outputData = consolidateFunctionHallsDataByProductId(activeBookings);
 
             const today = new Date();
@@ -179,7 +180,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                 const bookingDate = moment(item?.startDate, 'DD MMM YYYY').toDate();
                 return bookingDate >= oneMonthAgo;
             });
-            console.log('filteredData is ::>>', filteredData);
+            // console.log('filteredData is ::>>', filteredData);
             setFunctionHallBookingsData(filteredData);
 
         } catch (error) {
@@ -210,13 +211,14 @@ const VendorDashBoardTab = ({ navigation }) => {
     const deleteTheVendorPost = async (vendorId, postId) => {
         const token = await getVendorAuthToken();
         // console.log('vendorId is:::',vendorId,postId);
+        console.log("deleteTheVendorPost payload:::", vendorId, postId);
         try {
             const response = await axios.delete(`${BASE_URL}/deleteVendorPost/${vendorId}/post/${postId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            console.log('response is:::>>', response);
+            console.log('response deleteTheVendorPost is:::>>', response);
             if (response?.status == 200) {
                 showSuccessAlert();
                 getVendorListings();
@@ -313,51 +315,69 @@ const VendorDashBoardTab = ({ navigation }) => {
         );
     }
 
-    const renderVendorList = async ({ item }) => {
-        // const token = await getVendorAuthToken();
-
-        const convertedImageUrl = item?.productImage;
+    const renderVendorList = ({ item }) => {
+        if (!item) return null; // skip null placeholders
+    
         return (
             <TouchableOpacity
-                style={{ opacity: item?.available === true ? 1 : 0.5, backgroundColor: 'white', marginTop: 10, width: '48%', marginHorizontal: 5, alignSelf: 'center', justifyContent: 'center', borderRadius: 10, }}
+                style={{
+                    opacity: item?.available ? 1 : 0.5,
+                    backgroundColor: 'white',
+                    marginTop: 10,
+                    width: '90%', // full width for single column
+                    alignSelf: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 10,
+                }}
+                onPress={() => navigation.navigate('EditFunctionHall', { hallId: item?._id })} // Navigate to edit screen
             >
                 <View style={{ marginTop: 5, width: '100%', marginHorizontal: 5 }}>
-
                     <FastImage
-                        style={{ width: '95%', height: 200, borderRadius: 10 }}
-                        source={{
-                            uri: convertedImageUrl,
-                            // headers: { Authorization: `Bearer ${token}` }
-                        }}
+                        style={{ width: '97%', height: 200, borderRadius: 10 }}
+                        source={{ uri: item?.productImage }}
                     />
-                    <Text style={styles.productName}>{capitalizeFirstLetters(item?.productName)}</Text>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginHorizontal: 5 }}>
-                        <Text style={[styles.productListedName, { color: item?.available ? '#57A64F' : '#EF0000', backgroundColor: item?.available ? '#45FE3529' : '#FE353529' }]}>{item?.available ? 'Listed' : 'Not Listed'}</Text>
+                    <Text style={styles.productName}>
+                        {capitalizeFirstLetters(item?.productName)}
+                    </Text>
+    
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, justifyContent: 'space-between', width: '90%', marginHorizontal: 5 }}>
+                        <Text
+                            style={[
+                                styles.productListedName,
+                                {
+                                    color: item?.available ? '#57A64F' : '#EF0000',
+                                    backgroundColor: item?.available ? '#45FE3529' : '#FE353529',
+                                },
+                            ]}
+                        >
+                            {item?.available ? 'Listed' : 'Not Listed'}
+                        </Text>
                         <Switch
                             trackColor={{ false: '#EF0000', true: '#e8e46b' }}
-                            thumbColor={item?.available ? '#ECA73C' : '#ECA73C'}
+                            thumbColor="#ECA73C"
                             ios_backgroundColor="#3e3e3e"
-                            onValueChange={() => showAvailabilityConfirmation(item?.catType, item?.particularPostId, item?.available)}
+                            style={{left: 10}}
+                            onValueChange={() =>
+                                showAvailabilityConfirmation(item?.catType, item?.particularPostId, item?.available)
+                            }
                             value={item?.available}
                         />
                     </View>
-
+    
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, justifyContent: 'space-between', width: '90%', bottom: 5 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 }}>
                             <ListedTimeIcon />
                             <Text style={styles.price}>{formatDate(item?.createdAt)}</Text>
                         </View>
-                        {/* <TouchableOpacity onPress={() => { showAvailabilityConfirmation(item?.catType, item?.particularPostId, item?.available) }}>
-                            <EditButton />
-                        </TouchableOpacity> */}
-                        <TouchableOpacity onPress={() => { showConfirmationAlert(item?._id, item?.particularPostId) }}>
+                        <TouchableOpacity onPress={() => showConfirmationAlert(item?._id, item?.particularPostId)}>
                             <DeleteIcon />
                         </TouchableOpacity>
                     </View>
                 </View>
             </TouchableOpacity>
-        )
-    }
+        );
+    };
+    
 
     const renderFunctionHallItem = ({ item }) => {
         return (
@@ -725,8 +745,8 @@ const VendorDashBoardTab = ({ navigation }) => {
                     <FlatList
                         data={vendorListing}
                         renderItem={renderVendorList}
-                        contentContainerStyle={{ borderRadius: 15, margin: 10, paddingBottom: 50 }}
-                        numColumns={2}
+                        contentContainerStyle={{ paddingBottom: 100 }}
+                        // numColumns={2}
                     />
                 </ScrollView>
             </LinearGradient>

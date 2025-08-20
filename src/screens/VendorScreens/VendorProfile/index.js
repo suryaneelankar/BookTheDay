@@ -81,118 +81,69 @@ const VendorProfile = () => {
     };
 
     return (
-        <LinearGradient start={{ x: 1, y: 0 }} end={{ x: 1, y: 1 }} colors={['#FFF3CD', '#FFDB7E', '#FFDB7E', '#FFDB7E']} style={{ flex: 1 }}>
-            <View style={styles.profileContainer}>
-                <View style={styles.profileImageContainer}>
-                    <ProfileDefaultIcon name='user' size={90} />
-
-                </View>
-                <Text style={styles.profileName}>{profileData?.fullName}</Text>
-                <Text style={styles.profileEmail}>+91 {vendorLoggedInMobileNum}</Text>
-
-            </View>
-
-            <ScrollView style={styles.menuContainer} showsVerticalScrollIndicator={false}>
-
-                <MenuItem
-                    icon={<ProfileIcon />}
-                    title="My KYC"
-                    onPress={() => navigation.navigate('AadharUpload')}
-                />
-                <MenuItem
-                    icon={<ProfileIcon />}
-                    title="Update Bank Account"
-                    onPress={() => navigation.navigate('BankDetailsScreen')}
-                />
-                <MenuItem
-                    icon={<TransactionIcon />}
-                    title="My Transactions"
-                    onPress={() => navigation.navigate("MyTransactions")}
-                />
-
-                <MenuItem icon={<AboutUsIcon />} title="About Us" onPress={() => navigation.navigate('AboutUsScreen')} />
-                <MenuItem icon={<TermsConditionIcon />} title="Terms & Condition" onPress={() => navigation.navigate('VendorTermsAndCond')} />
-                <MenuItem icon={<RefundPolicy />} title="Refund Policy" onPress={() => navigation.navigate('VendorRefundPolicy')} />
-                <MenuItem icon={<LogOutIcon />} title="Log Out"
-                    onPress={async () => {
-                        // dispatch(getLoginUserId('')),
-                        // navigation.navigate('LandingScreen')
-                        dispatch(checkIsTokenStored(false));
-                        await removeVendorAuthToken();
-                        await removeVendorMobileNumber();
-                    }} />
-
-            </ScrollView>
-
-            <Modal
-                isVisible={modalVisible}
-                onBackdropPress={() => setModalVisible(false)}
-                backdropOpacity={0.9}
-                backdropColor={themevariable.Color_000000}
-                hideModalContentWhileAnimating={true}
-                animationOutTiming={500}
-                backdropTransitionInTiming={500}
-                backdropTransitionOutTiming={500}
-                animationInTiming={500}
-                style={{
-                    // flex: 1,
-                    position: "absolute",
-                    bottom: 0,
-                    // backgroundColor: "pink",
-                    alignSelf: "center", width: "100%"
-                }}
-                onBackButtonPress={() => {
-                    setModalVisible(false)
-                }}
-                animationOut={'slideOutDown'}
-                animationType={'slideInUp'}
+        <LinearGradient
+            start={{ x: 1, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            colors={['#FFF3CD', '#FFDB7E', '#FFDB7E', '#FFDB7E']}
+            style={{ flex: 1 }}
+        >
+            <ScrollView
+                style={{ flex: 1 }}
+                contentContainerStyle={{ paddingBottom: 60 }}
+                showsVerticalScrollIndicator={false}
             >
-                <View style={{ flex: 1, alignItems: "center", alignSelf: "center", justifyContent: "center" }}>
-                    <View style={styles.modalView}>
-                        <TouchableOpacity
-                            style={{ alignSelf: 'flex-end' }}
-                            onPress={() => setModalVisible(!modalVisible)}
-                        >
-                            <CrossIcon />
-                        </TouchableOpacity>
-                        <LinkBgm style={{ backgroundColor: "pink" }} />
-                        <Text style={styles.modalText}>Link Copied</Text>
-                        <Text style={styles.modalDescription}>B2B Team link is copied to your clipboard. Now you can share with others</Text>
-                        <View style={styles.linkContainer}>
-                            <TextInput
-                                style={styles.linkText}
-                                value={link}
-                                editable={false}
-                                placeholderTextColor={"#7E8389"}
-                            />
-                            <LinearGradient colors={['#D2453B', '#A0153E']}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 0 }}
-                                style={{ height: "100%", }}
-                            >
-                                <TouchableOpacity onPress={() => ('')}>
-                                    <Text style={{ color: "#F4F4F6" }}>Save</Text>
-                                </TouchableOpacity>
-                            </LinearGradient>
-                        </View>
-                        <Text style={styles.shareText}>Share the link through</Text>
-                        <View style={styles.shareButtons}>
-                            <TouchableOpacity style={styles.shareButton} onPress={() => shareLink('airdrop')}>
-                                {/* <Icon name="share-social-outline" size={30} color="blue" /> */}
-                                <Text style={{ color: themevariable.Color_000000, }}>AirDrop</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.shareButton} onPress={() => shareLink('messages')}>
-                                {/* <Icon name="chatbubble-outline" size={30} color="green" /> */}
-                                <Text style={{ color: themevariable.Color_000000, }}>Messages</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={styles.shareButton} onPress={() => shareLink('whatsapp')}>
-                                {/* <Icon name="logo-whatsapp" size={30} color="green" /> */}
-                                <Text style={{ color: themevariable.Color_000000, }}>WhatsApp</Text>
-                            </TouchableOpacity>
-                        </View>
+                <View style={styles.profileContainer}>
+                    <View style={styles.profileImageContainer}>
+                        <ProfileDefaultIcon name="user" size={90} />
                     </View>
+                    <Text style={styles.profileName}>{profileData?.fullName}</Text>
+                    <Text style={styles.profileEmail}>+91 {vendorLoggedInMobileNum}</Text>
                 </View>
-            </Modal>
+
+                <View style={styles.menuContainer}>
+                    <MenuItem
+                        icon={<ProfileIcon />}
+                        title="My KYC"
+                        onPress={() => navigation.navigate('AadharUpload')}
+                    />
+                    <MenuItem
+                        icon={<ProfileIcon />}
+                        title="Update Bank Account"
+                        onPress={() => navigation.navigate('BankDetailsScreen')}
+                    />
+                    <MenuItem
+                        icon={<DashboardIcon />}
+                        title="My Bookings"
+                        onPress={() => navigation.navigate('MyBookings')}
+                    />
+                    <MenuItem
+                        icon={<TransactionIcon />}
+                        title="My Transactions"
+                        onPress={() => navigation.navigate('MyTransactions')}
+                    />
+                    <MenuItem icon={<AboutUsIcon />} title="About Us" onPress={() => navigation.navigate('AboutUsScreen')} />
+
+                    <MenuItem
+                        icon={<TermsConditionIcon />}
+                        title="Terms & Condition"
+                        onPress={() => navigation.navigate('VendorTermsAndCond')}
+                    />
+                    <MenuItem
+                        icon={<RefundPolicy />}
+                        title="Refund Policy"
+                        onPress={() => navigation.navigate('VendorRefundPolicy')}
+                    />
+                    <MenuItem
+                        icon={<LogOutIcon />}
+                        title="Log Out"
+                        onPress={async () => {
+                            dispatch(checkIsTokenStored(false));
+                            await removeVendorAuthToken();
+                            await removeVendorMobileNumber();
+                        }}
+                    />
+                </View>
+            </ScrollView>
         </LinearGradient>
     );
 };
@@ -252,7 +203,7 @@ const styles = StyleSheet.create({
     menuContainer: {
         paddingVertical: 10,
         borderRadius: 10,
-        backgroundColor: "white",
+        backgroundColor: "#FFFFFF",
         borderTopLeftRadius: 40,
         borderTopRightRadius: 40,
     },

@@ -658,7 +658,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             {
                                 text: "Ok", onPress: () => {
                                     navigation.goBack()
-                                    // navigation.navigate('AadharUpload')
+                                    // navigation.navigate('EditFunctionHall');
                                 }
                             }
                         ],
@@ -1369,12 +1369,6 @@ const styles = StyleSheet.create({
         fontSize: 13,
         marginTop: 7,
         marginBottom: 10,
-    },
-    image: {
-        // marginLeft: 15,
-        // marginRight: 7,
-        // marginTop: 5,
-        // backgroundColor:'red'
     },
     imageContainer: {
         alignSelf: 'center',

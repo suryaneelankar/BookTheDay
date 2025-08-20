@@ -51,6 +51,8 @@ import { getUserAuthToken, getUserMobileNumber, getVendorAuthToken, getVendorMob
 import { ActivityIndicator, SafeAreaView, View } from "react-native";
 import UserAndVendorRegister from "../screens/LandingScreen/UserAndVendorRegister";
 import BookingReview from "../screens/Profile/BookingReview";
+import MyBookings from "../screens/VendorScreens/VendorProfile/MyBookings";
+import EditFunctionHall from "../screens/VendorScreens/VendorAddFunctionHalls/EditFunctionHall";
 
 const MainNavigation = () => {
 
@@ -175,12 +177,13 @@ const MainNavigation = () => {
                 headerShown: true,
             }} />
             <Stack.Screen name="ViewEvents" component={ViewEvents} options={{
-                 header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Event Details" />
-                        </SafeAreaView>
-                    )
-                , headerShown: true }} />
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="Event Details" />
+                    </SafeAreaView>
+                )
+                , headerShown: true
+            }} />
 
             <Stack.Screen
                 name="EditProfile"
@@ -335,6 +338,19 @@ const MainNavigation = () => {
                     header: () => (
                         <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
                             <NavigationHeader Icon={true} title="My Transactions" />
+                        </SafeAreaView>
+                    ),
+                    headerShown: true,
+                }}
+            />
+
+            <Stack.Screen
+                name="MyBookings"
+                component={MyBookings}
+                options={{
+                    header: () => (
+                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                            <NavigationHeader Icon={true} title="My Bookings" />
                         </SafeAreaView>
                     ),
                     headerShown: true,
@@ -528,6 +544,16 @@ const MainNavigation = () => {
                 ),
                 headerShown: true,
             }} />
+
+            <Stack.Screen name="EditFunctionHall" component={EditFunctionHall} options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="Edit Function Hall" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }} />
+            {/* EditFunctionHallScreen */}
 
 
             <Stack.Screen name="AddFoodCatering" component={AddFoodCatering} options={{
