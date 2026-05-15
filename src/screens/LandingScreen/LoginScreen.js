@@ -113,8 +113,14 @@ const LoginScreen = ({ route }) => {
                 }
             }
         } catch (error) {
-            setModalVisible(true)
             console.error("Error during login:", error);
+            Alert.alert(
+                error.response?.data?.message,
+                'Please try again',
+                [
+                    { text: 'OK' },
+                ]
+            );
         }
 
     }

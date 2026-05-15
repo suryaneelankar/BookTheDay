@@ -5,7 +5,7 @@ import ChooseMenuField from '../../../commonFields/ChooseMenuField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
 import SelectedUploadIcon from '../../../assets/svgs/selectedUploadIcon.svg';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import BASE_URL from '../../../apiconfig';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -20,6 +20,8 @@ import DetectLocation from '../../../assets/svgs/detectLocation.svg';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import { useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../../utils/GlobalFunctions';
+import DocumentPicker from 'react-native-document-picker';
+import Video from 'react-native-video';
 
 const GeneralDetails = ({ isAadharUpdate }) => {
     const navigation = useNavigation();
@@ -80,6 +82,11 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     const [premiumNonVegMenuName, setPremiumNonVegMenuName] = useState('');
     const [eliteNonVegMenuName, setEliteNonVegMenuName] = useState('');
     const [advanceAmountPercentage, setAdvanceAmountPercentage] = useState(0);
+    const [pickerModal, setPickerModal] = useState({ visible: false, index: null });
+    const [videos, setVideos] = useState([null, null, null]);
+    const [videoPickerModal, setVideoPickerModal] = useState({ visible: false, index: null });
+    const [videoPreview, setVideoPreview] = useState({ visible: false, uri: null });
+    const [videoPaused, setVideoPaused] = useState(false);
 
     const [loading, setLoading] = useState(false);
     const [functionHallAreaInSft, setfunctionHallAreaInSft] = useState('');
@@ -239,39 +246,194 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         });
     };
 
-    const openGalleryOrCameraForAdditonalImages = async (index) => {
-        const options = {
-            mediaType: 'photo',
-            maxWidth: 1920,
-            maxHeight: 1920,
-            quality: 1,
-        };
-        launchImageLibrary(options, (response) => {
-            // console.log('Response = ', response);
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.errorCode) {
-                console.log('ImagePicker Error: ', response.errorMessage);
+
+    const VIDEO_SIZE_LIMIT = 35 * 1024 * 1024; // 35 MB
+
+    const handlePickVideo = async (source) => {
+        const idx = videoPickerModal.index;
+        setVideoPickerModal({ visible: false, index: null });
+        try {
+            let picked = null;
+            if (source === 'gallery') {
+                await new Promise(resolve => {
+                    launchImageLibrary({ mediaType: 'video' }, (res) => {
+                        if (!res.didCancel && !res.errorCode) {
+                            const asset = res.assets?.[0];
+                            if (asset?.fileSize > VIDEO_SIZE_LIMIT) {
+                                Alert.alert('File too large', 'Please select a video under 35 MB.');
+                            } else {
+                                picked = asset;
+                            }
+                        }
+                        resolve();
+                    });
+                });
             } else {
-                if (index == 0) {
-                    setAdditionalImages({ ...additionalImages, additionalImageOne: response });
-                } else if (index == 1) {
-                    setAdditionalImages({ ...additionalImages, additionalImageTwo: response });
-                } else if (index == 2) {
-                    setAdditionalImages({ ...additionalImages, additionalImageThree: response });
-                } else if (index == 3) {
-                    setAdditionalImages({ ...additionalImages, additionalImageFour: response });
-                } else if (index == 4) {
-                    setAdditionalImages({ ...additionalImages, additionalImageFive: response });
-                } else if (index == 5) {
-                    setAdditionalImages({ ...additionalImages, additionalImageSix: response });
-                } else if (index == 6) {
-                    setAdditionalImages({ ...additionalImages, additionalImageSeven: response });
+                const result = await DocumentPicker.pickSingle({ type: [DocumentPicker.types.video] });
+                if (result.size > VIDEO_SIZE_LIMIT) {
+                    Alert.alert('File too large', 'Please select a video under 35 MB.');
                 } else {
-                    setAdditionalImages({ ...additionalImages, additionalImageEight: response });
+                    picked = { uri: result.uri, fileName: result.name, type: result.type, fileSize: result.size };
                 }
             }
-        });
+            if (picked) {
+                setVideos(prev => { const updated = [...prev]; updated[idx] = picked; return updated; });
+            }
+        } catch (err) {
+            if (!DocumentPicker.isCancel(err)) console.error('Video picker error:', err);
+        }
+    };
+
+    const VideoPreviewModal = ({ visible, uri, onClose }) => (
+        <Modal transparent animationType="fade" visible={visible} onRequestClose={onClose}>
+            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.92)', justifyContent: 'center' }}>
+                <TouchableOpacity
+                    onPress={onClose}
+                    style={{ position: 'absolute', top: 20, right: 20, zIndex: 10, padding: 8 }}
+                >
+                    <Text style={{ color: '#fff', fontSize: 28, fontWeight: 'bold' }}>✕</Text>
+                </TouchableOpacity>
+
+                {uri && (
+                    <TouchableOpacity activeOpacity={1} onPress={() => setVideoPaused(p => !p)}>
+                        <Video
+                            source={{ uri }}
+                            style={{ width: Dimensions.get('window').width, height: 300 }}
+                            resizeMode="contain"
+                            paused={videoPaused}
+                            controls={true}
+                            onError={(e) => console.error('Video error:', e)}
+                        />
+                    </TouchableOpacity>
+                )}
+
+                <TouchableOpacity
+                    onPress={onClose}
+                    style={[styles.cancelBtn, { marginHorizontal: 20, marginTop: 20 }]}
+                >
+                    <Text style={styles.cancelText}>Close</Text>
+                </TouchableOpacity>
+            </View>
+        </Modal>
+    );
+
+    const VideoPickerModal = ({ visible, onClose }) => (
+        <Modal transparent animationType="slide" visible={visible} onRequestClose={onClose}>
+            <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose} />
+            <View style={styles.sheet}>
+                <View style={styles.handle} />
+                <Text style={styles.sheetTitle}>Select Video</Text>
+                <Text style={[styles.subTitle, { marginBottom: 8 }]}>Max size: 35 MB</Text>
+
+                <TouchableOpacity style={styles.option} onPress={() => handlePickVideo('gallery')}>
+                    <Text style={styles.optionIcon}>🎞️</Text>
+                    <Text style={styles.optionText}>Gallery</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.option} onPress={() => handlePickVideo('file')}>
+                    <Text style={styles.optionIcon}>📁</Text>
+                    <Text style={styles.optionText}>File Manager</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
+                    <Text style={styles.cancelText}>Cancel</Text>
+                </TouchableOpacity>
+            </View>
+        </Modal>
+    );
+
+    const ImagePickerModal = ({ visible, onClose, onGallery, onCamera, onFileManager }) => (
+        <Modal transparent animationType="slide" visible={visible} onRequestClose={onClose}>
+            <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose} />
+            <View style={styles.sheet}>
+                <View style={styles.handle} />
+                <Text style={styles.sheetTitle}>Select Image</Text>
+
+                <TouchableOpacity style={styles.option} onPress={onGallery}>
+                    <Text style={styles.optionIcon}>🖼️</Text>
+                    <Text style={styles.optionText}>Gallery</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.option} onPress={onCamera}>
+                    <Text style={styles.optionIcon}>📷</Text>
+                    <Text style={styles.optionText}>Camera</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.option} onPress={onFileManager}>
+                    <Text style={styles.optionIcon}>📁</Text>
+                    <Text style={styles.optionText}>File Manager</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
+                    <Text style={styles.cancelText}>Cancel</Text>
+                </TouchableOpacity>
+            </View>
+        </Modal>
+    );
+
+
+    const openGalleryOrCameraForAdditonalImages = (index) => {
+        setPickerModal({ visible: true, index });
+    };
+
+    const imageKeys = [
+        'additionalImageOne', 'additionalImageTwo', 'additionalImageThree',
+        'additionalImageFour', 'additionalImageFive', 'additionalImageSix',
+        'additionalImageSeven', 'additionalImageEight'
+    ];
+
+    const handleSetImage = (response) => {
+        const key = imageKeys[pickerModal.index];
+        setAdditionalImages(prev => ({ ...prev, [key]: response }));
+        setPickerModal({ visible: false, index: null });
+    };
+
+
+    const openGalleryOrCameraForAdditonalIma = async (index) => {
+        const imageKeys = [
+            'additionalImageOne', 'additionalImageTwo', 'additionalImageThree',
+            'additionalImageFour', 'additionalImageFive', 'additionalImageSix',
+            'additionalImageSeven', 'additionalImageEight'
+        ];
+
+        const setImage = (response) => {
+            setAdditionalImages({ ...additionalImages, [imageKeys[index]]: response });
+        };
+
+        Alert.alert('Select Image', 'Choose an option', [
+            {
+                text: 'Gallery',
+                onPress: () => {
+                    const options = { mediaType: 'photo', maxWidth: 1920, maxHeight: 1920, quality: 1 };
+                    launchImageLibrary(options, (response) => {
+                        if (!response.didCancel && !response.errorCode) setImage(response);
+                    });
+                }
+            },
+            {
+                text: 'Camera',
+                onPress: () => {
+                    const options = { mediaType: 'photo', maxWidth: 1920, maxHeight: 1920, quality: 1 };
+                    launchCamera(options, (response) => {
+                        if (!response.didCancel && !response.errorCode) setImage(response);
+                    });
+                }
+            },
+            {
+                text: 'File Manager',
+                onPress: async () => {
+                    try {
+                        const result = await DocumentPicker.pickSingle({
+                            type: [DocumentPicker.types.images],
+                        });
+                        setImage({ assets: [{ uri: result.uri, fileName: result.name, type: result.type }] });
+                    } catch (err) {
+                        if (!DocumentPicker.isCancel(err)) console.error('File picker error:', err);
+                    }
+                }
+            },
+            { text: 'Cancel', style: 'cancel' }
+        ]);
     };
 
     const onChangeBasicVegMenuName = (value) => {
@@ -597,6 +759,16 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
         formData.append('menuImagesMeta', JSON.stringify(menuImageMetaData));
 
+        videos.forEach((video, idx) => {
+            if (video?.uri) {
+                formData.append('hallVideos', {
+                    uri: video.uri,
+                    type: video.type || 'video/mp4',
+                    name: video.fileName || `hall_video_${idx + 1}.mp4`,
+                });
+            }
+        });
+
         const functionHallAddessIs = { "address": functionHallAddress, "city": functionHallCity, "pinCode": functionHallPinCode };
         formData.append('serviceType', 'driver');
         formData.append('description', productDescription);
@@ -625,6 +797,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
         console.log('formdata is ::>>', formData);
         const token = await getVendorAuthToken();
+        console.log('Vendor Token is::::::::>>', token);
         setLoading(true);
         try {
             const response = await axios.post(`${BASE_URL}/AddFunctionHall`, formData, {
@@ -671,6 +844,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
             }
         } catch (error) {
             setLoading(false);
+            console.error('Error uploading document test:', error.response?.data);
             console.error('Error uploading document:', error);
             console.log('Error', 'Failed to upload document');
         }
@@ -1087,6 +1261,46 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             keyExtractor={item => item.id}
                             contentContainerStyle={{ width: '100%', alignItems: 'center' }}
                         />
+
+                        <Text style={styles.title}>Hall Videos</Text>
+                        <Text style={styles.subTitle}>Upload up to 3 videos (optional, max 35 MB each)</Text>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
+                            {videos.map((video, idx) => (
+                                <TouchableOpacity
+                                    key={idx}
+                                    onPress={() => setVideoPickerModal({ visible: true, index: idx })}
+                                    style={{
+                                        flex: 1, marginHorizontal: 4, borderWidth: 1,
+                                        borderColor: video ? '#ECA73C' : '#ccc',                                        
+                                        borderRadius: 8, padding: 10, alignItems: 'center',
+                                        backgroundColor: video ? '#FFF5E3' : '#f9f9f9',
+                                        minHeight: 80, justifyContent: 'center'
+                                    }}
+                                >
+                                    <Text style={{ fontSize: 24 }}>{video ? '🎬' : '🎥'}</Text>
+                                    <Text style={{ color: video ? '#ECA73C' : '#999', fontSize: 11, marginTop: 4, textAlign: 'center' }} numberOfLines={2}>
+                                        {video ? (video.fileName || 'Video ' + (idx + 1)) : `Upload Video ${idx + 1}`}
+                                    </Text>
+                                    {video && (
+                                        <>
+                                            <TouchableOpacity
+                                                onPress={(e) => { e.stopPropagation?.(); setVideoPaused(false); setVideoPreview({ visible: true, uri: video.uri }); }}
+                                                style={{ marginTop: 6, backgroundColor: '#ECA73C', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 }}
+                                            >
+                                                <Text style={{ color: '#fff', fontSize: 11, fontWeight: '600' }}>▶ Preview</Text>
+                                            </TouchableOpacity>
+                                            <TouchableOpacity
+                                                onPress={(e) => { e.stopPropagation?.(); setVideos(prev => { const u = [...prev]; u[idx] = null; return u; }); }}
+                                                style={{ position: 'absolute', top: 4, right: 4 }}
+                                            >
+                                                <Text style={{ color: '#e74c3c', fontSize: 14, fontWeight: 'bold' }}>✕</Text>
+                                            </TouchableOpacity>
+                                        </>
+                                    )}
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                        
                         <TextField
                             label='Hall Name'
                             placeholder="Please Enter Hall Name"
@@ -1317,10 +1531,48 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         />
                     </View>
 
+                    <VideoPreviewModal
+                        visible={videoPreview.visible}
+                        uri={videoPreview.uri}
+                        onClose={() => { setVideoPreview({ visible: false, uri: null }); setVideoPaused(true); }}
+                    />
+
+                    <VideoPickerModal
+                        visible={videoPickerModal.visible}
+                        onClose={() => setVideoPickerModal({ visible: false, index: null })}
+                    />
+
+                    <ImagePickerModal
+                        visible={pickerModal.visible}
+                        onClose={() => setPickerModal({ visible: false, index: null })}
+                        onGallery={() => {
+                            setPickerModal(prev => ({ ...prev, visible: false }));
+                            launchImageLibrary({ mediaType: 'photo', maxWidth: 1920, maxHeight: 1920, quality: 1 }, (res) => {
+                                if (!res.didCancel && !res.errorCode) handleSetImage(res);
+                            });
+                        }}
+                        onCamera={() => {
+                            setPickerModal(prev => ({ ...prev, visible: false }));
+                            launchCamera({ mediaType: 'photo', maxWidth: 1920, maxHeight: 1920, quality: 1 }, (res) => {
+                                if (!res.didCancel && !res.errorCode) handleSetImage(res);
+                            });
+                        }}
+                        onFileManager={async () => {
+                            setPickerModal(prev => ({ ...prev, visible: false }));
+                            try {
+                                const result = await DocumentPicker.pickSingle({ type: [DocumentPicker.types.images] });
+                                handleSetImage({ assets: [{ uri: result.uri, fileName: result.name, type: result.type }] });
+                            } catch (err) {
+                                if (!DocumentPicker.isCancel(err)) console.error('File picker error:', err);
+                            }
+                        }}
+                    />
+
                     {/* <Text style={{ fontFamily: 'InterRegular', color: '#5F6377', fontSize: 15, fontWeight: '600' }}>I Accept Terms and Conditions</Text> */}
                     <TouchableOpacity onPress={() => { onPressSaveAndPost() }} style={{ padding: 10, backgroundColor: '#FFF5E3', alignSelf: 'center', borderRadius: 5, borderColor: '#ECA73C', borderWidth: 2, marginTop: 40, bottom: 20 }}>
                         <Text style={{ color: '#ECA73C' }}> Save & Post </Text>
                     </TouchableOpacity>
+
                 </View>}
 
         </View>
@@ -1495,5 +1747,29 @@ const styles = StyleSheet.create({
         borderColor: themevariable.Color_C8C8C6,
         // paddingHorizontal:12,
         borderRadius: 5,
-    }
+    },
+    overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' },
+    sheet: {
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        padding: 20,
+        paddingBottom: 34,
+    },
+    handle: {
+        width: 40, height: 4, backgroundColor: '#ddd',
+        borderRadius: 2, alignSelf: 'center', marginBottom: 16,
+    },
+    sheetTitle: { fontSize: 16, fontWeight: '600', color: '#333', marginBottom: 16 },
+    option: {
+        flexDirection: 'row', alignItems: 'center',
+        paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#f0f0f0',
+    },
+    optionIcon: { fontSize: 22, marginRight: 14 },
+    optionText: { fontSize: 15, color: '#333' },
+    cancelBtn: {
+        marginTop: 12, paddingVertical: 14,
+        alignItems: 'center', backgroundColor: '#f5f5f5', borderRadius: 12,
+    },
+    cancelText: { fontSize: 15, color: '#e74c3c', fontWeight: '600' },
 })

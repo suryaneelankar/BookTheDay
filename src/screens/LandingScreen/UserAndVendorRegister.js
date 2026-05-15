@@ -109,6 +109,9 @@ const UserAndVendorRegister = ({ route }) => {
             fullName: fullName,
             role: type
         }
+        console.log('URL:', `${BASE_URL}/${type}/register`);
+        console.log('Payload:', payload);
+
         try {
             const RegisterRes = await axios.post(`${BASE_URL}/${type}/register`, payload);
             if (RegisterRes?.data?.message) {
@@ -145,14 +148,16 @@ const UserAndVendorRegister = ({ route }) => {
                         }
                     }
                 } catch (error) {
-                    setModalVisible(true)
+                    // setModalVisible(true)
                     console.error("Error during login:", error);
                 }
             }
         } catch (error) {
+            console.error("Error during register:", error.response?.data?.message);
+
             console.error("Error during register:", error);
             Alert.alert(
-                'Something went wrong!',
+                 error.response?.data?.message,
                 'Please try again',
                 [
                     { text: 'OK' },

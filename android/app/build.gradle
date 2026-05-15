@@ -128,6 +128,7 @@ dependencies {
     implementation project(':react-native-splash-screen')
     implementation project(':react-native-razorpay') 
     implementation 'com.razorpay:checkout:1.6.40'
+    implementation project(':react-native-video')
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-analytics")
 

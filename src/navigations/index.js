@@ -66,39 +66,44 @@ const MainNavigation = () => {
 
     useEffect(() => {
         getToken();
-        console.log('calling this get token method *********************************************')
-    }, [checkIfAnyTokenStored, switchtab, loading]);
+        console.log('calling this get token method test crash *********************************************')
+    }, [checkIfAnyTokenStored, switchtab]);
 
     const getToken = async () => {
-        const fcmToken = await messaging().getToken();
-        // console.log('device fcm test token is ::>>', fcmToken);
-        dispatch(getDeviceFCMToken(fcmToken));
-        const userToken = await getUserAuthToken();
-        const vendorToken = await getVendorAuthToken();
-        const vendorMobileNumber = await getVendorMobileNumber();
-        const userMobileNumber = await getUserMobileNumber();
-        console.log("user token for auto login is ::>>>>", userToken);
-        console.log("vendorToken token for auto login is ::>>>>", vendorToken);
-        console.log("switch tab id:::::::::::", switchtab);
-        if (userToken || vendorToken) {
-            dispatch(checkIsTokenStored(true));
-            setLoading(false);
-
-        } else {
-            dispatch(checkIsTokenStored(false));
-            setLoading(false);
+        try {
+            const fcmToken = await messaging().getToken();
+            dispatch(getDeviceFCMToken(fcmToken));
+        } catch (e) {
+            console.warn('FCM token fetch failed:', e);
         }
-
-        console.log("checkIfAnyTokenStored is ::>>>", checkIfAnyTokenStored);
-        if (vendorToken) {
-            dispatch(getLoginUserId(true));
-            dispatch(getCurrentLoggedInVendorMobileNum(vendorMobileNumber));
-            return;
-        }
-        if (userToken) {
-            dispatch(getLoginUserId(false));
-            dispatch(getCurrentLoggedInUserMobileNum(userMobileNumber));
-            return;
+        try {
+            const userToken = await getUserAuthToken();
+            const vendorToken = await getVendorAuthToken();
+            const vendorMobileNumber = await getVendorMobileNumber();
+            const userMobileNumber = await getUserMobileNumber();
+            console.log("user token for auto login is ::>>>>", userToken);
+            console.log("vendorToken token for auto login is ::>>>>", vendorToken);
+            console.log("switch tab id:::::::::::", switchtab);
+            if (userToken || vendorToken) {
+                dispatch(checkIsTokenStored(true));
+            } else {
+                dispatch(checkIsTokenStored(false));
+            }
+            setLoading(false);
+            console.log("checkIfAnyTokenStored is ::>>>", checkIfAnyTokenStored);
+            if (vendorToken) {
+                dispatch(getLoginUserId(true));
+                dispatch(getCurrentLoggedInVendorMobileNum(vendorMobileNumber));
+                return;
+            }
+            if (userToken) {
+                dispatch(getLoginUserId(false));
+                dispatch(getCurrentLoggedInUserMobileNum(userMobileNumber));
+                return;
+            }
+        } catch (e) {
+            console.error('getToken error:', e);
+            setLoading(false);
         }
     }
 

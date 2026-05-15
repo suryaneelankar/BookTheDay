@@ -355,7 +355,7 @@ const Events = () => {
         </View>
     );
 
-    console.log('switchCateringVal is :::>>>>', switchCateringVal);
+    // console.log('switchCateringVal is :::>>>>', switchCateringVal);
 
     const renderPriceRanges = () => (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', padding: 10 }}>

@@ -28,6 +28,7 @@ import IonIcons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import ZoomImage from "../../components/ZoomImage";
 import ZoomIcon from 'react-native-vector-icons/MaterialIcons';
+import Video from 'react-native-video';
 
 const ViewEvents = ({ route, navigation }) => {
   const [showModal, setShowModal] = useState(false);
@@ -54,6 +55,8 @@ const ViewEvents = ({ route, navigation }) => {
   const [menuImageCurrentIndex, setMenuImageCurrentIndex] = useState(0);
   const [menuQuantities, setMenuQuantities] = useState({});
   const [loading, setLoading] = useState(false);
+  const [hallVideos, setHallVideos] = useState([]);
+  const [videoPreview, setVideoPreview] = useState({ visible: false, uri: null });
 
   const HallDescription = 'Transform your special occasions into unforgettable memories with our exquisite function hall rentals! Whether you are hosting a grand wedding, a lively birthday bash, or a corporate event, our halls offer the perfect blend of elegance and comfort. With spacious layouts, stunning décor, and top-notch amenities, your guests will be impressed from the moment they arrive. Book with us today and let us help you create an event that exceeds all expectations!'
 
@@ -224,6 +227,7 @@ const ViewEvents = ({ route, navigation }) => {
           menuPrice: image?.menuPrice,
         }));
       setMenuImages(menuImagesArr);
+      setHallVideos(response?.data?.hallVideos || []);
       // console.log("hall amenities", JSON.stringify(response?.data))
       const amenities = response?.data?.hallAmenities[0]?.split(',').map((item, index) => ({
         id: (index + 1).toString(),
@@ -476,6 +480,44 @@ const ViewEvents = ({ route, navigation }) => {
             <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#FD813B", fontWeight: "400", marginTop: 4 }}>{eventsDetails?.description}</Text>
             <Text style={{ fontFamily: 'ManropeRegular', fontSize: 12, color: "#FD813B", fontWeight: "400", marginTop: 4 }}>{eventsDetails?.functionHallAreaInSft ? `* Hall Area: ${eventsDetails?.functionHallAreaInSft} Sqft` : ''}</Text>
           </View>
+
+          {hallVideos?.length > 0 && (
+            <View style={{ marginBottom: 16 }}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {hallVideos.map((video, idx) => (
+                  <TouchableOpacity
+                    key={video._id || idx}
+                    onPress={() => setVideoPreview({ visible: true, uri: video.url })}
+                    style={{
+                      width: 180, height: 120, marginRight: 12,
+                      borderRadius: 12, overflow: 'hidden',
+                      backgroundColor: '#1a1a2e',
+                      borderWidth: 1.5, borderColor: '#ECA73C'
+                    }}
+                  >
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                      <View style={{
+                        width: 48, height: 48, borderRadius: 24,
+                        backgroundColor: 'rgba(253,129,59,0.9)',
+                        justifyContent: 'center', alignItems: 'center',
+                        shadowColor: '#FD813B', shadowOffset: { width: 0, height: 0 },
+                        shadowOpacity: 0.8, shadowRadius: 10, elevation: 8
+                      }}>
+                        <Text style={{ color: '#fff', fontSize: 18, marginLeft: 3 }}>▶</Text>
+                      </View>
+                      <Text style={{ color: '#fff', fontSize: 11, marginTop: 8, fontFamily: 'ManropeRegular', opacity: 0.8 }}>Video {idx + 1}</Text>
+                    </View>
+                    <View style={{
+                      position: 'absolute', bottom: 0, left: 0, right: 0,
+                      backgroundColor: 'rgba(0,0,0,0.5)', paddingVertical: 5, paddingHorizontal: 8
+                    }}>
+                      <Text style={{ color: '#ECA73C', fontSize: 10, fontWeight: '600' }} numberOfLines={1}>{video.filename || `Hall Video ${idx + 1}`}</Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
           {menuImages?.length > 0 && (
             CateringMenuSection()
           )}
@@ -662,6 +704,38 @@ const ViewEvents = ({ route, navigation }) => {
           message={modalMessage}
           onClose={() => setModalVisible(false)}
         />
+
+        {/* Video Preview Modal */}
+        <Modal
+          isVisible={videoPreview.visible}
+          backdropOpacity={0.95}
+          backdropColor="#000"
+          onBackButtonPress={() => setVideoPreview({ visible: false, uri: null })}
+          onBackdropPress={() => setVideoPreview({ visible: false, uri: null })}
+          style={{ margin: 0, justifyContent: 'center' }}
+        >
+          <View style={{ backgroundColor: '#000', borderRadius: 16, overflow: 'hidden', marginHorizontal: 10 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 14 }}>
+              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15, fontFamily: 'ManropeRegular' }}>🎬 Hall Video</Text>
+              <TouchableOpacity onPress={() => setVideoPreview({ visible: false, uri: null })}>
+                <Text style={{ color: '#FD813B', fontSize: 22, fontWeight: 'bold' }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            {videoPreview.uri && (
+              <Video
+                source={{ uri: videoPreview.uri }}
+                style={{ width: '100%', height: 260 }}
+                resizeMode="contain"
+                controls={true}
+                paused={false}
+                onError={(e) => console.error('Video error:', e)}
+              />
+            )}
+            <View style={{ padding: 12, backgroundColor: '#111' }}>
+              <Text style={{ color: '#888', fontSize: 11, fontFamily: 'ManropeRegular', textAlign: 'center' }}>Tap outside to close</Text>
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
       {console.log('totalAdvacneAmountAfterPercentageCalculation is ::>>', totalAdvacneAmountAfterPercentageCalculation)}
       <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
