@@ -94,7 +94,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
         Alert.alert("Location permission denied");
       }
     } catch (err) {
-      console.warn(err);
+      console.log(err);
     }
   };
 

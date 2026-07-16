@@ -14,6 +14,8 @@ import FocusedCaterings from '../assets/svgs/tabIcons/FocusedCaterings.svg';
 import NavigationHeader from '../components/NavigationHeader';
 import Caterings from '../screens/Caterings';
 import { Platform } from 'react-native';
+import LuxuryResorts from '../screens/Events/LuxuryResorts';
+import FarmHouse from '../screens/Events/FarmHouse';
 
 const Tab = createBottomTabNavigator();
 
@@ -55,6 +57,40 @@ const UserTabs = () => {
       />
 
       <Tab.Screen
+        name="Luxury Resorts"
+        component={LuxuryResorts}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            focused ? <FocusedEvents /> : <EventsIcon />
+          ),
+          tabBarLabel: 'Resorts',
+          tabBarShowLabel: true,
+          header: () => <NavigationHeader Icon={false} title="Event Management" />,
+          headerShown: false,
+          tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
+        }}
+      />
+
+      <Tab.Screen
+        name="Farm House"
+        component={FarmHouse}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            focused ? <FocusedEvents /> : <EventsIcon />
+          ),
+          tabBarLabel: 'Farm House',
+          tabBarShowLabel: true,
+          header: () => <NavigationHeader Icon={false} title="Event Management" />,
+          headerShown: false,
+          tabBarLabelStyle: {
+            fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
+          },
+        }}
+      />
+
+      {/* <Tab.Screen
         name="Caterings"
         component={Caterings}
         options={{
@@ -69,9 +105,9 @@ const UserTabs = () => {
             fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
           },
         }}
-      />
+      /> */}
 
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Categories"
         component={Categories}
         options={{
@@ -86,7 +122,7 @@ const UserTabs = () => {
             fontSize: 12, fontWeight: "400", fontFamily: "ManropeRegular"
           },
         }}
-      />
+      /> */}
 
       <Tab.Screen
         name="Events"

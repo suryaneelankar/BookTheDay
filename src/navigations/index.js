@@ -30,7 +30,7 @@ import CateringsOverView from "../screens/Bookings/CateringsOverView";
 import LoginScreen from "../screens/LandingScreen/LoginScreen";
 import OtpValidation from "../screens/LandingScreen/OtpValidation";
 import { checkIsTokenStored, getCurrentLoggedInUserMobileNum, getCurrentLoggedInVendorMobileNum, getDeviceFCMToken, getLoginUserId } from "../../redux/actions";
-import messaging from '@react-native-firebase/messaging';
+// import messaging from '@react-native-firebase/messaging'; // COMMENTED OUT — testing without Firebase
 import AadharUpload from "../screens/KYC/AadharUpload";
 import BankDetailsScreen from "../screens/VendorScreens/VendorProfile/BankDetails";
 import UserAadharUpload from "../screens/KYC/UserAadharUpload";
@@ -40,6 +40,8 @@ import PaymentFailedScreen from "../screens/PaymentScreens/PaymentFailed";
 import EditAddFoodCatering from "../screens/VendorScreens/VendorAddFoodCatering/EditAddFoodCatering";
 import EditAddFoodCateringGeneral from "../screens/VendorScreens/VendorAddFoodCatering/EditFoodCateringGeneral";
 import NearByEvents from "../screens/Events/NearByEvents";
+import LuxuryResorts from "../screens/Events/LuxuryResorts";
+import FarmHouse from "../screens/Events/FarmHouse";
 import NearByFoodCaterings from "../screens/Caterings/NearByFoodCaterings";
 import MyTransactions from "../screens/VendorScreens/VendorProfile/MyTransactions";
 import AboutUsScreen from "../screens/VendorScreens/VendorProfile/VendorAboutus";
@@ -53,6 +55,7 @@ import UserAndVendorRegister from "../screens/LandingScreen/UserAndVendorRegiste
 import BookingReview from "../screens/Profile/BookingReview";
 import MyBookings from "../screens/VendorScreens/VendorProfile/MyBookings";
 import EditFunctionHall from "../screens/VendorScreens/VendorAddFunctionHalls/EditFunctionHall";
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const MainNavigation = () => {
 
@@ -66,10 +69,10 @@ const MainNavigation = () => {
 
     useEffect(() => {
         getToken();
-        console.log('calling this get token method test crash *********************************************')
     }, [checkIfAnyTokenStored, switchtab]);
 
     const getToken = async () => {
+        // COMMENTED OUT — Firebase FCM token fetch
         try {
             const fcmToken = await messaging().getToken();
             dispatch(getDeviceFCMToken(fcmToken));
@@ -89,7 +92,6 @@ const MainNavigation = () => {
             } else {
                 dispatch(checkIsTokenStored(false));
             }
-            setLoading(false);
             console.log("checkIfAnyTokenStored is ::>>>", checkIfAnyTokenStored);
             if (vendorToken) {
                 dispatch(getLoginUserId(true));
@@ -103,6 +105,8 @@ const MainNavigation = () => {
             }
         } catch (e) {
             console.error('getToken error:', e);
+        } finally {
+            // Always unblock the loading screen — even if FCM or keychain fails
             setLoading(false);
         }
     }
@@ -423,6 +427,30 @@ const MainNavigation = () => {
                 }}
             />
             <Stack.Screen
+                name="LuxuryResorts"
+                component={LuxuryResorts}
+                options={{
+                    header: () => (
+                        <SafeAreaView edges={['top']} style={{ backgroundColor: '#0A1628' }}>
+                            <NavigationHeader Icon={true} title="Luxury Resorts" />
+                        </SafeAreaView>
+                    ),
+                    headerShown: true,
+                }}
+            />
+            <Stack.Screen
+                name="FarmHouse"
+                component={FarmHouse}
+                options={{
+                    header: () => (
+                        <SafeAreaView edges={['top']} style={{ backgroundColor: '#1A2E1A' }}>
+                            <NavigationHeader Icon={true} title="Farm Houses" />
+                        </SafeAreaView>
+                    ),
+                    headerShown: true,
+                }}
+            />
+            <Stack.Screen
                 name="NearByFoodCaterings"
                 component={NearByFoodCaterings}
                 options={{
@@ -591,11 +619,12 @@ const MainNavigation = () => {
     }
 
     return (
-        <NavigationContainer>
+            <NavigationContainer>
 
-            {checkIfAnyTokenStored ? <HomeNavigator /> : <AuthNavigator />}
 
-        </NavigationContainer>
+                {checkIfAnyTokenStored ? <HomeNavigator /> : <AuthNavigator />}
+
+            </NavigationContainer>
     )
 }
 

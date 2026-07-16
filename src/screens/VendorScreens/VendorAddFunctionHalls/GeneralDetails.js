@@ -28,20 +28,12 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     const [BedRooms, setBedRooms] = useState();
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [functionHallName, setfunctionHallName] = useState('');
+    const [venueCategory, setVenueCategory] = useState(''); // Function Hall | Farm House | Luxury Resort | Destination Wedding
     const [productDescription, setProductDescription] = useState('');
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isFoodDropDownCollapsed, setIsFoodDropDownCollapsed] = useState(false);
     const [selectedFoodType, setSelectedFoodType] = useState('');
-    const [additionalImages, setAdditionalImages] = useState({
-        additionalImageOne: undefined,
-        additionalImageTwo: undefined,
-        additionalImageThree: undefined,
-        additionalImageFour: undefined,
-        additionalImageFive: undefined,
-        additionalImageSix: undefined,
-        additionalImageSeven: undefined,
-        additionalImageEight: undefined
-    });
+    const [additionalImages, setAdditionalImages] = useState([]); // flat array, max 20
     const [menuImages, setMenuImages] = useState({
         menuImageOne: undefined,
         menuImageTwo: undefined,
@@ -656,9 +648,9 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     const onPressSaveAndPost = async () => {
         const { finalEarningAfterDiscount, earningAmount, serviceCharges } = calculateCharges();
         if (!mainImageUrl || functionHallName === '' || functionHallAreaInSft === '' ||
-            selectedItemArray?.length === 0 || selectedItemArray === '' || functionHallAddress === ''
+            selectedItemArray?.length === 0 || selectedItemArray === '' || functionHallAddress === '' || venueCategory === ''
         ) {
-            Alert.alert('Please fill Mandatory fields');
+            Alert.alert('Please fill Mandatory fields', 'Hall image, name, area, amenities, address and venue category are required.');
             return;
         }
         // console.log('menuAvailable is::>>>',menuAvailable);
@@ -775,6 +767,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         formData.append('hallAmenities', selectedItemArray);
         formData.append('functionHallName', functionHallName);
         formData.append('rentPricePerDay', perDayRentPrice);
+        formData.append('venueCategory', venueCategory);
         formData.append('bedRooms', BedRooms);
         formData.append('available', true);
         formData.append('functionHallAddress', JSON.stringify(functionHallAddessIs));
@@ -1271,7 +1264,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     onPress={() => setVideoPickerModal({ visible: true, index: idx })}
                                     style={{
                                         flex: 1, marginHorizontal: 4, borderWidth: 1,
-                                        borderColor: video ? '#ECA73C' : '#ccc',                                        
+                                        borderColor: video ? '#ECA73C' : '#ccc',
                                         borderRadius: 8, padding: 10, alignItems: 'center',
                                         backgroundColor: video ? '#FFF5E3' : '#f9f9f9',
                                         minHeight: 80, justifyContent: 'center'
@@ -1300,7 +1293,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                 </TouchableOpacity>
                             ))}
                         </View>
-                        
+
                         <TextField
                             label='Hall Name'
                             placeholder="Please Enter Hall Name"
@@ -1310,7 +1303,110 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             isRequired={true}
                         />
 
-                        <Text style={styles.labelText}>Food Type</Text>
+                        {/* ── Venue Category ── */}
+                        <Text style={styles.labelText}>
+                            Select Venue Category<Text style={{ color: 'red' }}>*</Text>
+                        </Text>
+                        <View style={styles.categoryRow}>
+                            {[
+                                {
+                                    label: 'Function Hall',
+                                    iconName: 'business',
+                                    color: '#FD813B',
+                                },
+                                {
+                                    label: 'Farm House',
+                                    iconName: 'leaf',
+                                    color: '#06BE66',
+                                },
+                                {
+                                    label: 'Luxury Resort',
+                                    iconName: 'water',
+                                    color: '#ECA73C',
+                                },
+                                {
+                                    label: 'Destination Wedding',
+                                    iconName: 'flower',
+                                    color: '#A0143E',
+                                },
+                            ].map(cat => {
+                                const selected = venueCategory === cat.label;
+
+                                return (
+                                    <TouchableOpacity
+                                        key={cat.label}
+                                        activeOpacity={0.92}
+                                        onPress={() => setVenueCategory(cat.label)}
+                                        style={styles.categoryItem}
+                                    >
+                                        {/* CARD */}
+                                        <View
+                                            style={[
+                                                styles.categoryCard,
+                                                {
+                                                    borderColor: selected
+                                                        ? cat.color
+                                                        : '#F3F3F3',
+
+                                                    backgroundColor: selected
+                                                        ? `${cat.color}10`
+                                                        : '#FFFFFF',
+                                                },
+                                            ]}
+                                        >
+                                            {/* TOP ICON */}
+                                            <View
+                                                style={[
+                                                    styles.iconWrapper,
+                                                    {
+                                                        backgroundColor: selected
+                                                            ? cat.color
+                                                            : `${cat.color}12`,
+                                                    },
+                                                ]}
+                                            >
+                                                <Icon
+                                                    name={`${cat.iconName}-outline`}
+                                                    size={24}
+                                                    color={
+                                                        selected
+                                                            ? '#FFFFFF'
+                                                            : cat.color
+                                                    }
+                                                />
+                                            </View>
+
+                                            {/* LABEL */}
+                                            <Text
+                                                style={[
+                                                    styles.categoryText,
+                                                    {
+                                                        color: selected
+                                                            ? '#121212'
+                                                            : '#555',
+                                                    },
+                                                ]}
+                                                numberOfLines={2}
+                                            >
+                                                {cat.label}
+                                            </Text>
+
+                                            {/* SMALL INDICATOR */}
+                                            <View
+                                                style={[
+                                                    styles.bottomIndicator,
+                                                    {
+                                                        backgroundColor: selected
+                                                            ? cat.color
+                                                            : 'transparent',
+                                                    },
+                                                ]}
+                                            />
+                                        </View>
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </View>
                         {RentalFoodTypeList()}
 
                         <TextField
@@ -1772,4 +1868,66 @@ const styles = StyleSheet.create({
         alignItems: 'center', backgroundColor: '#f5f5f5', borderRadius: 12,
     },
     cancelText: { fontSize: 15, color: '#e74c3c', fontWeight: '600' },
+    categoryRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 6,
+        marginBottom: 18,
+    },
+
+    categoryItem: {
+        width: '23%',
+    },
+
+    categoryCard: {
+        borderWidth: 1,
+        borderRadius: 24,
+
+        paddingTop: 18,
+        paddingBottom: 14,
+        paddingHorizontal: 8,
+
+        alignItems: 'center',
+        justifyContent: 'space-between',
+
+        minHeight: 132,
+
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.04,
+        shadowRadius: 8,
+
+        elevation: 2,
+    },
+
+    iconWrapper: {
+        width: 56,
+        height: 56,
+        borderRadius: 18,
+
+        justifyContent: 'center',
+        alignItems: 'center',
+
+        marginBottom: 12,
+    },
+
+    categoryText: {
+        fontSize: 11.5,
+        textAlign: 'center',
+        lineHeight: 16,
+        fontWeight: '700',
+        fontFamily: 'ManropeRegular',
+
+        minHeight: 34,
+    },
+
+    bottomIndicator: {
+        width: 24,
+        height: 4,
+        borderRadius: 10,
+        marginTop: 12,
+    },
 })

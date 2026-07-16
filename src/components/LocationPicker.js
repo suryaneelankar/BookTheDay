@@ -101,7 +101,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
         );
       }
     } catch (err) {
-      console.warn(err);
+      console.log(err);
     }
   };
 

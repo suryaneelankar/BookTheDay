@@ -10,6 +10,7 @@ import OnboardingBGImg from '../../assets/OnboardingBGImg.png';
 const LandingScreen = () => {
 
     const navigation = useNavigation();
+    console.log("TESTTTTTTTT WORKINGGGGGGGGGGGGGGGGGGGG")
 
     return (
         <ImageBackground

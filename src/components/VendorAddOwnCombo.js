@@ -186,7 +186,7 @@ const FoodMenu = ({ onSaveClick }) => {
     const cleanCategoryName = (categoryName) => {
         // Check if categoryName is a valid string
         if (typeof categoryName !== 'string') {
-            console.warn('Invalid category name:', categoryName); // Log a warning if it's not a string
+            console.log('Invalid category name:', categoryName); // Log a warning if it's not a string
             return ''; // Return an empty string for invalid input
         }
 

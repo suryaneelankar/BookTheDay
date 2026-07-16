@@ -10,57 +10,47 @@ import {
   Alert,
   StyleSheet,
 } from 'react-native';
-import messaging from '@react-native-firebase/messaging';
+// import messaging from '@react-native-firebase/messaging'; // COMMENTED OUT — testing without Firebase
 import { store } from "./redux/store";
 import { Provider } from "react-redux";
 import MainNavigation from './src/navigations';
 import SplashScreen from 'react-native-splash-screen';
-import RazorpayCheckout from 'react-native-razorpay';
+// import RazorpayCheckout from 'react-native-razorpay';
 
 const App = () => {
-
-  // console.log = () => { };
-  // console.info = () => { };
-  // console.debug = () => { };
-  // console.warn = () => { };
-  // console.error = () => { };
 
   useEffect(() => {
     SplashScreen.hide();
   }, []);
 
-  useEffect(() => {
-    requestUserPermission();
-    getToken();
-  }, [])
+  // COMMENTED OUT — Firebase permission + token fetch
+  // useEffect(() => {
+  //   requestUserPermission();
+  //   getToken();
+  // }, [])
 
-  async function requestUserPermission() {
-    const authStatus = await messaging().requestPermission();
-    const enabled =
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  // async function requestUserPermission() {
+  //   const authStatus = await messaging().requestPermission();
+  //   const enabled =
+  //     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+  //     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+  //   if (enabled) {
+  //     console.log('Authorization status:', authStatus);
+  //   }
+  // }
 
-    if (enabled) {
-      console.log('Authorization status:', authStatus);
-    }
-  }
+  // const getToken = async () => {
+  //   const fcmToken = await messaging().getToken();
+  // }
 
-  const getToken = async () => {
-    const fcmToken = await messaging().getToken();
-    // console.log('token is ::>>',fcmToken);
-  }
-
-  useEffect(() => {
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      // Alert.alert('A new FCM message arrived in foreground mode', JSON.stringify(remoteMessage));
-      console.log("remoted message is:::::::::", JSON.stringify(remoteMessage))
-      Alert.alert(remoteMessage?.notification?.body);
-      // setNotificationMessage(remoteMessage?.data?.user_relations_id)
-      // setModalVisible(true);
-    });
-
-    return unsubscribe;
-  }, []);
+  // COMMENTED OUT — Firebase foreground message listener
+  // useEffect(() => {
+  //   const unsubscribe = messaging().onMessage(async remoteMessage => {
+  //     console.log("remoted message is:::::::::", JSON.stringify(remoteMessage))
+  //     Alert.alert(remoteMessage?.notification?.body);
+  //   });
+  //   return unsubscribe;
+  // }, []);
 
   return (
     <Provider store={store}>
@@ -68,7 +58,6 @@ const App = () => {
     </Provider>
   )
 }
-
 
 const styles = StyleSheet.create({
   sectionContainer: {

@@ -554,7 +554,7 @@ const Events = () => {
                         disabled={isApplyDisabled}
                     >
                         <LinearGradient
-                            colors={['#FD813B', '#DF6E12']}
+                            colors={['#ECA73C', '#B8860B']}
                             start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                             style={styles.filterApplyGradient}
                         >
@@ -564,90 +564,94 @@ const Events = () => {
                 </View>
             </ActionSheet>
 
-            {/* ── SEARCH BAR ── */}
-            <View style={styles.searchBarWrapper}>
+            {/* ── FUNCTION HALLS HERO HEADER ── */}
+            <LinearGradient
+                colors={['#1C1C1E', '#252525', '#2C2C2E']}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                style={styles.heroHeader}
+            >
+                {/* decorative circles */}
+                <View style={styles.heroCircle1} />
+                <View style={styles.heroCircle2} />
+
+                <View style={styles.heroRow}>
+                    <View style={{ flex: 1 }}>
+                        <View style={styles.heroBadge}>
+                            <IonIcon name="business" size={11} color="#ECA73C" />
+                            <Text style={styles.heroBadgeText}>Premium Venues</Text>
+                        </View>
+                        <Text style={styles.heroTitle}>Function Halls</Text>
+                        <Text style={styles.heroSub}>Grand banquets & event spaces</Text>
+                    </View>
+                    <View style={styles.heroIconWrap}>
+                        <IonIcon name="business" size={32} color="#ECA73C" />
+                    </View>
+                </View>
+
+                {/* search bar inside hero */}
                 <View style={styles.searchBar}>
-                    <IonIcon name="search-outline" size={18} color="#A3A3A3" style={{ marginRight: 8 }} />
+                    <IonIcon name="search-outline" size={16} color="rgba(236,167,60,0.7)" style={{ marginRight: 8 }} />
                     <TextInput
                         style={styles.searchInput}
                         value={query}
                         onChangeText={handleQueryChange}
-                        placeholder="Search by hall name or area..."
-                        placeholderTextColor="#A3A3A3"
+                        placeholder="Search halls by name or area..."
+                        placeholderTextColor="rgba(236,167,60,0.45)"
                         returnKeyType="search"
                     />
                     {query.length > 0 && (
                         <TouchableOpacity onPress={handleClearSearch}>
-                            <IonIcon name="close-circle" size={18} color="#A3A3A3" />
+                            <IonIcon name="close-circle" size={16} color="rgba(236,167,60,0.7)" />
                         </TouchableOpacity>
                     )}
                 </View>
 
-                {/* ── DROPDOWN: area suggestions + name matches ── */}
+                {/* dropdown */}
                 {dropdownVisible && (locationSuggestions.length > 0 || nameFilteredData.length > 0) && (
                     <View style={styles.dropdown}>
-
-                        {/* area suggestions */}
                         {locationSuggestions.length > 0 && (
                             <>
                                 <View style={styles.dropdownSectionHeader}>
-                                    <IonIcon name="location-outline" size={12} color="#FD813B" />
+                                    <IonIcon name="location-outline" size={12} color="#ECA73C" />
                                     <Text style={styles.dropdownSectionLabel}>Areas</Text>
                                 </View>
                                 {locationSuggestions.map((item, index) => (
                                     <TouchableOpacity
                                         key={`area-${item._id}`}
-                                        style={[
-                                            styles.dropdownItem,
-                                            (index < locationSuggestions.length - 1 || nameFilteredData.length > 0)
-                                                && styles.dropdownDivider,
-                                        ]}
+                                        style={[styles.dropdownItem, (index < locationSuggestions.length - 1 || nameFilteredData.length > 0) && styles.dropdownDivider]}
                                         onPress={() => handleSelectArea(item.value)}
                                     >
-                                        <IonIcon name="location-outline" size={14} color="#FD813B" style={{ marginRight: 8 }} />
+                                        <IonIcon name="location-outline" size={14} color="#ECA73C" style={{ marginRight: 8 }} />
                                         <Text style={styles.dropdownText}>{item.value}</Text>
                                     </TouchableOpacity>
                                 ))}
                             </>
                         )}
-
-                        {/* hall name matches */}
                         {nameFilteredData.length > 0 && (
                             <>
                                 <View style={styles.dropdownSectionHeader}>
-                                    <IonIcon name="business-outline" size={12} color="#FD813B" />
+                                    <IonIcon name="business-outline" size={12} color="#ECA73C" />
                                     <Text style={styles.dropdownSectionLabel}>Halls</Text>
                                 </View>
                                 {nameFilteredData.slice(0, 5).map((item, index) => (
                                     <TouchableOpacity
                                         key={`hall-${item._id}`}
-                                        style={[
-                                            styles.dropdownItem,
-                                            index < Math.min(nameFilteredData.length, 5) - 1 && styles.dropdownDivider,
-                                        ]}
-                                        onPress={() => {
-                                            setDropdownVisible(false);
-                                            navigation.navigate('ViewEvents', { categoryId: item._id });
-                                        }}
+                                        style={[styles.dropdownItem, index < Math.min(nameFilteredData.length, 5) - 1 && styles.dropdownDivider]}
+                                        onPress={() => { setDropdownVisible(false); navigation.navigate('ViewEvents', { categoryId: item._id }); }}
                                     >
                                         <IonIcon name="business-outline" size={14} color="#939393" style={{ marginRight: 8 }} />
                                         <View style={{ flex: 1 }}>
-                                            <Text style={styles.dropdownText} numberOfLines={1}>
-                                                {item.functionHallName}
-                                            </Text>
-                                            <Text style={styles.dropdownSubText} numberOfLines={1}>
-                                                {item?.functionHallAddress?.address}
-                                            </Text>
+                                            <Text style={styles.dropdownText} numberOfLines={1}>{item.functionHallName}</Text>
+                                            <Text style={styles.dropdownSubText} numberOfLines={1}>{item?.functionHallAddress?.address}</Text>
                                         </View>
                                         <IonIcon name="chevron-forward" size={13} color="#ccc" />
                                     </TouchableOpacity>
                                 ))}
                             </>
                         )}
-
                     </View>
                 )}
-            </View>
+            </LinearGradient>
 
             {/* ── HEADER ROW ── */}
             <View style={styles.headerRow}>
@@ -697,36 +701,56 @@ const Events = () => {
 };
 
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: '#F9F9F9', marginBottom: '10%' },
+    safeArea: { flex: 1, backgroundColor: '#FFFBF5', marginBottom: '10%' },
     listContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24 },
 
-    // ── SEARCH ──
-    searchBarWrapper: {
+    // ── HERO HEADER ──
+    heroHeader: {
         paddingHorizontal: 16,
-        paddingTop: 10,
-        paddingBottom: 4,
-        zIndex: 10,
-        backgroundColor: '#F9F9F9',
+        paddingTop: 14,
+        paddingBottom: 18,
+        overflow: 'hidden',
+    },
+    heroCircle1: {
+        position: 'absolute', width: 200, height: 200, borderRadius: 100,
+        backgroundColor: 'rgba(236,167,60,0.06)', top: -60, right: -50,
+    },
+    heroCircle2: {
+        position: 'absolute', width: 120, height: 120, borderRadius: 60,
+        backgroundColor: 'rgba(236,167,60,0.04)', bottom: -30, left: -20,
+    },
+    heroRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
+    heroBadge: {
+        flexDirection: 'row', alignItems: 'center', gap: 5,
+        backgroundColor: 'rgba(236,167,60,0.18)',
+        borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4,
+        alignSelf: 'flex-start', marginBottom: 8,
+        borderWidth: 1, borderColor: 'rgba(236,167,60,0.3)',
+    },
+    heroBadgeText: { fontFamily: 'ManropeRegular', fontSize: 11, fontWeight: '700', color: '#ECA73C' },
+    heroTitle: { fontFamily: 'ManropeRegular', fontSize: 22, fontWeight: '800', color: '#fff' },
+    heroSub: { fontFamily: 'ManropeRegular', fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 3 },
+    heroIconWrap: {
+        width: 64, height: 64, borderRadius: 32,
+        backgroundColor: 'rgba(236,167,60,0.12)',
+        justifyContent: 'center', alignItems: 'center',
+        borderWidth: 1, borderColor: 'rgba(236,167,60,0.25)',
+    },
+
+    // ── SEARCH (inside hero) ──
+    searchBarWrapper: {
+        paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4,
+        zIndex: 10, backgroundColor: '#FFFBF5',
     },
     searchBar: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 14,
-        paddingHorizontal: 14,
-        paddingVertical: 10,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.07,
-        shadowRadius: 4,
+        flexDirection: 'row', alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.08)',
+        borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10,
+        borderWidth: 1, borderColor: 'rgba(236,167,60,0.3)',
     },
     searchInput: {
-        flex: 1,
-        fontSize: 14,
-        fontFamily: 'ManropeRegular',
-        color: '#121212',
-        padding: 0,
+        flex: 1, fontSize: 13, fontFamily: 'ManropeRegular',
+        color: '#fff', padding: 0,
     },
     dropdown: {
         backgroundColor: '#fff',
@@ -772,7 +796,7 @@ const styles = StyleSheet.create({
     dropdownSectionLabel: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#FD813B',
+        color: '#ECA73C',
         fontFamily: 'ManropeRegular',
         textTransform: 'uppercase',
         letterSpacing: 0.5,
@@ -790,7 +814,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 18,
         fontWeight: '800',
-        color: '#121212',
+        color: '#1C1C1E',
         fontFamily: 'ManropeRegular',
     },
     headerSubtitle: {
@@ -812,18 +836,21 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.07,
         shadowRadius: 3,
+        borderWidth: 1,
+        borderColor: '#F5E7B6',
     },
     filterBtnActive: {
-        backgroundColor: '#FD813B',
+        backgroundColor: '#ECA73C',
+        borderColor: '#ECA73C',
     },
     filterBtnText: {
         fontSize: 13,
         fontWeight: '600',
         fontFamily: 'ManropeRegular',
-        color: '#333',
+        color: '#1C1C1E',
     },
     filterBadge: {
-        backgroundColor: '#fff',
+        backgroundColor: '#1C1C1E',
         borderRadius: 10,
         width: 18,
         height: 18,
@@ -834,7 +861,7 @@ const styles = StyleSheet.create({
     filterBadgeText: {
         fontSize: 10,
         fontWeight: '800',
-        color: '#FD813B',
+        color: '#ECA73C',
         fontFamily: 'ManropeRegular',
     },
 
@@ -882,7 +909,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        backgroundColor: 'rgba(253,129,59,0.85)',
+        backgroundColor: 'rgba(160,20,62,0.85)',
         paddingHorizontal: 9,
         paddingVertical: 4,
         borderRadius: 20,
@@ -933,7 +960,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 3,
-        backgroundColor: '#FFF5EE',
+        backgroundColor: '#FEF8E8',
         paddingHorizontal: 8,
         paddingVertical: 3,
         borderRadius: 20,
@@ -941,7 +968,7 @@ const styles = StyleSheet.create({
     cardRatingText: {
         fontSize: 11,
         fontWeight: '700',
-        color: '#FD813B',
+        color: '#B8860B',
         fontFamily: 'ManropeRegular',
     },
     cardAddressRow: {
@@ -966,10 +993,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
-        backgroundColor: '#FFF5EE',
+        backgroundColor: '#FFFBF5',
         paddingHorizontal: 10,
         paddingVertical: 5,
         borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#F5E7B6',
     },
     cardChipText: {
         fontSize: 11,
@@ -1011,8 +1040,8 @@ const styles = StyleSheet.create({
         borderColor: 'transparent',
     },
     filterChipActive: {
-        borderColor: '#FD813B',
-        backgroundColor: '#FFF5EE',
+        borderColor: '#ECA73C',
+        backgroundColor: '#FEF8E8',
     },
     filterChipText: {
         fontSize: 13,
@@ -1020,7 +1049,7 @@ const styles = StyleSheet.create({
         color: '#555',
     },
     filterChipTextActive: {
-        color: '#FD813B',
+        color: '#B8860B',
         fontWeight: '700',
     },
     switchRow: {

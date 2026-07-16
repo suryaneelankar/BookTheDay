@@ -725,36 +725,6 @@ const ViewEvents = ({ route, navigation }) => {
             </View>
           </View>
 
-          {/* ── WHY BOOK HERE ── */}
-          <View style={styles.whyBookContainer}>
-            <Text style={styles.whyBookTitle}>Why Book Here?</Text>
-            <View style={styles.whyBookRow}>
-              <View style={styles.whyBookItem}>
-                <View style={styles.whyBookIconCircle}>
-                  <IonIcon name="checkmark-circle-outline" size={20} color="#009C4D" />
-                </View>
-                <Text style={styles.whyBookItemText}>Instant{'\n'}Confirmation</Text>
-              </View>
-              <View style={styles.whyBookItem}>
-                <View style={styles.whyBookIconCircle}>
-                  <IonIcon name="refresh-circle-outline" size={20} color="#FD813B" />
-                </View>
-                <Text style={styles.whyBookItemText}>Easy{'\n'}Cancellation</Text>
-              </View>
-              <View style={styles.whyBookItem}>
-                <View style={styles.whyBookIconCircle}>
-                  <IonIcon name="headset-outline" size={20} color="#042CB0" />
-                </View>
-                <Text style={styles.whyBookItemText}>24/7{'\n'}Support</Text>
-              </View>
-              <View style={styles.whyBookItem}>
-                <View style={styles.whyBookIconCircle}>
-                  <IonIcon name="shield-outline" size={20} color="#BF5286" />
-                </View>
-                <Text style={styles.whyBookItemText}>Secure{'\n'}Payments</Text>
-              </View>
-            </View>
-          </View>
 
           {/* ── DESCRIPTION ── */}
           <View style={{ marginTop: 20, marginBottom: 10 }}>
@@ -1092,8 +1062,8 @@ const ViewEvents = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   imageContainer: {
     justifyContent: 'center',
-    alignItems: 'center', backgroundColor: "yellow",
-    height: 200, // Adjust the height as needed
+    alignItems: 'center', backgroundColor: "#F9F9F9",
+    height: 200,
   },
   container: { flex: 1, backgroundColor: 'white' },
   menuContainer: {
@@ -1312,14 +1282,14 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(253,129,59,0.9)',
+    backgroundColor: 'rgba(160,20,62,0.88)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   thumbActiveOverlay: {
     position: 'absolute',
     top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(253,129,59,0.3)',
+    backgroundColor: 'rgba(160,20,62,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1353,7 +1323,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#FD813B',
+    backgroundColor: '#ECA73C',
   },
   videoModalTitle: {
     color: '#fff',
@@ -1396,7 +1366,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 4,
     right: 4,
-    backgroundColor: '#FD813B',
+    backgroundColor: '#A0143E',
     borderRadius: 4,
     paddingHorizontal: 4,
     paddingVertical: 1,
@@ -1785,49 +1755,6 @@ const styles = StyleSheet.create({
     color: '#DF6E12',
     fontFamily: 'ManropeRegular',
     marginTop: 2,
-  },
-  // ── WHY BOOK HERE ──
-  whyBookContainer: {
-    marginTop: 20,
-    backgroundColor: '#F9F9F9',
-    borderRadius: 16,
-    padding: 16,
-  },
-  whyBookTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#121212',
-    fontFamily: 'ManropeRegular',
-    marginBottom: 14,
-  },
-  whyBookRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  whyBookItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  whyBookIconCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-  },
-  whyBookItemText: {
-    fontSize: 10,
-    color: '#606060',
-    fontFamily: 'ManropeRegular',
-    textAlign: 'center',
-    marginTop: 6,
-    lineHeight: 14,
   },
   // ── AREA CHIP ──
   areaChip: {
