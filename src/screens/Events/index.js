@@ -29,6 +29,7 @@ import VegIcon from '../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 import FloatingCloseButton from "./floatingCloseButton";
 import LinearGradient from "react-native-linear-gradient";
+import Swiper from "react-native-swiper";
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 32;
@@ -342,40 +343,44 @@ const Events = () => {
     // ─── Card ─────────────────────────────────────────────────────────────────
     const renderItem = useCallback(({ item, index }) => {
         const heroImage = item?.professionalImage?.url;
-        const totalPhotos = 1 + (item?.additionalImages?.flat()?.length || 0);
+        const imageUrls = [heroImage, ...(item?.additionalImages?.flat()?.map(img => img?.url) || [])].filter(Boolean);
+        const totalPhotos = imageUrls.length;
         const hasVideo = item?.hallVideos?.length > 0;
 
         return (
-            <TouchableOpacity
-                activeOpacity={0.93}
-                style={styles.card}
-                onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}
-            >
-                {/* ── hero image ── */}
+            <View style={styles.card}>
+                {/* ── image swiper ── */}
                 <View style={styles.cardImageWrapper}>
-                    <FastImage
-                        source={{ uri: heroImage, priority: FastImage.priority.normal }}
-                        style={styles.cardImage}
-                        resizeMode={FastImage.resizeMode.cover}
-                    />
-                    {/* gradient overlay */}
-                    <LinearGradient
-                        colors={['transparent', 'rgba(0,0,0,0.55)']}
-                        style={styles.cardImageGradient}
-                    />
-                    {/* photo count badge */}
+                    <Swiper
+                        loop
+                        showsPagination
+                        activeDotColor="#fff"
+                        dotColor="rgba(255,255,255,0.5)"
+                        activeDotStyle={{ width: 12, height: 6, borderRadius: 3 }}
+                        dotStyle={{ width: 6, height: 6, borderRadius: 3 }}
+                        paginationStyle={{ bottom: 10 }}
+                        style={{ height: 200 }}
+                    >
+                        {imageUrls.map((imgUrl, idx) => (
+                            <TouchableOpacity key={idx} activeOpacity={0.93}
+                                onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}
+                                style={{ flex: 1 }}>
+                                <FastImage source={{ uri: imgUrl, priority: FastImage.priority.normal }}
+                                    style={styles.cardImage} resizeMode={FastImage.resizeMode.cover} />
+                            </TouchableOpacity>
+                        ))}
+                    </Swiper>
+                    <LinearGradient colors={['transparent', 'rgba(0,0,0,0.55)']} style={styles.cardImageGradient} pointerEvents="none" />
                     <View style={styles.photoCountBadge}>
                         <IonIcon name="images-outline" size={11} color="#fff" />
                         <Text style={styles.photoCountText}>{totalPhotos}</Text>
                     </View>
-                    {/* video badge */}
                     {hasVideo && (
                         <View style={styles.videoBadge}>
                             <IonIcon name="videocam" size={11} color="#fff" />
                             <Text style={styles.photoCountText}>Video</Text>
                         </View>
                     )}
-                    {/* price overlay bottom-right */}
                     <View style={styles.priceOverlay}>
                         {item?.menuImages?.length > 0
                             ? <Text style={styles.priceOverlayText}>Menu Based</Text>
@@ -385,13 +390,11 @@ const Events = () => {
                 </View>
 
                 {/* ── card body ── */}
+                <TouchableOpacity activeOpacity={0.93}
+                    onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}>
                 <View style={styles.cardBody}>
                     <View style={styles.cardTitleRow}>
                         <Text style={styles.cardTitle} numberOfLines={1}>{item?.functionHallName}</Text>
-                        <View style={styles.cardRatingPill}>
-                            <IonIcon name="star" size={11} color="#FD813B" />
-                            <Text style={styles.cardRatingText}>4.5</Text>
-                        </View>
                     </View>
 
                     <View style={styles.cardAddressRow}>
@@ -401,7 +404,6 @@ const Events = () => {
                         </Text>
                     </View>
 
-                    {/* ── chips row ── */}
                     <View style={styles.cardChipsRow}>
                         <View style={styles.cardChip}>
                             <IonIcon name="people-outline" size={11} color="#FD813B" />
@@ -424,7 +426,8 @@ const Events = () => {
                         </View>
                     </View>
                 </View>
-            </TouchableOpacity>
+                </TouchableOpacity>
+            </View>
         );
     }, [navigation]);
 

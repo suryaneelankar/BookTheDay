@@ -28,12 +28,21 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     const [BedRooms, setBedRooms] = useState();
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [functionHallName, setfunctionHallName] = useState('');
-    const [venueCategory, setVenueCategory] = useState(''); // Function Hall | Farm House | Luxury Resort | Destination Wedding
+    const [venueCategory, setVenueCategory] = useState(''); // Function Hall | Farm House | Luxury Resort | Banquet Hall
     const [productDescription, setProductDescription] = useState('');
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isFoodDropDownCollapsed, setIsFoodDropDownCollapsed] = useState(false);
     const [selectedFoodType, setSelectedFoodType] = useState('');
-    const [additionalImages, setAdditionalImages] = useState([]); // flat array, max 20
+    const [additionalImages, setAdditionalImages] = useState({
+        additionalImageOne: undefined,
+        additionalImageTwo: undefined,
+        additionalImageThree: undefined,
+        additionalImageFour: undefined,
+        additionalImageFive: undefined,
+        additionalImageSix: undefined,
+        additionalImageSeven: undefined,
+        additionalImageEight: undefined
+    });
     const [menuImages, setMenuImages] = useState({
         menuImageOne: undefined,
         menuImageTwo: undefined,
@@ -364,8 +373,38 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     );
 
 
-    const openGalleryOrCameraForAdditonalImages = (index) => {
-        setPickerModal({ visible: true, index });
+    const openGalleryOrCameraForAdditonalImages = async (index) => {
+        const options = {
+            mediaType: 'photo',
+            maxWidth: 1920,
+            maxHeight: 1920,
+            quality: 1,
+        };
+        launchImageLibrary(options, (response) => {
+            if (response.didCancel) {
+                console.log('User cancelled image picker');
+            } else if (response.errorCode) {
+                console.log('ImagePicker Error: ', response.errorMessage);
+            } else {
+                if (index == 0) {
+                    setAdditionalImages(prev => ({ ...prev, additionalImageOne: response }));
+                } else if (index == 1) {
+                    setAdditionalImages(prev => ({ ...prev, additionalImageTwo: response }));
+                } else if (index == 2) {
+                    setAdditionalImages(prev => ({ ...prev, additionalImageThree: response }));
+                } else if (index == 3) {
+                    setAdditionalImages(prev => ({ ...prev, additionalImageFour: response }));
+                } else if (index == 4) {
+                    setAdditionalImages(prev => ({ ...prev, additionalImageFive: response }));
+                } else if (index == 5) {
+                    setAdditionalImages(prev => ({ ...prev, additionalImageSix: response }));
+                } else if (index == 6) {
+                    setAdditionalImages(prev => ({ ...prev, additionalImageSeven: response }));
+                } else {
+                    setAdditionalImages(prev => ({ ...prev, additionalImageEight: response }));
+                }
+            }
+        });
     };
 
     const imageKeys = [
@@ -711,10 +750,19 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
         const vendorMobileNumber = vendorLoggedInMobileNum
         const formData = new FormData();
+        console.log('mainImageUrl is ::>>>',mainImageUrl);
+        console.log('additionalImages is::>>>',additionalImages);
+
+        // Helper: sanitize filename — remove spaces, parentheses, special chars
+        const sanitizeFileName = (name) => {
+            if (!name) return `image_${Date.now()}.jpg`;
+            return name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        };
+
         formData.append('professionalImage', {
             uri: mainImageUrl?.assets[0]?.uri,
-            type: mainImageUrl?.assets[0]?.type,
-            name: mainImageUrl?.assets[0]?.fileName,
+            type: mainImageUrl?.assets[0]?.type || 'image/jpeg',
+            name: sanitizeFileName(mainImageUrl?.assets[0]?.fileName),
         });
 
         Object.entries(additionalImages).forEach(([key, value]) => {
@@ -722,8 +770,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
             if (imageAsset?.uri) {
                 formData.append('additionalImages', {
                     uri: imageAsset.uri,
-                    type: imageAsset.type,
-                    name: imageAsset.fileName,
+                    type: imageAsset.type || 'image/jpeg',
+                    name: sanitizeFileName(imageAsset.fileName),
                 });
             }
         });
@@ -798,6 +846,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`,
                 },
+                timeout: 120000, // 2 minutes for large file uploads
             });
             console.log("booking response:", response);
             if (response.status === 201) {
@@ -1325,7 +1374,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     color: '#ECA73C',
                                 },
                                 {
-                                    label: 'Destination Wedding',
+                                    label: 'Banquet Hall',
                                     iconName: 'flower',
                                     color: '#A0143E',
                                 },
@@ -1642,22 +1691,32 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         visible={pickerModal.visible}
                         onClose={() => setPickerModal({ visible: false, index: null })}
                         onGallery={() => {
-                            setPickerModal(prev => ({ ...prev, visible: false }));
+                            const idx = pickerModal.index;
+                            setPickerModal({ visible: false, index: null });
                             launchImageLibrary({ mediaType: 'photo', maxWidth: 1920, maxHeight: 1920, quality: 1 }, (res) => {
-                                if (!res.didCancel && !res.errorCode) handleSetImage(res);
+                                if (!res.didCancel && !res.errorCode) {
+                                    const key = imageKeys[idx];
+                                    setAdditionalImages(prev => ({ ...prev, [key]: res }));
+                                }
                             });
                         }}
                         onCamera={() => {
-                            setPickerModal(prev => ({ ...prev, visible: false }));
+                            const idx = pickerModal.index;
+                            setPickerModal({ visible: false, index: null });
                             launchCamera({ mediaType: 'photo', maxWidth: 1920, maxHeight: 1920, quality: 1 }, (res) => {
-                                if (!res.didCancel && !res.errorCode) handleSetImage(res);
+                                if (!res.didCancel && !res.errorCode) {
+                                    const key = imageKeys[idx];
+                                    setAdditionalImages(prev => ({ ...prev, [key]: res }));
+                                }
                             });
                         }}
                         onFileManager={async () => {
-                            setPickerModal(prev => ({ ...prev, visible: false }));
+                            const idx = pickerModal.index;
+                            setPickerModal({ visible: false, index: null });
                             try {
                                 const result = await DocumentPicker.pickSingle({ type: [DocumentPicker.types.images] });
-                                handleSetImage({ assets: [{ uri: result.uri, fileName: result.name, type: result.type }] });
+                                const key = imageKeys[idx];
+                                setAdditionalImages(prev => ({ ...prev, [key]: { assets: [{ uri: result.uri, fileName: result.name, type: result.type }] } }));
                             } catch (err) {
                                 if (!DocumentPicker.isCancel(err)) console.error('File picker error:', err);
                             }

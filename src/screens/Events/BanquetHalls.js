@@ -11,7 +11,6 @@ import { formatAmount } from '../../utils/GlobalFunctions';
 import LocationMarkIcon from '../../assets/svgs/location.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
-import { useSelector } from "react-redux";
 import ActionSheet from 'react-native-actions-sheet';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
@@ -23,18 +22,19 @@ import Swiper from "react-native-swiper";
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-// Resort theme palette
-const RESORT_DARK = '#0A1628';
-const RESORT_MID = '#0F2040';
-const RESORT_BLUE = '#8195D7';
-const RESORT_GOLD = '#ECA73C';
-const RESORT_GOLD2 = '#B8860B';
-const RESORT_LIGHT = '#E6EAF7';
+// ── Banquet Hall theme — deep crimson + warm gold ─────────────────────────────
+const BH_DARK   = '#1A0808';   // deep maroon-black
+const BH_MID    = '#2D0F0F';   // dark crimson
+const BH_ACCENT = '#A0143E';   // primary crimson
+const BH_GOLD   = '#ECA73C';   // harvest gold
+const BH_GOLD2  = '#B8860B';   // dark gold
+const BH_CREAM  = '#FDF5F5';   // warm rose-cream background
+const BH_LIGHT  = '#FAE8EC';   // light crimson tint for chips
 
-const VENUE_CATEGORY = 'Luxury Resort';
+const VENUE_CATEGORY = 'Banquet Hall';
 
-const seatingCapacity = ['50-100', '100-200', '200-400', '400-600', '600-800', '800-1000', '1000-1200', '1200+'];
-const priceRanges = ['10k-50k', '50k-1L', '1L-2L', '2L-3L', '3L-5L', '5L-10L', '10L+'];
+const seatingCapacity = ['50-100','100-200','200-400','400-600','600-800','800-1000','1000-1200','1200+'];
+const priceRanges     = ['10k-50k','50k-1L','1L-2L','2L-3L','3L-5L','5L-10L','10L+'];
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 const SkeletonCard = () => (
@@ -51,45 +51,43 @@ const SkeletonCard = () => (
     </View>
 );
 
-const LuxuryResorts = () => {
+const BanquetHalls = () => {
     const navigation = useNavigation();
     const actionSheetRef = useRef(null);
 
-    const [eventsData, setEventsData] = useState([]);
-    const [filteredList, setFilteredList] = useState([]);
+    const [eventsData, setEventsData]           = useState([]);
+    const [filteredList, setFilteredList]       = useState([]);
     const [locationBasedData, setLocationBasedData] = useState([]);
-    const [allLocations, setAllLocations] = useState([]);
+    const [allLocations, setAllLocations]       = useState([]);
     const [selectedSeatingCapacity, setSelectedSeatingCapacity] = useState('');
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
-    const [isACSelected, setIsACSelected] = useState(null);
+    const [isACSelected, setIsACSelected]       = useState(null);
     const [switchCateringVal, setSwitchCateringVal] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
+    const [currentPage, setCurrentPage]         = useState(1);
+    const [hasMore, setHasMore]                 = useState(true);
     const [totalEventPages, setTotalEventPages] = useState(0);
     const [filterDataCurrentPage, setFilterDataCurrentPage] = useState(1);
-    const [filterDataLimit] = useState(10);
+    const [filterDataLimit]                     = useState(10);
     const [hasMoreFilterData, setHasMoreFilterData] = useState(true);
     const [filterDataLoading, setFilterDataLoading] = useState(false);
     const [isFilterApplied, setIsFilterApplied] = useState(false);
     const [totalFilterDataPages, setTotalFilterDataPages] = useState(0);
-    const [loading, setLoading] = useState(false);
-    const [query, setQuery] = useState('');
+    const [loading, setLoading]                 = useState(false);
+    const [query, setQuery]                     = useState('');
     const [dropdownVisible, setDropdownVisible] = useState(false);
 
-    // Pagination refs — always current, no stale closures
-    const isFetchingRef = useRef(false);
+    const isFetchingRef       = useRef(false);
     const isFetchingFilterRef = useRef(false);
-    const currentPageRef = useRef(1);
-    const hasMoreRef = useRef(true);
-    const totalEventPagesRef = useRef(0);
-    const filterPageRef = useRef(1);
-    const hasMoreFilterRef = useRef(true);
+    const currentPageRef      = useRef(1);
+    const hasMoreRef          = useRef(true);
+    const totalEventPagesRef  = useRef(0);
+    const filterPageRef       = useRef(1);
+    const hasMoreFilterRef    = useRef(true);
     const totalFilterPagesRef = useRef(0);
-    const isFilterAppliedRef = useRef(false);
+    const isFilterAppliedRef  = useRef(false);
 
     useEffect(() => { getAllEvents(1); getAllLocations(); }, []);
 
-    // ── API: fetch all halls, filter client-side to Luxury Resort ────────────
     const getAllEvents = async (page) => {
         if (isFetchingRef.current) return;
         isFetchingRef.current = true;
@@ -102,7 +100,7 @@ const LuxuryResorts = () => {
                     params: {
                         page,
                         limit: 10,
-                        venueCategory: "Luxury Resort",
+                        venueCategory: "Banquet Hall",
                     },
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -110,35 +108,23 @@ const LuxuryResorts = () => {
                 }
             );
             const allData = Array.isArray(response?.data?.data) ? response.data.data : [];
-            // Filter client-side — only show Luxury Resort category
-            // console.log('allData is ::>>>>>',allData);
             const newData = allData.filter(item => item?.venueCategory === VENUE_CATEGORY);
             const total = response?.data?.totalPages ?? 0;
             currentPageRef.current = page;
             totalEventPagesRef.current = total;
             hasMoreRef.current = page < total;
-            setCurrentPage(page);
-            setTotalEventPages(total);
-            setHasMore(page < total);
+            setCurrentPage(page); setTotalEventPages(total); setHasMore(page < total);
             setEventsData(prev => page === 1 ? newData : [...prev, ...newData]);
-        } catch (e) {
-            console.error('LuxuryResorts fetch error:', e);
-        } finally {
-            isFetchingRef.current = false;
-            setLoading(false);
-        }
+        } catch (e) { console.error('FarmHouse fetch error:', e); }
+        finally { isFetchingRef.current = false; setLoading(false); }
     };
 
     const getAllEventsByLocation = async (value) => {
         const token = await getUserAuthToken();
         try {
-            const res = await axios.get(
-                `${BASE_URL}/getAllFunctionHallsByLocation/${value}`,
-                { headers: { Authorization: `Bearer ${token}` } },
-            );
-            const allData = res?.data?.data ?? [];
-            // Filter client-side
-            setLocationBasedData(allData.filter(item => item?.venueCategory === VENUE_CATEGORY));
+            const res = await axios.get(`${BASE_URL}/getAllFunctionHallsByLocation/${value}`,
+                { headers: { Authorization: `Bearer ${token}` } });
+            setLocationBasedData((res?.data?.data ?? []).filter(i => i?.venueCategory === VENUE_CATEGORY));
         } catch (e) { console.error(e); }
     };
 
@@ -155,32 +141,30 @@ const LuxuryResorts = () => {
         isFetchingFilterRef.current = true;
         setFilterDataLoading(true);
         const token = await getUserAuthToken();
-        const qp = new URLSearchParams();
-        if (isACSelected !== null) qp.append('ac', isACSelected === 'AC');
-        if (selectedPriceRange) qp.append('priceRanges', selectedPriceRange);
-        if (selectedSeatingCapacity) qp.append('seatingCapacity', selectedSeatingCapacity);
-        qp.append('withFoodOnly', switchCateringVal);
-        qp.append('page', page);
-        qp.append('limit', filterDataLimit);
-        try {
-            const res = await axios.get(
-                `${BASE_URL}/filterFunctionHalls?${qp.toString()}`,
-                { headers: { Authorization: `Bearer ${token}` } },
+      try {
+            const response = await axios.get(
+                `${BASE_URL}/filterFunctionHalls`,
+                {
+                    params: {
+                        page,
+                        limit: 10,
+                        venueCategory: "Farm House",
+                    },
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
             );
-            const newData = res?.data?.data ?? [];
-            const total = res?.data?.totalPages ?? 1;
-            filterPageRef.current = page;
-            totalFilterPagesRef.current = total;
-            hasMoreFilterRef.current = page < total;
-            setFilterDataCurrentPage(page);
-            setTotalFilterDataPages(total);
-            setHasMoreFilterData(page < total);
-            setFilteredList(reset ? newData : prev => [...prev, ...newData]);
+            const allData = Array.isArray(response?.data?.data) ? response.data.data : [];
+            const newData = allData.filter(item => item?.venueCategory === VENUE_CATEGORY);
+            const total = response?.data?.totalPages ?? 0;
+            currentPageRef.current = page;
+            totalEventPagesRef.current = total;
+            hasMoreRef.current = page < total;
+            setCurrentPage(page); setTotalEventPages(total); setHasMore(page < total);
+            setEventsData(prev => page === 1 ? newData : [...prev, ...newData]);
         } catch (e) { console.error(e); }
-        finally {
-            isFetchingFilterRef.current = false;
-            setFilterDataLoading(false);
-        }
+        finally { isFetchingFilterRef.current = false; setFilterDataLoading(false); }
     };
 
     const loadMore = () => {
@@ -188,13 +172,11 @@ const LuxuryResorts = () => {
         if (currentPageRef.current >= totalEventPagesRef.current) return;
         getAllEvents(currentPageRef.current + 1);
     };
-
     const loadMoreFiltered = () => {
         if (!hasMoreFilterRef.current || isFetchingFilterRef.current) return;
         if (filterPageRef.current >= totalFilterPagesRef.current) return;
         fetchFilteredFunctionHalls(false, filterPageRef.current + 1);
     };
-
     const clearFilters = () => {
         setSelectedPriceRange(''); setSelectedSeatingCapacity('');
         setIsACSelected(null); setFilteredList([]);
@@ -202,10 +184,8 @@ const LuxuryResorts = () => {
         isFilterAppliedRef.current = false;
         currentPageRef.current = 1; hasMoreRef.current = true;
         totalEventPagesRef.current = 0; isFetchingRef.current = false;
-        setCurrentPage(1); setHasMore(true);
-        getAllEvents(1);
+        setCurrentPage(1); setHasMore(true); getAllEvents(1);
     };
-
     const applyFilters = () => {
         setFilteredList([]);
         filterPageRef.current = 1; hasMoreFilterRef.current = true;
@@ -216,7 +196,6 @@ const LuxuryResorts = () => {
         setIsFilterApplied(true); isFilterAppliedRef.current = true;
     };
 
-    // ── Search ────────────────────────────────────────────────────────────────
     const locationSuggestions = useMemo(() => {
         if (!query) return [];
         return allLocations?.filter(i => i?.value?.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
@@ -229,8 +208,7 @@ const LuxuryResorts = () => {
     }, [query, eventsData]);
 
     const handleQueryChange = (text) => {
-        setQuery(text);
-        setDropdownVisible(text.length > 0);
+        setQuery(text); setDropdownVisible(text.length > 0);
         if (!text) setLocationBasedData([]);
     };
 
@@ -242,12 +220,12 @@ const LuxuryResorts = () => {
     }, [query, locationBasedData, nameFilteredData, filteredList, eventsData]);
 
     const countText = useMemo(() => {
-        if (query && locationBasedData.length > 0) return `${locationBasedData.length} Resorts in "${query}"`;
-        if (query && nameFilteredData.length > 0) return `${nameFilteredData.length} Resorts matching "${query}"`;
-        if (query) return 'No resorts found';
+        if (query && locationBasedData.length > 0) return `${locationBasedData.length} Banquet Halls in "${query}"`;
+        if (query && nameFilteredData.length > 0)  return `${nameFilteredData.length} Halls matching "${query}"`;
+        if (query) return 'No banquet halls found';
         if (filteredList.length > 0 || isFilterApplied)
-            return filteredList.length === 0 ? 'No resorts found' : `${filteredList.length} Filtered Resorts`;
-        return eventsData?.length === 0 ? 'No resorts found' : `${eventsData.length} Luxury Resorts`;
+            return filteredList.length === 0 ? 'No halls found' : `${filteredList.length} Filtered`;
+        return eventsData?.length === 0 ? 'No banquet halls found' : `${eventsData.length} Banquet Halls`;
     }, [query, locationBasedData, nameFilteredData, filteredList, isFilterApplied, eventsData]);
 
     const activeFilterCount = [selectedSeatingCapacity, selectedPriceRange, isACSelected, switchCateringVal || null].filter(Boolean).length;
@@ -256,18 +234,18 @@ const LuxuryResorts = () => {
         isFilterAppliedRef.current ? loadMoreFiltered() : loadMore();
     }, []);
 
-    // ── Resort-themed card ────────────────────────────────────────────────────
     const renderItem = useCallback(({ item }) => {
-        const heroImage = item?.professionalImage?.url;
-        const imageUrls = [heroImage, ...(item?.additionalImages?.flat()?.map(img => img?.url) || [])].filter(Boolean);
+        const heroImage   = item?.professionalImage?.url;
+        const imageUrls   = [heroImage, ...(item?.additionalImages?.flat()?.map(img => img?.url) || [])].filter(Boolean);
         const totalPhotos = imageUrls.length;
-        const hasVideo = item?.hallVideos?.length > 0;
+        const hasVideo    = item?.hallVideos?.length > 0;
         return (
             <View style={styles.card}>
                 <View style={styles.cardImageWrapper}>
                     <Swiper
-                        loop
-                        showsPagination
+                        loop={true}
+                        autoplay={false}
+                        showsPagination={true}
                         activeDotColor="#fff"
                         dotColor="rgba(255,255,255,0.5)"
                         activeDotStyle={{ width: 12, height: 6, borderRadius: 3 }}
@@ -276,18 +254,24 @@ const LuxuryResorts = () => {
                         style={{ height: 200 }}
                     >
                         {imageUrls.map((imgUrl, idx) => (
-                            <TouchableOpacity key={idx} activeOpacity={0.93}
+                            <TouchableOpacity
+                                key={idx}
+                                activeOpacity={0.93}
                                 onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}
-                                style={{ flex: 1 }}>
-                                <FastImage source={{ uri: imgUrl, priority: FastImage.priority.normal }}
-                                    style={styles.cardImage} resizeMode={FastImage.resizeMode.cover} />
+                                style={{ flex: 1 }}
+                            >
+                                <FastImage
+                                    source={{ uri: imgUrl, priority: FastImage.priority.normal }}
+                                    style={styles.cardImage}
+                                    resizeMode={FastImage.resizeMode.cover}
+                                />
                             </TouchableOpacity>
                         ))}
                     </Swiper>
-                    <LinearGradient colors={['transparent', 'rgba(10,22,40,0.75)']} style={styles.cardImageGradient} pointerEvents="none" />
-                    <View style={styles.luxuryBadge}>
-                        <IonIcon name="diamond" size={10} color={RESORT_GOLD} />
-                        <Text style={styles.luxuryBadgeText}>Luxury</Text>
+                    <LinearGradient colors={['transparent', 'rgba(26,8,8,0.72)']} style={styles.cardImageGradient} pointerEvents="none" />
+                    <View style={styles.banquetBadge}>
+                        <IonIcon name="ribbon" size={10} color="#fff" />
+                        <Text style={styles.banquetBadgeText}>Banquet</Text>
                     </View>
                     {hasVideo && (
                         <View style={styles.videoBadge}>
@@ -302,16 +286,13 @@ const LuxuryResorts = () => {
                     <View style={styles.priceOverlay}>
                         {item?.menuImages?.length > 0
                             ? <Text style={styles.priceText}>Menu Based</Text>
-                            : <Text style={styles.priceText}>{formatAmount(item?.rentPricePerDay)}<Text style={styles.priceUnit}>/day</Text></Text>
-                        }
+                            : <Text style={styles.priceText}>{formatAmount(item?.rentPricePerDay)}<Text style={styles.priceUnit}>/day</Text></Text>}
                     </View>
                 </View>
                 <TouchableOpacity activeOpacity={0.93}
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}>
                 <View style={styles.cardBody}>
-                    <View style={styles.cardTitleRow}>
-                        <Text style={styles.cardTitle} numberOfLines={1}>{item?.functionHallName}</Text>
-                    </View>
+                    <Text style={styles.cardTitle} numberOfLines={1}>{item?.functionHallName}</Text>
                     <View style={styles.addressRow}>
                         <LocationMarkIcon width={12} height={12} />
                         <Text numberOfLines={1} style={styles.addressText}>{item?.functionHallAddress?.address}</Text>
@@ -319,27 +300,25 @@ const LuxuryResorts = () => {
                     <View style={styles.chipsRow}>
                         {item?.seatingCapacity ? (
                             <View style={styles.chip}>
-                                <IonIcon name="people-outline" size={11} color={RESORT_BLUE} />
+                                <IonIcon name="people-outline" size={11} color={BH_ACCENT} />
                                 <Text style={styles.chipText}>{item?.seatingCapacity} pax</Text>
-                            </View>
-                        ) : null}
+                            </View>) : null}
                         {item?.bedRooms > 0 && (
                             <View style={styles.chip}>
-                                <IonIcon name="bed-outline" size={11} color={RESORT_BLUE} />
+                                <IonIcon name="bed-outline" size={11} color={BH_ACCENT} />
                                 <Text style={styles.chipText}>{item?.bedRooms} Rooms</Text>
-                            </View>
-                        )}
+                            </View>)}
                         <View style={styles.chip}>
                             {item?.foodType === 'Both' ? <VegNonVegIcon width={14} height={14} /> :
-                                item?.foodType === 'veg' ? <VegIcon width={14} height={14} /> :
-                                    <NonVegIcon width={14} height={14} />}
+                             item?.foodType === 'veg'  ? <VegIcon width={14} height={14} /> :
+                             <NonVegIcon width={14} height={14} />}
                             <Text style={styles.chipText}>
                                 {item?.foodType === 'Both' ? 'Veg & Non-Veg' : item?.foodType === 'veg' ? 'Veg' : 'Non-Veg'}
                             </Text>
                         </View>
                     </View>
                 </View>
-                </TouchableOpacity>
+            </TouchableOpacity>
             </View>
         );
     }, [navigation]);
@@ -348,369 +327,230 @@ const LuxuryResorts = () => {
 
     const ListFooter = useCallback(() => {
         if (!loading && !filterDataLoading) return null;
-        return (
-            <View style={styles.footerLoader}>
-                <ActivityIndicator size="small" color={RESORT_BLUE} />
-                <Text style={styles.footerLoaderText}>Loading more resorts...</Text>
-            </View>
-        );
+        return (<View style={styles.footerLoader}>
+            <ActivityIndicator size="small" color={BH_ACCENT} />
+            <Text style={styles.footerLoaderText}>Loading banquet halls...</Text>
+        </View>);
     }, [loading, filterDataLoading]);
 
     const ListEmpty = useCallback(() => (
         <View style={styles.emptyState}>
-            <IonIcon name="water-outline" size={56} color={RESORT_LIGHT} />
-            <Text style={styles.emptyTitle}>No Luxury Resorts Found</Text>
+            <IonIcon name="ribbon-outline" size={56} color={BH_LIGHT} />
+            <Text style={styles.emptyTitle}>No Banquet Halls Found</Text>
             <Text style={styles.emptySubtitle}>
-                {isFilterApplied ? 'Try adjusting your filters.' : 'No resorts available right now.'}
+                {isFilterApplied ? 'Try adjusting your filters.' : 'No banquet halls available right now.'}
             </Text>
             {isFilterApplied && (
                 <TouchableOpacity style={styles.emptyBtn} onPress={clearFilters}>
                     <Text style={styles.emptyBtnText}>Clear Filters</Text>
-                </TouchableOpacity>
-            )}
+                </TouchableOpacity>)}
         </View>
     ), [isFilterApplied]);
 
     return (
         <SafeAreaView style={styles.safeArea}>
-
-            {/* ── FILTER SHEET ── */}
-            <ActionSheet
-                ref={actionSheetRef}
-                statusBarTranslucent
-                closeOnPressBack
-                defaultOverlayOpacity={0.5}
-                containerStyle={styles.actionSheetContainer}
-            >
+            <ActionSheet ref={actionSheetRef} statusBarTranslucent closeOnPressBack
+                defaultOverlayOpacity={0.5} containerStyle={styles.actionSheetContainer}>
                 <FloatingCloseButton onPress={() => actionSheetRef.current?.hide()} />
                 <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
                     <Text style={styles.filterSectionLabel}>Seating Capacity</Text>
                     <View style={styles.filterChipsWrap}>
                         {seatingCapacity.map(item => (
-                            <TouchableOpacity
-                                key={item}
+                            <TouchableOpacity key={item}
                                 style={[styles.filterChip, selectedSeatingCapacity === item && styles.filterChipActive]}
-                                onPress={() => setSelectedSeatingCapacity(item)}
-                            >
+                                onPress={() => setSelectedSeatingCapacity(item)}>
                                 <Text style={[styles.filterChipText, selectedSeatingCapacity === item && styles.filterChipTextActive]}>{item}</Text>
-                            </TouchableOpacity>
-                        ))}
+                            </TouchableOpacity>))}
                     </View>
                     <Text style={styles.filterSectionLabel}>AC / Non-AC</Text>
                     <View style={styles.filterChipsWrap}>
                         {['AC', 'Non-AC'].map(item => (
-                            <TouchableOpacity
-                                key={item}
+                            <TouchableOpacity key={item}
                                 style={[styles.filterChip, isACSelected === item && styles.filterChipActive]}
-                                onPress={() => setIsACSelected(isACSelected === item ? null : item)}
-                            >
+                                onPress={() => setIsACSelected(isACSelected === item ? null : item)}>
                                 <Text style={[styles.filterChipText, isACSelected === item && styles.filterChipTextActive]}>{item}</Text>
-                            </TouchableOpacity>
-                        ))}
+                            </TouchableOpacity>))}
                         <View style={styles.switchRow}>
                             <Text style={styles.switchLabel}>In-house Catering</Text>
-                            <Switch
-                                trackColor={{ false: '#E8E8E8', true: '#C8D0F0' }}
-                                thumbColor={switchCateringVal ? RESORT_BLUE : '#ccc'}
-                                onValueChange={(val) => { setSwitchCateringVal(val); }}
-                                value={switchCateringVal}
-                            />
+                            <Switch trackColor={{ false: '#E8E8E8', true: '#F5C0CC' }}
+                                thumbColor={switchCateringVal ? BH_ACCENT : '#ccc'}
+                                onValueChange={setSwitchCateringVal} value={switchCateringVal} />
                         </View>
                     </View>
                     <Text style={styles.filterSectionLabel}>Price Range</Text>
                     <View style={styles.filterChipsWrap}>
                         {priceRanges.map(item => (
-                            <TouchableOpacity
-                                key={item}
+                            <TouchableOpacity key={item}
                                 style={[styles.filterChip, selectedPriceRange === item && styles.filterChipActive]}
-                                onPress={() => setSelectedPriceRange(item)}
-                            >
+                                onPress={() => setSelectedPriceRange(item)}>
                                 <Text style={[styles.filterChipText, selectedPriceRange === item && styles.filterChipTextActive]}>{item}</Text>
-                            </TouchableOpacity>
-                        ))}
+                            </TouchableOpacity>))}
                     </View>
                 </ScrollView>
                 <View style={styles.filterFooter}>
                     <TouchableOpacity style={styles.filterClearBtn} onPress={clearFilters}>
                         <Text style={styles.filterClearText}>Clear All</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                        style={[styles.filterApplyBtn, isApplyDisabled && { opacity: 0.45 }]}
-                        onPress={applyFilters}
-                        disabled={isApplyDisabled}
-                    >
-                        <LinearGradient
-                            colors={[RESORT_BLUE, '#4A5FA8']}
-                            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                            style={styles.filterApplyGradient}
-                        >
+                    <TouchableOpacity style={[styles.filterApplyBtn, isApplyDisabled && { opacity: 0.45 }]}
+                        onPress={applyFilters} disabled={isApplyDisabled}>
+                        <LinearGradient colors={[BH_ACCENT, '#D2453B']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                            style={styles.filterApplyGradient}>
                             <Text style={styles.filterApplyText}>Apply Filters</Text>
                         </LinearGradient>
                     </TouchableOpacity>
                 </View>
             </ActionSheet>
 
-            {/* ── RESORT HERO HEADER ── */}
-            <LinearGradient
-                colors={[RESORT_DARK, RESORT_MID, '#162035']}
-                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                style={styles.heroHeader}
-            >
-                {/* decorative circle */}
-                <View style={styles.heroCircle} />
+            {/* ── BANQUET HALLS HERO ── */}
+            <LinearGradient colors={[BH_DARK, BH_MID, '#3D1010']}
+                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.heroHeader}>
+                <View style={styles.heroCircle1} />
+                <View style={styles.heroCircle2} />
                 <View style={styles.heroRow}>
                     <View style={{ flex: 1 }}>
                         <View style={styles.heroBadge}>
-                            <IonIcon name="diamond" size={11} color={RESORT_GOLD} />
-                            <Text style={styles.heroBadgeText}>Premium Collection</Text>
+                            <IonIcon name="ribbon" size={11} color={BH_GOLD} />
+                            <Text style={styles.heroBadgeText}>Grand Venues</Text>
                         </View>
-                        <Text style={styles.heroTitle}>Luxury Resorts</Text>
-                        <Text style={styles.heroSub}>5-star stays & celebrations</Text>
+                        <Text style={styles.heroTitle}>Banquet Halls</Text>
+                        <Text style={styles.heroSub}>Premium halls for all occasions</Text>
                     </View>
                     <View style={styles.heroIconWrap}>
-                        <IonIcon name="water" size={36} color={RESORT_BLUE} />
+                        <IonIcon name="ribbon" size={32} color={BH_GOLD} />
                     </View>
                 </View>
-
-                {/* search bar inside hero */}
                 <View style={styles.searchBar}>
-                    <IonIcon name="search-outline" size={16} color="#8195D7" style={{ marginRight: 8 }} />
-                    <TextInput
-                        style={styles.searchInput}
-                        value={query}
-                        onChangeText={handleQueryChange}
-                        placeholder="Search resorts by name or area..."
-                        placeholderTextColor="#4A5FA8"
-                        returnKeyType="search"
-                    />
+                    <IonIcon name="search-outline" size={16} color="rgba(236,167,60,0.7)" style={{ marginRight: 8 }} />
+                    <TextInput style={styles.searchInput} value={query} onChangeText={handleQueryChange}
+                        placeholder="Search banquet halls by name or area..."
+                        placeholderTextColor="rgba(236,167,60,0.45)" returnKeyType="search" />
                     {query.length > 0 && (
                         <TouchableOpacity onPress={() => { setQuery(''); setDropdownVisible(false); setLocationBasedData([]); }}>
-                            <IonIcon name="close-circle" size={16} color="#8195D7" />
-                        </TouchableOpacity>
-                    )}
+                            <IonIcon name="close-circle" size={16} color="rgba(236,167,60,0.7)" />
+                        </TouchableOpacity>)}
                 </View>
-
-                {/* dropdown */}
                 {dropdownVisible && (locationSuggestions.length > 0 || nameFilteredData.length > 0) && (
                     <View style={styles.dropdown}>
                         {locationSuggestions.map((item, index) => (
-                            <TouchableOpacity
-                                key={`area-${item._id}`}
+                            <TouchableOpacity key={`area-${item._id}`}
                                 style={[styles.dropdownItem, index < locationSuggestions.length - 1 && styles.dropdownDivider]}
-                                onPress={() => { setQuery(item.value); setDropdownVisible(false); getAllEventsByLocation(item.value); }}
-                            >
-                                <IonIcon name="location-outline" size={13} color={RESORT_BLUE} style={{ marginRight: 8 }} />
+                                onPress={() => { setQuery(item.value); setDropdownVisible(false); getAllEventsByLocation(item.value); }}>
+                                <IonIcon name="location-outline" size={13} color={BH_GOLD} style={{ marginRight: 8 }} />
                                 <Text style={styles.dropdownText}>{item.value}</Text>
-                            </TouchableOpacity>
-                        ))}
+                            </TouchableOpacity>))}
                         {nameFilteredData.slice(0, 4).map((item, index) => (
-                            <TouchableOpacity
-                                key={`hall-${item._id}`}
+                            <TouchableOpacity key={`bh-${item._id}`}
                                 style={[styles.dropdownItem, index < 3 && styles.dropdownDivider]}
-                                onPress={() => { setDropdownVisible(false); navigation.navigate('ViewEvents', { categoryId: item._id }); }}
-                            >
+                                onPress={() => { setDropdownVisible(false); navigation.navigate('ViewEvents', { categoryId: item._id }); }}>
                                 <IonIcon name="business-outline" size={13} color="#939393" style={{ marginRight: 8 }} />
                                 <View style={{ flex: 1 }}>
                                     <Text style={styles.dropdownText} numberOfLines={1}>{item.functionHallName}</Text>
                                     <Text style={styles.dropdownSubText} numberOfLines={1}>{item?.functionHallAddress?.address}</Text>
                                 </View>
                                 <IonIcon name="chevron-forward" size={12} color="#ccc" />
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                )}
+                            </TouchableOpacity>))}
+                    </View>)}
             </LinearGradient>
 
             {/* ── HEADER ROW ── */}
             <View style={styles.headerRow}>
                 <View>
-                    <Text style={styles.headerTitle}>Luxury Resorts</Text>
+                    <Text style={styles.headerTitle}>Banquet Halls</Text>
                     <Text style={styles.headerSubtitle}>{countText}</Text>
                 </View>
-                <TouchableOpacity
-                    style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnActive]}
-                    onPress={() => actionSheetRef.current?.show()}
-                >
-                    <IonIcon name="options-outline" size={16} color={activeFilterCount > 0 ? '#fff' : RESORT_BLUE} />
+                <TouchableOpacity style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnActive]}
+                    onPress={() => actionSheetRef.current?.show()}>
+                    <IonIcon name="options-outline" size={16} color={activeFilterCount > 0 ? '#fff' : BH_ACCENT} />
                     <Text style={[styles.filterBtnText, activeFilterCount > 0 && { color: '#fff' }]}>Filter</Text>
                     {activeFilterCount > 0 && (
                         <View style={styles.filterBadge}>
                             <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
-                        </View>
-                    )}
+                        </View>)}
                 </TouchableOpacity>
             </View>
 
-            {/* ── LIST ── */}
             {loading && eventsData.length === 0 ? (
                 <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8 }}>
                     {[1, 2, 3].map(i => <SkeletonCard key={i} />)}
                 </ScrollView>
             ) : (
-                <FlatList
-                    data={dataSource}
-                    renderItem={renderItem}
-                    keyExtractor={keyExtractor}
-                    onEndReached={onEndReached}
-                    onEndReachedThreshold={0.6}
-                    ListFooterComponent={ListFooter}
-                    ListEmptyComponent={ListEmpty}
+                <FlatList data={dataSource} renderItem={renderItem} keyExtractor={keyExtractor}
+                    onEndReached={onEndReached} onEndReachedThreshold={0.6}
+                    ListFooterComponent={ListFooter} ListEmptyComponent={ListEmpty}
                     contentContainerStyle={styles.listContent}
-                    removeClippedSubviews={true}
-                    maxToRenderPerBatch={6}
-                    windowSize={10}
-                    initialNumToRender={5}
-                    showsVerticalScrollIndicator={false}
-                />
+                    removeClippedSubviews maxToRenderPerBatch={6} windowSize={10}
+                    initialNumToRender={5} showsVerticalScrollIndicator={false} />
             )}
         </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: '#F4F6FB' },
+    safeArea: { flex: 1, backgroundColor: BH_CREAM },
     listContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24 },
 
-    // ── HERO HEADER ──
-    heroHeader: {
-        paddingHorizontal: 16,
-        paddingTop: 14,
-        paddingBottom: 18,
-        overflow: 'hidden',
-    },
-    heroCircle: {
-        position: 'absolute', width: 180, height: 180, borderRadius: 90,
-        backgroundColor: 'rgba(129,149,215,0.08)', top: -40, right: -40,
-    },
+    // ── HERO ──
+    heroHeader: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 18, overflow: 'hidden' },
+    heroCircle1: { position: 'absolute', width: 200, height: 200, borderRadius: 100, backgroundColor: 'rgba(160,20,62,0.07)', top: -60, right: -50 },
+    heroCircle2: { position: 'absolute', width: 120, height: 120, borderRadius: 60, backgroundColor: 'rgba(160,20,62,0.05)', bottom: -30, left: -20 },
     heroRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
-    heroBadge: {
-        flexDirection: 'row', alignItems: 'center', gap: 5,
-        backgroundColor: 'rgba(236,167,60,0.15)',
-        borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4,
-        alignSelf: 'flex-start', marginBottom: 8,
-        borderWidth: 1, borderColor: 'rgba(236,167,60,0.25)',
-    },
-    heroBadgeText: { fontFamily: 'ManropeRegular', fontSize: 11, fontWeight: '700', color: RESORT_GOLD },
+    heroBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(236,167,60,0.18)', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, alignSelf: 'flex-start', marginBottom: 8, borderWidth: 1, borderColor: 'rgba(236,167,60,0.3)' },
+    heroBadgeText: { fontFamily: 'ManropeRegular', fontSize: 11, fontWeight: '700', color: BH_GOLD },
     heroTitle: { fontFamily: 'ManropeRegular', fontSize: 22, fontWeight: '800', color: '#fff' },
     heroSub: { fontFamily: 'ManropeRegular', fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 3 },
-    heroIconWrap: {
-        width: 64, height: 64, borderRadius: 32,
-        backgroundColor: 'rgba(129,149,215,0.15)',
-        justifyContent: 'center', alignItems: 'center',
-        borderWidth: 1, borderColor: 'rgba(129,149,215,0.25)',
-    },
+    heroIconWrap: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(236,167,60,0.15)', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(236,167,60,0.25)' },
 
     // ── SEARCH ──
-    searchBar: {
-        flexDirection: 'row', alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.08)',
-        borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10,
-        borderWidth: 1, borderColor: 'rgba(129,149,215,0.3)',
-    },
+    searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1, borderColor: 'rgba(160,20,62,0.35)' },
     searchInput: { flex: 1, fontSize: 13, fontFamily: 'ManropeRegular', color: '#fff', padding: 0 },
-    dropdown: {
-        backgroundColor: '#fff', borderRadius: 12, marginTop: 6,
-        elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.12, shadowRadius: 6, overflow: 'hidden',
-    },
+    dropdown: { backgroundColor: '#fff', borderRadius: 12, marginTop: 6, elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.12, shadowRadius: 6, overflow: 'hidden' },
     dropdownItem: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 11 },
     dropdownDivider: { borderBottomWidth: 1, borderBottomColor: '#F1F1F1' },
     dropdownText: { fontSize: 13, fontFamily: 'ManropeRegular', color: '#333', flex: 1 },
     dropdownSubText: { fontSize: 11, fontFamily: 'ManropeRegular', color: '#939393', marginTop: 1 },
 
     // ── HEADER ROW ──
-    headerRow: {
-        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-        paddingHorizontal: 16, paddingTop: 14, paddingBottom: 10,
-    },
-    headerTitle: { fontFamily: 'ManropeRegular', fontSize: 17, fontWeight: '800', color: RESORT_DARK },
+    headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 14, paddingBottom: 10 },
+    headerTitle: { fontFamily: 'ManropeRegular', fontSize: 17, fontWeight: '800', color: BH_DARK },
     headerSubtitle: { fontFamily: 'ManropeRegular', fontSize: 12, color: '#7D7F88', marginTop: 2 },
-    filterBtn: {
-        flexDirection: 'row', alignItems: 'center', gap: 5,
-        backgroundColor: '#fff', borderRadius: 10,
-        paddingHorizontal: 12, paddingVertical: 8,
-        elevation: 2, shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.07, shadowRadius: 3,
-        borderWidth: 1, borderColor: RESORT_LIGHT,
-    },
-    filterBtnActive: { backgroundColor: RESORT_BLUE, borderColor: RESORT_BLUE },
-    filterBtnText: { fontSize: 13, fontWeight: '600', fontFamily: 'ManropeRegular', color: RESORT_BLUE },
-    filterBadge: {
-        backgroundColor: '#fff', borderRadius: 10,
-        width: 18, height: 18, justifyContent: 'center', alignItems: 'center', marginLeft: 2,
-    },
-    filterBadgeText: { fontSize: 10, fontWeight: '800', color: RESORT_BLUE, fontFamily: 'ManropeRegular' },
+    filterBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#fff', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.07, shadowRadius: 3, borderWidth: 1, borderColor: BH_LIGHT },
+    filterBtnActive: { backgroundColor: BH_ACCENT, borderColor: BH_ACCENT },
+    filterBtnText: { fontSize: 13, fontWeight: '600', fontFamily: 'ManropeRegular', color: BH_ACCENT },
+    filterBadge: { backgroundColor: '#fff', borderRadius: 10, width: 18, height: 18, justifyContent: 'center', alignItems: 'center', marginLeft: 2 },
+    filterBadgeText: { fontSize: 10, fontWeight: '800', color: BH_ACCENT, fontFamily: 'ManropeRegular' },
 
     // ── CARD ──
-    card: {
-        backgroundColor: '#fff', borderRadius: 20, marginBottom: 16,
-        elevation: 3, shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 6,
-        overflow: 'hidden',
-    },
+    card: { backgroundColor: '#fff', borderRadius: 20, marginBottom: 16, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 6, overflow: 'hidden' },
     cardImageWrapper: { width: '100%', height: 200 },
     cardImage: { width: '100%', height: '100%' },
     cardImageGradient: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 90 },
-    luxuryBadge: {
-        position: 'absolute', top: 12, left: 12,
-        flexDirection: 'row', alignItems: 'center', gap: 4,
-        backgroundColor: 'rgba(236,167,60,0.88)',
-        paddingHorizontal: 9, paddingVertical: 4, borderRadius: 20,
-    },
-    luxuryBadgeText: { fontFamily: 'ManropeRegular', fontSize: 10, fontWeight: '700', color: '#1a1a1a' },
-    videoBadge: {
-        position: 'absolute', top: 12, left: 90,
-        flexDirection: 'row', alignItems: 'center', gap: 4,
-        backgroundColor: 'rgba(129,149,215,0.85)',
-        paddingHorizontal: 9, paddingVertical: 4, borderRadius: 20,
-    },
-    photoBadge: {
-        position: 'absolute', bottom: 10, left: 12,
-        flexDirection: 'row', alignItems: 'center', gap: 4,
-        backgroundColor: 'rgba(0,0,0,0.45)',
-        paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20,
-    },
+    banquetBadge: { position: 'absolute', top: 12, left: 12, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(160,20,62,0.88)', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 20 },
+    banquetBadgeText: { fontFamily: 'ManropeRegular', fontSize: 10, fontWeight: '700', color: '#fff' },
+    videoBadge: { position: 'absolute', top: 12, left: 86, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(236,167,60,0.85)', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 20 },
+    photoBadge: { position: 'absolute', bottom: 10, left: 12, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(0,0,0,0.45)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20 },
     badgeText: { color: '#fff', fontSize: 11, fontWeight: '700', fontFamily: 'ManropeRegular' },
-    priceOverlay: {
-        position: 'absolute', bottom: 10, right: 12,
-        backgroundColor: 'rgba(10,22,40,0.7)',
-        paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20,
-    },
+    priceOverlay: { position: 'absolute', bottom: 10, right: 12, backgroundColor: 'rgba(26,8,8,0.7)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
     priceText: { color: '#fff', fontSize: 13, fontWeight: '800', fontFamily: 'ManropeRegular' },
     priceUnit: { fontSize: 10, fontWeight: '400', color: 'rgba(255,255,255,0.75)' },
     cardBody: { padding: 14 },
-    cardTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    cardTitle: { fontFamily: 'ManropeRegular', fontSize: 15, fontWeight: '700', color: RESORT_DARK, flex: 1, marginRight: 8 },
-    ratingPill: {
-        flexDirection: 'row', alignItems: 'center', gap: 3,
-        backgroundColor: '#FEF8E8', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20,
-    },
-    ratingText: { fontSize: 11, fontWeight: '700', color: RESORT_GOLD2, fontFamily: 'ManropeRegular' },
-    addressRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 4 },
+    cardTitle: { fontFamily: 'ManropeRegular', fontSize: 15, fontWeight: '700', color: BH_DARK, marginBottom: 6 },
+    addressRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 10 },
     addressText: { fontSize: 12, color: '#939393', fontFamily: 'ManropeRegular', flex: 1 },
-    chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 },
-    chip: {
-        flexDirection: 'row', alignItems: 'center',
-        backgroundColor: RESORT_LIGHT,
-        paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20,
-    },
-    chipText: { fontSize: 11, color: RESORT_DARK, fontFamily: 'ManropeRegular', fontWeight: '500', marginLeft: 3 },
+    chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+    chip: { flexDirection: 'row', alignItems: 'center', backgroundColor: BH_LIGHT, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20 },
+    chipText: { fontSize: 11, color: BH_DARK, fontFamily: 'ManropeRegular', fontWeight: '500', marginLeft: 3 },
 
     // ── FILTER SHEET ──
     actionSheetContainer: { backgroundColor: '#fff', paddingBottom: 20, borderTopRightRadius: 20, borderTopLeftRadius: 20 },
-    filterSectionLabel: { fontFamily: 'ManropeRegular', fontWeight: '700', color: RESORT_DARK, fontSize: 14, paddingLeft: 16, paddingTop: 18, paddingBottom: 4 },
+    filterSectionLabel: { fontFamily: 'ManropeRegular', fontWeight: '700', color: BH_DARK, fontSize: 14, paddingLeft: 16, paddingTop: 18, paddingBottom: 4 },
     filterChipsWrap: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 12, paddingBottom: 4, gap: 8, alignItems: 'center' },
     filterChip: { backgroundColor: '#F5F5F5', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, borderWidth: 1.5, borderColor: 'transparent' },
-    filterChipActive: { borderColor: RESORT_BLUE, backgroundColor: RESORT_LIGHT },
+    filterChipActive: { borderColor: BH_ACCENT, backgroundColor: BH_LIGHT },
     filterChipText: { fontSize: 13, fontFamily: 'ManropeRegular', color: '#555' },
-    filterChipTextActive: { color: RESORT_BLUE, fontWeight: '700' },
+    filterChipTextActive: { color: BH_ACCENT, fontWeight: '700' },
     switchRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 4 },
     switchLabel: { fontSize: 13, fontFamily: 'ManropeRegular', color: '#333' },
-    filterFooter: {
-        position: 'absolute', left: 0, right: 0, bottom: 0,
-        flexDirection: 'row', padding: 16, gap: 12,
-        backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#F1F1F1',
-    },
+    filterFooter: { position: 'absolute', left: 0, right: 0, bottom: 0, flexDirection: 'row', padding: 16, gap: 12, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#F1F1F1' },
     filterClearBtn: { flex: 1, paddingVertical: 13, backgroundColor: '#F5F5F5', borderRadius: 12, alignItems: 'center' },
     filterClearText: { fontSize: 14, fontWeight: '600', color: '#555', fontFamily: 'ManropeRegular' },
     filterApplyBtn: { flex: 2, borderRadius: 12, overflow: 'hidden' },
@@ -721,14 +561,14 @@ const styles = StyleSheet.create({
     footerLoader: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, paddingVertical: 20 },
     footerLoaderText: { fontSize: 13, color: '#939393', fontFamily: 'ManropeRegular' },
     emptyState: { alignItems: 'center', paddingTop: 80, paddingHorizontal: 32 },
-    emptyTitle: { fontSize: 17, fontWeight: '700', color: RESORT_DARK, fontFamily: 'ManropeRegular', marginTop: 16 },
+    emptyTitle: { fontSize: 17, fontWeight: '700', color: BH_DARK, fontFamily: 'ManropeRegular', marginTop: 16 },
     emptySubtitle: { fontSize: 13, color: '#939393', fontFamily: 'ManropeRegular', textAlign: 'center', marginTop: 8, lineHeight: 20 },
-    emptyBtn: { marginTop: 20, backgroundColor: RESORT_LIGHT, borderRadius: 12, paddingHorizontal: 24, paddingVertical: 12, borderWidth: 1, borderColor: RESORT_BLUE },
-    emptyBtnText: { color: RESORT_BLUE, fontWeight: '700', fontFamily: 'ManropeRegular', fontSize: 14 },
-    skeletonImage: { width: '100%', height: 200, backgroundColor: '#EBEBEB' },
+    emptyBtn: { marginTop: 20, backgroundColor: BH_LIGHT, borderRadius: 12, paddingHorizontal: 24, paddingVertical: 12, borderWidth: 1, borderColor: BH_ACCENT },
+    emptyBtnText: { color: BH_ACCENT, fontWeight: '700', fontFamily: 'ManropeRegular', fontSize: 14 },
+    skeletonImage: { width: '100%', height: 200, backgroundColor: '#F5E8EC' },
     skeletonBody: { padding: 14 },
-    skeletonLine: { height: 14, borderRadius: 7, backgroundColor: '#EBEBEB', width: '80%' },
-    skeletonChip: { height: 28, width: 72, borderRadius: 14, backgroundColor: '#EBEBEB' },
+    skeletonLine: { height: 14, borderRadius: 7, backgroundColor: '#F5E8EC', width: '80%' },
+    skeletonChip: { height: 28, width: 72, borderRadius: 14, backgroundColor: '#F5E8EC' },
 });
 
-export default LuxuryResorts;
+export default BanquetHalls;

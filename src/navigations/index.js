@@ -30,7 +30,7 @@ import CateringsOverView from "../screens/Bookings/CateringsOverView";
 import LoginScreen from "../screens/LandingScreen/LoginScreen";
 import OtpValidation from "../screens/LandingScreen/OtpValidation";
 import { checkIsTokenStored, getCurrentLoggedInUserMobileNum, getCurrentLoggedInVendorMobileNum, getDeviceFCMToken, getLoginUserId } from "../../redux/actions";
-// import messaging from '@react-native-firebase/messaging'; // COMMENTED OUT — testing without Firebase
+import messaging from '@react-native-firebase/messaging'; // COMMENTED OUT — testing without Firebase
 import AadharUpload from "../screens/KYC/AadharUpload";
 import BankDetailsScreen from "../screens/VendorScreens/VendorProfile/BankDetails";
 import UserAadharUpload from "../screens/KYC/UserAadharUpload";
@@ -42,6 +42,7 @@ import EditAddFoodCateringGeneral from "../screens/VendorScreens/VendorAddFoodCa
 import NearByEvents from "../screens/Events/NearByEvents";
 import LuxuryResorts from "../screens/Events/LuxuryResorts";
 import FarmHouse from "../screens/Events/FarmHouse";
+import BanquetHalls from "../screens/Events/BanquetHalls";
 import NearByFoodCaterings from "../screens/Caterings/NearByFoodCaterings";
 import MyTransactions from "../screens/VendorScreens/VendorProfile/MyTransactions";
 import AboutUsScreen from "../screens/VendorScreens/VendorProfile/VendorAboutus";
@@ -445,6 +446,18 @@ const MainNavigation = () => {
                     header: () => (
                         <SafeAreaView edges={['top']} style={{ backgroundColor: '#1A2E1A' }}>
                             <NavigationHeader Icon={true} title="Farm Houses" />
+                        </SafeAreaView>
+                    ),
+                    headerShown: true,
+                }}
+            />
+            <Stack.Screen
+                name="BanquetHalls"
+                component={BanquetHalls}
+                options={{
+                    header: () => (
+                        <SafeAreaView edges={['top']} style={{ backgroundColor: '#1A0808' }}>
+                            <NavigationHeader Icon={true} title="Banquet Halls" />
                         </SafeAreaView>
                     ),
                     headerShown: true,

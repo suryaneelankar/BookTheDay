@@ -546,7 +546,7 @@ const HomeDashboard = () => {
             {/* gold underline accent */}
             <View style={styles.heroTitleAccent} />
             <Text style={styles.heroSubtitle}>
-              Premium Halls · Farm Houses · Resorts
+              Premium Halls · Farm Houses · Resorts · Banquets
             </Text>
 
             <TouchableOpacity
@@ -566,18 +566,18 @@ const HomeDashboard = () => {
           {/* floating stats card — overlaps hero bottom */}
           <View style={styles.statsFloat}>
             <View style={styles.statItem}>
-              <Text style={styles.statNum}>50+</Text>
+              <Text style={styles.statNum}>{eventsData?.length > 0 ? `${eventsData.length}+` : '—'}</Text>
               <Text style={styles.statLbl}>Venues</Text>
             </View>
             <View style={styles.statSep} />
             <View style={styles.statItem}>
-              <Text style={styles.statNum}>500+</Text>
-              <Text style={styles.statLbl}>Bookings</Text>
+              <Text style={styles.statNum}>Hyderabad</Text>
+              <Text style={styles.statLbl}>City</Text>
             </View>
             <View style={styles.statSep} />
             <View style={styles.statItem}>
-              <Text style={styles.statNum}>4.8★</Text>
-              <Text style={styles.statLbl}>Rating</Text>
+              <Text style={styles.statNum}>24/7</Text>
+              <Text style={styles.statLbl}>Support</Text>
             </View>
           </View>
         </View>
@@ -676,10 +676,10 @@ const HomeDashboard = () => {
               </View>
             </TouchableOpacity>
 
-            {/* ── Destination Weddings ── */}
+            {/* ── Banquet Halls ── */}
             <TouchableOpacity
               activeOpacity={0.88}
-              onPress={() => navigation.navigate('Events')}
+              onPress={() => navigation.navigate('BanquetHalls')}
               style={styles.catCard}>
               <View style={[styles.catIconArea, { backgroundColor: '#FDF0F4' }]}>
                 <View style={[styles.catIconCircle, { backgroundColor: 'rgba(160,20,62,0.1)' }]}>
@@ -690,8 +690,8 @@ const HomeDashboard = () => {
                 </View>
               </View>
               <View style={styles.catCardBody}>
-                <Text style={styles.catCardTitle}>Destination Weddings</Text>
-                <Text style={styles.catCardDesc}>Unforgettable celebrations</Text>
+                <Text style={styles.catCardTitle}>Banquet Halls</Text>
+                <Text style={styles.catCardDesc}>Premium halls for all occasions</Text>
                 <View style={[styles.catCardFooter, { borderTopColor: '#FAE0E8' }]}>
                   <Text style={[styles.catCardLink, { color: '#A0143E' }]}>Explore</Text>
                   <IonIcon name="arrow-forward" size={12} color="#A0143E" />
@@ -765,7 +765,7 @@ const HomeDashboard = () => {
         )}
 
         {/* ════════════════════════════════════════
-            DESTINATION WEDDINGS BANNER
+            BANQUET HALLS BANNER
         ════════════════════════════════════════ */}
         <View style={styles.destBannerWrapper}>
           <LinearGradient
@@ -778,12 +778,12 @@ const HomeDashboard = () => {
               <View style={styles.destNewPill}>
                 <Text style={styles.destNewText}>✦ Exclusive</Text>
               </View>
-              <Text style={styles.destTitle}>Destination{'\n'}Weddings</Text>
+              <Text style={styles.destTitle}>Banquet{'\n'}Halls</Text>
               <Text style={styles.destSub}>
-                Farm houses & luxury resorts{'\n'}around Hyderabad
+                Premium halls for weddings,{'\n'}corporate & social events
               </Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate('Events')}
+                onPress={() => navigation.navigate('BanquetHalls')}
                 style={styles.destCta}>
                 <Text style={styles.destCtaText}>Explore</Text>
                 <IonIcon name="arrow-forward" size={13} color="#131313" />
@@ -868,8 +868,8 @@ const HomeDashboard = () => {
 
           {/* gold trust badge */}
           <View style={styles.whyBookTrustBadge}>
-            <IonIcon name="star" size={12} color="#ECA73C" />
-            <Text style={styles.whyBookTrustText}>Trusted by 500+ happy customers in Hyderabad</Text>
+            <IonIcon name="shield-checkmark" size={12} color="#ECA73C" />
+            <Text style={styles.whyBookTrustText}>Every venue personally verified in Hyderabad</Text>
           </View>
         </View>
 

@@ -685,14 +685,6 @@ const ViewEvents = ({ route, navigation }) => {
             </View>
           </View>
 
-          {/* ── RATING ROW ── */}
-          <View style={{ flexDirection: "row", alignItems: "center", marginTop: 8 }}>
-            {[1,2,3,4,5].map(i => (
-              <IonIcon key={i} name={i <= 4 ? "star" : "star-half"} size={14} color="#FD813B" style={{ marginRight: 2 }} />
-            ))}
-            <Text style={{ color: "#FD813B", fontSize: 12, fontWeight: "700", fontFamily: 'ManropeRegular', marginLeft: 4 }}>4.5</Text>
-            <Text style={{ color: "#939393", fontSize: 12, fontFamily: 'ManropeRegular', marginLeft: 4 }}>(128 reviews)</Text>
-          </View>
 
           {/* ── ADDRESS + STREET VIEW ── */}
           <View style={{ flexDirection: "row", marginTop: 12, alignItems: "flex-start" }}>

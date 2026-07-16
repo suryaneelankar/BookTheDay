@@ -18,6 +18,7 @@ import VegIcon from '../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 import FloatingCloseButton from "./floatingCloseButton";
 import LinearGradient from "react-native-linear-gradient";
+import Swiper from "react-native-swiper";
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -238,26 +239,32 @@ const FarmHouse = () => {
     // ── Farm House themed card ────────────────────────────────────────────────
     const renderItem = useCallback(({ item }) => {
         const heroImage = item?.professionalImage?.url;
-        const totalPhotos = 1 + (item?.additionalImages?.flat()?.length || 0);
+        const imageUrls = [heroImage, ...(item?.additionalImages?.flat()?.map(img => img?.url) || [])].filter(Boolean);
+        const totalPhotos = imageUrls.length;
         const hasVideo = item?.hallVideos?.length > 0;
         return (
-            <TouchableOpacity
-                activeOpacity={0.93}
-                style={styles.card}
-                onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}
-            >
+            <View style={styles.card}>
                 <View style={styles.cardImageWrapper}>
-                    <FastImage
-                        source={{ uri: heroImage, priority: FastImage.priority.normal }}
-                        style={styles.cardImage}
-                        resizeMode={FastImage.resizeMode.cover}
-                    />
-                    {/* warm earth-to-forest gradient overlay */}
-                    <LinearGradient
-                        colors={['transparent', 'rgba(26,46,26,0.72)']}
-                        style={styles.cardImageGradient}
-                    />
-                    {/* scenic badge */}
+                    <Swiper
+                        loop
+                        showsPagination
+                        activeDotColor="#fff"
+                        dotColor="rgba(255,255,255,0.5)"
+                        activeDotStyle={{ width: 12, height: 6, borderRadius: 3 }}
+                        dotStyle={{ width: 6, height: 6, borderRadius: 3 }}
+                        paginationStyle={{ bottom: 10 }}
+                        style={{ height: 200 }}
+                    >
+                        {imageUrls.map((imgUrl, idx) => (
+                            <TouchableOpacity key={idx} activeOpacity={0.93}
+                                onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}
+                                style={{ flex: 1 }}>
+                                <FastImage source={{ uri: imgUrl, priority: FastImage.priority.normal }}
+                                    style={styles.cardImage} resizeMode={FastImage.resizeMode.cover} />
+                            </TouchableOpacity>
+                        ))}
+                    </Swiper>
+                    <LinearGradient colors={['transparent', 'rgba(26,46,26,0.72)']} style={styles.cardImageGradient} pointerEvents="none" />
                     <View style={styles.scenicBadge}>
                         <IonIcon name="leaf" size={10} color="#fff" />
                         <Text style={styles.scenicBadgeText}>Scenic</Text>
@@ -279,13 +286,11 @@ const FarmHouse = () => {
                         }
                     </View>
                 </View>
+                <TouchableOpacity activeOpacity={0.93}
+                    onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}>
                 <View style={styles.cardBody}>
                     <View style={styles.cardTitleRow}>
                         <Text style={styles.cardTitle} numberOfLines={1}>{item?.functionHallName}</Text>
-                        <View style={styles.ratingPill}>
-                            <IonIcon name="star" size={11} color={FH_GOLD} />
-                            <Text style={styles.ratingText}>4.5</Text>
-                        </View>
                     </View>
                     <View style={styles.addressRow}>
                         <LocationMarkIcon width={12} height={12} />
@@ -314,7 +319,8 @@ const FarmHouse = () => {
                         </View>
                     </View>
                 </View>
-            </TouchableOpacity>
+                </TouchableOpacity>
+            </View>
         );
     }, [navigation]);
 
