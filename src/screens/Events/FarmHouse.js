@@ -35,7 +35,16 @@ const FH_GOLD = '#ECA73C';   // harvest gold accent
 const VENUE_CATEGORY = 'Farm House';
 
 const seatingCapacity = ['50-100', '100-200', '200-400', '400-600', '600-800', '800-1000', '1000-1200', '1200+'];
-const priceRanges = ['10k-50k', '50k-1L', '1L-2L', '2L-3L', '3L-5L', '5L-10L', '10L+'];
+const priceRanges = ['10k-50k','50k-1L','1L-2L','2L-3L','3L-5L','5L-10L','10L-12L','12L-15L','15L-20L','20L+'];
+const chips = ['Budget', 'Standard', 'Premium', 'Luxury', 'Elite'];
+const chipColors = {
+    Budget: '#FFE8B3', Standard: '#B3E5FF',
+    Luxury: '#D3C0FF', Premium: '#C8FACC', Elite: '#FFD6E8',
+};
+const categoryPriceMapping = {
+    Budget: '10k-50k', Standard: '1L-2L',
+    Premium: '3L-5L', Luxury: '5L-10L', Elite: '10L+',
+};
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 const SkeletonCard = () => (
@@ -62,6 +71,7 @@ const FarmHouse = () => {
     const [allLocations, setAllLocations] = useState([]);
     const [selectedSeatingCapacity, setSelectedSeatingCapacity] = useState('');
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
+    const [selectedChip, setSelectedChip] = useState('');
     const [isACSelected, setIsACSelected] = useState(null);
     const [switchCateringVal, setSwitchCateringVal] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -147,8 +157,14 @@ const FarmHouse = () => {
         setFilterDataLoading(true);
         const token = await getUserAuthToken();
         const qp = new URLSearchParams();
+        qp.append('venueCategory', VENUE_CATEGORY);
         if (isACSelected !== null) qp.append('ac', isACSelected === 'AC');
-        if (selectedPriceRange) qp.append('priceRanges', selectedPriceRange);
+        if (selectedChip) {
+            const priceRange = categoryPriceMapping[selectedChip];
+            if (priceRange) qp.append('priceRanges', priceRange);
+        } else if (selectedPriceRange) {
+            qp.append('priceRanges', selectedPriceRange);
+        }
         if (selectedSeatingCapacity) qp.append('seatingCapacity', selectedSeatingCapacity);
         qp.append('withFoodOnly', switchCateringVal);
         qp.append('page', page); qp.append('limit', filterDataLimit);
@@ -181,7 +197,7 @@ const FarmHouse = () => {
     };
     const clearFilters = () => {
         setSelectedPriceRange(''); setSelectedSeatingCapacity('');
-        setIsACSelected(null); setFilteredList([]);
+        setIsACSelected(null); setSelectedChip(''); setFilteredList([]);
         setSwitchCateringVal(false); setIsFilterApplied(false);
         isFilterAppliedRef.current = false;
         currentPageRef.current = 1; hasMoreRef.current = true;
@@ -217,9 +233,9 @@ const FarmHouse = () => {
     const dataSource = useMemo(() => {
         if (query && locationBasedData.length > 0) return locationBasedData;
         if (query) return nameFilteredData;
-        if (filteredList.length > 0) return filteredList;
+        if (isFilterApplied) return filteredList;
         return eventsData;
-    }, [query, locationBasedData, nameFilteredData, filteredList, eventsData]);
+    }, [query, locationBasedData, nameFilteredData, filteredList, eventsData, isFilterApplied]);
 
     const countText = useMemo(() => {
         if (query && locationBasedData.length > 0) return `${locationBasedData.length} Farm Houses in "${query}"`;
@@ -230,7 +246,7 @@ const FarmHouse = () => {
         return eventsData?.length === 0 ? 'No farm houses found' : `${eventsData.length} Farm Houses`;
     }, [query, locationBasedData, nameFilteredData, filteredList, isFilterApplied, eventsData]);
 
-    const activeFilterCount = [selectedSeatingCapacity, selectedPriceRange, isACSelected, switchCateringVal || null].filter(Boolean).length;
+    const activeFilterCount = [selectedSeatingCapacity, selectedPriceRange, selectedChip, isACSelected, switchCateringVal || null].filter(Boolean).length;
     const keyExtractor = useCallback((item) => item._id, []);
     const onEndReached = useCallback(() => {
         isFilterAppliedRef.current ? loadMoreFiltered() : loadMore();
@@ -324,7 +340,7 @@ const FarmHouse = () => {
         );
     }, [navigation]);
 
-    const isApplyDisabled = !selectedPriceRange && !selectedSeatingCapacity && isACSelected === null && !switchCateringVal;
+    const isApplyDisabled = !selectedPriceRange && !selectedSeatingCapacity && isACSelected === null && !selectedChip && !switchCateringVal;
 
     const ListFooter = useCallback(() => {
         if (!loading && !filterDataLoading) return null;
@@ -368,7 +384,7 @@ const FarmHouse = () => {
                         {seatingCapacity.map(item => (
                             <TouchableOpacity key={item}
                                 style={[styles.filterChip, selectedSeatingCapacity === item && styles.filterChipActive]}
-                                onPress={() => setSelectedSeatingCapacity(item)}>
+                                onPress={() => setSelectedSeatingCapacity(selectedSeatingCapacity === item ? '' : item)}>
                                 <Text style={[styles.filterChipText, selectedSeatingCapacity === item && styles.filterChipTextActive]}>{item}</Text>
                             </TouchableOpacity>
                         ))}
@@ -387,17 +403,37 @@ const FarmHouse = () => {
                             <Switch
                                 trackColor={{ false: '#E8E8E8', true: '#B8E8C8' }}
                                 thumbColor={switchCateringVal ? FH_GREEN : '#ccc'}
-                                onValueChange={setSwitchCateringVal}
+                                onValueChange={(val) => {
+                                    setSwitchCateringVal(val);
+                                    if (val) { setSelectedChip(''); setSelectedPriceRange(''); }
+                                }}
                                 value={switchCateringVal}
                             />
                         </View>
+                    </View>
+                    <Text style={styles.filterSectionLabel}>Category</Text>
+                    <View style={styles.filterChipsWrap}>
+                        {chips.map(item => (
+                            <TouchableOpacity key={item}
+                                style={[styles.filterChip,
+                                    { backgroundColor: chipColors[item] },
+                                    selectedChip === item && styles.filterChipActive,
+                                    switchCateringVal && { opacity: 0.4 }]}
+                                disabled={switchCateringVal}
+                                onPress={() => { setSelectedChip(selectedChip === item ? '' : item); setSelectedPriceRange(''); }}>
+                                <Text style={[styles.filterChipText, selectedChip === item && styles.filterChipTextActive]}>{item}</Text>
+                            </TouchableOpacity>
+                        ))}
                     </View>
                     <Text style={styles.filterSectionLabel}>Price Range</Text>
                     <View style={styles.filterChipsWrap}>
                         {priceRanges.map(item => (
                             <TouchableOpacity key={item}
-                                style={[styles.filterChip, selectedPriceRange === item && styles.filterChipActive]}
-                                onPress={() => setSelectedPriceRange(item)}>
+                                style={[styles.filterChip,
+                                    selectedPriceRange === item && styles.filterChipActive,
+                                    switchCateringVal && { opacity: 0.4 }]}
+                                disabled={switchCateringVal}
+                                onPress={() => { setSelectedPriceRange(selectedPriceRange === item ? '' : item); setSelectedChip(''); }}>
                                 <Text style={[styles.filterChipText, selectedPriceRange === item && styles.filterChipTextActive]}>{item}</Text>
                             </TouchableOpacity>
                         ))}

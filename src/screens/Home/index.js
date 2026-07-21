@@ -40,7 +40,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import FastImage from 'react-native-fast-image';
 import { isLocationEnabled } from 'react-native-android-location-enabler';
 import { promptForEnableLocationIfNeeded } from 'react-native-android-location-enabler';
-import DistanceIcon from '../../assets/svgs/distanceIcon.svg';
+import LocationIcon from '../../assets/svgs/locationIcon.svg';
 
 /* COMMENTED OUT — catering/cloth/jewel imports no longer used
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -75,7 +75,8 @@ import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 import CatHalls from '../../assets/svgs/categories/home_categories_hall_icon.svg';
 import ResortIcon from '../../assets/svgs/categories/home_categories_resort_icon.svg';
 import DestinationIcon from '../../assets/svgs/categories/home_categories_destination_icon.svg';
-import FarmHouseIcon from '../../assets/svgs/categories/home_categories_farm_house_icon.svg';
+import FarmHouseIcon from '../../assets/svgs/categories/home_categories_farmhouse_icon.svg';
+import BgHeroFrame from '../../assets/svgs/BgHeroFrame.svg';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -193,7 +194,7 @@ const HomeDashboard = () => {
         payload,
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      console.log('userTokenRes  res:::::::::', userTokenRes);
+      // console.log('userTokenRes  res:::::::::', userTokenRes);
       if (userTokenRes?.status === 200) {
         console.log(
           'successfully logged fcm token:',
@@ -439,49 +440,49 @@ const HomeDashboard = () => {
         {/* image */}
         <View style={styles.hallImageWrapper}>
           <FastImage
-            source={{ uri: imgUrl, priority: FastImage.priority.normal }}
+            source={{ uri: imgUrl, priority: FastImage.priority.high }}
             style={styles.hallImage}
             resizeMode={FastImage.resizeMode.cover}
           />
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.65)']}
-            style={styles.hallImageGradient}
-          />
-          {/* premium ribbon */}
           {showPremiumBadge && (
             <View style={styles.premiumRibbon}>
-              <IonIcon name="ribbon" size={10} color="#FD813B" />
+              <IonIcon name="ribbon" size={10} color="#fff" />
               <Text style={styles.premiumRibbonText}>Premium</Text>
             </View>
           )}
-          {/* price pill — bottom left over gradient */}
-          <View style={styles.cardPricePill}>
-            <Text style={styles.cardPriceText}>{priceLabel}</Text>
-          </View>
         </View>
 
         {/* body */}
         <View style={styles.hallCardBody}>
-          <Text numberOfLines={1} style={styles.hallName}>
-            {item?.functionHallName}
-          </Text>
+          <View style={styles.hallNamePriceRow}>
+            <Text numberOfLines={1} style={styles.hallName}>
+              {item?.functionHallName}
+            </Text>
+            <Text style={styles.hallPrice}>{priceLabel}</Text>
+          </View>
           <View style={styles.hallAddressRow}>
-            <IonIcon name="location-outline" size={11} color="#FD813B" />
+            <IonIcon name="location-sharp" size={12} color="#FD813B" />
             <Text numberOfLines={1} style={styles.hallAddress}>
               {item?.functionHallAddress?.address || item?.county || ''}
             </Text>
+            <View style={styles.availableBadge}>
+              <Text style={styles.availableBadgeText}>Available</Text>
+            </View>
           </View>
           <View style={styles.chipsRow}>
             {item?.seatingCapacity ? (
               <View style={styles.chip}>
-                <IonIcon name="people-outline" size={10} color="#FD813B" />
-                <Text style={styles.chipText}> {item?.seatingCapacity} pax</Text>
+                <Text style={styles.chipText}>{item?.seatingCapacity} pax</Text>
+              </View>
+            ) : null}
+            {item?.bedRooms > 0 ? (
+              <View style={styles.chip}>
+                <Text style={styles.chipText}>{item?.bedRooms} Rooms</Text>
               </View>
             ) : null}
             {item?.distance ? (
               <View style={styles.chip}>
-                <IonIcon name="navigate-outline" size={10} color="#FD813B" />
-                <Text style={styles.chipText}> {item?.distance?.toFixed(1)} km</Text>
+                <Text style={styles.chipText}>{item?.distance?.toFixed(1)} km</Text>
               </View>
             ) : null}
           </View>
@@ -496,6 +497,11 @@ const HomeDashboard = () => {
   // ─── Return ───────────────────────────────────────────────────────────────────
   return (
     <SafeAreaView style={styles.safeArea}>
+      <LinearGradient
+        colors={['#FFF7E7', '#FFF7E7', '#FFF8EB', '#FFFAF1', '#FFFCF6', '#FFFFFF']}
+        locations={[0, 0.4, 0.5, 0.64, 0.77, 1]}
+        style={{ flex: 1 }}
+      >
       <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
 
         {/* ════════════════════════════════════════
@@ -505,20 +511,25 @@ const HomeDashboard = () => {
           <TouchableOpacity
             style={styles.locationPill}
             onPress={() => navigation.navigate('LocationAdded')}>
-            <IonIcon name="location" size={14} color="#FD813B" />
-            <Text numberOfLines={1} style={styles.locationPillText}>
-              {userLocationFetched?.formatted_address
-                ? userLocationFetched.formatted_address
-                : userLocationFetched?.address
-                  ? userLocationFetched.address
-                  : 'Select Location'}
-            </Text>
-            <IonIcon name="chevron-down" size={13} color="#939393" />
+            <LocationMarkIcon width={16} height={16} />
+            <View style={{ flex: 1 }}>
+              <Text numberOfLines={1} style={styles.locationSubText}>
+                Your current location
+              </Text>
+              <Text numberOfLines={1} style={styles.locationMainText}>
+                {userLocationFetched?.formatted_address
+                  ? userLocationFetched.formatted_address
+                  : userLocationFetched?.address
+                    ? userLocationFetched.address
+                    : 'Select Location'}
+              </Text>
+            </View>
+            <IonIcon name="chevron-down" size={14} color="#7D7F88" />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.profileBtn}
             onPress={() => navigation.navigate('ProfileScreen')}>
-            <IonIcon name="person-circle-outline" size={32} color="#131313" />
+            <IonIcon name="person-circle-outline" size={40} color="#131313" />
           </TouchableOpacity>
         </View>
 
@@ -526,47 +537,37 @@ const HomeDashboard = () => {
             HERO — warm gradient, on-brand
         ════════════════════════════════════════ */}
         <View style={styles.heroWrapper}>
-          <LinearGradient
-            colors={['#FD813B', '#DF6E12', '#B46609']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.heroBanner}>
+          <View style={styles.heroBanner}>
+            {/* SVG background */}
+            <BgHeroFrame width="100%" height="100%" style={styles.heroSvgBg} preserveAspectRatio="xMidYMid slice" />
 
-            {/* decorative circles */}
-            <View style={styles.heroCircle1} />
-            <View style={styles.heroCircle2} />
+            {/* Content overlay */}
+            <View style={styles.heroContent}>
+              <Text style={styles.heroTitle}>Your Dream{'\n'}Venue Awaits</Text>
+              <View style={styles.heroTitleAccent} />
+              <Text style={styles.heroSubtitle}>
+                Premium Halls · Farm Houses · Resorts · Banquets
+              </Text>
 
-            {/* gold badge */}
-            <View style={styles.heroBadge}>
-              <IonIcon name="star" size={10} color="#ECA73C" />
-              <Text style={styles.heroBadgeText}>Hyderabad's #1 Venue Platform</Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Events')}
+                style={styles.heroCta}>
+                <LinearGradient
+                  colors={['#D2453B', '#A0143E']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.heroCtaGradient}>
+                  <Text style={styles.heroCtaText}>Browse Venues</Text>
+                  <IonIcon name="arrow-forward" size={14} color="#fff" />
+                </LinearGradient>
+              </TouchableOpacity>
             </View>
-
-            <Text style={styles.heroTitle}>Your Dream{'\n'}Venue Awaits</Text>
-            {/* gold underline accent */}
-            <View style={styles.heroTitleAccent} />
-            <Text style={styles.heroSubtitle}>
-              Premium Halls · Farm Houses · Resorts · Banquets
-            </Text>
-
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Events')}
-              style={styles.heroCta}>
-              <LinearGradient
-                colors={['#D2453B', '#A0143E']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.heroCtaGradient}>
-                <Text style={styles.heroCtaText}>Browse Venues</Text>
-                <IonIcon name="arrow-forward" size={14} color="#fff" />
-              </LinearGradient>
-            </TouchableOpacity>
-          </LinearGradient>
+          </View>
 
           {/* floating stats card — overlaps hero bottom */}
           <View style={styles.statsFloat}>
             <View style={styles.statItem}>
-              <Text style={styles.statNum}>{eventsData?.length > 0 ? `${eventsData.length}+` : '—'}</Text>
+              <Text style={styles.statNum}>{eventsData?.length > 0 ? `${eventsData?.length}+` : '—'}</Text>
               <Text style={styles.statLbl}>Venues</Text>
             </View>
             <View style={styles.statSep} />
@@ -583,143 +584,68 @@ const HomeDashboard = () => {
         </View>
 
         {/* ════════════════════════════════════════
-            CATEGORIES — premium venue types
+            CATEGORIES — round circles like Figma
         ════════════════════════════════════════ */}
         <View style={styles.categoriesSection}>
+          <Text style={styles.categoriesTitle}>Categories</Text>
 
-          {/* section header */}
-          <View style={styles.categoriesHeader}>
-            <View style={styles.catHeaderLeft}>
-              <View style={styles.goldAccentBar} />
-              <View>
-                <Text style={styles.categoriesTitle}>Explore By Type</Text>
-                <Text style={styles.categoriesSub}>Choose your perfect venue style</Text>
-              </View>
-            </View>
-            <View style={styles.catHeaderCrown}>
-              <IonIcon name="diamond" size={14} color="#ECA73C" />
-            </View>
-          </View>
-
-          {/* horizontal scroll of cards */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.catScrollContent}>
-
-            {/* ── Function Halls ── */}
+          <View style={styles.catGrid}>
             <TouchableOpacity
-              activeOpacity={0.88}
+              activeOpacity={0.8}
               onPress={() => navigation.navigate('Events')}
-              style={styles.catCard}>
-              <View style={[styles.catIconArea, { backgroundColor: '#FFF0E6' }]}>
-                <View style={[styles.catIconCircle, { backgroundColor: 'rgba(253,129,59,0.15)' }]}>
-                  <CatHalls width={60} height={60} />
-                </View>
-                <View style={[styles.catTagPill, { backgroundColor: 'rgba(253,129,59,0.12)' }]}>
-                  <Text style={[styles.catTagText, { color: '#DF6E12' }]}>★ Popular</Text>
-                </View>
+              style={styles.catItem}>
+              <View style={styles.catCircle}>
+                <CatHalls width={68} height={68} />
               </View>
-              <View style={styles.catCardBody}>
-                <Text style={styles.catCardTitle}>Function Halls</Text>
-                <Text style={styles.catCardDesc}>Grand banquets & event spaces</Text>
-                <View style={[styles.catCardFooter, { borderTopColor: '#FFE8D6' }]}>
-                  <Text style={[styles.catCardLink, { color: '#FD813B' }]}>Explore</Text>
-                  <IonIcon name="arrow-forward" size={12} color="#FD813B" />
-                </View>
-              </View>
+              <Text style={styles.catLabel}>Halls</Text>
             </TouchableOpacity>
 
-            {/* ── Farm Houses ── */}
             <TouchableOpacity
-              activeOpacity={0.88}
+              activeOpacity={0.8}
               onPress={() => navigation.navigate('FarmHouse')}
-              style={styles.catCard}>
-              <View style={[styles.catIconArea, { backgroundColor: '#E8F8F0' }]}>
-                <View style={[styles.catIconCircle, { backgroundColor: 'rgba(6,190,102,0.15)' }]}>
-                  <FarmHouseIcon width={60} height={60} />
-                </View>
-                <View style={[styles.catTagPill, { backgroundColor: 'rgba(6,190,102,0.12)' }]}>
-                  <Text style={[styles.catTagText, { color: '#047A42' }]}>✦ Scenic</Text>
-                </View>
+              style={styles.catItem}>
+              <View style={styles.catCircle}>
+                <FarmHouseIcon width={68} height={68} />
               </View>
-              <View style={styles.catCardBody}>
-                <Text style={styles.catCardTitle}>Farm Houses</Text>
-                <Text style={styles.catCardDesc}>Open-air & nature retreats</Text>
-                <View style={[styles.catCardFooter, { borderTopColor: '#D0F0E0' }]}>
-                  <Text style={[styles.catCardLink, { color: '#06BE66' }]}>Explore</Text>
-                  <IonIcon name="arrow-forward" size={12} color="#06BE66" />
-                </View>
-              </View>
+              <Text style={styles.catLabel}>Farm House</Text>
             </TouchableOpacity>
 
-            {/* ── Luxury Resorts ── */}
             <TouchableOpacity
-              activeOpacity={0.88}
+              activeOpacity={0.8}
               onPress={() => navigation.navigate('LuxuryResorts')}
-              style={styles.catCard}>
-              <View style={[styles.catIconArea, { backgroundColor: '#FEF8E8' }]}>
-                <View style={[styles.catIconCircle, { backgroundColor: 'rgba(236,167,60,0.15)' }]}>
-                  <ResortIcon width={60} height={60} />
-                </View>
-                <View style={[styles.catTagPill, { backgroundColor: 'rgba(236,167,60,0.12)' }]}>
-                  <Text style={[styles.catTagText, { color: '#B8860B' }]}>◆ Luxury</Text>
-                </View>
+              style={styles.catItem}>
+              <View style={styles.catCircle}>
+                <ResortIcon width={68} height={68} />
               </View>
-              <View style={styles.catCardBody}>
-                <Text style={styles.catCardTitle}>Luxury Resorts</Text>
-                <Text style={styles.catCardDesc}>5-star stays & celebrations</Text>
-                <View style={[styles.catCardFooter, { borderTopColor: '#FDF0C8' }]}>
-                  <Text style={[styles.catCardLink, { color: '#ECA73C' }]}>Explore</Text>
-                  <IonIcon name="arrow-forward" size={12} color="#ECA73C" />
-                </View>
-              </View>
+              <Text style={styles.catLabel}>Resorts</Text>
             </TouchableOpacity>
 
-            {/* ── Banquet Halls ── */}
             <TouchableOpacity
-              activeOpacity={0.88}
+              activeOpacity={0.8}
               onPress={() => navigation.navigate('BanquetHalls')}
-              style={styles.catCard}>
-              <View style={[styles.catIconArea, { backgroundColor: '#FDF0F4' }]}>
-                <View style={[styles.catIconCircle, { backgroundColor: 'rgba(160,20,62,0.1)' }]}>
-                  <DestinationIcon width={60} height={60} />
-                </View>
-                <View style={[styles.catTagPill, { backgroundColor: 'rgba(160,20,62,0.08)' }]}>
-                  <Text style={[styles.catTagText, { color: '#A0143E' }]}>✦ Exclusive</Text>
-                </View>
+              style={styles.catItem}>
+              <View style={styles.catCircle}>
+                <DestinationIcon width={68} height={68} />
               </View>
-              <View style={styles.catCardBody}>
-                <Text style={styles.catCardTitle}>Banquet Halls</Text>
-                <Text style={styles.catCardDesc}>Premium halls for all occasions</Text>
-                <View style={[styles.catCardFooter, { borderTopColor: '#FAE0E8' }]}>
-                  <Text style={[styles.catCardLink, { color: '#A0143E' }]}>Explore</Text>
-                  <IonIcon name="arrow-forward" size={12} color="#A0143E" />
-                </View>
-              </View>
+              <Text style={styles.catLabel}>Banquets</Text>
             </TouchableOpacity>
-
-          </ScrollView>
+          </View>
         </View>
 
         {/* ════════════════════════════════════════
             HALLS NEAR YOU
         ════════════════════════════════════════ */}
         {nearByEventsData?.length > 0 && (
-          <View style={{ marginTop: 28 }}>
+          <View style={{ marginTop: verticalScale(24) }}>
             <View style={styles.sectionHeader}>
-              <View>
-                <View style={styles.sectionTitleRow}>
-                  <View style={styles.goldAccentBar} />
-                  <Text style={styles.sectionTitle}>Near You</Text>
-                </View>
-                <Text style={styles.sectionSub}>Halls close to your location</Text>
-              </View>
+              <Text style={styles.sectionTitle}>Function Halls Near You</Text>
               <TouchableOpacity
                 onPress={() => navigation.navigate('NearByEvents')}
-                style={styles.seeAllPill}>
+                style={styles.seeAllBtn}>
                 <Text style={styles.seeAllText}>See All</Text>
-                <IonIcon name="arrow-forward" size={12} color="#FD813B" />
+                <View style={styles.seeAllArrow}>
+                  <IonIcon name="arrow-forward" size={16} color="#fff" />
+                </View>
               </TouchableOpacity>
             </View>
             <FlatList
@@ -737,20 +663,16 @@ const HomeDashboard = () => {
             PREMIUM HALLS
         ════════════════════════════════════════ */}
         {eventsData?.length > 0 && (
-          <View style={{ marginTop: 28 }}>
+          <View style={{ marginTop: verticalScale(24) }}>
             <View style={styles.sectionHeader}>
-              <View>
-                <View style={styles.sectionTitleRow}>
-                  <View style={styles.goldAccentBar} />
-                  <Text style={styles.sectionTitle}>Premium Halls</Text>
-                </View>
-                <Text style={styles.sectionSub}>Handpicked high-end venues</Text>
-              </View>
+              <Text style={styles.sectionTitle}>Popular Event Halls</Text>
               <TouchableOpacity
                 onPress={() => navigation.navigate('Events')}
-                style={styles.seeAllPill}>
-                <Text style={styles.seeAllText}>View All</Text>
-                <IonIcon name="arrow-forward" size={12} color="#FD813B" />
+                style={styles.seeAllBtn}>
+                <Text style={styles.seeAllText}>See All</Text>
+                <View style={styles.seeAllArrow}>
+                  <IonIcon name="arrow-forward" size={16} color="#fff" />
+                </View>
               </TouchableOpacity>
             </View>
             <FlatList
@@ -769,7 +691,7 @@ const HomeDashboard = () => {
         ════════════════════════════════════════ */}
         <View style={styles.destBannerWrapper}>
           <LinearGradient
-            colors={['#131313', '#2a1a0e']}
+            colors={['#FFF3CD', '#FFDB7E']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.destBanner}>
@@ -778,19 +700,18 @@ const HomeDashboard = () => {
               <View style={styles.destNewPill}>
                 <Text style={styles.destNewText}>✦ Exclusive</Text>
               </View>
-              <Text style={styles.destTitle}>Banquet{'\n'}Halls</Text>
+              <Text style={styles.destTitle}>Expect More{'\n'}With Less</Text>
               <Text style={styles.destSub}>
-                Premium halls for weddings,{'\n'}corporate & social events
+                We are here for your every need.{'\n'}Premium venues at best prices.
               </Text>
               <TouchableOpacity
                 onPress={() => navigation.navigate('BanquetHalls')}
                 style={styles.destCta}>
-                <Text style={styles.destCtaText}>Explore</Text>
-                <IonIcon name="arrow-forward" size={13} color="#131313" />
+                <Text style={styles.destCtaText}>About us »</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.destRight}>
-              <IonIcon name="flower" size={90} color="rgba(253,129,59,0.18)" />
+              <IonIcon name="flower" size={80} color="rgba(217,119,6,0.2)" />
             </View>
           </LinearGradient>
         </View>
@@ -885,9 +806,9 @@ const HomeDashboard = () => {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.exploreAllGradient}>
-            <IonIcon name="business-outline" size={18} color="#ECA73C" />
+            <IonIcon name="business-outline" size={18} color="#FFDB7E" />
             <Text style={styles.exploreAllText}>Explore All Venues</Text>
-            <IonIcon name="arrow-forward" size={16} color="#fff" />
+            <IonIcon name="arrow-forward" size={16} color="#FFDB7E" />
           </LinearGradient>
         </TouchableOpacity>
 
@@ -913,6 +834,7 @@ const HomeDashboard = () => {
         </Modal>
 
       </ScrollView>
+      </LinearGradient>
     </SafeAreaView>
   );
 };
@@ -920,7 +842,7 @@ const HomeDashboard = () => {
 // const styles = StyleSheet.create({
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#FFFBF5' },
+  safeArea: { flex: 1, backgroundColor: '#FFF7E7' },
   scrollView: { flex: 1, marginBottom: verticalScale(70) },
 
   // ── TOP BAR ──────────────────────────────────────────────────────────────────
@@ -929,119 +851,105 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: horizontalScale(16),
-    paddingTop: verticalScale(14),
-    paddingBottom: verticalScale(8),
-    backgroundColor: '#FFFBF5',
+    paddingTop: verticalScale(12),
+    paddingBottom: verticalScale(6),
   },
   locationPill: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: '#fff',
-    borderRadius: moderateScale(14),
-    paddingHorizontal: horizontalScale(12),
-    paddingVertical: verticalScale(8),
-    gap: 5,
-    elevation: 2,
-    shadowColor: '#FD813B',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    alignItems: 'center',
     flex: 1,
-    marginRight: horizontalScale(10),
+    marginRight: horizontalScale(50),
+    gap: 6,
   },
-  locationPillText: {
+  locationSubText: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(12),
-    fontWeight: '500',
-    color: '#131313',
-    flex: 1,
-    lineHeight: moderateScale(17),
+    fontWeight: '600',
+    color: '#7D7F88',
+    lineHeight: moderateScale(16),
+  },
+  locationMainText: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(14),
+    fontWeight: '600',
+    color: '#404348',
+    lineHeight: moderateScale(21),
   },
   profileBtn: {
-    width: moderateScale(40),
-    height: moderateScale(40),
-    borderRadius: moderateScale(20),
-    backgroundColor: '#fff',
+    width: moderateScale(38),
+    height: moderateScale(38),
+    borderRadius: moderateScale(19),
+    // backgroundColor: '#F5F5F5',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
   },
 
   // ── HERO ─────────────────────────────────────────────────────────────────────
   heroWrapper: {
     marginHorizontal: horizontalScale(16),
-    marginTop: verticalScale(8),
-    marginBottom: verticalScale(36),
+    marginTop: verticalScale(6),
+    marginBottom: verticalScale(32),
   },
   heroBanner: {
-    borderRadius: moderateScale(24),
-    padding: horizontalScale(22),
-    paddingBottom: verticalScale(48),
+    borderRadius: moderateScale(16),
     overflow: 'hidden',
-    minHeight: verticalScale(200),
-    justifyContent: 'flex-end',
+    minHeight: verticalScale(180),
+    position: 'relative',
+  },
+  heroSvgBg: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
+  },
+  heroContent: {
+    padding: horizontalScale(20),
+    paddingTop: verticalScale(24),
+    paddingBottom: verticalScale(44),
   },
   heroCircle1: {
-    position: 'absolute',
-    width: moderateScale(180),
-    height: moderateScale(180),
-    borderRadius: moderateScale(90),
-    backgroundColor: 'rgba(255,255,255,0.07)',
-    top: -40,
-    right: -40,
+    display: 'none',
   },
   heroCircle2: {
-    position: 'absolute',
-    width: moderateScale(100),
-    height: moderateScale(100),
-    borderRadius: moderateScale(50),
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    top: 30,
-    right: 60,
+    display: 'none',
   },
   heroBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(236,167,60,0.2)',
+    backgroundColor: 'rgba(253,129,59,0.12)',
     borderRadius: moderateScale(20),
     paddingHorizontal: horizontalScale(10),
     paddingVertical: verticalScale(4),
     marginBottom: verticalScale(12),
     gap: 5,
     borderWidth: 1,
-    borderColor: 'rgba(236,167,60,0.35)',
+    borderColor: 'rgba(253,129,59,0.25)',
   },
   heroBadgeText: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(11),
     fontWeight: '700',
-    color: '#ECA73C',
+    color: '#D97706',
   },
   heroTitle: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(30),
+    fontSize: moderateScale(28),
     fontWeight: '800',
-    color: '#fff',
-    lineHeight: moderateScale(36),
+    color: '#1A1E25',
+    lineHeight: moderateScale(34),
     marginBottom: verticalScale(8),
   },
   heroTitleAccent: {
     width: horizontalScale(48),
     height: 3,
     borderRadius: 2,
-    backgroundColor: '#ECA73C',
-    marginBottom: verticalScale(10),
+    backgroundColor: '#FD813B',
+    marginBottom: verticalScale(4),
   },
   heroSubtitle: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(13),
-    color: 'rgba(255,255,255,0.8)',
-    marginBottom: verticalScale(20),
+    color: '#555',
+    marginBottom: verticalScale(10),
   },
   heroCta: {
     alignSelf: 'flex-start',
@@ -1052,7 +960,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: horizontalScale(18),
-    paddingVertical: verticalScale(10),
+    paddingVertical: verticalScale(12),
     gap: 7,
   },
   heroCtaText: {
@@ -1064,18 +972,18 @@ const styles = StyleSheet.create({
   // floating stats card
   statsFloat: {
     position: 'absolute',
-    bottom: -28,
-    left: horizontalScale(16),
-    right: horizontalScale(16),
+    bottom: -32,
+    left: horizontalScale(10),
+    right: horizontalScale(10),
     flexDirection: 'row',
     backgroundColor: '#fff',
-    borderRadius: moderateScale(16),
-    paddingVertical: verticalScale(14),
-    elevation: 6,
-    shadowColor: '#FD813B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
+    borderRadius: moderateScale(12),
+    paddingVertical: verticalScale(12),
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
   },
   statItem: { flex: 1, alignItems: 'center' },
   statNum: {
@@ -1087,26 +995,26 @@ const styles = StyleSheet.create({
   statLbl: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(11),
-    color: '#939393',
+    color: '#7D7F88',
     marginTop: 2,
   },
   statSep: {
     width: 1,
     height: '70%',
-    backgroundColor: '#F5E7B6',
+    backgroundColor: '#FFDB7E',
     alignSelf: 'center',
   },
 
   // ── CATEGORIES ────────────────────────────────────────────────────────────────
   categoriesSection: {
-    marginTop: verticalScale(28),
+    marginTop: verticalScale(20),
     paddingHorizontal: horizontalScale(16),
   },
   categoriesHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: verticalScale(18),
+    marginBottom: verticalScale(16),
   },
   catHeaderLeft: {
     flexDirection: 'row',
@@ -1116,87 +1024,65 @@ const styles = StyleSheet.create({
   categoriesTitle: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(18),
-    fontWeight: '800',
-    color: '#131313',
+    fontWeight: '700',
+    color: '#1A1A1A',
+    marginBottom: verticalScale(16),
   },
   categoriesSub: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(11),
-    color: '#939393',
+    color: '#999',
     marginTop: 1,
   },
   catHeaderCrown: {
-    width: moderateScale(34),
-    height: moderateScale(34),
-    borderRadius: moderateScale(17),
-    backgroundColor: 'rgba(236,167,60,0.12)',
-    borderWidth: 1,
-    borderColor: 'rgba(236,167,60,0.3)',
+    width: moderateScale(32),
+    height: moderateScale(32),
+    borderRadius: moderateScale(16),
+    backgroundColor: 'rgba(236,167,60,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   goldAccentBar: {
-    width: 4,
-    height: moderateScale(36),
+    width: 3,
+    height: moderateScale(32),
     borderRadius: 2,
-    backgroundColor: '#ECA73C',
+    backgroundColor: '#FD813B',
+  },
+  catGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  catItem: {
+    alignItems: 'center',
+    width: (screenWidth - 32) / 4,
+  },
+  catCircle: {
+    width: moderateScale(70),
+    height: moderateScale(70),
+    borderRadius: moderateScale(35),
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: verticalScale(8),
+    // borderWidth: 1,
+    // borderColor: '#707070',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  catLabel: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(12),
+    fontWeight: '600',
+    color: '#202020',
+    textAlign: 'center',
   },
   catScrollContent: {
     paddingRight: horizontalScale(16),
     gap: 12,
-  },
-  // ── category card ──
-  catCard: {
-    width: moderateScale(148),
-    backgroundColor: '#fff',
-    borderRadius: moderateScale(18),
-    overflow: 'hidden',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-  },
-  catIconArea: {
-    height: verticalScale(110),
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 10,
-  },
-  catIconCircle: {
-    width: moderateScale(60),
-    height: moderateScale(60),
-    borderRadius: moderateScale(30),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  catTagPill: {
-    borderRadius: moderateScale(10),
-    paddingHorizontal: horizontalScale(8),
-    paddingVertical: verticalScale(3),
-  },
-  catTagText: {
-    fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(9),
-    fontWeight: '700',
-    letterSpacing: 0.3,
-  },
-  catCardBody: {
-    padding: horizontalScale(12),
-    paddingTop: verticalScale(10),
-  },
-  catCardTitle: {
-    fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(13),
-    fontWeight: '800',
-    color: '#131313',
-    marginBottom: verticalScale(3),
-  },
-  catCardDesc: {
-    fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(10),
-    color: '#939393',
-    lineHeight: moderateScale(14),
   },
   catCardFooter: {
     flexDirection: 'row',
@@ -1225,9 +1111,9 @@ const styles = StyleSheet.create({
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     paddingHorizontal: horizontalScale(16),
-    marginBottom: verticalScale(12),
+    marginBottom: verticalScale(14),
   },
   sectionTitleRow: {
     flexDirection: 'row',
@@ -1236,31 +1122,35 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(2),
   },
   sectionTitle: {
-    fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(18),
-    fontWeight: '800',
-    color: '#131313',
+    fontFamily: 'Manrope',
+    fontSize: moderateScale(17),
+    fontWeight: '700',
+    color: '#1A1A1A',
   },
   sectionSub: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(12),
-    color: '#939393',
+    fontSize: moderateScale(11),
+    color: '#999',
     marginTop: 2,
   },
-  seeAllPill: {
+  seeAllBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF5EE',
-    borderRadius: moderateScale(20),
-    paddingHorizontal: horizontalScale(10),
-    paddingVertical: verticalScale(5),
-    gap: 3,
+    gap: 6,
   },
   seeAllText: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(12),
+    fontSize: moderateScale(13),
     fontWeight: '700',
-    color: '#FD813B',
+    color: '#1A1A1A',
+  },
+  seeAllArrow: {
+    width: moderateScale(24),
+    height: moderateScale(24),
+    borderRadius: moderateScale(12),
+    backgroundColor: '#FBB302',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   listPadding: {
     paddingLeft: horizontalScale(16),
@@ -1269,21 +1159,21 @@ const styles = StyleSheet.create({
 
   // ── HALL CARD ─────────────────────────────────────────────────────────────────
   hallCard: {
-    width: moderateScale(220),
+    width: moderateScale(260),
     backgroundColor: '#fff',
-    borderRadius: moderateScale(20),
+    borderRadius: moderateScale(12),
     marginRight: horizontalScale(12),
     marginBottom: verticalScale(4),
-    elevation: 4,
+    elevation: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.09,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
     overflow: 'hidden',
   },
   hallImageWrapper: {
     width: '100%',
-    height: verticalScale(145),
+    height: verticalScale(150),
   },
   hallImage: {
     width: '100%',
@@ -1292,33 +1182,32 @@ const styles = StyleSheet.create({
   hallImageGradient: {
     position: 'absolute',
     bottom: 0, left: 0, right: 0,
-    height: verticalScale(70),
+    height: verticalScale(50),
   },
   premiumRibbon: {
     position: 'absolute',
-    top: verticalScale(10),
-    left: horizontalScale(10),
+    top: verticalScale(8),
+    left: horizontalScale(8),
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(236,167,60,0.92)',
-    borderRadius: moderateScale(10),
+    backgroundColor: '#FD813B',
+    borderRadius: moderateScale(6),
     paddingHorizontal: horizontalScale(7),
     paddingVertical: verticalScale(3),
     gap: 3,
-    elevation: 2,
   },
   premiumRibbonText: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(10),
+    fontSize: moderateScale(9),
     fontWeight: '700',
-    color: '#1a1a1a',
+    color: '#fff',
   },
   cardPricePill: {
     position: 'absolute',
-    bottom: verticalScale(10),
-    left: horizontalScale(10),
-    backgroundColor: 'rgba(0,0,0,0.55)',
-    borderRadius: moderateScale(10),
+    bottom: verticalScale(8),
+    left: horizontalScale(8),
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    borderRadius: moderateScale(6),
     paddingHorizontal: horizontalScale(8),
     paddingVertical: verticalScale(3),
   },
@@ -1330,25 +1219,51 @@ const styles = StyleSheet.create({
   },
   hallCardBody: {
     padding: horizontalScale(12),
+    paddingTop: verticalScale(10),
+  },
+  hallNamePriceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: verticalScale(6),
   },
   hallName: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(14),
     fontWeight: '700',
-    color: '#131313',
-    marginBottom: verticalScale(4),
+    color: '#1A1A1A',
+    flex: 1,
+    marginRight: horizontalScale(8),
+  },
+  hallPrice: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(12),
+    fontWeight: '700',
+    color: '#FD813B',
   },
   hallAddressRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
+    gap: 4,
     marginBottom: verticalScale(8),
   },
   hallAddress: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(11),
-    color: '#939393',
+    color: '#777',
     flex: 1,
+  },
+  availableBadge: {
+    backgroundColor: '#E6F9F0',
+    borderRadius: moderateScale(4),
+    paddingHorizontal: horizontalScale(6),
+    paddingVertical: verticalScale(2),
+  },
+  availableBadgeText: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(9),
+    fontWeight: '600',
+    color: '#06BE66',
   },
   chipsRow: {
     flexDirection: 'row',
@@ -1358,15 +1273,17 @@ const styles = StyleSheet.create({
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF5EE',
-    borderRadius: moderateScale(12),
-    paddingHorizontal: horizontalScale(8),
-    paddingVertical: verticalScale(4),
+    backgroundColor: '#FAFAFA',
+    borderRadius: moderateScale(6),
+    paddingHorizontal: horizontalScale(10),
+    paddingVertical: verticalScale(5),
+    borderWidth: 1,
+    borderColor: '#ECECEC',
   },
   chipText: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(10),
-    color: '#4A4A4A',
+    color: '#555',
     fontWeight: '500',
   },
 
@@ -1374,13 +1291,13 @@ const styles = StyleSheet.create({
   destBannerWrapper: {
     marginHorizontal: horizontalScale(16),
     marginTop: verticalScale(28),
-    borderRadius: moderateScale(24),
+    borderRadius: moderateScale(14),
     overflow: 'hidden',
-    elevation: 4,
+    elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
   },
   destBanner: {
     flexDirection: 'row',
@@ -1417,14 +1334,14 @@ const styles = StyleSheet.create({
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(22),
     fontWeight: '800',
-    color: '#fff',
+    color: '#1A1E25',
     lineHeight: moderateScale(28),
     marginBottom: verticalScale(6),
   },
   destSub: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(12),
-    color: 'rgba(255,255,255,0.6)',
+    color: '#555',
     lineHeight: moderateScale(18),
     marginBottom: verticalScale(16),
   },
@@ -1432,7 +1349,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: '#A0143E',
+    backgroundColor: 'rgba(160,20,62,0.75)',
     borderRadius: moderateScale(20),
     paddingHorizontal: horizontalScale(16),
     paddingVertical: verticalScale(8),
@@ -1491,15 +1408,15 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(28),
     marginHorizontal: horizontalScale(16),
     backgroundColor: '#fff',
-    borderRadius: moderateScale(20),
-    padding: horizontalScale(18),
+    borderRadius: moderateScale(14),
+    padding: horizontalScale(16),
     borderWidth: 1,
-    borderColor: '#F1F1F1',
-    elevation: 2,
+    borderColor: '#F0F0F0',
+    elevation: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
   },
   whyBookHeader: {
     flexDirection: 'row',
@@ -1516,7 +1433,7 @@ const styles = StyleSheet.create({
     width: 4,
     height: moderateScale(36),
     borderRadius: 2,
-    backgroundColor: '#ECA73C',
+    backgroundColor: '#FFDB7E',
   },
   whyBookTitle: {
     fontFamily: 'ManropeRegular',
@@ -1534,9 +1451,9 @@ const styles = StyleSheet.create({
     width: moderateScale(34),
     height: moderateScale(34),
     borderRadius: moderateScale(17),
-    backgroundColor: 'rgba(236,167,60,0.1)',
+    backgroundColor: 'rgba(255,219,126,0.25)',
     borderWidth: 1,
-    borderColor: 'rgba(236,167,60,0.25)',
+    borderColor: '#FFDB7E',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1587,31 +1504,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     marginTop: verticalScale(14),
-    backgroundColor: '#FFF9EE',
+    backgroundColor: '#FFF8E7',
     borderRadius: moderateScale(20),
     paddingVertical: verticalScale(8),
     paddingHorizontal: horizontalScale(14),
     borderWidth: 1,
-    borderColor: '#FFEAC1',
+    borderColor: '#FFDB7E',
   },
   whyBookTrustText: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(11),
     fontWeight: '600',
-    color: '#B8860B',
+    color: '#D97706',
   },
 
   // ── EXPLORE ALL CTA ───────────────────────────────────────────────────────────
   exploreAllBtn: {
     marginHorizontal: horizontalScale(16),
     marginTop: verticalScale(28),
-    borderRadius: moderateScale(16),
+    borderRadius: moderateScale(12),
     overflow: 'hidden',
-    elevation: 4,
-    shadowColor: '#FD813B',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
+    elevation: 2,
+    shadowColor: '#A0143E',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
   },
   exploreAllGradient: {
     flexDirection: 'row',
@@ -1623,7 +1540,7 @@ const styles = StyleSheet.create({
   exploreAllText: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(15),
-    fontWeight: '800',
+    fontWeight: '700',
     color: '#fff',
   },
 

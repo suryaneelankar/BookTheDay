@@ -12,7 +12,7 @@ const FloatingCloseButton = ({ onPress }) => (
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 10, // Adjust to float above the sheet
+    top: -20,
     alignSelf: 'center',
     zIndex: 99,
   },

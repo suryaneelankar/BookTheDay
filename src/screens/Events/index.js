@@ -35,7 +35,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 32;
 
 const seatingCapacity = ['50-100', '100-200', '200-400', '400-600', '600-800', '800-1000', '1000-1200', '1200+'];
-const priceRanges = ['10k-50k', '50k-1L', '1L-2L', '2L-3L', '3L-5L', '5L-10L', '10L+'];
+const priceRanges = ['10k-50k','50k-1L','1L-2L','2L-3L','3L-5L','5L-10L','10L-12L','12L-15L','15L-20L','20L+'];
 const chips = ['Budget', 'Standard', 'Premium', 'Luxury', 'Elite'];
 const chipColors = {
     Budget: '#FFE8B3', Standard: '#B3E5FF',
@@ -123,19 +123,24 @@ const Events = () => {
         setGetUserAuth(token);
         try {
             const response = await axios.get(
-                `${BASE_URL}/getAllFunctionHalls?page=${page}&limit=10`,
-                { headers: { Authorization: `Bearer ${token}` } },
+                `${BASE_URL}/filterFunctionHalls`,
+                {
+                    params: {
+                        page,
+                        limit: 10,
+                        venueCategory: 'Function Hall',
+                    },
+                    headers: { Authorization: `Bearer ${token}` },
+                },
             );
-            const newData = Array.isArray(response?.data?.data) ? response.data.data : [];
+            const allData = Array.isArray(response?.data?.data) ? response.data.data : [];
+            const newData = allData.filter(item => item?.venueCategory === 'Function Hall');
             const total = response?.data?.totalPages ?? 0;
 
-            // Update refs first (synchronous, always current)
             currentPageRef.current = page;
             totalEventPagesRef.current = total;
-            // hasMore is true only when there are more pages AND we got a full batch
             hasMoreRef.current = page < total;
 
-            // Then sync state for UI
             setCurrentPage(page);
             setTotalEventPages(total);
             setHasMore(page < total);
@@ -181,6 +186,7 @@ const Events = () => {
         setFilterDataLoading(true);
         const token = await getUserAuthToken();
         const queryParams = new URLSearchParams();
+        queryParams.append('venueCategory', 'Function Hall');
         if (isACSelected !== null) queryParams.append('ac', isACSelected === 'AC');
         if (selectedChip) {
             const priceRange = categoryPriceMapping[selectedChip];
@@ -197,7 +203,8 @@ const Events = () => {
                 `${BASE_URL}/filterFunctionHalls?${queryParams.toString()}`,
                 { headers: { Authorization: `Bearer ${token}` } },
             );
-            const newData = response?.data?.data ?? [];
+            const allData = response?.data?.data ?? [];
+            const newData = allData.filter(item => item?.venueCategory === 'Function Hall');
             const total = response?.data?.totalPages ?? 1;
 
             filterPageRef.current = page;
@@ -309,9 +316,9 @@ const Events = () => {
     const dataSource = useMemo(() => {
         if (query && locationBasedData.length > 0) return locationBasedData;
         if (query) return nameFilteredData;
-        if (filteredList.length > 0) return filteredList;
+        if (isFilterApplied) return filteredList;
         return eventsData;
-    }, [query, locationBasedData, nameFilteredData, filteredList, eventsData]);
+    }, [query, locationBasedData, nameFilteredData, filteredList, eventsData, isFilterApplied]);
 
     const countText = useMemo(() => {
         if (query && locationBasedData.length > 0)
@@ -381,12 +388,12 @@ const Events = () => {
                             <Text style={styles.photoCountText}>Video</Text>
                         </View>
                     )}
-                    <View style={styles.priceOverlay}>
+                    {/* <View style={styles.priceOverlay}>
                         {item?.menuImages?.length > 0
                             ? <Text style={styles.priceOverlayText}>Menu Based</Text>
                             : <Text style={styles.priceOverlayText}>{formatAmount(item?.rentPricePerDay)}<Text style={styles.priceOverlayUnit}>/day</Text></Text>
                         }
-                    </View>
+                    </View> */}
                 </View>
 
                 {/* ── card body ── */}
@@ -394,7 +401,13 @@ const Events = () => {
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}>
                 <View style={styles.cardBody}>
                     <View style={styles.cardTitleRow}>
-                        <Text style={styles.cardTitle} numberOfLines={1}>{item?.functionHallName}</Text>
+                        <Text style={styles.cardTitle} numberOfLines={2}>{item?.functionHallName}</Text>
+                        <View style={styles.cardPriceWrap}>
+                        {item?.menuImages?.length > 0
+                            ? <Text style={styles.cardPriceText}>Menu Based</Text>
+                            : <Text style={styles.cardPriceText}>{formatAmount(item?.rentPricePerDay)}<Text style={styles.cardPriceUnit}>/day</Text></Text>
+                        }
+                    </View>
                     </View>
 
                     <View style={styles.cardAddressRow}>
@@ -480,7 +493,7 @@ const Events = () => {
                             <TouchableOpacity
                                 key={item}
                                 style={[styles.filterChip, selectedSeatingCapacity === item && styles.filterChipActive]}
-                                onPress={() => setSelectedSeatingCapacity(item)}
+                                onPress={() => setSelectedSeatingCapacity(selectedSeatingCapacity === item ? '' : item)}
                             >
                                 <Text style={[styles.filterChipText, selectedSeatingCapacity === item && styles.filterChipTextActive]}>{item}</Text>
                             </TouchableOpacity>
@@ -522,7 +535,7 @@ const Events = () => {
                                     selectedChip === item && styles.filterChipActive,
                                     switchCateringVal && { opacity: 0.4 }]}
                                 disabled={switchCateringVal}
-                                onPress={() => { setSelectedChip(item); setSelectedPriceRange(''); }}
+                                onPress={() => { setSelectedChip(selectedChip === item ? '' : item); setSelectedPriceRange(''); }}
                             >
                                 <Text style={[styles.filterChipText, selectedChip === item && styles.filterChipTextActive]}>{item}</Text>
                             </TouchableOpacity>
@@ -538,7 +551,7 @@ const Events = () => {
                                     selectedPriceRange === item && styles.filterChipActive,
                                     switchCateringVal && { opacity: 0.4 }]}
                                 disabled={switchCateringVal}
-                                onPress={() => { setSelectedPriceRange(item); setSelectedChip(''); }}
+                                onPress={() => { setSelectedPriceRange(selectedPriceRange === item ? '' : item); setSelectedChip(''); }}
                             >
                                 <Text style={[styles.filterChipText, selectedPriceRange === item && styles.filterChipTextActive]}>{item}</Text>
                             </TouchableOpacity>
@@ -943,18 +956,32 @@ const styles = StyleSheet.create({
         fontWeight: '400',
         color: 'rgba(255,255,255,0.8)',
     },
+    cardPriceWrap: {
+        flexShrink: 0,
+    },
+    cardPriceText: {
+        color: '#D97706',
+        fontSize: 13,
+        fontWeight: '700',
+        fontFamily: 'ManropeRegular',
+    },
+    cardPriceUnit: {
+        fontSize: 11,
+        fontWeight: '400',
+        color: '#D97706',
+    },
     cardBody: {
         padding: 14,
     },
     cardTitleRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
+        alignItems: 'flex-start',
     },
     cardTitle: {
         fontSize: 15,
         fontWeight: '700',
-        color: '#121212',
+        color: '#1A1E25',
         fontFamily: 'ManropeRegular',
         flex: 1,
         marginRight: 8,

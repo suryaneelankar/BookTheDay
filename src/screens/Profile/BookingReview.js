@@ -25,6 +25,9 @@ const BookingReview = ({ navigation, route }) => {
         vendorMobileNumber,
         functionHallName,
         foodCateringName,
+        hallAddress,
+        hallImage,
+        seatingCapacity,
     } = selectedBooking;
 
     const userLoggedInMobileNum = useSelector((state) => state.userLoggedInMobileNum);
@@ -33,25 +36,25 @@ const BookingReview = ({ navigation, route }) => {
     // Token amount fixed to ₹10,000 or full advance if less
     // const fixedTokenAmount = Math.min(10000, advanceAmountToPay || securityDepositAmount || 0);
 
-    let fixedTokenAmount = 0;
+    let fixedTokenAmount = 1;
 
-    if (securityDepositAmount) {
-        fixedTokenAmount = securityDepositAmount;
-    } else {
-        if (totalAmount > 900000) {
-            fixedTokenAmount = 30000;
-        } else if (totalAmount > 600000) {
-            fixedTokenAmount = 20000;
-        } else if (totalAmount > 300000) {
-            fixedTokenAmount = 15000;
-        } else {
-            fixedTokenAmount = 10000;
-        }
-    }   
+    // if (securityDepositAmount) {
+    //     fixedTokenAmount = securityDepositAmount;
+    // } else {
+    //     if (totalAmount > 900000) {
+    //         fixedTokenAmount = 30000;
+    //     } else if (totalAmount > 600000) {
+    //         fixedTokenAmount = 20000;
+    //     } else if (totalAmount > 300000) {
+    //         fixedTokenAmount = 15000;
+    //     } else {
+    //         fixedTokenAmount = 10000;
+    //     }
+    // }   
     
-    if (advanceAmountToPay < 10000) {
-        fixedTokenAmount = advanceAmountToPay;
-    }
+    // if (advanceAmountToPay < 10000) {
+    //     fixedTokenAmount = 5;
+    // }
 
     const remainingAdvance = (advanceAmountToPay || securityDepositAmount || 0) - fixedTokenAmount;
     const remainingAmount = totalAmount - (advanceAmountToPay || securityDepositAmount || 0);
@@ -65,16 +68,18 @@ const BookingReview = ({ navigation, route }) => {
     };
 
 
-    const fetchRazorpayKey = async () => {
-        const res = await fetch(`${BASE_URL}/razorpay-key`);
+    const fetchRazorpayKey = async (token) => {
+        const res = await fetch(`${BASE_URL}/razorpay-key`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await res.json();
-        console.log('Razorpay key data is ::>>', data);
+        console.log('Razorpay key data is booking review ::>>', data);
         return data;
     };
 
     const handlePayment = async (advanceAmount, bookingId, catType, vendorMobileNumber, productName, totalAmount) => {
         const token = await getUserAuthToken();
-        const { key, defaultMethod } = await fetchRazorpayKey();
+        const { key, defaultMethod } = await fetchRazorpayKey(token);
         let initiatePaymentPayload = {
             orderAmount: advanceAmount,
             currency: 'INR',
@@ -98,12 +103,13 @@ const BookingReview = ({ navigation, route }) => {
                     const response = await fetch(`${BASE_URL}/create-order`, {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
                         },
                         body: JSON.stringify({
-                            amount: advanceAmount, // Amount in INR
+                            amount: advanceAmount,
                             currency: 'INR',
-                            receipt: 'receipt#1',
+                            receipt: `${bookingId.slice(-8)}_${new Date().toISOString().slice(0,16)}`,
                             userFullName: userLoggedInName,
                             userMobileNumber: userLoggedInMobileNum,
                         })
@@ -136,7 +142,20 @@ const BookingReview = ({ navigation, route }) => {
                     RazorpayCheckout.open(options)
                         .then(async (paymentData) => {
                             console.log('success resp::>>', paymentData);
-                            navigation.navigate('PaymentSuccess');
+                            navigation.navigate('PaymentSuccess', {
+                                productName: catType === 'caterings' ? foodCateringName : catType === 'functionHalls' ? functionHallName : productName,
+                                advanceAmount,
+                                totalAmount,
+                                bookingId,
+                                orderId: initiateresponse?.data?.data?.OrderId,
+                                paymentId: paymentData?.razorpay_payment_id,
+                                catType,
+                                hallAddress: hallAddress || '',
+                                hallImage: hallImage || '',
+                                startDate: startDate || '',
+                                endDate: endDate || '',
+                                seatingCapacity: seatingCapacity || '',
+                            });
                             let statusPaymentPayload = {
                                 orderId: initiateresponse?.data?.data?.OrderId,
                                 paymentStatus: "success",

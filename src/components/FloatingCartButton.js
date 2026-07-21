@@ -47,20 +47,31 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
       advanceAmountToPay: item?.advanceAmountToPay,
       totalAmount: item?.totalAmount,
       vendorMobileNumber: item?.vendorMobileNumber,
-      image: item?.professionalImage?.url
+      image: item?.professionalImage?.url,
+      hallAddress: item?.functionHallAddress?.address || '',
+      seatingCapacity: item?.seatingCapacity || '',
+      startDate: item?.startDate || '',
+      endDate: item?.endDate || '',
     })),
   ];
 
-  const fetchRazorpayKey = async () => {
-    const res = await fetch(`${BASE_URL}/razorpay-key`);
+  const fetchRazorpayKey = async (token) => {
+    const res = await fetch(`${BASE_URL}/razorpay-key`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     const data = await res.json();
-    console.log('Razorpay key data is ::>>', data);
+    console.log('Razorpay key data is floating cart ::>>', data);
     return data;
   };
 
+  const [paymentInProgress, setPaymentInProgress] = useState(false);
+
   const handlePayment = async (advanceAmount, bookingId, catType, vendorMobileNumber, productName, totalAmount) => {
-    const { key, defaultMethod } = await fetchRazorpayKey();
+    if (paymentInProgress) return;
+    setPaymentInProgress(true);
+
     const token = authToken;
+    const { key, defaultMethod } = await fetchRazorpayKey(token);
     let initiatePaymentPayload = {
       orderAmount: advanceAmount,
       currency: 'INR',
@@ -80,16 +91,16 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
 
       if (initiateresponse?.data) {
         try {
-          // Fetch the order details from your backend
           const response = await fetch(`${BASE_URL}/create-order`, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({
-              amount: advanceAmount, // Amount in INR
+              amount: advanceAmount,
               currency: 'INR',
-              receipt: 'receipt#1',
+              receipt: `${bookingId.slice(-8)}_${new Date().toISOString().slice(0,16)}`,
               userFullName: userLoggedInName,
               userMobileNumber: userLoggedInMobileNum,
             })
@@ -97,32 +108,28 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
 
           const data = await response.json();
           console.log('razor pay data is ::>>', data);
-          // Start the Razorpay payment process
           var options = {
             description: 'Book the day Transaction',
             image: 'https://your-logo-url.com/logo.png',
             currency: data.currency,
-            key: key, // Your Razorpay Key ID
-            amount: data.amount, // Amount in smallest currency unit
-            order_id: data.orderId, // Order ID returned from backend
+            key: key,
+            amount: data.amount,
+            order_id: data.orderId,
             name: 'Book the day',
             prefill: {
               email: 'bookthedaytechnologies@gmail.com',
               contact: userLoggedInMobileNum,
               name: userLoggedInName,
-              method: defaultMethod,  // Pre-select UPI as the payment method
-              // vpa: ''
+              method: defaultMethod,
             },
-            theme: { color: '#FFDB7E' }
+            theme: { color: '#FD813B' }
           };
 
           console.log('options is::>>', options);
 
-
           RazorpayCheckout.open(options)
             .then(async (paymentData) => {
               console.log('success resp::>>', paymentData);
-              navigation.navigate('PaymentSuccess');
               let statusPaymentPayload = {
                 orderId: initiateresponse?.data?.data?.OrderId,
                 paymentStatus: "success",
@@ -133,63 +140,65 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
                 vendorMobileNumber: vendorMobileNumber,
                 bookingId: bookingId,
                 catType: catType
-
               };
               try {
-                const response = await axios.patch(`${BASE_URL}/user/update-payment-status`, statusPaymentPayload, {
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                  },
-
+                const resp = await axios.patch(`${BASE_URL}/user/update-payment-status`, statusPaymentPayload, {
+                  headers: { Authorization: `Bearer ${token}` },
                 });
-                console.log("success payment  RES:::::::::", JSON.stringify(response?.data))
-              } catch (error) {
-                console.log("Payment error>>::", error);
-              };
-              // Success callback
-              // Alert.alert(`Success: ${paymentData.razorpay_payment_id}`);
-              // Verify the payment on the server-side
-
-              //   verifyPayment(paymentData);
+                console.log("success payment  RES:::::::::", JSON.stringify(resp?.data))
+              } catch (updateErr) {
+                console.log("Payment status update error>>::", updateErr);
+              }
+              // Navigate AFTER status update completes
+              navigation.navigate('PaymentSuccess', {
+                productName,
+                advanceAmount,
+                totalAmount,
+                bookingId,
+                orderId: initiateresponse?.data?.data?.OrderId,
+                paymentId: paymentData?.razorpay_payment_id,
+                catType,
+                hallAddress: selectedObjectedforPayment?.hallAddress || '',
+                hallImage: selectedObjectedforPayment?.image || '',
+                startDate: selectedObjectedforPayment?.startDate || '',
+                endDate: selectedObjectedforPayment?.endDate || '',
+                seatingCapacity: selectedObjectedforPayment?.seatingCapacity || '',
+              });
+              setPaymentInProgress(false);
             })
-            .catch(async (error) => {
+            .catch(async (paymentErr) => {
               let failurePaymentPayload = {
-
                 orderId: initiateresponse?.data?.data?.OrderId,
                 paymentStatus: "failed",
                 orderAdvanceAmount: advanceAmount,
                 razorpay_order_id: data?.orderId,
                 razorpay_payment_id: '',
                 razorpay_signature: ''
-
               };
-
               try {
-                const response = await axios.patch(`${BASE_URL}/user/update-payment-status`, failurePaymentPayload, {
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                  },
-
+                const resp = await axios.patch(`${BASE_URL}/user/update-payment-status`, failurePaymentPayload, {
+                  headers: { Authorization: `Bearer ${token}` },
                 });
-                console.log("failure payment  RES:::::::::", JSON.stringify(response?.data))
-              } catch (error) {
-                console.log("failure Payment error>>::", error);
-              };
-              // Failure callback
-              // Alert.alert(`Error: ${error.code} | ${error.description}`);
-              // navigation.navigate('PaymentSuccess');
+                console.log("failure payment  RES:::::::::", JSON.stringify(resp?.data))
+              } catch (updateErr) {
+                console.log("failure Payment status update error>>::", updateErr);
+              }
               navigation.navigate('PaymentFailed');
-              console.log(error);
+              setPaymentInProgress(false);
+              console.log('Razorpay error:', paymentErr);
             });
-        } catch (error) {
-          console.error(error);
+        } catch (orderErr) {
+          console.error('Create order error:', orderErr);
           Alert.alert('Error', 'Something went wrong');
+          setPaymentInProgress(false);
         }
-
+      } else {
+        setPaymentInProgress(false);
       }
-    } catch (error) {
-      console.log("Initiate Payment error>>::", error);
-    };
+    } catch (initiateErr) {
+      console.log("Initiate Payment error>>::", initiateErr);
+      setPaymentInProgress(false);
+    }
   };
 
   return (

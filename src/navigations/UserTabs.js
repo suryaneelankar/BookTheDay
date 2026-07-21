@@ -8,9 +8,11 @@ import EventsIcon from '../assets/svgs/tabIcons/events.svg';
 import FocusedEvents from '../assets/svgs/tabIcons/focusedEvents.svg';
 import NavigationHeader from '../components/NavigationHeader';
 import { Platform } from 'react-native';
+import IonIcon from 'react-native-vector-icons/Ionicons';
 import LuxuryResorts from '../screens/Events/LuxuryResorts';
 import FarmHouse from '../screens/Events/FarmHouse';
 import BanquetHalls from '../screens/Events/BanquetHalls';
+import SmartSearch from '../screens/Search/SmartSearch';
 
 const Tab = createBottomTabNavigator();
 
@@ -47,6 +49,19 @@ const UserTabs = () => {
             focused ? <FocusedHomeIcon /> : <HomeIcon />
           ),
           tabBarLabel: 'Halls',
+          headerShown: false,
+        }}
+      />
+
+      {/* ── Search ── */}
+      <Tab.Screen
+        name="SmartSearch"
+        component={SmartSearch}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <IonIcon name={focused ? "search" : "search-outline"} size={22} color={focused ? '#FD813B' : '#AAAEBB'} />
+          ),
+          tabBarLabel: 'Search',
           headerShown: false,
         }}
       />

@@ -34,7 +34,16 @@ const RESORT_LIGHT = '#E6EAF7';
 const VENUE_CATEGORY = 'Luxury Resort';
 
 const seatingCapacity = ['50-100', '100-200', '200-400', '400-600', '600-800', '800-1000', '1000-1200', '1200+'];
-const priceRanges = ['10k-50k', '50k-1L', '1L-2L', '2L-3L', '3L-5L', '5L-10L', '10L+'];
+const priceRanges = ['10k-50k','50k-1L','1L-2L','2L-3L','3L-5L','5L-10L','10L-12L','12L-15L','15L-20L','20L+'];
+const chips = ['Budget', 'Standard', 'Premium', 'Luxury', 'Elite'];
+const chipColors = {
+    Budget: '#FFE8B3', Standard: '#B3E5FF',
+    Luxury: '#D3C0FF', Premium: '#C8FACC', Elite: '#FFD6E8',
+};
+const categoryPriceMapping = {
+    Budget: '10k-50k', Standard: '1L-2L',
+    Premium: '3L-5L', Luxury: '5L-10L', Elite: '10L+',
+};
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 const SkeletonCard = () => (
@@ -61,6 +70,7 @@ const LuxuryResorts = () => {
     const [allLocations, setAllLocations] = useState([]);
     const [selectedSeatingCapacity, setSelectedSeatingCapacity] = useState('');
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
+    const [selectedChip, setSelectedChip] = useState('');
     const [isACSelected, setIsACSelected] = useState(null);
     const [switchCateringVal, setSwitchCateringVal] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -156,8 +166,14 @@ const LuxuryResorts = () => {
         setFilterDataLoading(true);
         const token = await getUserAuthToken();
         const qp = new URLSearchParams();
+        qp.append('venueCategory', VENUE_CATEGORY);
         if (isACSelected !== null) qp.append('ac', isACSelected === 'AC');
-        if (selectedPriceRange) qp.append('priceRanges', selectedPriceRange);
+        if (selectedChip) {
+            const priceRange = categoryPriceMapping[selectedChip];
+            if (priceRange) qp.append('priceRanges', priceRange);
+        } else if (selectedPriceRange) {
+            qp.append('priceRanges', selectedPriceRange);
+        }
         if (selectedSeatingCapacity) qp.append('seatingCapacity', selectedSeatingCapacity);
         qp.append('withFoodOnly', switchCateringVal);
         qp.append('page', page);
@@ -167,7 +183,8 @@ const LuxuryResorts = () => {
                 `${BASE_URL}/filterFunctionHalls?${qp.toString()}`,
                 { headers: { Authorization: `Bearer ${token}` } },
             );
-            const newData = res?.data?.data ?? [];
+            const allData = res?.data?.data ?? [];
+            const newData = allData.filter(item => item?.venueCategory === VENUE_CATEGORY);
             const total = res?.data?.totalPages ?? 1;
             filterPageRef.current = page;
             totalFilterPagesRef.current = total;
@@ -197,7 +214,7 @@ const LuxuryResorts = () => {
 
     const clearFilters = () => {
         setSelectedPriceRange(''); setSelectedSeatingCapacity('');
-        setIsACSelected(null); setFilteredList([]);
+        setIsACSelected(null); setSelectedChip(''); setFilteredList([]);
         setSwitchCateringVal(false); setIsFilterApplied(false);
         isFilterAppliedRef.current = false;
         currentPageRef.current = 1; hasMoreRef.current = true;
@@ -237,9 +254,9 @@ const LuxuryResorts = () => {
     const dataSource = useMemo(() => {
         if (query && locationBasedData.length > 0) return locationBasedData;
         if (query) return nameFilteredData;
-        if (filteredList.length > 0) return filteredList;
+        if (isFilterApplied) return filteredList;
         return eventsData;
-    }, [query, locationBasedData, nameFilteredData, filteredList, eventsData]);
+    }, [query, locationBasedData, nameFilteredData, filteredList, eventsData, isFilterApplied]);
 
     const countText = useMemo(() => {
         if (query && locationBasedData.length > 0) return `${locationBasedData.length} Resorts in "${query}"`;
@@ -250,7 +267,7 @@ const LuxuryResorts = () => {
         return eventsData?.length === 0 ? 'No resorts found' : `${eventsData.length} Luxury Resorts`;
     }, [query, locationBasedData, nameFilteredData, filteredList, isFilterApplied, eventsData]);
 
-    const activeFilterCount = [selectedSeatingCapacity, selectedPriceRange, isACSelected, switchCateringVal || null].filter(Boolean).length;
+    const activeFilterCount = [selectedSeatingCapacity, selectedPriceRange, selectedChip, isACSelected, switchCateringVal || null].filter(Boolean).length;
     const keyExtractor = useCallback((item) => item._id, []);
     const onEndReached = useCallback(() => {
         isFilterAppliedRef.current ? loadMoreFiltered() : loadMore();
@@ -344,7 +361,7 @@ const LuxuryResorts = () => {
         );
     }, [navigation]);
 
-    const isApplyDisabled = !selectedPriceRange && !selectedSeatingCapacity && isACSelected === null && !switchCateringVal;
+    const isApplyDisabled = !selectedPriceRange && !selectedSeatingCapacity && isACSelected === null && !selectedChip && !switchCateringVal;
 
     const ListFooter = useCallback(() => {
         if (!loading && !filterDataLoading) return null;
@@ -390,7 +407,7 @@ const LuxuryResorts = () => {
                             <TouchableOpacity
                                 key={item}
                                 style={[styles.filterChip, selectedSeatingCapacity === item && styles.filterChipActive]}
-                                onPress={() => setSelectedSeatingCapacity(item)}
+                                onPress={() => setSelectedSeatingCapacity(selectedSeatingCapacity === item ? '' : item)}
                             >
                                 <Text style={[styles.filterChipText, selectedSeatingCapacity === item && styles.filterChipTextActive]}>{item}</Text>
                             </TouchableOpacity>
@@ -412,18 +429,38 @@ const LuxuryResorts = () => {
                             <Switch
                                 trackColor={{ false: '#E8E8E8', true: '#C8D0F0' }}
                                 thumbColor={switchCateringVal ? RESORT_BLUE : '#ccc'}
-                                onValueChange={(val) => { setSwitchCateringVal(val); }}
+                                onValueChange={(val) => {
+                                    setSwitchCateringVal(val);
+                                    if (val) { setSelectedChip(''); setSelectedPriceRange(''); }
+                                }}
                                 value={switchCateringVal}
                             />
                         </View>
+                    </View>
+                    <Text style={styles.filterSectionLabel}>Category</Text>
+                    <View style={styles.filterChipsWrap}>
+                        {chips.map(item => (
+                            <TouchableOpacity key={item}
+                                style={[styles.filterChip,
+                                    { backgroundColor: chipColors[item] },
+                                    selectedChip === item && styles.filterChipActive,
+                                    switchCateringVal && { opacity: 0.4 }]}
+                                disabled={switchCateringVal}
+                                onPress={() => { setSelectedChip(selectedChip === item ? '' : item); setSelectedPriceRange(''); }}>
+                                <Text style={[styles.filterChipText, selectedChip === item && styles.filterChipTextActive]}>{item}</Text>
+                            </TouchableOpacity>
+                        ))}
                     </View>
                     <Text style={styles.filterSectionLabel}>Price Range</Text>
                     <View style={styles.filterChipsWrap}>
                         {priceRanges.map(item => (
                             <TouchableOpacity
                                 key={item}
-                                style={[styles.filterChip, selectedPriceRange === item && styles.filterChipActive]}
-                                onPress={() => setSelectedPriceRange(item)}
+                                style={[styles.filterChip,
+                                    selectedPriceRange === item && styles.filterChipActive,
+                                    switchCateringVal && { opacity: 0.4 }]}
+                                disabled={switchCateringVal}
+                                onPress={() => { setSelectedPriceRange(selectedPriceRange === item ? '' : item); setSelectedChip(''); }}
                             >
                                 <Text style={[styles.filterChipText, selectedPriceRange === item && styles.filterChipTextActive]}>{item}</Text>
                             </TouchableOpacity>

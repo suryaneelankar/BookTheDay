@@ -183,7 +183,7 @@ const ViewMyBookings = () => {
   const fetchRazorpayKey = async () => {
     const res = await fetch(`${BASE_URL}/razorpay-key`);
     const data = await res.json();
-    console.log('Razorpay key data is ::>>', data);
+    console.log('Razorpay key data is my bookings ::>>', data);
     return data;
   };
 
@@ -251,7 +251,15 @@ const ViewMyBookings = () => {
           RazorpayCheckout.open(options)
             .then(async (paymentData) => {
               console.log('success resp::>>', paymentData);
-              navigation.navigate('PaymentSuccess');
+              navigation.navigate('PaymentSuccess', {
+                productName,
+                advanceAmount,
+                totalAmount,
+                bookingId,
+                orderId: initiateresponse?.data?.data?.OrderId,
+                paymentId: paymentData?.razorpay_payment_id,
+                catType,
+              });
               let statusPaymentPayload = {
                 orderId: initiateresponse?.data?.data?.OrderId,
                 paymentStatus: "success",
@@ -428,7 +436,9 @@ const ViewMyBookings = () => {
                 vendorMobileNumber: item?.vendorMobileNumber,
                 foodCateringName: item?.foodCateringName ?? '',
                 functionHallName: item?.functionHallName ?? '',
-
+                hallAddress: item?.functionHallAddress?.address ?? '',
+                hallImage: item?.professionalImage?.url ?? '',
+                seatingCapacity: item?.seatingCapacity ?? '',
               };
               navigation.navigate('BookingReview', {
               selectedBooking: yourObjectWithDetails
