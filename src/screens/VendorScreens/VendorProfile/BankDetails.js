@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import CustomAlert from '../../../components/CustomAlert';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
@@ -54,11 +55,11 @@ const BankDetailsScreen = () => {
         // const isValidUPI = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/.test(upiId);
 
         if (!isValidBankAccount) {
-            Alert.alert('Enter valid Bank Account Number');
+            CustomAlert.alert('Enter valid Bank Account Number', undefined, undefined, {type: 'warning'});
             return;
         }
         if (!isValidIFSC) {
-            Alert.alert('Enter valid IFSC Code');
+            CustomAlert.alert('Enter valid IFSC Code', undefined, undefined, {type: 'warning'});
             return;
         }
         // if (!isValidUPI) {
@@ -84,13 +85,13 @@ const BankDetailsScreen = () => {
                 });
                 if (response.status === 200) {
                     console.log('Success', `uploaded successfully`);
-                    Alert.alert(
+                    CustomAlert.alert(
                         "Confirmation",
                         "KYC posted successfully",
                         [
                             { text: "OK", onPress: () => { navigation.goBack() } }
                         ],
-                        { cancelable: false }
+                        { cancelable: false, type: 'success' }
                     );
                 } else {
                     console.log('Error', 'Failed to upload Bank details error');
@@ -109,13 +110,13 @@ const BankDetailsScreen = () => {
             });
             if (response.status === 200) {
                 console.log('Success', `uploaded successfully`);
-                Alert.alert(
+                CustomAlert.alert(
                     "Confirmation",
                     "KYC posted successfully",
                     [
                         { text: "OK", onPress: () => { navigation.goBack() } }
                     ],
-                    { cancelable: false }
+                    { cancelable: false, type: 'success' }
                 );
             } else {
                 console.log('Error', 'Failed to upload Bank details error');

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import CustomAlert from '../../components/CustomAlert';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import themevariable from '../../utils/themevariable';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
@@ -213,7 +214,7 @@ const BookingReview = ({ navigation, route }) => {
                         });
                 } catch (error) {
                     console.error(error);
-                    Alert.alert('Error', 'Something went wrong');
+                    CustomAlert.alert('Error', 'Something went wrong', undefined, {type: 'error'});
                 }
 
             }

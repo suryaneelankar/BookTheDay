@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Alert, FlatList, Button, Linking, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Button, Linking, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
+import CustomAlert from '../../../components/CustomAlert';
 import BASE_URL from "../../../apiconfig";
 import axios from "axios";
 import { LocalHostUrl } from "../../../apiconfig";
@@ -251,7 +252,7 @@ const RequestConfirmation = ({ navigation, route }) => {
     }
 
     const showAlert = (alertText, userMobileNumber, bookingId) => {
-        Alert.alert(
+        CustomAlert.alert(
             "Confirmation",
             alertText,
             [

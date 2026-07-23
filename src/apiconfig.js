@@ -8,7 +8,7 @@
 
 // Staging / Dev
 
-const BASE_URL = "http://192.168.1.5:4000"; // Staging url
-export const LocalHostUrl = '192.168.1.5';
+const BASE_URL = "http://192.168.1.2:4000"; // Staging url
+export const LocalHostUrl = '192.168.1.2';
 
 export default BASE_URL;

@@ -7,7 +7,6 @@
 
 import React, { useEffect } from 'react';
 import {
-  Alert,
   StyleSheet,
 } from 'react-native';
 // import messaging from '@react-native-firebase/messaging'; // COMMENTED OUT — testing without Firebase
@@ -15,6 +14,7 @@ import { store } from "./redux/store";
 import { Provider } from "react-redux";
 import MainNavigation from './src/navigations';
 import SplashScreen from 'react-native-splash-screen';
+import { AlertProvider, AlertBridge } from './src/components/CustomAlert';
 // import RazorpayCheckout from 'react-native-razorpay';
 
 const App = () => {
@@ -54,7 +54,10 @@ const App = () => {
 
   return (
     <Provider store={store}>
-      <MainNavigation />
+      <AlertProvider>
+        <AlertBridge />
+        <MainNavigation />
+      </AlertProvider>
     </Provider>
   )
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, FlatList, Switch, Image, Dimensions, TouchableOpacity, Alert, Modal, TextInput, ScrollView, ActivityIndicator, BackHandler } from 'react-native';
+import CustomAlert from '../../../components/CustomAlert';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import ChooseMenuField from '../../../commonFields/ChooseMenuField';
 import themevariable from '../../../utils/themevariable';
@@ -261,7 +262,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         if (!res.didCancel && !res.errorCode) {
                             const asset = res.assets?.[0];
                             if (asset?.fileSize > VIDEO_SIZE_LIMIT) {
-                                Alert.alert('File too large', 'Please select a video under 35 MB.');
+                                CustomAlert.alert('File too large', 'Please select a video under 35 MB.', undefined, {type: 'warning'});
                             } else {
                                 picked = asset;
                             }
@@ -272,7 +273,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
             } else {
                 const result = await DocumentPicker.pickSingle({ type: [DocumentPicker.types.video] });
                 if (result.size > VIDEO_SIZE_LIMIT) {
-                    Alert.alert('File too large', 'Please select a video under 35 MB.');
+                    CustomAlert.alert('File too large', 'Please select a video under 35 MB.', undefined, {type: 'warning'});
                 } else {
                     picked = { uri: result.uri, fileName: result.name, type: result.type, fileSize: result.size };
                 }
@@ -689,18 +690,18 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         if (!mainImageUrl || functionHallName === '' || functionHallAreaInSft === '' ||
             selectedItemArray?.length === 0 || selectedItemArray === '' || functionHallAddress === '' || venueCategory === ''
         ) {
-            Alert.alert('Please fill Mandatory fields', 'Hall image, name, area, amenities, address and venue category are required.');
+            CustomAlert.alert('Please fill Mandatory fields', 'Hall image, name, area, amenities, address and venue category are required.', undefined, {type: 'warning'});
             return;
         }
         // console.log('menuAvailable is::>>>',menuAvailable);
         if (!menuAvailable) {
             if ((perDayRentPrice === 0 || perDayRentPrice === undefined) || (advanceAmount === undefined || advanceAmount === 0)) {
-                Alert.alert('Please fill Per Day Rent Price & Advance amount');
+                CustomAlert.alert('Please fill Per Day Rent Price & Advance amount', undefined, undefined, {type: 'warning'});
                 return;
             }
         } else {
             if ((basicVegPrice === 0 || basicVegPrice === undefined) || (advanceAmountPercentage === 0 || advanceAmountPercentage === undefined)) {
-                Alert.alert('Please fill Veg Menu Price & Advance percentage');
+                CustomAlert.alert('Please fill Veg Menu Price & Advance percentage', undefined, undefined, {type: 'warning'});
                 return;
             }
         }
@@ -727,7 +728,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         Object.entries(menuImages).forEach(([key, value]) => {
             console.log('value is ::>>', value);
             if (value?.menuPrice && (!value?.assets || value.assets.length === 0)) {
-                Alert.alert('Missing Image', `Please upload an image for menu.`);
+                CustomAlert.alert('Missing Image', `Please upload an image for menu.`, undefined, {type: 'warning'});
                 return;
             }
         });
@@ -735,14 +736,14 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         const uploadedImagesCount = Object.values(additionalImages).filter(value => value !== undefined).length;
 
         if (uploadedImagesCount < 4) {
-            Alert.alert('Incomplete Details', 'Please upload at least 4 images.');
+            CustomAlert.alert('Incomplete Details', 'Please upload at least 4 images.', undefined, {type: 'warning'});
             return; // Exit immediately if the total uploaded images are less than 4
         }
 
         for (const [key, value] of Object.entries(additionalImages)) {
             if (uploadedImagesCount < 4) {
                 if (value === undefined) {
-                    Alert.alert('Incomplete Details', `Please fill ${key.replace('additionalImage', 'Image ')}`);
+                    CustomAlert.alert('Incomplete Details', `Please fill ${key.replace('additionalImage', 'Image ')}`, undefined, {type: 'warning'});
                     return; // Exit immediately if any image is undefined
                 }
             }
@@ -853,7 +854,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                 setLoading(false);
                 console.log('Success', `uploaded successfully`);
                 if (isAadharUpdate) {
-                    Alert.alert(
+                    CustomAlert.alert(
                         "Confirmation",
                         "Your product posted successfully",
                         [
@@ -863,10 +864,10 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                 }
                             }
                         ],
-                        { cancelable: false }
+                        { cancelable: false, type: 'success' }
                     );
                 } else {
-                    Alert.alert(
+                    CustomAlert.alert(
                         "Confirmation",
                         "Your product posted successfully, Please complete KYC Status",
                         [
@@ -877,7 +878,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                 }
                             }
                         ],
-                        { cancelable: false }
+                        { cancelable: false, type: 'success' }
                     );
                 }
             } else {

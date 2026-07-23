@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, Alert, TextInput, ScrollView, ActivityIndicator, Modal, BackHandler } from 'react-native';
+import { Text, View, StyleSheet, FlatList, Image, Dimensions, TouchableOpacity, TextInput, ScrollView, ActivityIndicator, Modal, BackHandler } from 'react-native';
+import CustomAlert from '../../../components/CustomAlert';
 import ChooseFileField from '../../../commonFields/ChooseFileField';
 import themevariable from '../../../utils/themevariable';
 import TextField from '../../../commonFields/TextField';
@@ -282,18 +283,18 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         if (!mainImageUrl || foodCateringName === '' || cateringCity === '' ||
             cateringAddress === '' || (advanceAmount === undefined || advanceAmount === '') || finalCombomenu?.length === 0
         ) {
-            Alert.alert('Please fill Mandatory fields');
+            CustomAlert.alert('Please fill Mandatory fields', undefined, undefined, {type: 'warning'});
             return;
         }
         for (const [key, value] of Object.entries(additionalImages)) {
             if (value === undefined) {
-                Alert.alert('Incomplete Details', `Please fill ${key.replace('additionalImage', 'Image ')}`);
+                CustomAlert.alert('Incomplete Details', `Please fill ${key.replace('additionalImage', 'Image ')}`, undefined, {type: 'warning'});
                 return;
             }
         }
         finalCombomenu.forEach((obj) => {
             if (obj?.minOrder === 0 && obj?.perPlateCost === 0) {
-                Alert.alert('Please fill Mandatory fields', `Details missing for: ${obj.title}`);
+                CustomAlert.alert('Please fill Mandatory fields', `Details missing for: ${obj.title}`, undefined, {type: 'warning'});
                 return;
             }
         });
@@ -364,17 +365,17 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                 setLoading(false);
                 console.log('Success', `uploaded successfully`);
                 if (isAadharUpdate) {
-                    Alert.alert(
+                    CustomAlert.alert(
                         "Confirmation",
                         "Your product posted successfully",
                         [
                             { text: "Ok", onPress: () => navigation.goBack() }
                         ],
-                        { cancelable: false }
+                        { cancelable: false, type: 'success' }
                     );
 
                 } else {
-                    Alert.alert(
+                    CustomAlert.alert(
                         "Confirmation",
                         "Your product posted successfully, Please complete KYC Status",
                         [
@@ -382,7 +383,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                 text: "Ok", onPress: () => navigation.goBack()
                             }
                         ],
-                        { cancelable: false }
+                        { cancelable: false, type: 'success' }
                     );
                 }
             } else {

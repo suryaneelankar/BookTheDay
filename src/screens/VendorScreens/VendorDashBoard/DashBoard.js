@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, SafeAreaView, Image, ScrollView, Alert, TouchableOpacity, Dimensions, StyleSheet, Animated, FlatList, Switch } from "react-native";
+import { View, Text, SafeAreaView, Image, ScrollView, TouchableOpacity, Dimensions, StyleSheet, Animated, FlatList, Switch } from "react-native";
+import CustomAlert from '../../../components/CustomAlert';
 import ProfileIcon from '../../../assets/vendorIcons/profileIcon.svg'
 import LinearGradient from "react-native-linear-gradient";
 import axios from "axios";
@@ -229,7 +230,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     const showConfirmationAlert = (vendorId, postId) => {
-        Alert.alert(
+        CustomAlert.alert(
             "Confirmation",
             "Are you sure you want to delete the post?",
             [
@@ -245,7 +246,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     };
 
     const showAvailabilityConfirmation = (catType, postId, toggleAvailable) => {
-        Alert.alert(
+        CustomAlert.alert(
             "Confirmation",
             "Are you sure you want to make the change in product availability?",
             [
@@ -286,7 +287,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     };
 
     const showSuccessToggleAlert = () => {
-        Alert.alert(
+        CustomAlert.alert(
             "Confirmation",
             "Your Product has been Updated successfully.",
             [
@@ -296,12 +297,12 @@ const VendorDashBoardTab = ({ navigation }) => {
                     // style: "cancel"
                 },
             ],
-            { cancelable: false }
+            { cancelable: false, type: 'success' }
         );
     }
 
     const showSuccessAlert = () => {
-        Alert.alert(
+        CustomAlert.alert(
             "Confirmation",
             "Your post has been deleted successfully.",
             [
@@ -311,7 +312,7 @@ const VendorDashBoardTab = ({ navigation }) => {
                     // style: "cancel"
                 },
             ],
-            { cancelable: false }
+            { cancelable: false, type: 'success' }
         );
     }
 

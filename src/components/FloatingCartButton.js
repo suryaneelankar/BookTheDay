@@ -8,6 +8,7 @@ import { formatAmount } from "../utils/GlobalFunctions";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import RazorpayCheckout from 'react-native-razorpay';
+import CustomAlert from './CustomAlert';
 import { useNavigation } from "@react-navigation/native";
 
 const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsData, authToken }) => {
@@ -189,7 +190,7 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
             });
         } catch (orderErr) {
           console.error('Create order error:', orderErr);
-          Alert.alert('Error', 'Something went wrong');
+          CustomAlert.alert('Error', 'Something went wrong', undefined, {type: 'error'});
           setPaymentInProgress(false);
         }
       } else {

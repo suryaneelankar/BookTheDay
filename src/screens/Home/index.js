@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
+  Image,
   Dimensions,
   FlatList,
   PermissionsAndroid,
@@ -11,7 +12,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
-  Alert,
   Modal,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -75,8 +75,9 @@ import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 import CatHalls from '../../assets/svgs/categories/home_categories_hall_icon.svg';
 import ResortIcon from '../../assets/svgs/categories/home_categories_resort_icon.svg';
 import DestinationIcon from '../../assets/svgs/categories/home_categories_destination_icon.svg';
-import FarmHouseIcon from '../../assets/svgs/categories/home_categories_farmhouse_icon.svg';
+const FarmHouseIconPng = require('../../assets/categories/hall_category.png');
 import BgHeroFrame from '../../assets/svgs/BgHeroFrame.svg';
+import CustomAlert from '../../components/CustomAlert';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -385,7 +386,7 @@ const HomeDashboard = () => {
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         handleCheckPressed();
       } else {
-        Alert.alert('Location permissions denied');
+        CustomAlert.alert('Permission Denied', 'Location permissions denied');
       }
     } catch (err) {
       // silently ignore
@@ -605,7 +606,7 @@ const HomeDashboard = () => {
               onPress={() => navigation.navigate('FarmHouse')}
               style={styles.catItem}>
               <View style={styles.catCircle}>
-                <FarmHouseIcon width={68} height={68} />
+                <Image source={FarmHouseIconPng} style={{width: 62, height: 62, borderRadius: 34}} resizeMode="cover" />
               </View>
               <Text style={styles.catLabel}>Farm House</Text>
             </TouchableOpacity>

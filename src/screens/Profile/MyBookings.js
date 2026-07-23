@@ -1,5 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, ScrollView, Dimensions, Alert, Linking, TextInput } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, ScrollView, Dimensions, Linking, TextInput } from 'react-native';
+import CustomAlert from '../../components/CustomAlert';
 import BASE_URL, { LocalHostUrl } from '../../apiconfig';
 import axios from 'axios';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
@@ -156,7 +157,7 @@ const ViewMyBookings = () => {
       console.log("cancelBookingResp RES:::::::::", JSON.stringify(cancelBookingResp?.data));
       if (cancelBookingResp?.data?.status === 200) {
         actionSheetRef.current?.hide();
-        Alert.alert(
+        CustomAlert.alert(
           "Success",
           "Booking cancelled successfully!",
           [
@@ -170,11 +171,11 @@ const ViewMyBookings = () => {
               }
             }
           ],
-          { cancelable: false }
+          { cancelable: false, type: 'success' }
         );
       }
     } catch (error) {
-      Alert.alert("Error", error?.response?.data?.message || "Something went wrong while cancelling the booking");
+      CustomAlert.alert("Error", error?.response?.data?.message || "Something went wrong while cancelling the booking", undefined, {type: 'error'});
       console.log("cancelBookingResp error>>::", error?.response?.data || error);
     }
   };
@@ -320,7 +321,7 @@ const ViewMyBookings = () => {
             });
         } catch (error) {
           console.error(error);
-          Alert.alert('Error', 'Something went wrong');
+          CustomAlert.alert('Error', 'Something went wrong', undefined, {type: 'error'});
         }
 
       }
@@ -594,7 +595,7 @@ const ViewMyBookings = () => {
             disabled={!selectedReason || !selectedBookingId}
             onPress={() => {
               if (selectedReason === "Other (Please specify...)" && !otherReasonText.trim()) {
-                Alert.alert(
+                CustomAlert.alert(
                   "Alert",
                   "Please enter your custom reason!",
                   [
@@ -603,12 +604,12 @@ const ViewMyBookings = () => {
                       }
                     }
                   ],
-                  { cancelable: false }
+                  { cancelable: false, type: 'warning' }
                 );
                 return;
               }
               if (isChecked === false) {
-                Alert.alert(
+                CustomAlert.alert(
                   "Alert",
                   "Please agree the terms & conditions upon cancellation.",
                   [
@@ -617,13 +618,13 @@ const ViewMyBookings = () => {
                       }
                     }
                   ],
-                  { cancelable: false }
+                  { cancelable: false, type: 'warning' }
                 );
                 return;
               }
               if (selectedReason) {
                 // Are you sure? This will cancel your booking and apply the refund policy mentioned
-                Alert.alert(
+                CustomAlert.alert(
                   "Alert",
                   "Are you sure you want to cancel the booking? This will apply the refund policy mentioned.",
                   [

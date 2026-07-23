@@ -1,14 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, FlatList, ActivityIndicator, PermissionsAndroid, ScrollView, Linking } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+  PermissionsAndroid,
+  ScrollView,
+  Linking,
+  Platform,
+  KeyboardAvoidingView,
+} from 'react-native';
+import MapView, {Marker} from 'react-native-maps';
 import GetLocation from 'react-native-get-location';
 import SaveLocationButton from './SaveLocationButton';
-import Iconleftcircle from 'react-native-vector-icons/AntDesign';
-import { isLocationEnabled } from 'react-native-android-location-enabler';
-import { promptForEnableLocationIfNeeded } from 'react-native-android-location-enabler';
-import themevariable from '../utils/themevariable';
+import IonIcon from 'react-native-vector-icons/Ionicons';
+import {isLocationEnabled} from 'react-native-android-location-enabler';
+import {promptForEnableLocationIfNeeded} from 'react-native-android-location-enabler';
+import CustomAlert from './CustomAlert';
 
-const UserLocationPicker = ({ onLocationSelected, onBack }) => {
+const UserLocationPicker = ({onLocationSelected, onBack}) => {
   const [region, setRegion] = useState(null);
   const [address, setAddress] = useState('');
   const [apartment, setApartment] = useState('');
@@ -17,12 +30,10 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
   const [label, setLabel] = useState('Home');
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [onSelectLoc, setOnSelectLoc] = useState(false);
-  const [searchLocation, setSearchLocation] = useState();
-
   const [places, setPlaces] = useState([]);
-
   const [completeAddress, setCompleteAddress] = useState();
   const [subDivisionArea, setSubDivisionArea] = useState();
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     getPermissions();
@@ -36,7 +47,7 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       });
 
       if (location) {
-        const { latitude, longitude } = location;
+        const {latitude, longitude} = location;
 
         setRegion({
           latitude,
@@ -44,11 +55,11 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
           latitudeDelta: 0.015,
           longitudeDelta: 0.0121,
         });
-        setSelectedLocation({ latitude, longitude });
+        setSelectedLocation({latitude, longitude});
 
         const apiKey = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo';
         const response = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=${apiKey}`
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location?.latitude},${location?.longitude}&key=${apiKey}`,
         );
 
         if (!response.ok) {
@@ -56,23 +67,24 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
         }
 
         const data = await response.json();
-        // console.log('data sub div is:::>>>', JSON.stringify(data));
         setCompleteAddress(data?.results[0]?.formatted_address);
         setAddress(data?.results[0]?.formatted_address);
 
-        const postalCodeComponent = data?.results[0]?.address_components.find(component =>
-          component.types.includes("postal_code")
-        );
-        setPinCode(postalCodeComponent?.long_name || "Postal code not found");
+        const postalCodeComponent =
+          data?.results[0]?.address_components.find(component =>
+            component.types.includes('postal_code'),
+          );
+        setPinCode(postalCodeComponent?.long_name || 'Postal code not found');
 
-        const subDivisionAreaCodeComponent = data?.results[0]?.address_components.find(component =>
-          component.types.includes("sublocality_level_1")
-        );
-        setSubDivisionArea(subDivisionAreaCodeComponent?.long_name || "");
-      };
+        const subDivisionAreaCodeComponent =
+          data?.results[0]?.address_components.find(component =>
+            component.types.includes('sublocality_level_1'),
+          );
+        setSubDivisionArea(subDivisionAreaCodeComponent?.long_name || '');
+      }
       setOnSelectLoc(true);
     } catch (error) {
-      console.log("Error msg location:", error.message);
+      console.log('Error msg location:', error.message);
     }
   };
 
@@ -85,19 +97,19 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
           message: 'App needs location permissions',
           buttonNeutral: 'Ask Me Later',
           buttonNegative: 'Cancel',
-          buttonPositive: 'OK'
+          buttonPositive: 'OK',
         },
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         handleCheckPressed();
       } else {
-        Alert.alert(
+        CustomAlert.alert(
           'Location Permission Denied',
           'You have denied the location permission. Please enable it in your settings to use this feature.',
           [
-            { text: 'OK' },
-            { text: 'Open Settings', onPress: () => Linking.openSettings() },
-          ]
+            {text: 'OK'},
+            {text: 'Open Settings', onPress: () => Linking.openSettings()},
+          ],
         );
       }
     } catch (err) {
@@ -105,18 +117,13 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
     }
   };
 
-  const [searchText, setSearchText] = useState('');
-
-  // Function to fetch places from Google Places API
-  const fetchPlaces = async (text) => {
-    const apiKey = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo'; // Replace with your API key
+  const fetchPlaces = async text => {
+    const apiKey = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo';
     const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${text}&key=${apiKey}&language=en`;
 
     try {
       const response = await fetch(url);
       const result = await response.json();
-
-      // console.log('result is::>>', JSON.stringify(result));
 
       if (result?.predictions) {
         setPlaces(result?.predictions);
@@ -126,20 +133,18 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
     }
   };
 
-  // Call fetchPlaces whenever the text changes
-  const handleSearch = (text) => {
+  const handleSearch = text => {
     setSearchText(text);
     if (text.length > 2) {
       fetchPlaces(text);
     } else {
-      setPlaces([]); // Clear results if text length is <= 1
+      setPlaces([]);
     }
   };
 
   const handleCheckPressed = async () => {
     if (Platform.OS === 'android') {
       const checkEnabled = await isLocationEnabled();
-      console.log('checkEnabled', checkEnabled);
       if (!checkEnabled) {
         handleEnabledPressed();
       } else {
@@ -151,35 +156,23 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
   const handleEnabledPressed = async () => {
     if (Platform.OS === 'android') {
       try {
-        const enableResult = await promptForEnableLocationIfNeeded();
-        console.log('enableResult', enableResult);
+        await promptForEnableLocationIfNeeded();
         getLocation();
-        // The user has accepted to enable the location services
-        // data can be :
-        //  - "already-enabled" if the location services has been already enabled
-        //  - "enabled" if user has clicked on OK button in the popup
       } catch (error) {
         if (error instanceof Error) {
           console.error(error.message);
-          // The user has not accepted to enable the location services or something went wrong during the process
-          // "err" : { "code" : "ERR00|ERR01|ERR02|ERR03", "message" : "message"}
-          // codes :
-          //  - ERR00 : The user has clicked on Cancel button in the popup
-          //  - ERR01 : If the Settings change are unavailable
-          //  - ERR02 : If the popup has failed to open
-          //  - ERR03 : Internal error
         }
       }
     }
   };
 
-  const handleMapPress = async (event) => {
-    const { latitude, longitude } = event.nativeEvent.coordinate;
-    setSelectedLocation({ latitude, longitude });
+  const handleMapPress = async event => {
+    const {latitude, longitude} = event.nativeEvent.coordinate;
+    setSelectedLocation({latitude, longitude});
 
     const apiKey = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo';
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`,
     );
 
     if (!response.ok) {
@@ -187,20 +180,20 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
     }
 
     const data = await response.json();
-    // console.log('handle maps preeesss::>>', JSON.stringify(data))
     setCompleteAddress(data?.results[0]?.formatted_address);
     setAddress(data?.results[0]?.formatted_address);
 
-    const postalCodeComponent = data?.results[0]?.address_components.find(component =>
-      component.types.includes("postal_code")
-    );
+    const postalCodeComponent =
+      data?.results[0]?.address_components.find(component =>
+        component.types.includes('postal_code'),
+      );
 
-    const subDivisionAreaCodeComponent = data?.results[0]?.address_components.find(component =>
-      component.types.includes("sublocality_level_1")
-    );
-    // sublocality_level_1
-    setSubDivisionArea(subDivisionAreaCodeComponent?.long_name || "");
-    setPinCode(postalCodeComponent?.long_name || "Postal code not found");
+    const subDivisionAreaCodeComponent =
+      data?.results[0]?.address_components.find(component =>
+        component.types.includes('sublocality_level_1'),
+      );
+    setSubDivisionArea(subDivisionAreaCodeComponent?.long_name || '');
+    setPinCode(postalCodeComponent?.long_name || 'Postal code not found');
   };
 
   const saveLocation = () => {
@@ -211,14 +204,12 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       pinCode,
       label,
       region,
-      subDivisionArea
+      subDivisionArea,
     };
-    // console.log("locationData is::>>", locationData,'+++++++', selectedLocation, '+++++++', completeAddress,'+++++', label);
     onLocationSelected(locationData, completeAddress, label);
   };
 
-
-  const fetchPlaceDetails = async (placeId) => {
+  const fetchPlaceDetails = async placeId => {
     const apiKey = 'AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo';
     const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${apiKey}`;
 
@@ -227,10 +218,11 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
       const result = await response.json();
 
       if (result.result) {
-        // console.log('result.result is::>>>', JSON.stringify(result.result));
-        const { lat, lng } = result.result.geometry.location;
-        setSelectedLocation({ latitude: lat, longitude: lng });
-        const name = result?.result?.name ? `${result?.result?.name}, ` : "";
+        const {lat, lng} = result.result.geometry.location;
+        setSelectedLocation({latitude: lat, longitude: lng});
+        const name = result?.result?.name
+          ? `${result?.result?.name}, `
+          : '';
         setCompleteAddress(`${name}${result?.result?.formatted_address}`);
         setRegion({
           latitude: lat,
@@ -239,130 +231,192 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
           longitudeDelta: 0.0121,
         });
         const addressComponents = result.result.address_components;
-        const subdivisionArea = addressComponents.find(component =>
-            component.types.includes('sublocality_level_1') // Adjust type based on desired subdivision
-        )?.long_name;
-
-        // console.log('Subdivision Area tested:', subdivisionArea);
-
-        ///////////////////////////
 
         const postalCodeComponent = addressComponents.find(component =>
-          component.types.includes("postal_code")
+          component.types.includes('postal_code'),
         );
-        setPinCode(postalCodeComponent?.long_name || "Postal code not found");
+        setPinCode(postalCodeComponent?.long_name || 'Postal code not found');
 
-        const subDivisionAreaCodeComponent = addressComponents.find(component =>
-          component.types.includes("sublocality_level_1")
+        const subDivisionAreaCodeComponent = addressComponents.find(
+          component => component.types.includes('sublocality_level_1'),
         );
-        setSubDivisionArea(subDivisionAreaCodeComponent?.long_name || "");
-        ///////////////////////////
-        // alert(`Latitude: ${lat}, Longitude: ${lng}`); // Display or store this data as needed
+        setSubDivisionArea(subDivisionAreaCodeComponent?.long_name || '');
       }
     } catch (error) {
       console.error(error);
     }
   };
 
+  const labelIcons = {
+    Home: 'home-outline',
+    Office: 'briefcase-outline',
+    Other: 'location-outline',
+  };
+
   return (
     <View style={styles.container}>
-      {/* {console.log('places is::>>',places)} */}
-
-
-      <View style={{ width: "95%", marginTop: 10, flexDirection: "row", alignSelf: "center", alignItems: "center", justifyContent: "space-between" }}>
-        <TouchableOpacity onPress={() => onBack()}>
-          <Iconleftcircle name='leftcircle' color={'#494a49'} size={33} style={{ bottom: 5 }} />
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => onBack()} style={styles.backBtn}>
+          <IonIcon name="chevron-back" size={22} color="#1A1E25" />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>Pick Location</Text>
+      </View>
+
+      {/* Divider */}
+      <View style={styles.divider} />
+
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <IonIcon
+          name="search-outline"
+          size={16}
+          color="#7E8389"
+          style={styles.searchIcon}
+        />
         <TextInput
-          placeholder="Search for area, street name.."
+          placeholder="Search for area, street name..."
           value={searchText}
           onChangeText={handleSearch}
-          style={styles.locationInput}
-          placeholderTextColor={"#7E8389"}
+          style={styles.searchInput}
+          placeholderTextColor="#7E8389"
           onFocus={() => setOnSelectLoc(false)}
-        // onBlur={() => setOnSelectLoc(true)}
         />
+        {searchText.length > 0 && (
+          <TouchableOpacity
+            onPress={() => {
+              setSearchText('');
+              setPlaces([]);
+            }}>
+            <IonIcon name="close-circle" size={18} color="#7E8389" />
+          </TouchableOpacity>
+        )}
       </View>
-      {!onSelectLoc ?
-        <TouchableOpacity onPress={() => setOnSelectLoc(true)} style={{ alignItems: "center" }}>
-          <Text style={{ color: themevariable.Color_000000,marginTop:"20%" }}>Get Current Location</Text>
-        </TouchableOpacity> : null}
 
-      {console.log('!selectedLocation is vendor::>>', !selectedLocation)}
-
-      {onSelectLoc ?
+      {!onSelectLoc ? (
         <>
+          {/* Get Current Location button */}
+          <TouchableOpacity
+            onPress={() => setOnSelectLoc(true)}
+            style={styles.currentLocRow}>
+            <View style={styles.currentLocIcon}>
+              <IonIcon name="navigate" size={16} color="#FD813B" />
+            </View>
+            <Text style={styles.currentLocText}>Use Current Location</Text>
+          </TouchableOpacity>
 
+          <View style={styles.divider} />
+
+          {/* Search results */}
+          <FlatList
+            data={places}
+            keyExtractor={item => item.place_id}
+            ItemSeparatorComponent={() => <View style={styles.listDivider} />}
+            renderItem={({item}) => (
+              <TouchableOpacity
+                style={styles.placeItem}
+                onPress={() => {
+                  setOnSelectLoc(true);
+                  setSearchText(item.description);
+                  fetchPlaceDetails(item.place_id);
+                }}>
+                <View style={styles.placeIconCircle}>
+                  <IonIcon name="location" size={14} color="#1A1E25" />
+                </View>
+                <Text style={styles.placeText} numberOfLines={2}>
+                  {item.description}
+                </Text>
+              </TouchableOpacity>
+            )}
+          />
+        </>
+      ) : (
+        <KeyboardAvoidingView
+          style={{flex: 1}}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          {/* Map */}
           {region ? (
             <MapView
               style={styles.map}
               region={region}
               onPress={handleMapPress}
               showsUserLocation={true}
-              showsMyLocationButton={true}
-            >
-              {selectedLocation && (
-                <Marker coordinate={selectedLocation} />
-              )}
+              showsMyLocationButton={true}>
+              {selectedLocation && <Marker coordinate={selectedLocation} />}
             </MapView>
           ) : (
-            <ActivityIndicator size="large" color="orange" />
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#FD813B" />
+              <Text style={styles.loadingText}>Fetching location...</Text>
+            </View>
           )}
 
-
-          <ScrollView style={styles.form}>
-            <Text style={[styles.labelText, { marginTop: 20 }]}>Address</Text>
+          {/* Form */}
+          <ScrollView
+            style={styles.formContainer}
+            contentContainerStyle={styles.formContent}
+            keyboardShouldPersistTaps="handled">
+            {/* Address */}
+            <Text style={styles.fieldLabel}>Address</Text>
             <TextInput
               numberOfLines={3}
-              label="address"
-              style={[styles.input, { height: 100 }]}
+              style={styles.addressInput}
               value={completeAddress}
+              onChangeText={setCompleteAddress}
               placeholder="Address"
               editable={true}
               multiline={true}
-              placeholderTextColor={"#7E8389"}
+              placeholderTextColor="#7E8389"
             />
 
-            <Text style={[styles.labelText, { marginTop: 20 }]}>Pincode</Text>
+            {/* Pincode */}
+            <Text style={styles.fieldLabel}>Pincode</Text>
             <TextInput
-              style={styles.input}
+              style={styles.pincodeInput}
               value={pinCode}
               onChangeText={setPinCode}
               placeholder="Pin Code"
-              placeholderTextColor={"#7E8389"}
+              placeholderTextColor="#7E8389"
+              keyboardType="numeric"
             />
 
-            <View style={styles.labels}>
-              {['Home', 'Office', 'Other'].map((type) => (
+            {/* Label selector */}
+            <Text style={styles.fieldLabel}>Save As</Text>
+            <View style={styles.labelsRow}>
+              {['Home', 'Office', 'Other'].map(type => (
                 <TouchableOpacity
                   key={type}
-                  style={[styles.label, label === type && styles.selectedLabel]}
-                  onPress={() => setLabel(type)}
-                >
-                  <Text style={styles.labelAsText}>{type}</Text>
+                  style={[
+                    styles.labelChip,
+                    label === type && styles.labelChipSelected,
+                  ]}
+                  onPress={() => setLabel(type)}>
+                  <IonIcon
+                    name={labelIcons[type]}
+                    size={14}
+                    color={label === type ? '#1A1E25' : '#7E8389'}
+                    style={{marginRight: 6}}
+                  />
+                  <Text
+                    style={[
+                      styles.labelChipText,
+                      label === type && styles.labelChipTextSelected,
+                    ]}>
+                    {type}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-
+            {/* Save button */}
             <SaveLocationButton
               onPress={() => saveLocation()}
-              text={'Save Location'}
+              text="Save Location"
               padding={10}
             />
           </ScrollView>
-        </>
-
-        :
-        <FlatList
-          data={places}
-          keyExtractor={(item) => item.place_id}
-          renderItem={({ item }) => (
-            <TouchableOpacity style={styles.listItem} onPress={() => { setOnSelectLoc(true), setSearchText(item.description), fetchPlaceDetails(item.place_id) }}>
-              <Text style={styles.placeText}>{item.description}</Text>
-            </TouchableOpacity>
-          )}
-        />}
+        </KeyboardAvoidingView>
+      )}
     </View>
   );
 };
@@ -370,131 +424,194 @@ const UserLocationPicker = ({ onLocationSelected, onBack }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
-  map: {
-    // flex: 1,
-    height: 200,
+  // Header
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 12,
   },
-  autocompleteContainer: {
-    position: 'absolute',
-    top: 10,
-    width: '95%',
-    alignSelf: 'center',
-    zIndex: 1,
-    flexDirection: "row",
-    alignItems: "center"
+  backBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F2F2F2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
   },
-  listItem: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
+  headerTitle: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '700',
+    fontSize: 20,
+    color: '#1A1E25',
   },
-  placeText: {
-    fontSize: 16,
-    color: '#333',
+  divider: {
+    height: 0.5,
+    backgroundColor: 'rgba(126, 131, 137, 0.2)',
   },
-  form: {
-    flex: 1,
-    paddingHorizontal: 20,
-    bottom: 0
+  // Search
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F2F2F2',
+    borderRadius: 10,
+    marginHorizontal: 20,
+    marginTop: 16,
+    marginBottom: 12,
+    height: 45,
+    paddingHorizontal: 12,
   },
-  input: {
-    height: 90,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginBottom: 15,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    backgroundColor: "#F0F5FA",
-    color: themevariable.Color_000000,
-  },
-  locationInput: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginBottom: 5,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    backgroundColor: "#F0F5FA",
-    width: "90%",
-    color: themevariable.Color_000000,
+  searchIcon: {
+    marginRight: 8,
   },
   searchInput: {
-    height: 50,
-    borderColor: '#3e423e',
-    borderWidth: 0.5,
-    borderWidth: 1,
-    marginBottom: 15,
-    paddingHorizontal: 10,
-    backgroundColor: "#e3e6e4",
-    marginHorizontal: 5
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '600',
+    fontFamily: 'ManropeRegular',
+    color: '#1A1E25',
+    paddingVertical: 0,
   },
-  labels: {
+  // Current location row
+  currentLocRow: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
-    marginBottom: 20,
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
   },
-  label: {
-    padding: 10,
+  currentLocIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FEF8EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  currentLocText: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '700',
+    fontSize: 15,
+    color: '#FD813B',
+  },
+  // Place items
+  placeItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+  },
+  placeIconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F2F2F2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  placeText: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: '600',
+    fontFamily: 'ManropeRegular',
+    color: '#1A1E25',
+    lineHeight: 18,
+  },
+  listDivider: {
+    height: 0.5,
+    backgroundColor: 'rgba(126, 131, 137, 0.15)',
+    marginLeft: 64,
+  },
+  // Map
+  map: {
+    height: 200,
+  },
+  loadingContainer: {
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 8,
+    fontSize: 13,
+    color: '#7E8389',
+    fontFamily: 'ManropeRegular',
+  },
+  // Form
+  formContainer: {
+    flex: 1,
+  },
+  formContent: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 30,
+  },
+  fieldLabel: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '700',
+    fontSize: 14,
+    color: '#1A1E25',
+    marginBottom: 8,
+  },
+  addressInput: {
     borderWidth: 1,
-    borderRadius: 20,
-    width: '30%',
-    alignItems: 'center',
-    borderColor: "#ECBF46"
-  },
-  labelAsText: {
-    color: "#100D25",
-    fontSize: 14,
-    fontWeight: "600",
-    fontFamily: 'ManropeRegular',
-  },
-  selectedLabel: {
-    backgroundColor: '#FFE49B',
-  },
-  saveButton: {
-    backgroundColor: '#F00',
-    padding: 15,
+    borderColor: 'rgba(126, 131, 137, 0.3)',
     borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: '20%',
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  cancelButton: {
-    backgroundColor: '#F00',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: '20%',
-  },
-  cancelButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  labelText: {
-    color: "#000000",
-    marginVertical: 5,
-    paddingHorizontal: 5,
-    fontSize: 14,
-    fontWeight: "700",
+    backgroundColor: '#F8FAFB',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 13,
     fontFamily: 'ManropeRegular',
+    color: '#1A1E25',
+    minHeight: 80,
+    textAlignVertical: 'top',
+    marginBottom: 16,
   },
-  backButton: {
-    // position: "static",
-    // top: 20,
-    // left: 20,
-    // backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    // padding: 5,
-    backgroundColor: "black",
+  pincodeInput: {
+    borderWidth: 1,
+    borderColor: 'rgba(126, 131, 137, 0.3)',
+    borderRadius: 10,
+    backgroundColor: '#F8FAFB',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 13,
+    fontFamily: 'ManropeRegular',
+    color: '#1A1E25',
+    height: 45,
+    marginBottom: 16,
+  },
+  // Labels
+  labelsRow: {
+    flexDirection: 'row',
+    marginBottom: 24,
+    gap: 10,
+  },
+  labelChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(126, 131, 137, 0.3)',
     borderRadius: 20,
-    // zIndex: 2,
   },
-  backButtonText: {
-    color: '#fff',
-    fontSize: 18,
+  labelChipSelected: {
+    backgroundColor: '#FEF8EB',
+    borderColor: '#ECBF46',
+  },
+  labelChipText: {
+    fontSize: 13,
+    fontWeight: '600',
+    fontFamily: 'ManropeRegular',
+    color: '#7E8389',
+  },
+  labelChipTextSelected: {
+    color: '#1A1E25',
   },
 });
 
