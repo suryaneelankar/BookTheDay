@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   Platform,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import IonIcon from 'react-native-vector-icons/Ionicons';
@@ -84,6 +85,9 @@ const { width: screenWidth } = Dimensions.get('window');
 const HomeDashboard = () => {
   // ─── Active state ────────────────────────────────────────────────────────────
   const [address, setAddress] = useState('');
+  const [activeBanner, setActiveBanner] = useState(0);
+  const bannerScrollRef = useRef(null);
+  const [totalVenueCount, setTotalVenueCount] = useState(0);
   const [eventsData, setEventsData] = useState([]);
   const [nearByEventsData, setNearByEventsData] = useState([]);
   const [getUserAuth, setGetUserAuth] = useState('');
@@ -154,6 +158,7 @@ const HomeDashboard = () => {
     useCallback(() => {
       /* COMMENTED OUT — getCategories(); getAllCaterings(currentPage); */
       getAllEvents(currentPage);
+      getPremiumHalls(1);
       getUserAuthTokenRes();
       getProfileData();
       return () => {
@@ -176,6 +181,27 @@ const HomeDashboard = () => {
   useEffect(() => {
     storeUserDeviceToken();
   }, []);
+
+  // ─── Auto-scroll banners ──────────────────────────────────────────────────────
+  useEffect(() => {
+    const bannerTimer = setInterval(() => {
+      setActiveBanner(prev => {
+        const next = (prev + 1) % 4;
+        bannerScrollRef.current?.scrollTo({
+          x: next * screenWidth,
+          animated: true,
+        });
+        return next;
+      });
+    }, 3500);
+    return () => clearInterval(bannerTimer);
+  }, []);
+
+  const handleBannerScroll = (event) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const index = Math.round(offsetX / screenWidth);
+    setActiveBanner(index);
+  };
 
   useEffect(() => {
     getPermissions();
@@ -274,8 +300,50 @@ const HomeDashboard = () => {
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setEventsData(response?.data?.data);
+      // Store total count from API response
+      if (response?.data?.totalCount) {
+        setTotalVenueCount(response.data.totalCount);
+      } else if (response?.data?.totalPages) {
+        setTotalVenueCount(response.data.totalPages * 10);
+      }
     } catch (error) {
       console.log('events data error>>::', error);
+    }
+  };
+
+  // ─── API: premium halls (3L+) with pagination ──────────────────────────────────
+  const [premiumHalls, setPremiumHalls] = useState([]);
+  const [premiumPage, setPremiumPage] = useState(1);
+  const [premiumHasMore, setPremiumHasMore] = useState(true);
+  const [premiumLoading, setPremiumLoading] = useState(false);
+
+  const getPremiumHalls = async (page = 1, append = false) => {
+    if (premiumLoading) return;
+    setPremiumLoading(true);
+    const token = await getUserAuthToken();
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/filterFunctionHalls`,
+        {
+          params: { page, limit: 10, priceRanges: '3L-5L' },
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const newData = Array.isArray(response?.data?.data) ? response.data.data : [];
+      const totalPages = response?.data?.totalPages ?? 1;
+      setPremiumHalls(prev => append ? [...prev, ...newData] : newData);
+      setPremiumPage(page);
+      setPremiumHasMore(page < totalPages);
+    } catch (error) {
+      console.log('premium halls error:', error);
+    } finally {
+      setPremiumLoading(false);
+    }
+  };
+
+  const loadMorePremiumHalls = () => {
+    if (premiumHasMore && !premiumLoading) {
+      getPremiumHalls(premiumPage + 1, true);
     }
   };
 
@@ -534,50 +602,199 @@ const HomeDashboard = () => {
           </TouchableOpacity>
         </View>
 
+        {/* ── Search Bar + Filter ── */}
+        <View style={styles.homeSearchRow}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('SearchVenues')}
+            style={styles.homeSearchBar}>
+            <IonIcon name="search-outline" size={18} color="#7E8389" />
+            <Text style={styles.homeSearchPlaceholder}>Search venues, halls, resorts...</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('SearchVenues')}
+            style={styles.homeFilterIcon}>
+            <IonIcon name="options-outline" size={20} color="#D97706" />
+          </TouchableOpacity>
+        </View>
+
         {/* ════════════════════════════════════════
-            HERO — warm gradient, on-brand
+            HERO — Auto-scrolling banners
         ════════════════════════════════════════ */}
         <View style={styles.heroWrapper}>
-          <View style={styles.heroBanner}>
-            {/* SVG background */}
-            <BgHeroFrame width="100%" height="100%" style={styles.heroSvgBg} preserveAspectRatio="xMidYMid slice" />
+          <ScrollView
+            ref={bannerScrollRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onMomentumScrollEnd={handleBannerScroll}
+            style={styles.heroBannerScroll}>
+           
+            {/* Banner 1 - Function Halls */}
+            <TouchableOpacity
+              activeOpacity={0.95}
+              onPress={() => navigation.navigate('Events')}
+              style={styles.heroBannerSlide}>
+              <LinearGradient
+                colors={['#78350F', '#A16207', '#EAB308']}
+                start={{x: 0, y: 0}}
+                end={{x: 1, y: 1}}
+                style={styles.heroBannerGradient}>
+                <View style={styles.heroBannerDecor1} />
+                <View style={styles.heroBannerDecor2} />
+                <View style={styles.heroBannerContent}>
+                  <View style={styles.heroBannerTextArea}>
+                    <View style={styles.heroBannerBadge}>
+                      <IonIcon name="business" size={10} color="#fff" />
+                      <Text style={styles.heroBannerBadgeText}>Best Value</Text>
+                    </View>
+                    <Text style={styles.heroBannerTitle}>Function{'\n'}Halls</Text>
+                    <Text style={styles.heroBannerDesc}>Spacious venues with AC, catering & all amenities</Text>
+                    <View style={styles.heroBannerCtaPill}>
+                      <Text style={styles.heroBannerCtaText}>Explore Now</Text>
+                      <IonIcon name="arrow-forward" size={13} color="#fff" />
+                    </View>
+                  </View>
+                  <View style={styles.heroBannerIconWrap}>
+                    <IonIcon name="business" size={40} color="rgba(255,255,255,0.85)" />
+                  </View>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
 
-            {/* Content overlay */}
-            <View style={styles.heroContent}>
-              <Text style={styles.heroTitle}>Your Dream{'\n'}Venue Awaits</Text>
-              <View style={styles.heroTitleAccent} />
-              <Text style={styles.heroSubtitle}>
-                Premium Halls · Farm Houses · Resorts · Banquets
-              </Text>
+            {/* Banner 2 - Farm Houses */}
+            <TouchableOpacity
+              activeOpacity={0.95}
+              onPress={() => navigation.navigate('FarmHouse')}
+              style={styles.heroBannerSlide}>
+              <LinearGradient
+                colors={['#1B4332', '#2D6A4F', '#52B788']}
+                start={{x: 0, y: 0}}
+                end={{x: 1, y: 1}}
+                style={styles.heroBannerGradient}>
+                <View style={styles.heroBannerDecor1} />
+                <View style={styles.heroBannerDecor2} />
+                <View style={styles.heroBannerContent}>
+                  <View style={styles.heroBannerTextArea}>
+                    <View style={styles.heroBannerBadge}>
+                      <IonIcon name="leaf" size={10} color="#fff" />
+                      <Text style={styles.heroBannerBadgeText}>Popular Choice</Text>
+                    </View>
+                    <Text style={styles.heroBannerTitle}>Scenic Farm{'\n'}Houses</Text>
+                    <Text style={styles.heroBannerDesc}>Open-air retreats for unforgettable celebrations</Text>
+                    <View style={styles.heroBannerCtaPill}>
+                      <Text style={styles.heroBannerCtaText}>Explore Now</Text>
+                      <IonIcon name="arrow-forward" size={13} color="#fff" />
+                    </View>
+                  </View>
+                  <View style={styles.heroBannerIconWrap}>
+                    <IonIcon name="leaf" size={40} color="rgba(255,255,255,0.85)" />
+                  </View>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={() => navigation.navigate('Events')}
-                style={styles.heroCta}>
-                <LinearGradient
-                  colors={['#D2453B', '#A0143E']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.heroCtaGradient}>
-                  <Text style={styles.heroCtaText}>Browse Venues</Text>
-                  <IonIcon name="arrow-forward" size={14} color="#fff" />
-                </LinearGradient>
-              </TouchableOpacity>
-            </View>
-          </View>
+            {/* Banner 3 - Luxury Resorts */}
+            <TouchableOpacity
+              activeOpacity={0.95}
+              onPress={() => navigation.navigate('LuxuryResorts')}
+              style={styles.heroBannerSlide}>
+              <LinearGradient
+                colors={['#4A1942', '#803D7A', '#CD6DBB']}
+                start={{x: 0, y: 0}}
+                end={{x: 1, y: 1}}
+                style={styles.heroBannerGradient}>
+                <View style={styles.heroBannerDecor1} />
+                <View style={styles.heroBannerDecor2} />
+                <View style={styles.heroBannerContent}>
+                  <View style={styles.heroBannerTextArea}>
+                    <View style={styles.heroBannerBadge}>
+                      <IonIcon name="sparkles" size={10} color="#fff" />
+                      <Text style={styles.heroBannerBadgeText}>Premium</Text>
+                    </View>
+                    <Text style={styles.heroBannerTitle}>Luxury{'\n'}Resorts</Text>
+                    <Text style={styles.heroBannerDesc}>World-class venues for grand weddings & parties</Text>
+                    <View style={styles.heroBannerCtaPill}>
+                      <Text style={styles.heroBannerCtaText}>Explore Now</Text>
+                      <IonIcon name="arrow-forward" size={13} color="#fff" />
+                    </View>
+                  </View>
+                  <View style={styles.heroBannerIconWrap}>
+                    <IonIcon name="sparkles" size={40} color="rgba(255,255,255,0.85)" />
+                  </View>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
 
-          {/* floating stats card — overlaps hero bottom */}
-          <View style={styles.statsFloat}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNum}>{eventsData?.length > 0 ? `${eventsData?.length}+` : '—'}</Text>
+             {/* Banner 4 - Banquet Halls */}
+            <TouchableOpacity
+              activeOpacity={0.95}
+              onPress={() => navigation.navigate('BanquetHalls')}
+              style={styles.heroBannerSlide}>
+              <LinearGradient
+                colors={['#92400E', '#D97706', '#FBBF24']}
+                start={{x: 0, y: 0}}
+                end={{x: 1, y: 1}}
+                style={styles.heroBannerGradient}>
+                <View style={styles.heroBannerDecor1} />
+                <View style={styles.heroBannerDecor2} />
+                <View style={styles.heroBannerContent}>
+                  <View style={styles.heroBannerTextArea}>
+                    <View style={styles.heroBannerBadge}>
+                      <IonIcon name="ribbon" size={10} color="#fff" />
+                      <Text style={styles.heroBannerBadgeText}>Elegant</Text>
+                    </View>
+                    <Text style={styles.heroBannerTitle}>Banquet{'\n'}Halls</Text>
+                    <Text style={styles.heroBannerDesc}>Elegant spaces for receptions, sangeets & celebrations</Text>
+                    <View style={styles.heroBannerCtaPill}>
+                      <Text style={styles.heroBannerCtaText}>Explore Now</Text>
+                      <IonIcon name="arrow-forward" size={13} color="#fff" />
+                    </View>
+                  </View>
+                  <View style={styles.heroBannerIconWrap}>
+                    <IonIcon name="ribbon" size={40} color="rgba(255,255,255,0.85)" />
+                  </View>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+
+          </ScrollView>
+        </View>
+
+        {/* Pagination dots */}
+        <View style={styles.bannerDots}>
+          {[0, 1, 2, 3].map(i => (
+            <View
+              key={i}
+              style={[
+                styles.bannerDotIndicator,
+                activeBanner === i && styles.bannerDotActive,
+              ]}
+            />
+          ))}
+        </View>
+
+        {/* Stats card — below dots */}
+        <View style={styles.statsFloat}>
+          <View style={styles.statItem}>
+            <IonIcon name="business" size={18} color="#D97706" style={{marginRight: 8}} />
+            <View>
+              <Text style={styles.statNum}>{totalVenueCount > 0 ? `${totalVenueCount}+` : '—'}</Text>
               <Text style={styles.statLbl}>Venues</Text>
             </View>
-            <View style={styles.statSep} />
-            <View style={styles.statItem}>
+          </View>
+          <View style={styles.statSep} />
+          <View style={styles.statItem}>
+            <IonIcon name="location" size={18} color="#D97706" style={{marginRight: 8}} />
+            <View>
               <Text style={styles.statNum}>Hyderabad</Text>
-              <Text style={styles.statLbl}>City</Text>
+              <Text style={styles.statLbl}>Location</Text>
             </View>
-            <View style={styles.statSep} />
-            <View style={styles.statItem}>
+          </View>
+          <View style={styles.statSep} />
+          <View style={styles.statItem}>
+            <IonIcon name="headset" size={18} color="#D97706" style={{marginRight: 8}} />
+            <View>
               <Text style={styles.statNum}>24/7</Text>
               <Text style={styles.statLbl}>Support</Text>
             </View>
@@ -723,77 +940,130 @@ const HomeDashboard = () => {
         <View style={styles.whyBookContainer}>
           {/* header */}
           <View style={styles.whyBookHeader}>
-            <View style={styles.whyBookHeaderLeft}>
-              <View style={styles.whyBookAccentBar} />
-              <View>
-                <Text style={styles.whyBookTitle}>Why BookTheDay?</Text>
-                <Text style={styles.whyBookSubtitle}>Everything you need, guaranteed</Text>
-              </View>
+            <View style={styles.whyBookBadge}>
+              <IonIcon name="sparkles" size={12} color="#FD813B" />
+              <Text style={styles.whyBookBadgeText}>Why Us</Text>
             </View>
-            <View style={styles.whyBookDiamondWrap}>
-              <IonIcon name="diamond" size={14} color="#ECA73C" />
+            <Text style={styles.whyBookTitle}>Why BookTheDay?</Text>
+            <Text style={styles.whyBookSubtitle}>
+              Everything you need for a perfect event, guaranteed.
+            </Text>
+          </View>
+
+          {/* feature cards — 2x2 grid */}
+          <View style={styles.whyBookGrid}>
+            <View style={[styles.whyBookCard, {backgroundColor: '#ECFDF5'}]}>
+              <View style={[styles.whyBookCardIcon, {backgroundColor: '#D1FAE5'}]}>
+                <IonIcon name="flash" size={20} color="#059669" />
+              </View>
+              <Text style={styles.whyBookCardTitle}>Instant{'\n'}Confirmation</Text>
+              <Text style={styles.whyBookCardDesc}>Booking confirmed immediately</Text>
+            </View>
+
+            <View style={[styles.whyBookCard, {backgroundColor: '#FFF7ED'}]}>
+              <View style={[styles.whyBookCardIcon, {backgroundColor: '#FED7AA'}]}>
+                <IonIcon name="refresh" size={20} color="#EA580C" />
+              </View>
+              <Text style={styles.whyBookCardTitle}>Easy{'\n'}Cancellation</Text>
+              <Text style={styles.whyBookCardDesc}>Flexible policy with quick refunds</Text>
+            </View>
+
+            <View style={[styles.whyBookCard, {backgroundColor: '#EFF6FF'}]}>
+              <View style={[styles.whyBookCardIcon, {backgroundColor: '#BFDBFE'}]}>
+                <IonIcon name="headset" size={20} color="#2563EB" />
+              </View>
+              <Text style={styles.whyBookCardTitle}>24/7{'\n'}Support</Text>
+              <Text style={styles.whyBookCardDesc}>Our team is always here for you</Text>
+            </View>
+
+            <View style={[styles.whyBookCard, {backgroundColor: '#FDF2F8'}]}>
+              <View style={[styles.whyBookCardIcon, {backgroundColor: '#FBCFE8'}]}>
+                <IonIcon name="shield-checkmark" size={20} color="#DB2777" />
+              </View>
+              <Text style={styles.whyBookCardTitle}>Secure{'\n'}Payments</Text>
+              <Text style={styles.whyBookCardDesc}>100% safe via Razorpay</Text>
             </View>
           </View>
 
-          {/* feature rows */}
-          <View style={styles.whyBookList}>
-            <View style={styles.whyBookFeatureRow}>
-              <LinearGradient colors={['#009C4D', '#047A42']} style={styles.whyBookFeatureIcon}>
-                <IonIcon name="flash" size={18} color="#fff" />
-              </LinearGradient>
-              <View style={styles.whyBookFeatureText}>
-                <Text style={styles.whyBookFeatureTitle}>Instant Confirmation</Text>
-                <Text style={styles.whyBookFeatureDesc}>Your booking is confirmed immediately — no waiting</Text>
-              </View>
-              <IonIcon name="checkmark-circle" size={18} color="#009C4D" />
-            </View>
-
-            <View style={styles.whyBookDivider} />
-
-            <View style={styles.whyBookFeatureRow}>
-              <LinearGradient colors={['#FD813B', '#DF6E12']} style={styles.whyBookFeatureIcon}>
-                <IonIcon name="refresh" size={18} color="#fff" />
-              </LinearGradient>
-              <View style={styles.whyBookFeatureText}>
-                <Text style={styles.whyBookFeatureTitle}>Easy Cancellation</Text>
-                <Text style={styles.whyBookFeatureDesc}>Flexible cancellation policy with quick refunds</Text>
-              </View>
-              <IonIcon name="checkmark-circle" size={18} color="#009C4D" />
-            </View>
-
-            <View style={styles.whyBookDivider} />
-
-            <View style={styles.whyBookFeatureRow}>
-              <LinearGradient colors={['#042CB0', '#0A3FD4']} style={styles.whyBookFeatureIcon}>
-                <IonIcon name="headset" size={18} color="#fff" />
-              </LinearGradient>
-              <View style={styles.whyBookFeatureText}>
-                <Text style={styles.whyBookFeatureTitle}>24/7 Support</Text>
-                <Text style={styles.whyBookFeatureDesc}>Our team is always available to assist you</Text>
-              </View>
-              <IonIcon name="checkmark-circle" size={18} color="#009C4D" />
-            </View>
-
-            <View style={styles.whyBookDivider} />
-
-            <View style={styles.whyBookFeatureRow}>
-              <LinearGradient colors={['#A0143E', '#D2453B']} style={styles.whyBookFeatureIcon}>
-                <IonIcon name="shield-checkmark" size={18} color="#fff" />
-              </LinearGradient>
-              <View style={styles.whyBookFeatureText}>
-                <Text style={styles.whyBookFeatureTitle}>Secure Payments</Text>
-                <Text style={styles.whyBookFeatureDesc}>100% safe transactions powered by Razorpay</Text>
-              </View>
-              <IonIcon name="checkmark-circle" size={18} color="#009C4D" />
-            </View>
-          </View>
-
-          {/* gold trust badge */}
+          {/* trust badge */}
           <View style={styles.whyBookTrustBadge}>
-            <IonIcon name="shield-checkmark" size={12} color="#ECA73C" />
+            <IonIcon name="checkmark-circle" size={14} color="#059669" />
             <Text style={styles.whyBookTrustText}>Every venue personally verified in Hyderabad</Text>
           </View>
         </View>
+
+        {/* ════════════════════════════════════════
+            POPULAR VENUES — vertical list
+        ════════════════════════════════════════ */}
+        {premiumHalls?.length > 0 && (
+          <View style={{ marginTop: verticalScale(24) }}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Popular Venues</Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Events')}
+                style={styles.seeAllBtn}>
+                <Text style={styles.seeAllText}>View All</Text>
+                <View style={styles.seeAllArrow}>
+                  <IonIcon name="arrow-forward" size={16} color="#fff" />
+                </View>
+              </TouchableOpacity>
+            </View>
+            <View style={{ paddingHorizontal: horizontalScale(16) }}>
+              {premiumHalls.map((item) => (
+                <TouchableOpacity
+                  key={item?._id}
+                  activeOpacity={0.92}
+                  onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
+                  style={styles.popularVenueCard}>
+                  <FastImage
+                    source={{ uri: item?.professionalImage?.url, priority: FastImage.priority.normal }}
+                    style={styles.popularVenueImage}
+                    resizeMode={FastImage.resizeMode.cover}
+                  />
+                  <View style={styles.popularVenueBody}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Text numberOfLines={1} style={styles.popularVenueName}>{item?.functionHallName}</Text>
+                      <Text style={styles.popularVenuePrice}>
+                        {item?.menuImages?.length > 0 ? 'Menu Based' : `${formatAmount(item?.rentPricePerDay)}/day`}
+                      </Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                      <IonIcon name="location-sharp" size={12} color="#FD813B" />
+                      <Text numberOfLines={1} style={styles.popularVenueAddress}>
+                        {item?.functionHallAddress?.address || ''}
+                      </Text>
+                    </View>
+                    {item?.seatingCapacity ? (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
+                        <View style={styles.popularVenueChip}>
+                          <IonIcon name="people-outline" size={11} color="#D97706" />
+                          <Text style={styles.popularVenueChipText}>{item?.seatingCapacity} pax</Text>
+                        </View>
+                        {item?.bedRooms > 0 && (
+                          <View style={styles.popularVenueChip}>
+                            <IonIcon name="bed-outline" size={11} color="#D97706" />
+                            <Text style={styles.popularVenueChipText}>{item?.bedRooms} Rooms</Text>
+                          </View>
+                        )}
+                      </View>
+                    ) : null}
+                  </View>
+                </TouchableOpacity>
+              ))}
+              {premiumHasMore && (
+                <TouchableOpacity
+                  onPress={loadMorePremiumHalls}
+                  style={{ alignSelf: 'center', marginTop: 12, marginBottom: 8, paddingVertical: 10, paddingHorizontal: 24, borderRadius: 10, borderWidth: 1, borderColor: '#D97706' }}>
+                  {premiumLoading ? (
+                    <ActivityIndicator size="small" color="#D97706" />
+                  ) : (
+                    <Text style={{ fontFamily: 'ManropeRegular', fontSize: 13, fontWeight: '700', color: '#D97706' }}>Load More</Text>
+                  )}
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        )}
 
         {/* ════════════════════════════════════════
             EXPLORE ALL CTA
@@ -880,102 +1150,164 @@ const styles = StyleSheet.create({
     width: moderateScale(38),
     height: moderateScale(38),
     borderRadius: moderateScale(19),
-    // backgroundColor: '#F5F5F5',
     justifyContent: 'center',
     alignItems: 'center',
   },
 
+  // ── HOME SEARCH BAR ──────────────────────────────────────────────────────────
+  homeSearchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: horizontalScale(16),
+    marginTop: verticalScale(10),
+    marginBottom: verticalScale(6),
+    gap: 10,
+  },
+  homeSearchBar: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: moderateScale(12),
+    paddingHorizontal: horizontalScale(14),
+    paddingVertical: verticalScale(12),
+    borderWidth: 1,
+    borderColor: '#EEEEEE',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  homeSearchPlaceholder: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(13),
+    fontWeight: '500',
+    color: '#7E8389',
+    marginLeft: 10,
+    flex: 1,
+  },
+  homeFilterIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#FEF3E2',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(217,119,6,0.15)',
+  },
+
   // ── HERO ─────────────────────────────────────────────────────────────────────
   heroWrapper: {
-    marginHorizontal: horizontalScale(16),
     marginTop: verticalScale(6),
-    marginBottom: verticalScale(32),
+    marginBottom: verticalScale(0),
   },
-  heroBanner: {
+  heroBannerScroll: {
+  },
+  heroBannerSlide: {
+    width: screenWidth,
+    paddingHorizontal: 16,
+  },
+  heroBannerGradient: {
     borderRadius: moderateScale(16),
+    paddingVertical: verticalScale(24),
+    paddingHorizontal: horizontalScale(20),
+    minHeight: verticalScale(170),
     overflow: 'hidden',
-    minHeight: verticalScale(180),
-    position: 'relative',
+    justifyContent: 'center',
   },
-  heroSvgBg: {
+  heroBannerDecor1: {
     position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
+    top: -30,
+    right: -30,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(255,255,255,0.08)',
   },
-  heroContent: {
-    padding: horizontalScale(20),
-    paddingTop: verticalScale(24),
-    paddingBottom: verticalScale(44),
+  heroBannerDecor2: {
+    position: 'absolute',
+    bottom: -20,
+    left: 30,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255,255,255,0.05)',
   },
-  heroCircle1: {
-    display: 'none',
+  heroBannerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 2,
   },
-  heroCircle2: {
-    display: 'none',
+  heroBannerTextArea: {
+    flex: 1,
+    paddingRight: 10,
   },
-  heroBadge: {
+  heroBannerBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(253,129,59,0.12)',
-    borderRadius: moderateScale(20),
-    paddingHorizontal: horizontalScale(10),
-    paddingVertical: verticalScale(4),
-    marginBottom: verticalScale(12),
-    gap: 5,
-    borderWidth: 1,
-    borderColor: 'rgba(253,129,59,0.25)',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 14,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    gap: 4,
   },
-  heroBadgeText: {
+  heroBannerBadgeText: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(11),
-    fontWeight: '700',
-    color: '#D97706',
+    fontSize: moderateScale(10),
+    fontWeight: '600',
+    color: '#fff',
   },
-  heroTitle: {
+  heroBannerTitle: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(28),
+    fontSize: moderateScale(24),
     fontWeight: '800',
-    color: '#1A1E25',
-    lineHeight: moderateScale(34),
-    marginBottom: verticalScale(8),
+    color: '#fff',
+    lineHeight: moderateScale(30),
+    marginBottom: 6,
   },
-  heroTitleAccent: {
-    width: horizontalScale(48),
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: '#FD813B',
-    marginBottom: verticalScale(4),
-  },
-  heroSubtitle: {
+  heroBannerDesc: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(13),
-    color: '#555',
-    marginBottom: verticalScale(10),
+    fontSize: moderateScale(12),
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.8)',
+    lineHeight: moderateScale(17),
+    marginBottom: 14,
   },
-  heroCta: {
-    alignSelf: 'flex-start',
-    borderRadius: moderateScale(20),
-    overflow: 'hidden',
-  },
-  heroCtaGradient: {
+  heroBannerCtaPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: horizontalScale(18),
-    paddingVertical: verticalScale(12),
-    gap: 7,
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.22)',
+    borderRadius: 16,
+    paddingVertical: 7,
+    paddingHorizontal: 14,
+    gap: 5,
   },
-  heroCtaText: {
+  heroBannerCtaText: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(13),
+    fontSize: moderateScale(12),
     fontWeight: '700',
     color: '#fff',
   },
+  heroBannerIconWrap: {
+    width: moderateScale(72),
+    height: moderateScale(72),
+    borderRadius: moderateScale(36),
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.25)',
+  },
   // floating stats card
   statsFloat: {
-    position: 'absolute',
-    bottom: -32,
-    left: horizontalScale(10),
-    right: horizontalScale(10),
+    marginHorizontal: horizontalScale(16),
+    marginTop: verticalScale(12),
+    marginBottom: verticalScale(4),
     flexDirection: 'row',
     backgroundColor: '#fff',
     borderRadius: moderateScale(12),
@@ -986,18 +1318,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 6,
   },
-  statItem: { flex: 1, alignItems: 'center' },
+  statItem: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   statNum: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(16),
     fontWeight: '800',
     color: '#ECA73C',
+    textAlign: 'center',
   },
   statLbl: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(11),
     color: '#7D7F88',
     marginTop: 2,
+    textAlign: 'center',
   },
   statSep: {
     width: 1,
@@ -1409,95 +1743,81 @@ const styles = StyleSheet.create({
     marginTop: verticalScale(28),
     marginHorizontal: horizontalScale(16),
     backgroundColor: '#fff',
-    borderRadius: moderateScale(14),
-    padding: horizontalScale(16),
+    borderRadius: moderateScale(16),
+    padding: horizontalScale(18),
     borderWidth: 1,
     borderColor: '#F0F0F0',
-    elevation: 1,
+    elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
   },
   whyBookHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     marginBottom: verticalScale(16),
   },
-  whyBookHeaderLeft: {
+  whyBookBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(253, 129, 59, 0.08)',
+    borderRadius: 20,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    gap: 4,
   },
-  whyBookAccentBar: {
-    width: 4,
-    height: moderateScale(36),
-    borderRadius: 2,
-    backgroundColor: '#FFDB7E',
+  whyBookBadgeText: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(11),
+    fontWeight: '600',
+    color: '#FD813B',
   },
   whyBookTitle: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(16),
+    fontSize: moderateScale(18),
     fontWeight: '800',
-    color: '#131313',
+    color: '#1A1E25',
+    marginBottom: 4,
   },
   whyBookSubtitle: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(11),
-    color: '#939393',
-    marginTop: 2,
+    fontSize: moderateScale(12),
+    color: '#7E8389',
+    lineHeight: moderateScale(17),
   },
-  whyBookDiamondWrap: {
-    width: moderateScale(34),
-    height: moderateScale(34),
-    borderRadius: moderateScale(17),
-    backgroundColor: 'rgba(255,219,126,0.25)',
-    borderWidth: 1,
-    borderColor: '#FFDB7E',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  whyBookList: {
-    backgroundColor: '#FAFAFA',
-    borderRadius: moderateScale(14),
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#F1F1F1',
-  },
-  whyBookFeatureRow: {
+  whyBookGrid: {
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: horizontalScale(14),
-    paddingVertical: verticalScale(13),
-    gap: 12,
+    flexWrap: 'wrap',
+    gap: 10,
   },
-  whyBookFeatureIcon: {
-    width: moderateScale(40),
-    height: moderateScale(40),
-    borderRadius: moderateScale(12),
+  whyBookCard: {
+    width: '48%',
+    borderRadius: moderateScale(14),
+    padding: moderateScale(14),
+    flexGrow: 1,
+  },
+  whyBookCardIcon: {
+    width: moderateScale(38),
+    height: moderateScale(38),
+    borderRadius: moderateScale(10),
     justifyContent: 'center',
     alignItems: 'center',
-    flexShrink: 0,
+    marginBottom: 10,
   },
-  whyBookFeatureText: { flex: 1 },
-  whyBookFeatureTitle: {
+  whyBookCardTitle: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(13),
     fontWeight: '700',
-    color: '#131313',
+    color: '#1A1E25',
+    marginBottom: 4,
+    lineHeight: moderateScale(17),
   },
-  whyBookFeatureDesc: {
+  whyBookCardDesc: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(11),
-    color: '#939393',
-    marginTop: 2,
-    lineHeight: moderateScale(15),
-  },
-  whyBookDivider: {
-    height: 1,
-    backgroundColor: '#F1F1F1',
-    marginHorizontal: horizontalScale(14),
+    fontSize: moderateScale(10.5),
+    color: '#7E8389',
+    lineHeight: moderateScale(14),
   },
   whyBookTrustBadge: {
     flexDirection: 'row',
@@ -1505,7 +1825,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     marginTop: verticalScale(14),
-    backgroundColor: '#FFF8E7',
+    backgroundColor: '#F0FDF4',
     borderRadius: moderateScale(20),
     paddingVertical: verticalScale(8),
     paddingHorizontal: horizontalScale(14),
@@ -1513,6 +1833,65 @@ const styles = StyleSheet.create({
     borderColor: '#FFDB7E',
   },
   whyBookTrustText: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(11),
+    fontWeight: '600',
+    color: '#D97706',
+  },
+
+  // ── POPULAR VENUES ─────────────────────────────────────────────────────────────
+  popularVenueCard: {
+    backgroundColor: '#fff',
+    borderRadius: moderateScale(14),
+    marginBottom: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    overflow: 'hidden',
+  },
+  popularVenueImage: {
+    width: '100%',
+    height: verticalScale(180),
+    borderTopLeftRadius: moderateScale(14),
+    borderTopRightRadius: moderateScale(14),
+  },
+  popularVenueBody: {
+    padding: 14,
+  },
+  popularVenueName: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(15),
+    fontWeight: '700',
+    color: '#1A1E25',
+    flex: 1,
+    marginRight: 8,
+  },
+  popularVenuePrice: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(13),
+    fontWeight: '700',
+    color: '#D97706',
+  },
+  popularVenueAddress: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(12),
+    color: '#7E8389',
+    marginLeft: 4,
+    flex: 1,
+  },
+  popularVenueChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF8EB',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginRight: 8,
+    gap: 4,
+  },
+  popularVenueChipText: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(11),
     fontWeight: '600',
@@ -1543,6 +1922,137 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(15),
     fontWeight: '700',
     color: '#fff',
+  },
+
+  // ── PROMOTIONAL BANNERS ───────────────────────────────────────────────────────
+  bannerSection: {
+    marginTop: verticalScale(20),
+    marginBottom: verticalScale(4),
+  },
+  bannerScroller: {
+    paddingLeft: horizontalScale(16),
+  },
+  bannerSlide: {
+    width: screenWidth - 32,
+    marginRight: 12,
+    borderRadius: moderateScale(16),
+    overflow: 'hidden',
+  },
+  bannerGradient: {
+    borderRadius: moderateScale(16),
+    paddingVertical: verticalScale(20),
+    paddingHorizontal: horizontalScale(18),
+    minHeight: verticalScale(145),
+    overflow: 'hidden',
+  },
+  bannerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 2,
+  },
+  bannerTextArea: {
+    flex: 1,
+    paddingRight: 10,
+  },
+  bannerBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 12,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    marginBottom: 8,
+    gap: 4,
+  },
+  bannerBadgeText: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(10),
+    fontWeight: '600',
+    color: '#fff',
+  },
+  bannerTitle: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(20),
+    fontWeight: '800',
+    color: '#fff',
+    marginBottom: 6,
+  },
+  bannerDesc: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(11.5),
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.8)',
+    lineHeight: moderateScale(16),
+    marginBottom: 12,
+  },
+  bannerCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 14,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    gap: 4,
+  },
+  bannerCtaText: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(11),
+    fontWeight: '700',
+    color: '#fff',
+  },
+  bannerIconArea: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bannerIconCircle: {
+    width: moderateScale(64),
+    height: moderateScale(64),
+    borderRadius: moderateScale(32),
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  bannerDecor1: {
+    position: 'absolute',
+    top: -20,
+    right: -20,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  bannerDecor2: {
+    position: 'absolute',
+    bottom: -15,
+    left: 40,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+  },
+  bannerDots: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: verticalScale(12),
+    marginBottom: verticalScale(0),
+    gap: 7,
+  },
+  bannerDotIndicator: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: 'rgba(0,0,0,0.15)',
+  },
+  bannerDotActive: {
+    width: 24,
+    height: 7,
+    backgroundColor: '#D97706',
+    borderRadius: 4,
   },
 
   // ── MODAL ─────────────────────────────────────────────────────────────────────

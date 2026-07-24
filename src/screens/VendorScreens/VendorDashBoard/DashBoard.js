@@ -655,7 +655,7 @@ const VendorDashBoardTab = ({ navigation }) => {
     };
 
     const ItemSeparator = () => {
-        return <View style={{ width: '90%', alignSelf: 'center', height: 1, backgroundColor: 'gray' }} />;
+        return <View style={{ width: '90%', alignSelf: 'center', height: 1, backgroundColor: '#F0F0F0', marginVertical: 6 }} />;
     };
 
 
@@ -688,7 +688,6 @@ const VendorDashBoardTab = ({ navigation }) => {
                             <Text style={{ fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 40, color: '#1A1F36', alignSelf: 'center' }}>{vendorListing?.length ? vendorListing?.length : 0}</Text>
                         </View>
                     </View>
-
                 </LinearGradient>
                 <ScrollView>
 

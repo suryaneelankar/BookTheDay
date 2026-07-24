@@ -4,15 +4,11 @@ import HomeDashboard from '../screens/Home';
 import Events from '../screens/Events';
 import HomeIcon from '../assets/svgs/tabIcons/home.svg';
 import FocusedHomeIcon from '../assets/svgs/tabIcons/focusedHome.svg';
-import EventsIcon from '../assets/svgs/tabIcons/events.svg';
-import FocusedEvents from '../assets/svgs/tabIcons/focusedEvents.svg';
-import NavigationHeader from '../components/NavigationHeader';
 import { Platform } from 'react-native';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import LuxuryResorts from '../screens/Events/LuxuryResorts';
 import FarmHouse from '../screens/Events/FarmHouse';
 import BanquetHalls from '../screens/Events/BanquetHalls';
-import SmartSearch from '../screens/Search/SmartSearch';
 
 const Tab = createBottomTabNavigator();
 
@@ -40,7 +36,7 @@ const UserTabs = () => {
         },
       }}>
 
-      {/* ── Halls (Home) ── */}
+      {/* ── Home ── */}
       <Tab.Screen
         name="UserHome"
         component={HomeDashboard}
@@ -48,20 +44,7 @@ const UserTabs = () => {
           tabBarIcon: ({ focused }) => (
             focused ? <FocusedHomeIcon /> : <HomeIcon />
           ),
-          tabBarLabel: 'Halls',
-          headerShown: false,
-        }}
-      />
-
-      {/* ── Search ── */}
-      <Tab.Screen
-        name="SmartSearch"
-        component={SmartSearch}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <IonIcon name={focused ? "search" : "search-outline"} size={22} color={focused ? '#FD813B' : '#AAAEBB'} />
-          ),
-          tabBarLabel: 'Search',
+          tabBarLabel: 'Home',
           headerShown: false,
         }}
       />
@@ -72,7 +55,7 @@ const UserTabs = () => {
         component={BanquetHalls}
         options={{
           tabBarIcon: ({ focused }) => (
-            focused ? <FocusedEvents /> : <EventsIcon />
+            <IonIcon name={focused ? "ribbon" : "ribbon-outline"} size={22} color={focused ? '#FD813B' : '#AAAEBB'} />
           ),
           tabBarLabel: 'Banquets',
           headerShown: false,
@@ -85,7 +68,7 @@ const UserTabs = () => {
         component={LuxuryResorts}
         options={{
           tabBarIcon: ({ focused }) => (
-            focused ? <FocusedEvents /> : <EventsIcon />
+            <IonIcon name={focused ? "sparkles" : "sparkles-outline"} size={22} color={focused ? '#FD813B' : '#AAAEBB'} />
           ),
           tabBarLabel: 'Resorts',
           headerShown: false,
@@ -98,7 +81,7 @@ const UserTabs = () => {
         component={FarmHouse}
         options={{
           tabBarIcon: ({ focused }) => (
-            focused ? <FocusedEvents /> : <EventsIcon />
+            <IonIcon name={focused ? "leaf" : "leaf-outline"} size={22} color={focused ? '#FD813B' : '#AAAEBB'} />
           ),
           tabBarLabel: 'Farm Houses',
           headerShown: false,
@@ -111,7 +94,7 @@ const UserTabs = () => {
         component={Events}
         options={{
           tabBarIcon: ({ focused }) => (
-            focused ? <FocusedHomeIcon /> : <HomeIcon />
+            <IonIcon name={focused ? "business" : "business-outline"} size={22} color={focused ? '#FD813B' : '#AAAEBB'} />
           ),
           tabBarLabel: 'All Halls',
           headerShown: false,

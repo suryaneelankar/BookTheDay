@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import BookDatesButton from '../../components/GradientButton';
 import { getVendorAuthToken } from '../../utils/StoreAuthToken';
 import axios from 'axios';
-import BASE_URL, { LocalHostUrl } from '../../apiconfig';
+import BASE_URL from '../../apiconfig';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import FastImage from 'react-native-fast-image';
@@ -26,20 +26,22 @@ const AadharUpload = () => {
     const getProfileData = async () => {
         const token = await getVendorAuthToken();
         try {
-            console.log("vendou num:", vendorLoggedInMobileNum)
+            console.log("vendor num:", vendorLoggedInMobileNum)
               const response = await axios.get(`${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`,{
                   headers: {
                       Authorization: `Bearer ${token}`,
                     },
               });
               setProfileData(response?.data?.data);
-              const updatedImgUrl = response?.data?.data?.aadharImage?.url ? response?.data?.data?.aadharImage?.url?.replace('localhost', LocalHostUrl) : response?.data?.data?.aadharImage?.url;
-              setIsAadharAvailable(updatedImgUrl);
+              const imgUrl = response?.data?.data?.aadharImage?.url;
+              console.log("vendor aadhar image url:", imgUrl);
+              if (imgUrl) {
+                setIsAadharAvailable(imgUrl);
+              }
               setGetVendorAuth(token);
-            //  console.log("profile vendor res:::", response?.data?.data);
              
           } catch (error) {
-              console.log("profile::::::::::", error);
+              console.log("profile error:", error);
           }
       }
 
@@ -95,10 +97,9 @@ console.log("selected iamge:::::", selectedImage, isAadharAvailable)
             Alert.alert('Please upload Aadhar Image')
             return;
         }
-        if(isAadharAvailable && !selectedImage && profileData?.kycStatus ==='onhold'){
+        if(isAadharAvailable && profileData?.kycStatus ==='onhold'){
             Alert.alert('KYC is Under Review, Will update shortly')
             return; 
-
         }
         const formData = new FormData();
 
@@ -177,7 +178,7 @@ console.log("selected iamge:::::", selectedImage, isAadharAvailable)
             </View>
 
 
-            <Text style={[styles.label, { marginTop: 20 }]}>Food Safety License</Text>
+            {/* <Text style={[styles.label, { marginTop: 20 }]}>Food Safety License</Text>
             <View style={styles.uploadBox}>
                 {selectedFoodLicenseImage ? (
                     <View style={{ flex: 1, flexDirection: "row" }}>
@@ -200,7 +201,7 @@ console.log("selected iamge:::::", selectedImage, isAadharAvailable)
                         </TouchableOpacity>
                     </>
                 )}
-            </View>
+            </View> */}
 
 
             <View style={{ position: 'absolute', bottom: 0 }}>

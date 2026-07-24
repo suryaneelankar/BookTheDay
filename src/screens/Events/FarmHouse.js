@@ -458,7 +458,7 @@ const FarmHouse = () => {
 
             {/* ── FARM HOUSE HERO HEADER ── */}
             <LinearGradient
-                colors={[FH_DARK, FH_MID, '#3A5C3A']}
+                colors={['#779B3F', '#779B3F', '#779B3F']}
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                 style={styles.heroHeader}
             >
@@ -482,13 +482,13 @@ const FarmHouse = () => {
 
                 {/* search bar */}
                 <View style={styles.searchBar}>
-                    <IonIcon name="search-outline" size={16} color={FH_SAGE} style={{ marginRight: 8 }} />
+                    <IonIcon name="search-outline" size={16} color={'black'} style={{ marginRight: 8 }} />
                     <TextInput
                         style={styles.searchInput}
                         value={query}
                         onChangeText={handleQueryChange}
                         placeholder="Search farm houses by name or area..."
-                        placeholderTextColor={FH_SAGE}
+                        placeholderTextColor={'black'}
                         returnKeyType="search"
                     />
                     {query.length > 0 && (
@@ -580,41 +580,41 @@ const styles = StyleSheet.create({
     listContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24 },
 
     // ── HERO ──
-    heroHeader: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 18, overflow: 'hidden' },
+    heroHeader: { paddingHorizontal: 16, paddingTop: 18, paddingBottom: 20, overflow: 'hidden', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 },
     heroCircle1: {
         position: 'absolute', width: 200, height: 200, borderRadius: 100,
-        backgroundColor: 'rgba(6,190,102,0.07)', top: -60, right: -50,
+        backgroundColor: 'rgba(6,190,102,0.06)', top: -50, right: -50,
     },
     heroCircle2: {
         position: 'absolute', width: 120, height: 120, borderRadius: 60,
-        backgroundColor: 'rgba(6,190,102,0.05)', bottom: -30, left: -20,
+        backgroundColor: 'rgba(6,190,102,0.04)', bottom: -30, left: -20,
     },
-    heroRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
+    heroRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
     heroBadge: {
         flexDirection: 'row', alignItems: 'center', gap: 5,
-        backgroundColor: 'rgba(6,190,102,0.18)',
-        borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4,
-        alignSelf: 'flex-start', marginBottom: 8,
-        borderWidth: 1, borderColor: 'rgba(6,190,102,0.3)',
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5,
+        alignSelf: 'flex-start', marginBottom: 10,
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)',
     },
-    heroBadgeText: { fontFamily: 'ManropeRegular', fontSize: 11, fontWeight: '700', color: FH_GREEN },
-    heroTitle: { fontFamily: 'ManropeRegular', fontSize: 22, fontWeight: '800', color: '#fff' },
-    heroSub: { fontFamily: 'ManropeRegular', fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 3 },
+    heroBadgeText: { fontFamily: 'ManropeRegular', fontSize: 11, fontWeight: '700', color: '#FFFFFF' },
+    heroTitle: { fontFamily: 'ManropeRegular', fontSize: 24, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.3 },
+    heroSub: { fontFamily: 'ManropeRegular', fontSize: 13, color: 'rgba(255,255,255,0.8)', marginTop: 4 },
     heroIconWrap: {
-        width: 64, height: 64, borderRadius: 32,
-        backgroundColor: 'rgba(6,190,102,0.15)',
+        width: 60, height: 60, borderRadius: 16,
+        backgroundColor: 'rgba(255,255,255,0.15)',
         justifyContent: 'center', alignItems: 'center',
-        borderWidth: 1, borderColor: 'rgba(6,190,102,0.25)',
+        borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.25)',
     },
 
     // ── SEARCH ──
     searchBar: {
         flexDirection: 'row', alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.08)',
-        borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10,
-        borderWidth: 1, borderColor: 'rgba(6,190,102,0.3)',
+        backgroundColor: 'white',
+        borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12,
+        borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.2)',
     },
-    searchInput: { flex: 1, fontSize: 13, fontFamily: 'ManropeRegular', color: '#fff', padding: 0 },
+    searchInput: { flex: 1, fontSize: 13, fontFamily: 'ManropeRegular', color: 'black', padding: 0 },
     dropdown: {
         backgroundColor: '#fff', borderRadius: 12, marginTop: 6,
         elevation: 8, shadowColor: '#000',

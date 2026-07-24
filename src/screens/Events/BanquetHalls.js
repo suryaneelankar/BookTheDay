@@ -438,7 +438,7 @@ const BanquetHalls = () => {
             </ActionSheet>
 
             {/* ── BANQUET HALLS HERO ── */}
-            <LinearGradient colors={[BH_DARK, BH_MID, '#3D1010']}
+            <LinearGradient colors={['#5C1E3E', '#7A2D52', '#9B3D6A']}
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.heroHeader}>
                 <View style={styles.heroCircle1} />
                 <View style={styles.heroCircle2} />
@@ -456,10 +456,10 @@ const BanquetHalls = () => {
                     </View>
                 </View>
                 <View style={styles.searchBar}>
-                    <IonIcon name="search-outline" size={16} color="rgba(236,167,60,0.7)" style={{ marginRight: 8 }} />
+                    <IonIcon name="search-outline" size={16} color="black" style={{ marginRight: 8 }} />
                     <TextInput style={styles.searchInput} value={query} onChangeText={handleQueryChange}
                         placeholder="Search banquet halls by name or area..."
-                        placeholderTextColor="rgba(236,167,60,0.45)" returnKeyType="search" />
+                        placeholderTextColor="black" returnKeyType="search" />
                     {query.length > 0 && (
                         <TouchableOpacity onPress={() => { setQuery(''); setDropdownVisible(false); setLocationBasedData([]); }}>
                             <IonIcon name="close-circle" size={16} color="rgba(236,167,60,0.7)" />
@@ -526,19 +526,19 @@ const styles = StyleSheet.create({
     listContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24 },
 
     // ── HERO ──
-    heroHeader: { paddingHorizontal: 16, paddingTop: 14, paddingBottom: 18, overflow: 'hidden' },
-    heroCircle1: { position: 'absolute', width: 200, height: 200, borderRadius: 100, backgroundColor: 'rgba(160,20,62,0.07)', top: -60, right: -50 },
-    heroCircle2: { position: 'absolute', width: 120, height: 120, borderRadius: 60, backgroundColor: 'rgba(160,20,62,0.05)', bottom: -30, left: -20 },
-    heroRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
-    heroBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(236,167,60,0.18)', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, alignSelf: 'flex-start', marginBottom: 8, borderWidth: 1, borderColor: 'rgba(236,167,60,0.3)' },
-    heroBadgeText: { fontFamily: 'ManropeRegular', fontSize: 11, fontWeight: '700', color: BH_GOLD },
-    heroTitle: { fontFamily: 'ManropeRegular', fontSize: 22, fontWeight: '800', color: '#fff' },
-    heroSub: { fontFamily: 'ManropeRegular', fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 3 },
-    heroIconWrap: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(236,167,60,0.15)', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(236,167,60,0.25)' },
+    heroHeader: { paddingHorizontal: 16, paddingTop: 18, paddingBottom: 20, overflow: 'hidden' },
+    heroCircle1: { position: 'absolute', width: 200, height: 200, borderRadius: 100, backgroundColor: 'rgba(255,255,255,0.06)', top: -60, right: -50 },
+    heroCircle2: { position: 'absolute', width: 120, height: 120, borderRadius: 60, backgroundColor: 'rgba(255,255,255,0.04)', bottom: -30, left: -20 },
+    heroRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+    heroBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, alignSelf: 'flex-start', marginBottom: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
+    heroBadgeText: { fontFamily: 'ManropeRegular', fontSize: 11, fontWeight: '700', color: '#FFFFFF' },
+    heroTitle: { fontFamily: 'ManropeRegular', fontSize: 24, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.3 },
+    heroSub: { fontFamily: 'ManropeRegular', fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 4 },
+    heroIconWrap: { width: 60, height: 60, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.12)', justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.2)' },
 
     // ── SEARCH ──
-    searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, borderWidth: 1, borderColor: 'rgba(160,20,62,0.35)' },
-    searchInput: { flex: 1, fontSize: 13, fontFamily: 'ManropeRegular', color: '#fff', padding: 0 },
+    searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.2)' },
+    searchInput: { flex: 1, fontSize: 13, fontFamily: 'ManropeRegular', color: 'black', padding: 0 },
     dropdown: { backgroundColor: '#fff', borderRadius: 12, marginTop: 6, elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.12, shadowRadius: 6, overflow: 'hidden' },
     dropdownItem: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 11 },
     dropdownDivider: { borderBottomWidth: 1, borderBottomColor: '#F1F1F1' },

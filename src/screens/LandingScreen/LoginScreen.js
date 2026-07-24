@@ -1,301 +1,444 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions, Alert } from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  StatusBar,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import BookDatesButton from '../../components/GradientButton';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import BASE_URL from '../../apiconfig';
 import axios from 'axios';
-import { getCurrentLoggedInVendorMobileNum, getCurrentLoggedInUserMobileNum, getLoginUserId, checkIsTokenStored } from '../../../redux/actions';
-import { useDispatch, useSelector } from 'react-redux';
-import { storeUserAuthToken, getVendorAuthToken, getUserAuthToken, storeVendorAuthToken, storeVendorMobileNumber, storeUserMobileNumber } from '../../utils/StoreAuthToken';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import CustomModal from '../../components/AlertModal';
+import {
+  getCurrentLoggedInVendorMobileNum,
+  getCurrentLoggedInUserMobileNum,
+  getLoginUserId,
+  checkIsTokenStored,
+} from '../../../redux/actions';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  storeUserAuthToken,
+  getVendorAuthToken,
+  storeVendorAuthToken,
+  storeVendorMobileNumber,
+  storeUserMobileNumber,
+} from '../../utils/StoreAuthToken';
+import IonIcon from 'react-native-vector-icons/Ionicons';
+import CustomAlert from '../../components/CustomAlert';
 
-const LoginScreen = ({ route }) => {
-    const { type } = route.params;
-    const [fullName, setFullName] = useState('');
-    const [modalVisible, setModalVisible] = useState('');
-    const [email, setEmail] = useState('');
-    const navigation = useNavigation();
-    const [phoneNumber, setPhoneNumber] = useState('');
-    const [password, setPassword] = useState('');
-    const [authToken, setAuthToken] = useState('');
-    const dispatch = useDispatch();
-    const deviceFCMToken = useSelector((state) => state.deviceFCMToken);
-    const [isPasswordVisible, setPasswordVisible] = useState(false);
-    const [fieldsCheckModalVisible, setFieldsCheckModalVisible] = useState(false);
-    const token = useSelector((state) => state.authToken);
-    const [userOrVendorAuthToken, setUserOrVendorAuthToken] = useState('');
+const LoginScreen = ({route}) => {
+  const {type} = route.params;
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const deviceFCMToken = useSelector(state => state.deviceFCMToken);
 
-    const togglePasswordVisibility = () => {
-        setPasswordVisible(!isPasswordVisible);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [password, setPassword] = useState('');
+  const [isPasswordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!isPasswordVisible);
+  };
+
+  const storeVendorDeviceToken = async token => {
+    const payload = {
+      mobileNumber: String(phoneNumber),
+      fcmToken: deviceFCMToken,
+    };
+    try {
+      const vendorToken = await getVendorAuthToken();
+      await axios.post(`${BASE_URL}/addVendorFCMToken`, payload, {
+        headers: {Authorization: `Bearer ${vendorToken}`},
+      });
+    } catch (error) {
+      console.error('Error during add vendor token:', error);
+    }
+  };
+
+  const getCheckUserValidation = async () => {
+    if (!phoneNumber || !password) {
+      CustomAlert.alert(
+        'Missing Fields',
+        'Please fill all required fields',
+        undefined,
+        {type: 'warning'},
+      );
+      return;
+    }
+
+    setLoading(true);
+    const payload = {
+      mobileNumber: String(phoneNumber),
+      password: String(password),
     };
 
-    // const storeUserDeviceToken = async () => {
-    //     const payload = {
-    //         mobileNumber: String(phoneNumber),
-    //         fcmToken: deviceFCMToken
-    //     }
-    //     console.log("payload is:::::::", payload, type);
-    //     const token = await getUserAuthToken();
-    //     console.log("LOgin screen scan", token);
-    //     try {
-    //         const userTokenRes = await axios.post(`${BASE_URL}/addUserFCMToken`, payload, {
-    //             headers: {
-    //                 Authorization: `Bearer ${userOrVendorAuthToken}`,
-    //             },
-    //         });
-    //         console.log("userTokenRes  res:::::::::", userTokenRes);
-    //         if (userTokenRes?.status === 200) {
-    //             console.warn("successfully logged fcm token:", userTokenRes?.data?.message);
-    //         }
-    //     } catch (error) {
-    //         console.error("Error during add user token 1 :", error);
-    //     }
-    // }
-
-    const storeVendorDeviceToken = async () => {
-        const payload = {
-            mobileNumber: String(phoneNumber),
-            fcmToken: deviceFCMToken
+    try {
+      const logineRes = await axios.post(`${BASE_URL}/${type}/login`, payload);
+      if (logineRes?.status === 200) {
+        if (type === 'vendor') {
+          dispatch(getLoginUserId(true));
+          dispatch(getCurrentLoggedInVendorMobileNum(phoneNumber));
+          storeVendorAuthToken(logineRes?.data?.token);
+          storeVendorMobileNumber(phoneNumber);
+          if (logineRes?.data?.token) {
+            dispatch(checkIsTokenStored(true));
+          }
+        } else {
+          dispatch(getLoginUserId(false));
+          dispatch(getCurrentLoggedInUserMobileNum(phoneNumber));
+          storeUserAuthToken(logineRes?.data?.token);
+          storeUserMobileNumber(phoneNumber);
+          if (logineRes?.data?.token) {
+            dispatch(checkIsTokenStored(true));
+          }
         }
-        console.log("payload is:::::::", payload, type);
-        const token = await getVendorAuthToken();
-        try {
-            const vendorTokenRes = await axios.post(`${BASE_URL}/addVendorFCMToken`, payload, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            // console.log("vendorTokenRes  res:::::::::", vendorTokenRes);
-            if (vendorTokenRes?.status === 200) {
-
-            }
-        } catch (error) {
-            console.error("Error during add vendor token:", error);
-        }
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      CustomAlert.alert(
+        'Login Failed',
+        error.response?.data?.message || 'Please try again',
+        undefined,
+        {type: 'error'},
+      );
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const getCheckUserValidation = async () => {
-        if (!phoneNumber || !password) {
-            setFieldsCheckModalVisible(true);
-            return;
-        }
+  const isVendor = type === 'vendor';
 
-        const payload = {
-            mobileNumber: String(phoneNumber),
-            password: String(password)
-        }
-        try {
-            const logineRes = await axios.post(`${BASE_URL}/${type}/login`, payload);
-            if (logineRes?.status === 200) {
-                setAuthToken(logineRes?.data?.token);
-                if (type === 'vendor') {
-                    console.log('into vendor LOGG');
-                    dispatch(getLoginUserId(true));
-                    dispatch(getCurrentLoggedInVendorMobileNum(phoneNumber));
-                    // storeVendorDeviceToken();
-                    storeVendorAuthToken(logineRes?.data?.token);
-                    storeVendorMobileNumber(phoneNumber);
-                    if (logineRes?.data?.token) {
-                        dispatch(checkIsTokenStored(true));
-                    }
-                } else {
-                    console.log('into USER LOGG');
-                    // storeUserDeviceToken();
-                    dispatch(getLoginUserId(false));
-                    dispatch(getCurrentLoggedInUserMobileNum(phoneNumber));
-                    storeUserAuthToken(logineRes?.data?.token);
-                    storeUserMobileNumber(phoneNumber);
-                    if (logineRes?.data?.token) {
-                        dispatch(checkIsTokenStored(true));
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("Error during login:", error);
-            Alert.alert(
-                error.response?.data?.message,
-                'Please try again',
-                [
-                    { text: 'OK' },
-                ]
-            );
-        }
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor="#FFFFFF" barStyle="dark-content" />
 
-    }
+      <KeyboardAvoidingView
+        style={{flex: 1}}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}>
+          {/* Back button */}
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backBtn}>
+            <IonIcon name="chevron-back" size={20} color="#1A1E25" />
+          </TouchableOpacity>
 
-    return (
-        <SafeAreaView style={styles.container}>
-            <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFFFFF']} style={{ flex: 1, paddingHorizontal: 20 }}>
+          {/* Header */}
+          <View style={styles.headerArea}>
+            <View style={styles.typeBadge}>
+              <IonIcon
+                name={isVendor ? 'storefront-outline' : 'person-outline'}
+                size={14}
+                color="#FD813B"
+              />
+              <Text style={styles.typeBadgeText}>
+                {isVendor ? 'Vendor' : 'Customer'}
+              </Text>
+            </View>
 
-                <Text style={styles.title}>Welcome!</Text>
-                {type === 'user' ?
-                    <Text style={styles.subtitle}>
-                        Connect to 'Booktheday', From dazzling outfits to grand halls & catering, book everything you need in just a few taps
-                    </Text>
-                    :
-                    <Text style={styles.subtitle}>
-                        Connect to 'Booktheday', Whether it’s catering, venues, or fashion rentals, let customers find you & book instantly.
-                    </Text>
+            <Text style={styles.title}>Welcome Back!</Text>
+            <Text style={styles.subtitle}>
+              {isVendor
+                ? 'Sign in to manage your venues, bookings, and grow your business.'
+                : 'Sign in to discover and book amazing venues for your events.'}
+            </Text>
+          </View>
 
-                }
+          {/* Form */}
+          <View style={styles.formArea}>
+            {/* Phone Number */}
+            <Text style={styles.fieldLabel}>
+              Phone Number
+              <Text style={styles.requiredStar}> *</Text>
+            </Text>
+            <View style={styles.phoneRow}>
+              <View style={styles.countryCodeBox}>
+                <Text style={styles.countryCodeText}>+91</Text>
+              </View>
+              <TextInput
+                style={styles.phoneInput}
+                placeholder="Enter mobile number"
+                placeholderTextColor="#A0A5AB"
+                value={phoneNumber}
+                onChangeText={setPhoneNumber}
+                keyboardType="phone-pad"
+                maxLength={10}
+              />
+            </View>
 
-                <CustomModal
-                    visible={fieldsCheckModalVisible}
-                    message={'Please fill all fields'}
-                    onClose={() => setFieldsCheckModalVisible(false)}
+            {/* Password */}
+            <Text style={styles.fieldLabel}>
+              Password
+              <Text style={styles.requiredStar}> *</Text>
+            </Text>
+            <View style={styles.passwordRow}>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="Enter password"
+                placeholderTextColor="#A0A5AB"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!isPasswordVisible}
+              />
+              <TouchableOpacity
+                onPress={togglePasswordVisibility}
+                style={styles.eyeBtn}
+                hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+                <IonIcon
+                  name={isPasswordVisible ? 'eye-outline' : 'eye-off-outline'}
+                  size={20}
+                  color="#7E8389"
                 />
+              </TouchableOpacity>
+            </View>
 
-                <Text style={styles.textLabel}>Phone Number<Text style={{ color: "red", fontSize: 14 }}> *</Text></Text>
-                <View style={styles.phoneContainer}>
-                    <Text style={styles.countryCode}>+91</Text>
-                    <TextInput
-                        style={{ color: "#333333", width: "100%" }}
-                        placeholderTextColor={"#7E8389"}
-                        placeholder="Enter Mobile Number"
-                        value={phoneNumber}
-                        onChangeText={setPhoneNumber}
-                        keyboardType="phone-pad"
-                        maxLength={10} // Limit the length for phone number
-                    />
-                </View>
-                <Text style={styles.textLabel}>Password<Text style={{ color: "red", fontSize: 14 }}> *</Text></Text>
+            {/* Login button */}
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={getCheckUserValidation}
+              disabled={loading}
+              style={styles.loginBtnWrapper}>
+              <LinearGradient
+                colors={['#FD813B', '#E8533C']}
+                start={{x: 0, y: 0}}
+                end={{x: 1, y: 0}}
+                style={styles.loginBtn}>
+                {loading ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <>
+                    <Text style={styles.loginBtnText}>Login</Text>
+                    <IonIcon name="arrow-forward" size={18} color="#FFFFFF" />
+                  </>
+                )}
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
 
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Enter Password"
-                        placeholderTextColor={"#7E8389"}
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry={!isPasswordVisible} // Hide or show password based on isPasswordVisible
-                    />
+          {/* Footer */}
+          <View style={styles.footerArea}>
+            <View style={styles.dividerRow}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>or</Text>
+              <View style={styles.dividerLine} />
+            </View>
 
-                    <TouchableOpacity onPress={togglePasswordVisibility} style={styles.eyeIcon}>
-                        <Icon name={!isPasswordVisible ? 'eye-slash' : 'eye'} size={18} color="#666666" />
-                    </TouchableOpacity>
-                </View>
-
-
-                <BookDatesButton
-                    onPress={() => getCheckUserValidation()}
-                    // onPress={() => navigation.navigate('OtpValidation')}
-                    text={'Login'}
-                    padding={10}
-                    buttonStyle={{ top: 10 }}
-                />
-
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('UserAndVendorRegister', { type: type })}
-                    style={styles.RegisterLabelContainer}>
-                    <Text style={styles.RegisterLabel}>Create new account</Text>
-                </TouchableOpacity>
-
-                <CustomModal
-                    visible={modalVisible}
-                    message={'Please Enter Valid Credentials'}
-                    onClose={() => setModalVisible(false)}
-                />
-
-            </LinearGradient>
-        </SafeAreaView>
-    );
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('UserAndVendorRegister', {type})
+              }
+              style={styles.registerBtn}
+              activeOpacity={0.7}>
+              <Text style={styles.registerBtnText}>Create a new account</Text>
+              <IonIcon
+                name="person-add-outline"
+                size={16}
+                color="#FD813B"
+                style={{marginLeft: 6}}
+              />
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: '700',
-        marginVertical: 20,
-        color: "#1A1E25",
-        fontFamily: 'ManropeRegular'
-    },
-    subtitle: {
-        fontSize: 14,
-        color: '#7D7F88',
-        marginBottom: 20,
-        fontFamily: 'ManropeRegular',
-        fontWeight: "400"
-    },
-    textLabel: {
-        fontSize: 14,
-        color: '#000000',
-        fontFamily: 'ManropeRegular',
-        fontWeight: "700",
-        marginBottom: 5,
-        marginTop: 20
-    },
-    input: {
-        height: 45,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 5,
-        marginBottom: 15,
-        paddingHorizontal: 10,
-        color: "#333333"
-    },
-    RegisterLabelContainer: {
-        flexDirection: 'row',
-        justifyContent: "center",
-        marginTop: 50
-    },
-    RegisterLabel: {
-        alignSelf: "center",
-        color: "grey",
-        textDecorationLine: "underline",
-        fontSize: 14,
-        fontWeight: "400",
-        fontFamily: 'ManropeRegular',
-
-    },
-    button: {
-        backgroundColor: '#FF6F61',
-        padding: 15,
-        borderRadius: 5,
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    buttonText: {
-        color: '#fff',
-        fontWeight: 'bold',
-    },
-    footerText: {
-        textAlign: 'center',
-        color: '#666',
-    },
-    signInText: {
-        color: '#FF6F61',
-        fontWeight: 'bold',
-    },
-    inputContainer: {
-        position: 'relative',
-        justifyContent: "space-between",
-    },
-    eyeIcon: {
-        position: 'absolute',
-        right: 10,
-        top: 10,
-        // top:Dimensions.get('window').height/65
-        // top: '50%',
-        // transform: [{ translateY: -10 }],
-    },
-    phoneContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        paddingHorizontal: 8,
-        borderRadius: 5,
-        height: 45
-    },
-    countryCode: {
-        // fontSize: 16,
-        color: '#000',
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 32,
+  },
+  // Back
+  backBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: '#F5F5F5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  // Header
+  headerArea: {
+    marginBottom: 32,
+  },
+  typeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(253, 129, 59, 0.08)',
+    borderRadius: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    marginBottom: 16,
+  },
+  typeBadgeText: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '600',
+    fontSize: 12,
+    color: '#FD813B',
+    marginLeft: 5,
+  },
+  title: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '800',
+    fontSize: 28,
+    color: '#1A1E25',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '500',
+    fontSize: 14,
+    color: '#7E8389',
+    lineHeight: 20,
+  },
+  // Form
+  formArea: {
+    marginBottom: 32,
+  },
+  fieldLabel: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '700',
+    fontSize: 13,
+    color: '#1A1E25',
+    marginBottom: 8,
+    marginTop: 16,
+  },
+  requiredStar: {
+    color: '#E8533C',
+    fontSize: 13,
+  },
+  phoneRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#EDEEF0',
+    height: 50,
+    overflow: 'hidden',
+  },
+  countryCodeBox: {
+    paddingHorizontal: 14,
+    height: '100%',
+    justifyContent: 'center',
+    borderRightWidth: 1,
+    borderRightColor: '#EDEEF0',
+  },
+  countryCodeText: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '600',
+    fontSize: 14,
+    color: '#1A1E25',
+  },
+  phoneInput: {
+    flex: 1,
+    paddingHorizontal: 12,
+    fontSize: 14,
+    fontFamily: 'ManropeRegular',
+    color: '#1A1E25',
+  },
+  passwordRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#EDEEF0',
+    height: 50,
+    paddingHorizontal: 14,
+  },
+  passwordInput: {
+    flex: 1,
+    fontSize: 14,
+    fontFamily: 'ManropeRegular',
+    color: '#1A1E25',
+  },
+  eyeBtn: {
+    padding: 4,
+  },
+  // Login button
+  loginBtnWrapper: {
+    marginTop: 28,
+    borderRadius: 14,
+    overflow: 'hidden',
+    shadowColor: '#FD813B',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  loginBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 14,
+    gap: 8,
+  },
+  loginBtnText: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '700',
+    fontSize: 16,
+    color: '#FFFFFF',
+  },
+  // Footer
+  footerArea: {
+    alignItems: 'center',
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    width: '100%',
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#EDEEF0',
+  },
+  dividerText: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '500',
+    fontSize: 12,
+    color: '#A0A5AB',
+    marginHorizontal: 12,
+  },
+  registerBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#EDEEF0',
+    backgroundColor: '#FAFAFA',
+  },
+  registerBtnText: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '600',
+    fontSize: 14,
+    color: '#1A1E25',
+  },
 });
 
 export default LoginScreen;

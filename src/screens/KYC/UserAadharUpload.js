@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import BookDatesButton from '../../components/GradientButton';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
 import axios from 'axios';
-import BASE_URL, { LocalHostUrl } from '../../apiconfig';
+import BASE_URL from '../../apiconfig';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import FastImage from 'react-native-fast-image';
@@ -25,21 +25,22 @@ const UserAadharUpload = () => {
       const getProfileData = async() => {
           const token = await getUserAuthToken();
           try {
-            console.log("vendou num:", userLoggedInMobileNum)
+            console.log("user num:", userLoggedInMobileNum)
             const response = await axios.get(`${BASE_URL}/getAllUserLocations/${userLoggedInMobileNum}`,{
                 headers: {
                       Authorization: `Bearer ${token}`,
                     },
               });
               setProfileData(response?.data?.data);
-            //   setSelectedImage(response?.data?.data?.aadharImage);
-              const updatedImgUrl = response?.data?.data?.aadharImage?.url ? response?.data?.data?.aadharImage?.url?.replace('localhost', LocalHostUrl) : response?.data?.data?.aadharImage?.url;
-              setIsAadharAvailable(updatedImgUrl);
+              const imgUrl = response?.data?.data?.aadharImage?.url;
+              console.log("aadhar image url:", imgUrl);
+              if (imgUrl) {
+                setIsAadharAvailable(imgUrl);
+              }
               setGetUserAuth(token);
-        //   console.log("profile user res:::", updatedImgUrl);
              
           } catch (error) {
-              console.log("profile::::::::::", error);
+              console.log("profile error::", error?.response?.data || error.message);
           }
       }
 
@@ -78,24 +79,39 @@ const UserAadharUpload = () => {
             Alert.alert('Please upload Aadhar Image')
             return;
         }
+        const asset = selectedImage?.assets?.[0];
+        if (!asset?.uri) {
+            Alert.alert('Error', 'Image not selected properly. Please try again.');
+            return;
+        }
+
+        // Ensure valid MIME type
+        let imageType = asset.type || 'image/jpeg';
+        if (imageType === 'image/jpg') {
+            imageType = 'image/jpeg';
+        }
+        const imageName = `aadhar_${userLoggedInMobileNum}_${Date.now()}.jpg`;
+
         const formData = new FormData();
         
         formData.append('aadharImage', {
-            uri: selectedImage?.assets[0]?.uri,
-            type: selectedImage?.assets[0]?.type,
-            name: selectedImage?.assets[0]?.fileName,
+            uri: asset.uri,
+            type: imageType,
+            name: imageName,
         });
         formData.append('userMobileNumber', userLoggedInMobileNum);
-        console.log('formdata is ::>>', JSON.stringify(formData));
+        console.log('Upload payload:', { uri: asset.uri, type: imageType, name: imageName, userMobileNumber: userLoggedInMobileNum });
         const token = await getUserAuthToken();
         try {
-            const response = await axios.post(`${BASE_URL}/user/uploadUserAadharImage`, formData, {
+            const response = await fetch(`${BASE_URL}/user/uploadUserAadharImage`, {
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`,
                 },
+                body: formData,
             });
-            console.log("response:::::", response)
+            const data = await response.json();
+            console.log("response:::::", response.status, data);
             if (response.status === 200) {
                 console.log('Success', `uploaded successfully`);
                 Alert.alert(
@@ -107,13 +123,13 @@ const UserAadharUpload = () => {
                     { cancelable: false }
                 );
             } else {
-                console.log('Error', 'Failed to upload document');
+                console.log('Error', data?.message || 'Failed to upload document');
+                Alert.alert('Error', data?.message || 'Failed to upload document. Please try again.');
             }
         } catch (error) {
-            console.error('Error uploading document:', error);
-            console.log('Error', 'Failed to upload document Aadhar');
+            console.error('Error uploading document:', error.message);
+            Alert.alert('Error', 'Failed to upload document. Please try again.');
         }
-
     }
 
     console.log("selectmage image url::::::", isAadharAvailable)

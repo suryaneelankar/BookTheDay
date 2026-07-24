@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native';
-import OrderIcon from "../../../assets/OrderIcon.svg";
 import BASE_URL from '../../../apiconfig';
 import { useSelector } from 'react-redux';
 import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import axios from "axios";
 import { formatAmount } from '../../../utils/GlobalFunctions';
-import themevariable from '../../../utils/themevariable';
+import IonIcon from 'react-native-vector-icons/Ionicons';
 
 const MyTransactions = () => {
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
@@ -54,40 +53,40 @@ const MyTransactions = () => {
     }
 
     const TransactionItem = ({ item }) => {
-        if (!item) return null; // Ensure item is valid
+        if (!item) return null;
+
+        const isSuccess = item?.paymentStatus === 'success';
 
         return (
             <View style={styles.transactionItemContainer}>
-                  <Text style={[styles.transactionOrderId,{color:"#666666",marginBottom:10}]}>
-                        Order Id: {item?.OrderId || "N/A"}
+                {/* Header row: Order ID + Amount */}
+                <View style={styles.transactionHeader}>
+                    <Text style={styles.transactionOrderIdLabel}>
+                        Order ID: <Text style={styles.transactionOrderIdValue}>{item?.OrderId || 'N/A'}</Text>
                     </Text>
-            <View style={styles.transactionItem}>
-                <OrderIcon style={styles.orderIcon} />
-                <View style={styles.transactionDetails}>
-                    <Text  style={styles.transactionOrderId}>{item?.productName}</Text>
-                    <Text style={styles.transactionDate}>
-                        {item?.createdAt ? formatDateToDMY(item?.createdAt) : "Date Unavailable"}
+                    <Text style={[styles.transactionAmount, {color: isSuccess ? '#059669' : '#DC2626'}]}>
+                        {formatAmount(`+${item?.orderAmount?.toFixed(2)}`)}
                     </Text>
-                    <Text style={{...styles.transactionStatus, color: item?.paymentStatus === "success" ? "#1BB003" : "#E64A19" }}>
-                        {item?.paymentStatus ? item?.paymentStatus.charAt(0).toUpperCase() + item?.paymentStatus.slice(1) : "Status Unavailable"}
-                    </Text>
-                    {/* <Text style={styles.transactionOrderId}>User Name: {item?.userFullName}</Text> */}
-                    <Text style={styles.userDetails}>
-                        Booked By: {item?.userFullName || "N/A"}
-                    </Text>
-
-                    {/* <Text style={styles.transactionOrderId}>User Mobile.No: {item?.userMobileNumber}</Text> */}
                 </View>
-                <Text
-                    style={[
-                        styles.transactionAmount,
-                        { color: item?.paymentStatus === "success" ? "#1BB003" : "#E64A19" },
-                    ]}
-                >
-                    {formatAmount(`+${item?.orderAmount?.toFixed(2)}`)}
-                </Text>
-            </View>
-           
+
+                {/* Body */}
+                <View style={styles.transactionBody}>
+                    <View style={[styles.statusDot, {backgroundColor: isSuccess ? '#059669' : '#DC2626'}]} />
+                    <View style={styles.transactionDetails}>
+                        <Text style={styles.transactionProductName}>{item?.productName}</Text>
+                        <Text style={styles.transactionDate}>
+                            {item?.createdAt ? formatDateToDMY(item?.createdAt) : 'Date Unavailable'}
+                        </Text>
+                        <Text style={styles.transactionUser}>
+                            Booked by: {item?.userFullName || 'N/A'}
+                        </Text>
+                    </View>
+                    <View style={[styles.statusPill, {backgroundColor: isSuccess ? '#ECFDF5' : '#FEF2F2'}]}>
+                        <Text style={[styles.statusPillText, {color: isSuccess ? '#059669' : '#DC2626'}]}>
+                            {isSuccess ? 'Success' : 'Failed'}
+                        </Text>
+                    </View>
+                </View>
             </View>
         );
     };
@@ -101,8 +100,10 @@ const MyTransactions = () => {
                 keyExtractor={(item) => item?._id || Math.random().toString()}
                 renderItem={({ item }) => <TransactionItem item={item} />}
                 ListEmptyComponent={() => (
-                    <View style={{ flex: 1, alignSelf: "center", justifyContent: "center", height: Dimensions.get('window').height - 100, width: "100%", alignItems: "center" }}>
-                        <Text style={{color:themevariable.Color_000000,}}>No transactions are found</Text>
+                    <View style={styles.emptyState}>
+                        <IonIcon name="receipt-outline" size={56} color="#D4D4D4" />
+                        <Text style={styles.emptyTitle}>No Transactions Yet</Text>
+                        <Text style={styles.emptySubtitle}>Your payment history will appear here once customers make bookings.</Text>
                     </View>
                 )}
             />
@@ -113,84 +114,113 @@ const MyTransactions = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
-        paddingTop: 20,
+        backgroundColor: '#F8F9FA',
+        paddingTop: 16,
         paddingHorizontal: 16,
     },
-    transactionItem: {
-        flexDirection: 'row',
-        marginBottom:10,
-
-        // alignItems: 'center',
-        // backgroundColor: '#FFF4CD',
-        // borderRadius: 8,
-        // padding: 16,
-        // marginBottom: 12,
-        // shadowColor: "#000",
-        // shadowOffset: { width: 0, height: 2 },
-        // shadowOpacity: 0.1,
-        // shadowRadius: 4,
-        // elevation: 3,
-    },
     transactionItemContainer: {
-        backgroundColor: '#FFF5E3',
-        borderRadius: 8,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 14,
         padding: 16,
         marginBottom: 12,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-        marginHorizontal: 10,
-        alignItems: 'center',
-        paddingHorizontal: 15,
-        backgroundColor: '#FFF5E3',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.06,
+        shadowRadius: 8,
+        elevation: 3,
+        borderWidth: 1,
+        borderColor: '#F0F0F0',
     },
-    orderIcon: {
-        marginRight: 12,
+    transactionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 12,
+        paddingBottom: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F5F5F5',
     },
-    transactionDetails: {
-        flex: 1,
-        paddingLeft: 10,
-    },
-    transactionDate: {
-        fontSize: 12,
-        color: '#A0A4B8', // Updated color to a classic gray
-        fontStyle: 'italic', // Added italic style for date
-        marginBottom: 4,
-    },
-    userDetails: {
-        fontSize: 14,
-        color: '#222222',
-        marginBottom: 4,
+    transactionOrderIdLabel: {
+        fontSize: 11,
+        color: '#7E8389',
         fontFamily: 'ManropeRegular',
-        textTransform: 'capitalize', // Ensures user details are displayed in lowercase
+        fontWeight: '400',
     },
-    transactionOrderId: {
-        fontSize: 14,
-        color: '#222222',
-        fontFamily: 'ManropeRegular',
-        marginBottom: 4,
-        textTransform: 'capitalize', // Uncomment if you want to force uppercase
-    },
-    transactionStatus: {
-        fontSize: 12,
-        color: '#A0A4B8',
-        marginBottom: 4,
-        fontFamily: 'ManropeRegular',
+    transactionOrderIdValue: {
+        fontWeight: '600',
+        color: '#1A1E25',
     },
     transactionAmount: {
         fontSize: 16,
+        fontWeight: '800',
         fontFamily: 'ManropeRegular',
-        alignSelf: 'flex-end',
-        // marginLeft: 'auto', // Aligns the amount to the right
-        // marginTop: 4,
-        // textAlign: 'right', // Aligns the text to the right
-        // width: '30%', // Adjusts the width to fit the amount
-
+    },
+    transactionBody: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+    },
+    statusDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        marginTop: 5,
+        marginRight: 10,
+    },
+    transactionDetails: {
+        flex: 1,
+    },
+    transactionProductName: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: '#1A1E25',
+        fontFamily: 'ManropeRegular',
+        marginBottom: 3,
+        textTransform: 'capitalize',
+    },
+    transactionDate: {
+        fontSize: 11,
+        color: '#7E8389',
+        fontFamily: 'ManropeRegular',
+        marginBottom: 4,
+    },
+    transactionUser: {
+        fontSize: 12,
+        color: '#555555',
+        fontFamily: 'ManropeRegular',
+        textTransform: 'capitalize',
+    },
+    statusPill: {
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 12,
+        alignSelf: 'flex-start',
+    },
+    statusPillText: {
+        fontSize: 11,
+        fontWeight: '700',
+        fontFamily: 'ManropeRegular',
+    },
+    emptyState: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: Dimensions.get('window').height - 150,
+    },
+    emptyTitle: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#1A1E25',
+        fontFamily: 'ManropeRegular',
+        marginTop: 12,
+    },
+    emptySubtitle: {
+        fontSize: 13,
+        color: '#7E8389',
+        fontFamily: 'ManropeRegular',
+        textAlign: 'center',
+        marginTop: 6,
+        paddingHorizontal: 40,
+        lineHeight: 18,
     },
 });
 

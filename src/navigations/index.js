@@ -18,6 +18,7 @@ import ViewCatDetails from "../screens/Categories/ViewCatDetails";
 import BookingDetailsScreen from "../screens/Categories/ViewCartDetails";
 import RequestConfirmation from "../screens/VendorScreens/VendorDashBoard/RequestConfirmation";
 import EditProfile from "../screens/Profile/EditProfile";
+import SearchVenues from "../screens/Search/SearchVenues";
 import ViewMyBookings from "../screens/Profile/MyBookings";
 import RentOnProducts from "../screens/GiveOnRent/RentOnProducts";
 import LocationAdded from "../screens/Location/LocationAdded";
@@ -194,6 +195,12 @@ const MainNavigation = () => {
                 )
                 , headerShown: true
             }} />
+
+            <Stack.Screen
+                name="SearchVenues"
+                component={SearchVenues}
+                options={{ headerShown: false }}
+            />
 
             <Stack.Screen
                 name="EditProfile"
@@ -493,7 +500,7 @@ const MainNavigation = () => {
                 options={{
                     header: () => (
                         <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Terms & Condtions" />
+                            <NavigationHeader Icon={true} title="" />
                         </SafeAreaView>
                     ),
                     headerShown: true,
@@ -548,7 +555,7 @@ const MainNavigation = () => {
             <Stack.Screen name="RefundPolicy" component={RefundPolicy} options={{
                 header: () => (
                     <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="Refund Policy" />
+                        <NavigationHeader Icon={true} title="" />
                     </SafeAreaView>
                 ),
                 headerShown: true,
@@ -556,7 +563,7 @@ const MainNavigation = () => {
             <Stack.Screen name="TermsAndConditions" component={TermsAndConditionsScreen} options={{
                 header: () => (
                     <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="Terms & Condtions" />
+                        <NavigationHeader Icon={true} title="" />
                     </SafeAreaView>
                 ),
                 headerShown: true,

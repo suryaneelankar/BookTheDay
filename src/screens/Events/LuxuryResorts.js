@@ -489,7 +489,7 @@ const LuxuryResorts = () => {
 
             {/* ── RESORT HERO HEADER ── */}
             <LinearGradient
-                colors={[RESORT_DARK, RESORT_MID, '#162035']}
+                colors={['#181818', '#2A2A2A', '#3D3D3D']}
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                 style={styles.heroHeader}
             >
@@ -505,19 +505,19 @@ const LuxuryResorts = () => {
                         <Text style={styles.heroSub}>5-star stays & celebrations</Text>
                     </View>
                     <View style={styles.heroIconWrap}>
-                        <IonIcon name="water" size={36} color={RESORT_BLUE} />
+                        <IonIcon name="sparkles" size={36} color={RESORT_GOLD} />
                     </View>
                 </View>
 
                 {/* search bar inside hero */}
                 <View style={styles.searchBar}>
-                    <IonIcon name="search-outline" size={16} color="#8195D7" style={{ marginRight: 8 }} />
+                    <IonIcon name="search-outline" size={16} color="black" style={{ marginRight: 8 }} />
                     <TextInput
                         style={styles.searchInput}
                         value={query}
                         onChangeText={handleQueryChange}
                         placeholder="Search resorts by name or area..."
-                        placeholderTextColor="#4A5FA8"
+                        placeholderTextColor="black"
                         returnKeyType="search"
                     />
                     {query.length > 0 && (
@@ -611,40 +611,42 @@ const styles = StyleSheet.create({
     // ── HERO HEADER ──
     heroHeader: {
         paddingHorizontal: 16,
-        paddingTop: 14,
-        paddingBottom: 18,
+        paddingTop: 18,
+        paddingBottom: 20,
         overflow: 'hidden',
+        // borderBottomLeftRadius: 20,
+        // borderBottomRightRadius: 20,
     },
     heroCircle: {
-        position: 'absolute', width: 180, height: 180, borderRadius: 90,
-        backgroundColor: 'rgba(129,149,215,0.08)', top: -40, right: -40,
+        position: 'absolute', width: 200, height: 200, borderRadius: 100,
+        backgroundColor: 'rgba(255,255,255,0.04)', top: -50, right: -50,
     },
-    heroRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
+    heroRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
     heroBadge: {
         flexDirection: 'row', alignItems: 'center', gap: 5,
-        backgroundColor: 'rgba(236,167,60,0.15)',
-        borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4,
-        alignSelf: 'flex-start', marginBottom: 8,
-        borderWidth: 1, borderColor: 'rgba(236,167,60,0.25)',
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5,
+        alignSelf: 'flex-start', marginBottom: 10,
+        borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)',
     },
-    heroBadgeText: { fontFamily: 'ManropeRegular', fontSize: 11, fontWeight: '700', color: RESORT_GOLD },
-    heroTitle: { fontFamily: 'ManropeRegular', fontSize: 22, fontWeight: '800', color: '#fff' },
-    heroSub: { fontFamily: 'ManropeRegular', fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 3 },
+    heroBadgeText: { fontFamily: 'ManropeRegular', fontSize: 11, fontWeight: '700', color: '#ECA73C' },
+    heroTitle: { fontFamily: 'ManropeRegular', fontSize: 24, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.3 },
+    heroSub: { fontFamily: 'ManropeRegular', fontSize: 13, color: 'rgba(255,255,255,0.6)', marginTop: 4 },
     heroIconWrap: {
-        width: 64, height: 64, borderRadius: 32,
-        backgroundColor: 'rgba(129,149,215,0.15)',
+        width: 60, height: 60, borderRadius: 16,
+        backgroundColor: 'rgba(236,167,60,0.1)',
         justifyContent: 'center', alignItems: 'center',
-        borderWidth: 1, borderColor: 'rgba(129,149,215,0.25)',
+        borderWidth: 1.5, borderColor: 'rgba(236,167,60,0.2)',
     },
 
     // ── SEARCH ──
     searchBar: {
         flexDirection: 'row', alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.08)',
-        borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10,
-        borderWidth: 1, borderColor: 'rgba(129,149,215,0.3)',
+        backgroundColor: 'white',
+        borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12,
+        borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.15)',
     },
-    searchInput: { flex: 1, fontSize: 13, fontFamily: 'ManropeRegular', color: '#fff', padding: 0 },
+    searchInput: { flex: 1, fontSize: 13, fontFamily: 'ManropeRegular', color: 'black', padding: 0 },
     dropdown: {
         backgroundColor: '#fff', borderRadius: 12, marginTop: 6,
         elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 3 },

@@ -1,127 +1,549 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Button } from 'react-native';
+import {View, Text, StyleSheet, ScrollView} from 'react-native';
+import IonIcon from 'react-native-vector-icons/Ionicons';
 
-const VendorRefundPolicy = ({ navigation }) => {
-    return (
-        <ScrollView contentContainerStyle={styles.container}>
+const VendorRefundPolicy = () => {
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={false}>
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerIcon}>
+          <IonIcon name="wallet" size={20} color="#D97706" />
+        </View>
+        <Text style={styles.headerTitle}>Vendor Refund Policy</Text>
+        <Text style={styles.headerSubtitle}>Last updated: July 2026</Text>
+      </View>
 
-            <Text style={styles.paragraph}>
-                At Book The Day, we understand that plans can change. Our refund policy is designed to be fair and transparent, while also considering our commitment to vendors. Please read this policy carefully to understand your rights regarding refunds.
+      {/* Quick Summary Card */}
+      <View style={styles.summaryCard}>
+        <Text style={styles.summaryTitle}>Quick Summary</Text>
+        <View style={styles.summaryRow}>
+          <IonIcon name="close-circle" size={16} color="#DC2626" />
+          <Text style={styles.summaryText}>
+            Vendor cancellations result in{' '}
+            <Text style={styles.bold}>full refund to customer</Text>
+          </Text>
+        </View>
+        <View style={styles.summaryRow}>
+          <IonIcon name="warning" size={16} color="#D97706" />
+          <Text style={styles.summaryText}>
+            Penalty fee deducted from{' '}
+            <Text style={styles.bold}>next payout</Text> for vendor-initiated
+            cancellations
+          </Text>
+        </View>
+        <View style={styles.summaryRow}>
+          <IonIcon name="checkmark-circle" size={16} color="#059669" />
+          <Text style={styles.summaryText}>
+            Commission refunded if{' '}
+            <Text style={styles.bold}>platform cancels</Text> the booking
+          </Text>
+        </View>
+        <View style={styles.summaryRow}>
+          <IonIcon name="time" size={16} color="#4F46E5" />
+          <Text style={styles.summaryText}>
+            Disputes resolved within{' '}
+            <Text style={styles.bold}>14 business days</Text>
+          </Text>
+        </View>
+      </View>
+
+      {/* Section 1 */}
+      <View style={styles.sectionCard}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionNum}>
+            <Text style={styles.sectionNumText}>1</Text>
+          </View>
+          <Text style={styles.sectionTitle}>Customer Refunds</Text>
+        </View>
+        <Text style={styles.sectionContent}>
+          As a vendor, you are required to honor refund requests in the
+          following scenarios:
+        </Text>
+        <View style={styles.bulletList}>
+          <View style={styles.bulletRow}>
+            <IonIcon name="arrow-forward-circle" size={14} color="#D97706" />
+            <Text style={styles.bulletText}>
+              You cancel a confirmed booking for any reason
             </Text>
-
-            <Text style={styles.subHeader}>1. General Refund Policy</Text>
-            <Text style={styles.paragraph}>
-                Refunds are subject to the specific cancellation and refund policies of each vendor listed on the Book The Day app. Book The Day acts as a platform to facilitate bookings, and while we strive to ensure a smooth experience, the final decision regarding refunds rests with the individual vendors. We recommend reviewing the vendor's refund and cancellation terms displayed at the time of booking.
+          </View>
+          <View style={styles.bulletRow}>
+            <IonIcon name="arrow-forward-circle" size={14} color="#D97706" />
+            <Text style={styles.bulletText}>
+              Services provided do not match what was described in the listing
             </Text>
-
-            
-
-
-            <Text style={styles.subHeader}>2. Cancellation Refunds</Text>
-            <Text style={styles.paragraph}>
-                <Text style={styles.bold}>Function Hall Bookings:</Text> Advance Payment is Non-Refundable: Once the advance is paid to confirm your booking, it cannot be refunded under any circumstances.
+          </View>
+          <View style={styles.bulletRow}>
+            <IonIcon name="arrow-forward-circle" size={14} color="#D97706" />
+            <Text style={styles.bulletText}>
+              Venue is unavailable on the booked date due to vendor oversight
             </Text>
+          </View>
+          <View style={styles.bulletRow}>
+            <IonIcon name="arrow-forward-circle" size={14} color="#D97706" />
+            <Text style={styles.bulletText}>
+              Major amenities listed are not provided during the event
+            </Text>
+          </View>
+        </View>
+        <Text style={styles.sectionContent}>
+          In all above cases, the customer receives a full refund including the
+          advance payment.
+        </Text>
+      </View>
 
-            <Text style={styles.paragraph}>
-                <Text style={styles.bold}>Cancellation Timeline:</Text> If you cancel the booking, even days/weeks in advance, the advance amount will not be returned.
+      {/* Section 2 */}
+      <View style={styles.sectionCard}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionNum}>
+            <Text style={styles.sectionNumText}>2</Text>
+          </View>
+          <Text style={styles.sectionTitle}>Vendor-Initiated Cancellations</Text>
+        </View>
+        <Text style={styles.sectionContent}>
+          If you cancel a confirmed booking:
+        </Text>
+        <View style={styles.bulletList}>
+          <View style={styles.bulletRow}>
+            <IonIcon name="close-circle" size={14} color="#DC2626" />
+            <Text style={[styles.bulletText, {color: '#DC2626'}]}>
+              Customer receives a full refund of all payments
             </Text>
+          </View>
+          <View style={styles.bulletRow}>
+            <IonIcon name="close-circle" size={14} color="#DC2626" />
+            <Text style={[styles.bulletText, {color: '#DC2626'}]}>
+              A penalty fee (up to 10% of booking value) is deducted from your
+              next payout
+            </Text>
+          </View>
+          <View style={styles.bulletRow}>
+            <IonIcon name="close-circle" size={14} color="#DC2626" />
+            <Text style={[styles.bulletText, {color: '#DC2626'}]}>
+              3 or more cancellations in 30 days may result in account
+              suspension
+            </Text>
+          </View>
+        </View>
+        <View style={styles.noteCard}>
+          <IonIcon name="information-circle" size={16} color="#78350F" />
+          <Text style={styles.noteText}>
+            Emergency cancellations with valid documentation (natural disaster,
+            government order) are reviewed on a case-by-case basis and may be
+            exempt from penalties.
+          </Text>
+        </View>
+      </View>
 
-            <Text style={styles.paragraph}>
-                <Text style={styles.bold}>Change of Date:</Text> In some cases, rescheduling may be possible based on vendor availability, but this is subject to approval and does not guarantee refund or credit if there is no availability for the new date.
+      {/* Section 3 */}
+      <View style={styles.sectionCard}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionNum}>
+            <Text style={styles.sectionNumText}>3</Text>
+          </View>
+          <Text style={styles.sectionTitle}>Commission on Refunds</Text>
+        </View>
+        <Text style={styles.sectionContent}>
+          How platform commission is handled when a refund occurs:
+        </Text>
+        <View style={styles.bulletList}>
+          <View style={styles.bulletRow}>
+            <View style={styles.bullet} />
+            <Text style={styles.bulletText}>
+              If the vendor cancels: Commission already deducted is not
+              refunded to vendor
             </Text>
+          </View>
+          <View style={styles.bulletRow}>
+            <View style={styles.bullet} />
+            <Text style={styles.bulletText}>
+              If the customer cancels (eligible refund): Commission is
+              adjusted proportionally
+            </Text>
+          </View>
+          <View style={styles.bulletRow}>
+            <View style={styles.bullet} />
+            <Text style={styles.bulletText}>
+              If the platform cancels: Full commission is refunded to both
+              parties
+            </Text>
+          </View>
+          <View style={styles.bulletRow}>
+            <View style={styles.bullet} />
+            <Text style={styles.bulletText}>
+              Partial refunds: Commission is recalculated on the final booking
+              amount
+            </Text>
+          </View>
+        </View>
+      </View>
 
-            <Text style={styles.paragraph}>
-                <Text style={styles.bold}>Vendor Cancellation:</Text> If the vendor cancels for any reason, the full amount (including advance) will be refunded to the customer.
+      {/* Section 4 */}
+      <View style={styles.sectionCard}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionNum}>
+            <Text style={styles.sectionNumText}>4</Text>
+          </View>
+          <Text style={styles.sectionTitle}>Payout Deductions</Text>
+        </View>
+        <Text style={styles.sectionContent}>
+          When a refund is issued to a customer due to vendor fault:
+        </Text>
+        <View style={styles.processSteps}>
+          <View style={styles.stepRow}>
+            <View style={styles.stepCircle}>
+              <Text style={styles.stepNumText}>1</Text>
+            </View>
+            <Text style={styles.stepText}>
+              Refund amount is calculated based on the booking value
             </Text>
+          </View>
+          <View style={styles.stepLine} />
+          <View style={styles.stepRow}>
+            <View style={styles.stepCircle}>
+              <Text style={styles.stepNumText}>2</Text>
+            </View>
+            <Text style={styles.stepText}>
+              Amount is deducted from your next scheduled payout
+            </Text>
+          </View>
+          <View style={styles.stepLine} />
+          <View style={styles.stepRow}>
+            <View style={styles.stepCircle}>
+              <Text style={styles.stepNumText}>3</Text>
+            </View>
+            <Text style={styles.stepText}>
+              If payout is insufficient, deduction carries over to subsequent
+              payouts
+            </Text>
+          </View>
+          <View style={styles.stepLine} />
+          <View style={styles.stepRow}>
+            <View style={styles.stepCircle}>
+              <Text style={styles.stepNumText}>4</Text>
+            </View>
+            <Text style={styles.stepText}>
+              Detailed deduction breakdown visible in your Transactions
+              dashboard
+            </Text>
+          </View>
+        </View>
+      </View>
 
-            <Text style={styles.paragraph}>
-                <Text style={styles.bold}>Disputes:</Text> All refund-related disputes are handled as per our Terms of Service.
+      {/* Section 5 */}
+      <View style={styles.sectionCard}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionNum}>
+            <Text style={styles.sectionNumText}>5</Text>
+          </View>
+          <Text style={styles.sectionTitle}>Dispute Resolution</Text>
+        </View>
+        <Text style={styles.sectionContent}>
+          If you disagree with a refund decision:
+        </Text>
+        <View style={styles.bulletList}>
+          <View style={styles.bulletRow}>
+            <View style={styles.bullet} />
+            <Text style={styles.bulletText}>
+              Raise a dispute within 7 days of the refund notification
             </Text>
+          </View>
+          <View style={styles.bulletRow}>
+            <View style={styles.bullet} />
+            <Text style={styles.bulletText}>
+              Provide supporting evidence (photos, communication records,
+              documentation)
+            </Text>
+          </View>
+          <View style={styles.bulletRow}>
+            <View style={styles.bullet} />
+            <Text style={styles.bulletText}>
+              BookTheDay mediates between vendor and customer
+            </Text>
+          </View>
+          <View style={styles.bulletRow}>
+            <View style={styles.bullet} />
+            <Text style={styles.bulletText}>
+              Resolution provided within 14 business days
+            </Text>
+          </View>
+          <View style={styles.bulletRow}>
+            <View style={styles.bullet} />
+            <Text style={styles.bulletText}>
+              Platform's decision on disputes is final and binding
+            </Text>
+          </View>
+        </View>
+      </View>
 
-            <Text style={styles.paragraph}>
-                <Text style={styles.bold}>Catering Services:</Text> Cancellations made at least 14 days in advance may qualify for a full refund. Partial refunds may be issued if canceled within 14 days, subject to vendor terms. Cancellations within 7 days of the event may not be eligible for a refund due to advance preparation costs.
-            </Text>
-            <Text style={styles.paragraph}>
-                <Text style={styles.bold}>Clothing and Jewellery Rentals:</Text> Cancellations made within 7 days of the scheduled rental date may not be eligible for a refund. Any cancellations prior to this period may qualify for a full or partial refund, as determined by the vendor.
-            </Text>
+      {/* Section 6 - Contact */}
+      <View style={styles.contactCard}>
+        <IonIcon name="help-circle" size={20} color="#D97706" />
+        <View style={styles.contactTextArea}>
+          <Text style={styles.contactTitle}>Need Help?</Text>
+          <Text style={styles.contactDesc}>
+            For refund queries, payout issues, or dispute resolution, contact
+            us at support@booktheday.com or use the in-app vendor support chat.
+          </Text>
+        </View>
+      </View>
 
-            <Text style={styles.subHeader}>3. No-Show Policy</Text>
-            <Text style={styles.paragraph}>
-                No refunds will be issued for no-shows or missed events, as vendors reserve the date and prepare accordingly. Users are advised to notify the vendor promptly if changes to the event occur.
-            </Text>
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          By listing your venue on BookTheDay, you acknowledge that you have
+          read and agreed to this refund policy.
+        </Text>
+      </View>
 
-            <Text style={styles.subHeader}>4. Non-Refundable Deposits</Text>
-            <Text style={styles.paragraph}>
-                Some bookings may require a non-refundable deposit to secure the vendor’s services. Such deposits are non-refundable under all circumstances, as they cover initial preparation and reservation costs.
-            </Text>
-
-            <Text style={styles.subHeader}>5. Refund Processing Time</Text>
-            <Text style={styles.paragraph}>
-                Refunds, if approved, will be processed within 7-10 business days. Once processed, refunds will be credited back to the original payment method. Processing times may vary depending on your bank or payment provider.
-            </Text>
-
-            <Text style={styles.subHeader}>6. Vendor-Canceled Services</Text>
-            <Text style={styles.paragraph}>
-                In the event that a vendor cancels a booking, Book The Day will work to either reschedule the service or issue a full refund, including any non-refundable deposits paid for that service. Book The Day will assist in finding a suitable replacement if desired, but the final decision rests with the user.
-            </Text>
-
-            <Text style={styles.subHeader}>7. Special Circumstances</Text>
-            <Text style={styles.paragraph}>
-                In cases of unforeseen circumstances, such as extreme weather, natural disasters, or government restrictions, refunds or rescheduling options will be evaluated on a case-by-case basis in coordination with the vendors involved.
-            </Text>
-
-            <Text style={styles.subHeader}>8. How to Request a Refund</Text>
-            <Text style={styles.paragraph}>
-                To initiate a refund request, please contact our customer support team within the app. Be sure to include your booking ID, the reason for cancellation, and any relevant documentation. Refund eligibility will be reviewed according to the vendor's policy, and you will be notified of the outcome within 3 business days.
-            </Text>
-
-            <Text style={styles.subHeader}>9. Changes to Refund Policy</Text>
-            <Text style={styles.paragraph}>
-                Book The Day reserves the right to update or modify this Refund Policy at any time. Users will be notified of any significant changes via app notification or email.
-            </Text>
-
-            <Text style={styles.paragraph}>
-                Thank you for choosing Book The Day. We’re committed to providing the best experience for your special day, and we’re here to support you in case of any changes to your plans.
-            </Text>
-        </ScrollView>
-    );
+      <View style={{height: 30}} />
+    </ScrollView>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flexGrow: 1,
-        padding: 20,
-        backgroundColor: '#fff',
-        // alignItems: 'center',
-    },
-    header: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        color: '#333',
-        textAlign: 'center',
-    },
-    subHeader: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginTop: 15,
-        marginBottom: 5,
-        color: '#333',
-        fontFamily:'ManropeRegular',
-
-    },
-    paragraph: {
-        fontSize: 16,
-        textAlign: 'left',
-        marginBottom: 15,
-        lineHeight: 24,
-        color: '#555',
-        fontFamily:'ManropeRegular',
-
-    },
-    bold: {
-        fontWeight: 'bold',
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  contentContainer: {
+    paddingBottom: 20,
+  },
+  // Header
+  header: {
+    alignItems: 'center',
+    paddingTop: 24,
+    paddingBottom: 16,
+    paddingHorizontal: 20,
+  },
+  headerIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#FEF8EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  headerTitle: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '800',
+    fontSize: 22,
+    color: '#1A1E25',
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '400',
+    fontSize: 12,
+    color: '#7E8389',
+  },
+  // Summary
+  summaryCard: {
+    marginHorizontal: 16,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+  },
+  summaryTitle: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '700',
+    fontSize: 14,
+    color: '#1A1E25',
+    marginBottom: 12,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 10,
+    gap: 8,
+  },
+  summaryText: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '400',
+    fontSize: 13,
+    color: '#555555',
+    lineHeight: 18,
+    flex: 1,
+  },
+  bold: {
+    fontWeight: '700',
+    color: '#1A1E25',
+  },
+  // Sections
+  sectionCard: {
+    marginHorizontal: 16,
+    marginBottom: 14,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sectionNum: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    backgroundColor: '#FEF8EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  sectionNumText: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '700',
+    fontSize: 12,
+    color: '#D97706',
+  },
+  sectionTitle: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '700',
+    fontSize: 15,
+    color: '#1A1E25',
+    flex: 1,
+  },
+  sectionContent: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '400',
+    fontSize: 13,
+    color: '#555555',
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  // Bullets
+  bulletList: {
+    marginTop: 4,
+  },
+  bulletRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+    gap: 8,
+  },
+  bullet: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#D97706',
+    marginTop: 6,
+  },
+  bulletText: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '400',
+    fontSize: 13,
+    color: '#555555',
+    lineHeight: 19,
+    flex: 1,
+  },
+  // Note card
+  noteCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#FEF8EB',
+    borderRadius: 10,
+    padding: 12,
+    marginTop: 8,
+    gap: 8,
+  },
+  noteText: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '400',
+    fontSize: 12,
+    color: '#78350F',
+    lineHeight: 17,
+    flex: 1,
+  },
+  // Process steps
+  processSteps: {
+    marginTop: 4,
+  },
+  stepRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  stepCircle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#D97706',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  stepNumText: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '700',
+    fontSize: 11,
+    color: '#FFFFFF',
+  },
+  stepText: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '400',
+    fontSize: 13,
+    color: '#555555',
+    lineHeight: 19,
+    flex: 1,
+  },
+  stepLine: {
+    width: 1,
+    height: 16,
+    backgroundColor: '#D97706',
+    marginLeft: 11.5,
+    marginVertical: 2,
+  },
+  // Contact
+  contactCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginHorizontal: 16,
+    marginTop: 8,
+    backgroundColor: '#FEF8EB',
+    borderRadius: 12,
+    padding: 14,
+    gap: 10,
+  },
+  contactTextArea: {
+    flex: 1,
+  },
+  contactTitle: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '700',
+    fontSize: 14,
+    color: '#78350F',
+    marginBottom: 4,
+  },
+  contactDesc: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '400',
+    fontSize: 12,
+    color: '#78350F',
+    lineHeight: 17,
+  },
+  // Footer
+  footer: {
+    marginHorizontal: 16,
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  footerText: {
+    fontFamily: 'ManropeRegular',
+    fontWeight: '400',
+    fontSize: 12,
+    color: '#7E8389',
+    textAlign: 'center',
+    lineHeight: 17,
+  },
 });
 
 export default VendorRefundPolicy;

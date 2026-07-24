@@ -81,14 +81,14 @@ const ProfileMainScreen = () => {
         <LinearGradient start={{ x: 1, y: 0 }} end={{ x: 1, y: 1 }} colors={['#FFF3CD', '#FFDB7E', '#FFDB7E', '#FFDB7E']} style={{ flex: 1 }}>
             <View style={styles.profileContainer}>
                 <View style={styles.profileImageContainer}>
-                    <ProfileDefaultIcon name='user' size={90}/>
-                    {/* <Image
-                        source={{ uri: 'https://via.placeholder.com/150' }} // Placeholder image, replace with your image source
-                        style={styles.profileImage}
-                    /> */}
+                    <View style={{width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(255,255,255,0.3)', justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: 'rgba(255,255,255,0.6)'}}>
+                        <Text style={{fontFamily: 'ManropeRegular', fontWeight: '800', fontSize: 32, color: '#92400E'}}>
+                            {profileData?.fullName ? profileData.fullName.charAt(0).toUpperCase() : '?'}
+                        </Text>
+                    </View>
                 </View>
-                <Text style={styles.profileName}>{profileData?.fullName}</Text>
-                {/* <Text style={styles.profileEmail}>{profileData?.email}</Text> */}
+                <Text style={styles.profileName}>{profileData?.fullName || 'User'}</Text>
+                <Text style={styles.profileEmail}>+91 {userLoggedInMobileNumber}</Text>
             </View>
 
             <ScrollView style={styles.menuContainer} showsVerticalScrollIndicator={false}>
