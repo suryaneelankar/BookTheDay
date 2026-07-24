@@ -11,7 +11,6 @@ import { formatAmount } from '../../utils/GlobalFunctions';
 import LocationMarkIcon from '../../assets/svgs/location.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
-import { useSelector } from "react-redux";
 import ActionSheet from 'react-native-actions-sheet';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
@@ -25,7 +24,6 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // Resort theme palette
 const RESORT_DARK = '#0A1628';
-const RESORT_MID = '#0F2040';
 const RESORT_BLUE = '#8195D7';
 const RESORT_GOLD = '#ECA73C';
 const RESORT_GOLD2 = '#B8860B';

@@ -24,7 +24,6 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // ── Farm House theme palette ──────────────────────────────────────────────────
 const FH_DARK = '#1A2E1A';   // deep forest green
-const FH_MID = '#2D4A2D';   // mid forest
 const FH_GREEN = '#06BE66';   // accent green
 const FH_SAGE = '#7BAE7F';   // muted sage
 const FH_EARTH = '#8B5E3C';   // warm earth brown

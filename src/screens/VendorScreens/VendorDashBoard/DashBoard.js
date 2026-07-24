@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, SafeAreaView, Image, ScrollView, TouchableOpacity, Dimensions, StyleSheet, Animated, FlatList, Switch } from "react-native";
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Dimensions, StyleSheet, FlatList, Switch } from "react-native";
 import CustomAlert from '../../../components/CustomAlert';
 import ProfileIcon from '../../../assets/vendorIcons/profileIcon.svg'
 import LinearGradient from "react-native-linear-gradient";
 import axios from "axios";
 import BASE_URL from "../../../apiconfig";
-import { LocalHostUrl } from "../../../apiconfig";
 import { formatAmount, formatDate } from '../../../utils/GlobalFunctions';
 import ArrowRight from '../../../assets/vendorIcons/arrowRight.svg';
 import PersonOne from '../../../assets/vendorIcons/personOne.svg';

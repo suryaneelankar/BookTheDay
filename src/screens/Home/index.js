@@ -6,7 +6,6 @@ import {
   Dimensions,
   FlatList,
   PermissionsAndroid,
-  Pressable,
   StyleSheet,
   SafeAreaView,
   ScrollView,
@@ -15,9 +14,8 @@ import {
   Modal,
   ActivityIndicator,
 } from 'react-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import IonIcon from 'react-native-vector-icons/Ionicons';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useIsFocused } from '@react-navigation/native';
 import BASE_URL from '../../apiconfig';
 import axios from 'axios';
 import GetLocation from 'react-native-get-location';
@@ -27,9 +25,7 @@ import {
   moderateScale,
 } from '../../utils/scalingMetrics';
 import LocationMarkIcon from '../../assets/svgs/location.svg';
-import ArrowDown from '../../assets/svgs/arrowDown.svg';
 import { LinearGradient } from 'react-native-linear-gradient';
-import themevariable from '../../utils/themevariable';
 import { formatAmount } from '../../utils/GlobalFunctions';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
 import {
@@ -41,7 +37,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import FastImage from 'react-native-fast-image';
 import { isLocationEnabled } from 'react-native-android-location-enabler';
 import { promptForEnableLocationIfNeeded } from 'react-native-android-location-enabler';
-import LocationIcon from '../../assets/svgs/locationIcon.svg';
 
 /* COMMENTED OUT — catering/cloth/jewel imports no longer used
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -77,7 +72,6 @@ import CatHalls from '../../assets/svgs/categories/home_categories_hall_icon.svg
 import ResortIcon from '../../assets/svgs/categories/home_categories_resort_icon.svg';
 import DestinationIcon from '../../assets/svgs/categories/home_categories_destination_icon.svg';
 const FarmHouseIconPng = require('../../assets/categories/hall_category.png');
-import BgHeroFrame from '../../assets/svgs/BgHeroFrame.svg';
 import CustomAlert from '../../components/CustomAlert';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -156,11 +150,15 @@ const HomeDashboard = () => {
   // ─── useFocusEffect: halls + auth + profile ──────────────────────────────────
   useFocusEffect(
     useCallback(() => {
-      /* COMMENTED OUT — getCategories(); getAllCaterings(currentPage); */
-      getAllEvents(currentPage);
-      getPremiumHalls(1);
-      getUserAuthTokenRes();
-      getProfileData();
+      const bootstrap = async () => {
+        const token = await getUserAuthToken();
+        /* COMMENTED OUT — getCategories(); getAllCaterings(currentPage); */
+        getAllEvents(currentPage, token);
+        getPremiumHalls(1, false, token);
+        getUserAuthTokenRes(token);
+        getProfileData(token);
+      };
+      bootstrap();
       return () => {
         console.log('Screen is unfocused');
       };
@@ -170,8 +168,12 @@ const HomeDashboard = () => {
   // ─── useFocusEffect: nearby halls ────────────────────────────────────────────
   useFocusEffect(
     useCallback(() => {
-      getNearByEvents();
-      /* COMMENTED OUT — getNearByCaterings(); */
+      const fetchNearby = async () => {
+        const token = await getUserAuthToken();
+        getNearByEvents(token);
+        /* COMMENTED OUT — getNearByCaterings(); */
+      };
+      fetchNearby();
       return () => {
         console.log('Screen is unfocused');
       };
@@ -182,8 +184,10 @@ const HomeDashboard = () => {
     storeUserDeviceToken();
   }, []);
 
-  // ─── Auto-scroll banners ──────────────────────────────────────────────────────
+  // ─── Auto-scroll banners (pauses when screen unfocused) ─────────────────────
+  const isFocused = useIsFocused();
   useEffect(() => {
+    if (!isFocused) return;
     const bannerTimer = setInterval(() => {
       setActiveBanner(prev => {
         const next = (prev + 1) % 4;
@@ -195,7 +199,7 @@ const HomeDashboard = () => {
       });
     }, 3500);
     return () => clearInterval(bannerTimer);
-  }, []);
+  }, [isFocused]);
 
   const handleBannerScroll = (event) => {
     const offsetX = event.nativeEvent.contentOffset.x;
@@ -208,12 +212,12 @@ const HomeDashboard = () => {
   }, []);
 
   // ─── API: store FCM token ─────────────────────────────────────────────────────
-  const storeUserDeviceToken = async () => {
+  const storeUserDeviceToken = async (cachedToken) => {
     const payload = {
       mobileNumber: String(userLoggedInMobileNum),
       fcmToken: deviceFCMToken,
     };
-    const token = await getUserAuthToken();
+    const token = cachedToken || await getUserAuthToken();
     console.log('LOgin screen scan', token);
     try {
       const userTokenRes = await axios.post(
@@ -234,9 +238,9 @@ const HomeDashboard = () => {
   };
 
   // ─── API: get nearby halls ────────────────────────────────────────────────────
-  const getNearByEvents = async () => {
+  const getNearByEvents = async (cachedToken) => {
     console.log('latitude , long are::>>', latitude, longitude);
-    const token = await getUserAuthToken();
+    const token = cachedToken || await getUserAuthToken();
     try {
       const response = await axios.get(
         `${BASE_URL}/getNearByFunctionHalls?latitude=${latitude}&longitude=${longitude}`,
@@ -270,14 +274,14 @@ const HomeDashboard = () => {
   */
 
   // ─── API: auth token ──────────────────────────────────────────────────────────
-  const getUserAuthTokenRes = async () => {
-    const token = await getUserAuthToken();
+  const getUserAuthTokenRes = async (cachedToken) => {
+    const token = cachedToken || await getUserAuthToken();
     setGetUserAuth(token);
   };
 
   // ─── API: profile ─────────────────────────────────────────────────────────────
-  const getProfileData = async () => {
-    const token = await getUserAuthToken();
+  const getProfileData = async (cachedToken) => {
+    const token = cachedToken || await getUserAuthToken();
     try {
       const response = await axios.get(
         `${BASE_URL}/getAllUserLocations/${userLoggedInMobileNumber}`,
@@ -292,8 +296,8 @@ const HomeDashboard = () => {
   };
 
   // ─── API: all halls ───────────────────────────────────────────────────────────
-  const getAllEvents = async page => {
-    const token = await getUserAuthToken();
+  const getAllEvents = async (page, cachedToken) => {
+    const token = cachedToken || await getUserAuthToken();
     try {
       const response = await axios.get(
         `${BASE_URL}/getAllFunctionHalls?page=${page}&limit=10`,
@@ -317,10 +321,10 @@ const HomeDashboard = () => {
   const [premiumHasMore, setPremiumHasMore] = useState(true);
   const [premiumLoading, setPremiumLoading] = useState(false);
 
-  const getPremiumHalls = async (page = 1, append = false) => {
+  const getPremiumHalls = async (page = 1, append = false, cachedToken) => {
     if (premiumLoading) return;
     setPremiumLoading(true);
-    const token = await getUserAuthToken();
+    const token = cachedToken || await getUserAuthToken();
     try {
       const response = await axios.get(
         `${BASE_URL}/filterFunctionHalls`,
@@ -509,7 +513,7 @@ const HomeDashboard = () => {
         {/* image */}
         <View style={styles.hallImageWrapper}>
           <FastImage
-            source={{ uri: imgUrl, priority: FastImage.priority.high }}
+            source={{ uri: imgUrl, priority: FastImage.priority.high, cache: FastImage.cacheControl.immutable }}
             style={styles.hallImage}
             resizeMode={FastImage.resizeMode.cover}
           />
@@ -1008,15 +1012,18 @@ const HomeDashboard = () => {
                 </View>
               </TouchableOpacity>
             </View>
-            <View style={{ paddingHorizontal: horizontalScale(16) }}>
-              {premiumHalls.map((item) => (
+            <FlatList
+              data={premiumHalls}
+              scrollEnabled={false}
+              keyExtractor={item => item?._id}
+              contentContainerStyle={{ paddingHorizontal: horizontalScale(16) }}
+              renderItem={({item}) => (
                 <TouchableOpacity
-                  key={item?._id}
                   activeOpacity={0.92}
                   onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
                   style={styles.popularVenueCard}>
                   <FastImage
-                    source={{ uri: item?.professionalImage?.url, priority: FastImage.priority.normal }}
+                    source={{ uri: item?.professionalImage?.url, priority: FastImage.priority.normal, cache: FastImage.cacheControl.immutable }}
                     style={styles.popularVenueImage}
                     resizeMode={FastImage.resizeMode.cover}
                   />
@@ -1049,8 +1056,8 @@ const HomeDashboard = () => {
                     ) : null}
                   </View>
                 </TouchableOpacity>
-              ))}
-              {premiumHasMore && (
+              )}
+              ListFooterComponent={premiumHasMore ? (
                 <TouchableOpacity
                   onPress={loadMorePremiumHalls}
                   style={{ alignSelf: 'center', marginTop: 12, marginBottom: 8, paddingVertical: 10, paddingHorizontal: 24, borderRadius: 10, borderWidth: 1, borderColor: '#D97706' }}>
@@ -1060,8 +1067,8 @@ const HomeDashboard = () => {
                     <Text style={{ fontFamily: 'ManropeRegular', fontSize: 13, fontWeight: '700', color: '#D97706' }}>Load More</Text>
                   )}
                 </TouchableOpacity>
-              )}
-            </View>
+              ) : null}
+            />
           </View>
         )}
 

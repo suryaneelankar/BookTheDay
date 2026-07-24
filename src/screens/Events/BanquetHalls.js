@@ -24,10 +24,8 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // ── Banquet Hall theme — deep crimson + warm gold ─────────────────────────────
 const BH_DARK   = '#1A0808';   // deep maroon-black
-const BH_MID    = '#2D0F0F';   // dark crimson
 const BH_ACCENT = '#A0143E';   // primary crimson
 const BH_GOLD   = '#ECA73C';   // harvest gold
-const BH_GOLD2  = '#B8860B';   // dark gold
 const BH_CREAM  = '#FDF5F5';   // warm rose-cream background
 const BH_LIGHT  = '#FAE8EC';   // light crimson tint for chips
 
