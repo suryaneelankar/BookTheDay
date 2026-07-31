@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useMemo, useCallback } from "react"
 import {
     View, Text, TouchableOpacity, StyleSheet, Dimensions,
     FlatList, SafeAreaView, ActivityIndicator, ScrollView,
-    Switch, TextInput,
+    Switch, TextInput, Animated, Easing
 } from 'react-native';
 import BASE_URL from "../../apiconfig";
 import axios from "axios";
@@ -23,16 +23,16 @@ import Swiper from "react-native-swiper";
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // ── Banquet Hall theme — deep crimson + warm gold ─────────────────────────────
-const BH_DARK   = '#1A0808';   // deep maroon-black
+const BH_DARK = '#1A0808';   // deep maroon-black
 const BH_ACCENT = '#A0143E';   // primary crimson
-const BH_GOLD   = '#ECA73C';   // harvest gold
-const BH_CREAM  = '#FDF5F5';   // warm rose-cream background
-const BH_LIGHT  = '#FAE8EC';   // light crimson tint for chips
+const BH_GOLD = '#ECA73C';   // harvest gold
+const BH_CREAM = '#FDF5F5';   // warm rose-cream background
+const BH_LIGHT = '#FAE8EC';   // light crimson tint for chips
 
 const VENUE_CATEGORY = 'Banquet Hall';
 
-const seatingCapacity = ['50-100','100-200','200-400','400-600','600-800','800-1000','1000-1200','1200+'];
-const priceRanges = ['10k-50k','50k-1L','1L-2L','2L-3L','3L-5L','5L-10L','10L-12L','12L-15L','15L-20L','20L+'];
+const seatingCapacity = ['50-100', '100-200', '200-400', '400-600', '600-800', '800-1000', '1000-1200', '1200+'];
+const priceRanges = ['10k-50k', '50k-1L', '1L-2L', '2L-3L', '3L-5L', '5L-10L', '10L-12L', '12L-15L', '15L-20L', '20L+'];
 const chips = ['Budget', 'Standard', 'Premium', 'Luxury', 'Elite'];
 const chipColors = {
     Budget: '#FFE8B3', Standard: '#B3E5FF',
@@ -62,37 +62,96 @@ const BanquetHalls = () => {
     const navigation = useNavigation();
     const actionSheetRef = useRef(null);
 
-    const [eventsData, setEventsData]           = useState([]);
-    const [filteredList, setFilteredList]       = useState([]);
+    const [eventsData, setEventsData] = useState([]);
+    const [filteredList, setFilteredList] = useState([]);
     const [locationBasedData, setLocationBasedData] = useState([]);
-    const [allLocations, setAllLocations]       = useState([]);
+    const [allLocations, setAllLocations] = useState([]);
     const [selectedSeatingCapacity, setSelectedSeatingCapacity] = useState('');
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
     const [selectedChip, setSelectedChip] = useState('');
-    const [isACSelected, setIsACSelected]       = useState(null);
+    const [isACSelected, setIsACSelected] = useState(null);
     const [switchCateringVal, setSwitchCateringVal] = useState(false);
-    const [currentPage, setCurrentPage]         = useState(1);
-    const [hasMore, setHasMore]                 = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
     const [totalEventPages, setTotalEventPages] = useState(0);
     const [filterDataCurrentPage, setFilterDataCurrentPage] = useState(1);
-    const [filterDataLimit]                     = useState(10);
+    const [filterDataLimit] = useState(10);
     const [hasMoreFilterData, setHasMoreFilterData] = useState(true);
     const [filterDataLoading, setFilterDataLoading] = useState(false);
     const [isFilterApplied, setIsFilterApplied] = useState(false);
     const [totalFilterDataPages, setTotalFilterDataPages] = useState(0);
-    const [loading, setLoading]                 = useState(false);
-    const [query, setQuery]                     = useState('');
+    const [loading, setLoading] = useState(false);
+    const [query, setQuery] = useState('');
     const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [headerHeight, setHeaderHeight] = useState(0);
 
-    const isFetchingRef       = useRef(false);
+    const isFetchingRef = useRef(false);
     const isFetchingFilterRef = useRef(false);
-    const currentPageRef      = useRef(1);
-    const hasMoreRef          = useRef(true);
-    const totalEventPagesRef  = useRef(0);
-    const filterPageRef       = useRef(1);
-    const hasMoreFilterRef    = useRef(true);
+    const currentPageRef = useRef(1);
+    const hasMoreRef = useRef(true);
+    const totalEventPagesRef = useRef(0);
+    const filterPageRef = useRef(1);
+    const hasMoreFilterRef = useRef(true);
     const totalFilterPagesRef = useRef(0);
-    const isFilterAppliedRef  = useRef(false);
+    const isFilterAppliedRef = useRef(false);
+
+    const scrollY = useRef(new Animated.Value(0)).current;
+    const lastScrollY = useRef(0);
+    const headerAnim = useRef(new Animated.Value(1)).current; // 1 = visible, 0 = hidden
+    const HEADER_MAX_HEIGHT = 220; // adjust to your hero/header size
+
+    // const lastScrollY = useRef(0);
+    const headerVisibleRef = useRef(true);
+
+    const HIDE_THRESHOLD = 20;
+    const SHOW_THRESHOLD = 8;
+
+    const handleScroll = (y) => {
+        const diff = y - lastScrollY.current;
+
+        if (diff > HIDE_THRESHOLD && headerVisibleRef.current) {
+            hideHeader();
+            headerVisibleRef.current = false;
+        } else if (diff < -SHOW_THRESHOLD && !headerVisibleRef.current) {
+            showHeader();
+            headerVisibleRef.current = true;
+        }
+
+        lastScrollY.current = y;
+    };
+
+    const HEADER_HEIGHT = 220;
+
+    const diffClamp = Animated.diffClamp(scrollY, 0, HEADER_HEIGHT);
+
+    const translateY = diffClamp.interpolate({
+        inputRange: [0, HEADER_HEIGHT],
+        outputRange: [0, -HEADER_HEIGHT],
+        extrapolate: 'clamp',
+    });
+
+    const hideHeader = () => {
+        Animated.timing(headerTranslateY, {
+            toValue: -HEADER_HEIGHT,
+            duration: 250,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+        }).start();
+    };
+
+    const showHeader = () => {
+        Animated.timing(headerTranslateY, {
+            toValue: 0,
+            duration: 250,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+        }).start();
+    };
+
+    const headerOpacity = headerAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 1],
+    });
 
     useEffect(() => { getAllEvents(1); getAllLocations(); }, []);
 
@@ -235,10 +294,10 @@ const BanquetHalls = () => {
 
     const countText = useMemo(() => {
         if (query && locationBasedData.length > 0) return `${locationBasedData.length} Banquet Halls in "${query}"`;
-        if (query && nameFilteredData.length > 0)  return `${nameFilteredData.length} Halls matching "${query}"`;
+        if (query && nameFilteredData.length > 0) return `${nameFilteredData.length} Halls matching "${query}"`;
         if (query) return 'No banquet halls found';
         if (filteredList.length > 0 || isFilterApplied)
-            return filteredList.length === 0 ? 'No halls found' : `${filteredList.length} Filtered`;
+            return filteredList.length === 0 ? 'No halls found' : `${filteredList.length} Halls found`;
         return eventsData?.length === 0 ? 'No banquet halls found' : `${eventsData.length} Banquet Halls`;
     }, [query, locationBasedData, nameFilteredData, filteredList, isFilterApplied, eventsData]);
 
@@ -249,10 +308,10 @@ const BanquetHalls = () => {
     }, []);
 
     const renderItem = useCallback(({ item }) => {
-        const heroImage   = item?.professionalImage?.url;
-        const imageUrls   = [heroImage, ...(item?.additionalImages?.flat()?.map(img => img?.url) || [])].filter(Boolean);
+        const heroImage = item?.professionalImage?.url;
+        const imageUrls = [heroImage, ...(item?.additionalImages?.flat()?.map(img => img?.url) || [])].filter(Boolean);
         const totalPhotos = imageUrls.length;
-        const hasVideo    = item?.hallVideos?.length > 0;
+        const hasVideo = item?.hallVideos?.length > 0;
         return (
             <View style={styles.card}>
                 <View style={styles.cardImageWrapper}>
@@ -305,34 +364,34 @@ const BanquetHalls = () => {
                 </View>
                 <TouchableOpacity activeOpacity={0.93}
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}>
-                <View style={styles.cardBody}>
-                    <Text style={styles.cardTitle} numberOfLines={1}>{item?.functionHallName}</Text>
-                    <View style={styles.addressRow}>
-                        <LocationMarkIcon width={12} height={12} />
-                        <Text numberOfLines={1} style={styles.addressText}>{item?.functionHallAddress?.address}</Text>
-                    </View>
-                    <View style={styles.chipsRow}>
-                        {item?.seatingCapacity ? (
+                    <View style={styles.cardBody}>
+                        <Text style={styles.cardTitle} numberOfLines={1}>{item?.functionHallName}</Text>
+                        <View style={styles.addressRow}>
+                            <LocationMarkIcon width={12} height={12} />
+                            <Text numberOfLines={1} style={styles.addressText}>{item?.functionHallAddress?.address}</Text>
+                        </View>
+                        <View style={styles.chipsRow}>
+                            {item?.seatingCapacity ? (
+                                <View style={styles.chip}>
+                                    <IonIcon name="people-outline" size={11} color={BH_ACCENT} />
+                                    <Text style={styles.chipText}>{item?.seatingCapacity} pax</Text>
+                                </View>) : null}
+                            {item?.bedRooms > 0 && (
+                                <View style={styles.chip}>
+                                    <IonIcon name="bed-outline" size={11} color={BH_ACCENT} />
+                                    <Text style={styles.chipText}>{item?.bedRooms} Rooms</Text>
+                                </View>)}
                             <View style={styles.chip}>
-                                <IonIcon name="people-outline" size={11} color={BH_ACCENT} />
-                                <Text style={styles.chipText}>{item?.seatingCapacity} pax</Text>
-                            </View>) : null}
-                        {item?.bedRooms > 0 && (
-                            <View style={styles.chip}>
-                                <IonIcon name="bed-outline" size={11} color={BH_ACCENT} />
-                                <Text style={styles.chipText}>{item?.bedRooms} Rooms</Text>
-                            </View>)}
-                        <View style={styles.chip}>
-                            {item?.foodType === 'Both' ? <VegNonVegIcon width={14} height={14} /> :
-                             item?.foodType === 'veg'  ? <VegIcon width={14} height={14} /> :
-                             <NonVegIcon width={14} height={14} />}
-                            <Text style={styles.chipText}>
-                                {item?.foodType === 'Both' ? 'Veg & Non-Veg' : item?.foodType === 'veg' ? 'Veg' : 'Non-Veg'}
-                            </Text>
+                                {item?.foodType === 'Both' ? <VegNonVegIcon width={14} height={14} /> :
+                                    item?.foodType === 'veg' ? <VegIcon width={14} height={14} /> :
+                                        <NonVegIcon width={14} height={14} />}
+                                <Text style={styles.chipText}>
+                                    {item?.foodType === 'Both' ? 'Veg & Non-Veg' : item?.foodType === 'veg' ? 'Veg' : 'Non-Veg'}
+                                </Text>
+                            </View>
                         </View>
                     </View>
-                </View>
-            </TouchableOpacity>
+                </TouchableOpacity>
             </View>
         );
     }, [navigation]);
@@ -400,9 +459,9 @@ const BanquetHalls = () => {
                         {chips.map(item => (
                             <TouchableOpacity key={item}
                                 style={[styles.filterChip,
-                                    { backgroundColor: chipColors[item] },
-                                    selectedChip === item && styles.filterChipActive,
-                                    switchCateringVal && { opacity: 0.4 }]}
+                                { backgroundColor: chipColors[item] },
+                                selectedChip === item && styles.filterChipActive,
+                                switchCateringVal && { opacity: 0.4 }]}
                                 disabled={switchCateringVal}
                                 onPress={() => { setSelectedChip(selectedChip === item ? '' : item); setSelectedPriceRange(''); }}>
                                 <Text style={[styles.filterChipText, selectedChip === item && styles.filterChipTextActive]}>{item}</Text>
@@ -413,8 +472,8 @@ const BanquetHalls = () => {
                         {priceRanges.map(item => (
                             <TouchableOpacity key={item}
                                 style={[styles.filterChip,
-                                    selectedPriceRange === item && styles.filterChipActive,
-                                    switchCateringVal && { opacity: 0.4 }]}
+                                selectedPriceRange === item && styles.filterChipActive,
+                                switchCateringVal && { opacity: 0.4 }]}
                                 disabled={switchCateringVal}
                                 onPress={() => { setSelectedPriceRange(selectedPriceRange === item ? '' : item); setSelectedChip(''); }}>
                                 <Text style={[styles.filterChipText, selectedPriceRange === item && styles.filterChipTextActive]}>{item}</Text>
@@ -436,85 +495,119 @@ const BanquetHalls = () => {
             </ActionSheet>
 
             {/* ── BANQUET HALLS HERO ── */}
-            <LinearGradient colors={['#5C1E3E', '#7A2D52', '#9B3D6A']}
-                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.heroHeader}>
-                <View style={styles.heroCircle1} />
-                <View style={styles.heroCircle2} />
-                <View style={styles.heroRow}>
-                    <View style={{ flex: 1 }}>
-                        <View style={styles.heroBadge}>
-                            <IonIcon name="ribbon" size={11} color={BH_GOLD} />
-                            <Text style={styles.heroBadgeText}>Grand Venues</Text>
+            <View style={{flex:1 }}>
+            <Animated.View style={[
+                {
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    zIndex: 100,
+                    elevation: 100,
+                    transform: [{ translateY }],
+                },
+            ]}
+                onLayout={(e) => {
+                    setHeaderHeight(e.nativeEvent.layout.height);
+                }}
+            >
+                <LinearGradient colors={['#5C1E3E', '#7A2D52', '#9B3D6A']}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.heroHeader}>
+                    <View style={styles.heroCircle1} />
+                    <View style={styles.heroCircle2} />
+                    <View style={styles.heroRow}>
+                        <View style={{ flex: 1 }}>
+                            <View style={styles.heroBadge}>
+                                <IonIcon name="ribbon" size={11} color={BH_GOLD} />
+                                <Text style={styles.heroBadgeText}>Grand Venues</Text>
+                            </View>
+                            <Text style={styles.heroTitle}>Banquet Halls</Text>
+                            <Text style={styles.heroSub}>Premium halls for all occasions</Text>
                         </View>
-                        <Text style={styles.heroTitle}>Banquet Halls</Text>
-                        <Text style={styles.heroSub}>Premium halls for all occasions</Text>
+                        <View style={styles.heroIconWrap}>
+                            <IonIcon name="ribbon" size={32} color={BH_GOLD} />
+                        </View>
                     </View>
-                    <View style={styles.heroIconWrap}>
-                        <IonIcon name="ribbon" size={32} color={BH_GOLD} />
+                    <View style={styles.searchBar}>
+                        <IonIcon name="search-outline" size={16} color="black" style={{ marginRight: 8 }} />
+                        <TextInput style={styles.searchInput} value={query} onChangeText={handleQueryChange}
+                            placeholder="Search banquet halls by name or area..."
+                            placeholderTextColor="black" returnKeyType="search" />
+                        {query.length > 0 && (
+                            <TouchableOpacity onPress={() => { setQuery(''); setDropdownVisible(false); setLocationBasedData([]); }}>
+                                <IonIcon name="close-circle" size={16} color="rgba(236,167,60,0.7)" />
+                            </TouchableOpacity>)}
                     </View>
-                </View>
-                <View style={styles.searchBar}>
-                    <IonIcon name="search-outline" size={16} color="black" style={{ marginRight: 8 }} />
-                    <TextInput style={styles.searchInput} value={query} onChangeText={handleQueryChange}
-                        placeholder="Search banquet halls by name or area..."
-                        placeholderTextColor="black" returnKeyType="search" />
-                    {query.length > 0 && (
-                        <TouchableOpacity onPress={() => { setQuery(''); setDropdownVisible(false); setLocationBasedData([]); }}>
-                            <IonIcon name="close-circle" size={16} color="rgba(236,167,60,0.7)" />
-                        </TouchableOpacity>)}
-                </View>
-                {dropdownVisible && (locationSuggestions.length > 0 || nameFilteredData.length > 0) && (
-                    <View style={styles.dropdown}>
-                        {locationSuggestions.map((item, index) => (
-                            <TouchableOpacity key={`area-${item._id}`}
-                                style={[styles.dropdownItem, index < locationSuggestions.length - 1 && styles.dropdownDivider]}
-                                onPress={() => { setQuery(item.value); setDropdownVisible(false); getAllEventsByLocation(item.value); }}>
-                                <IonIcon name="location-outline" size={13} color={BH_GOLD} style={{ marginRight: 8 }} />
-                                <Text style={styles.dropdownText}>{item.value}</Text>
-                            </TouchableOpacity>))}
-                        {nameFilteredData.slice(0, 4).map((item, index) => (
-                            <TouchableOpacity key={`bh-${item._id}`}
-                                style={[styles.dropdownItem, index < 3 && styles.dropdownDivider]}
-                                onPress={() => { setDropdownVisible(false); navigation.navigate('ViewEvents', { categoryId: item._id }); }}>
-                                <IonIcon name="business-outline" size={13} color="#939393" style={{ marginRight: 8 }} />
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.dropdownText} numberOfLines={1}>{item.functionHallName}</Text>
-                                    <Text style={styles.dropdownSubText} numberOfLines={1}>{item?.functionHallAddress?.address}</Text>
-                                </View>
-                                <IonIcon name="chevron-forward" size={12} color="#ccc" />
-                            </TouchableOpacity>))}
-                    </View>)}
-            </LinearGradient>
-
-            {/* ── HEADER ROW ── */}
-            <View style={styles.headerRow}>
-                <View>
-                    <Text style={styles.headerTitle}>Banquet Halls</Text>
-                    <Text style={styles.headerSubtitle}>{countText}</Text>
-                </View>
-                <TouchableOpacity style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnActive]}
-                    onPress={() => actionSheetRef.current?.show()}>
-                    <IonIcon name="options-outline" size={16} color={activeFilterCount > 0 ? '#fff' : BH_ACCENT} />
-                    <Text style={[styles.filterBtnText, activeFilterCount > 0 && { color: '#fff' }]}>Filter</Text>
-                    {activeFilterCount > 0 && (
-                        <View style={styles.filterBadge}>
-                            <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+                    {dropdownVisible && (locationSuggestions.length > 0 || nameFilteredData.length > 0) && (
+                        <View style={styles.dropdown}>
+                            {locationSuggestions.map((item, index) => (
+                                <TouchableOpacity key={`area-${item._id}`}
+                                    style={[styles.dropdownItem, index < locationSuggestions.length - 1 && styles.dropdownDivider]}
+                                    onPress={() => { setQuery(item.value); setDropdownVisible(false); getAllEventsByLocation(item.value); }}>
+                                    <IonIcon name="location-outline" size={13} color={BH_GOLD} style={{ marginRight: 8 }} />
+                                    <Text style={styles.dropdownText}>{item.value}</Text>
+                                </TouchableOpacity>))}
+                            {nameFilteredData.slice(0, 4).map((item, index) => (
+                                <TouchableOpacity key={`bh-${item._id}`}
+                                    style={[styles.dropdownItem, index < 3 && styles.dropdownDivider]}
+                                    onPress={() => { setDropdownVisible(false); navigation.navigate('ViewEvents', { categoryId: item._id }); }}>
+                                    <IonIcon name="business-outline" size={13} color="#939393" style={{ marginRight: 8 }} />
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={styles.dropdownText} numberOfLines={1}>{item.functionHallName}</Text>
+                                        <Text style={styles.dropdownSubText} numberOfLines={1}>{item?.functionHallAddress?.address}</Text>
+                                    </View>
+                                    <IonIcon name="chevron-forward" size={12} color="#ccc" />
+                                </TouchableOpacity>))}
                         </View>)}
-                </TouchableOpacity>
+                </LinearGradient>
+            </Animated.View>
             </View>
 
-            {loading && eventsData.length === 0 ? (
-                <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8 }}>
-                    {[1, 2, 3].map(i => <SkeletonCard key={i} />)}
-                </ScrollView>
-            ) : (
-                <FlatList data={dataSource} renderItem={renderItem} keyExtractor={keyExtractor}
-                    onEndReached={onEndReached} onEndReachedThreshold={0.6}
-                    ListFooterComponent={ListFooter} ListEmptyComponent={ListEmpty}
-                    contentContainerStyle={styles.listContent}
-                    removeClippedSubviews maxToRenderPerBatch={6} windowSize={10}
-                    initialNumToRender={5} showsVerticalScrollIndicator={false} />
-            )}
+            {/* ── HEADER ROW ── */}
+            
+            <View style={{ flex: 1 }}>
+
+                <View style={styles.headerRow}>
+                    <View>
+                        <Text style={styles.headerTitle}>Banquet Halls</Text>
+                        <Text style={styles.headerSubtitle}>{countText}</Text>
+                    </View>
+                    <TouchableOpacity style={[styles.filterBtn, activeFilterCount > 0 && styles.filterBtnActive]}
+                        onPress={() => actionSheetRef.current?.show()}>
+                        <IonIcon name="options-outline" size={16} color={activeFilterCount > 0 ? '#fff' : BH_ACCENT} />
+                        <Text style={[styles.filterBtnText, activeFilterCount > 0 && { color: '#fff' }]}>Filter</Text>
+                        {activeFilterCount > 0 && (
+                            <View style={styles.filterBadge}>
+                                <Text style={styles.filterBadgeText}>{activeFilterCount}</Text>
+                            </View>)}
+                    </TouchableOpacity>
+                </View>
+
+                {loading && eventsData.length === 0 ? (
+                    <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8 }}>
+                        {[1, 2, 3].map(i => <SkeletonCard key={i} />)}
+                    </ScrollView>
+                ) : (
+                    <Animated.FlatList data={dataSource} renderItem={renderItem} keyExtractor={keyExtractor}
+                        onEndReached={onEndReached} onEndReachedThreshold={0.6}
+                        onScroll={Animated.event(
+                            [
+                                {
+                                    nativeEvent: {
+                                        contentOffset: { y: scrollY },
+                                    },
+                                },
+                            ],
+                            { useNativeDriver: true }
+                        )}
+                        scrollEventThrottle={1}
+                        // scrollEventThrottle={16}
+                        ListFooterComponent={ListFooter} ListEmptyComponent={ListEmpty}
+                        contentContainerStyle={styles.listContent}
+                        removeClippedSubviews maxToRenderPerBatch={6} windowSize={10}
+                        initialNumToRender={5} showsVerticalScrollIndicator={false} />
+                )}
+            </View>
         </SafeAreaView>
     );
 };

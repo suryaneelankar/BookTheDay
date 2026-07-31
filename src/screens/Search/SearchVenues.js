@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -12,12 +12,12 @@ import {
   Switch,
 } from 'react-native';
 import IonIcon from 'react-native-vector-icons/Ionicons';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import BASE_URL from '../../apiconfig';
-import {getUserAuthToken} from '../../utils/StoreAuthToken';
+import { getUserAuthToken } from '../../utils/StoreAuthToken';
 import FastImage from 'react-native-fast-image';
-import {formatAmount} from '../../utils/GlobalFunctions';
+import { formatAmount } from '../../utils/GlobalFunctions';
 import ActionSheet from 'react-native-actions-sheet';
 import LinearGradient from 'react-native-linear-gradient';
 
@@ -61,7 +61,7 @@ const SearchVenues = () => {
     setSearched(true);
     const token = await getUserAuthToken();
     try {
-      const params = {page: 1, limit: 50};
+      const params = { page: 1, limit: 50 };
       if (selectedSeating) params.seatingCapacity = selectedSeating;
       if (selectedPrice) params.priceRanges = selectedPrice;
       if (isACSelected !== null) params.ac = isACSelected === 'AC';
@@ -69,15 +69,15 @@ const SearchVenues = () => {
 
       const response = await axios.get(`${BASE_URL}/filterFunctionHalls`, {
         params,
-        headers: {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       });
       const allData = Array.isArray(response?.data?.data) ? response.data.data : [];
       const filtered = searchText
         ? allData.filter(
-            item =>
-              item?.functionHallName?.toLowerCase().includes(searchText.toLowerCase()) ||
-              item?.functionHallAddress?.address?.toLowerCase().includes(searchText.toLowerCase()),
-          )
+          item =>
+            item?.functionHallName?.toLowerCase().includes(searchText.toLowerCase()) ||
+            item?.functionHallAddress?.address?.toLowerCase().includes(searchText.toLowerCase()),
+        )
         : allData;
       setResults(filtered);
     } catch (error) {
@@ -112,7 +112,7 @@ const SearchVenues = () => {
 
   const activeFilterCount = [selectedSeating, selectedPrice, isACSelected, withFood || null].filter(Boolean).length;
 
-  const renderItem = ({item}) => {
+  const renderItem = ({ item }) => {
     const imgUrl = item?.professionalImage?.url;
     const hasMenu = item?.menuImages?.length > 0;
 
@@ -120,9 +120,9 @@ const SearchVenues = () => {
       <TouchableOpacity
         style={styles.card}
         activeOpacity={0.9}
-        onPress={() => navigation.navigate('ViewEvents', {categoryId: item._id})}>
+        onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}>
         <FastImage
-          source={{uri: imgUrl, priority: FastImage.priority.normal}}
+          source={{ uri: imgUrl, priority: FastImage.priority.normal }}
           style={styles.cardImage}
           resizeMode={FastImage.resizeMode.cover}
         />
@@ -184,6 +184,11 @@ const SearchVenues = () => {
         </TouchableOpacity>
       </View>
 
+      {results?.length > 0
+        ?
+        <Text style={styles.headerSubtitle}>{results?.length} Halls found</Text>
+        : <></>}
+
       {/* Results */}
       {loading ? (
         <View style={styles.centerState}>
@@ -219,7 +224,7 @@ const SearchVenues = () => {
         closeOnPressBack
         defaultOverlayOpacity={0.5}
         containerStyle={styles.actionSheet}>
-        <ScrollView contentContainerStyle={{paddingBottom: 100}}>
+        <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
           <Text style={styles.filterTitle}>Filters</Text>
 
           <Text style={styles.filterSectionLabel}>Seating Capacity</Text>
@@ -259,7 +264,7 @@ const SearchVenues = () => {
             <View style={styles.switchRow}>
               <Text style={styles.switchLabel}>In-house Catering</Text>
               <Switch
-                trackColor={{false: '#E8E8E8', true: '#FFE0B2'}}
+                trackColor={{ false: '#E8E8E8', true: '#FFE0B2' }}
                 thumbColor={withFood ? '#D97706' : '#ccc'}
                 onValueChange={setWithFood}
                 value={withFood}
@@ -275,8 +280,8 @@ const SearchVenues = () => {
           <TouchableOpacity onPress={applyFilters} style={styles.filterApplyWrap}>
             <LinearGradient
               colors={['#D97706', '#92400E']}
-              start={{x: 0, y: 0}}
-              end={{x: 1, y: 0}}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
               style={styles.filterApplyBtn}>
               <Text style={styles.filterApplyText}>Apply Filters</Text>
             </LinearGradient>
@@ -288,49 +293,56 @@ const SearchVenues = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#F8F9FA'},
+  container: { flex: 1, backgroundColor: '#F8F9FA' },
   searchHeader: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10,
     backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#F0F0F0',
   },
-  backBtn: {width: 36, height: 36, borderRadius: 12, backgroundColor: '#F5F5F5', justifyContent: 'center', alignItems: 'center', marginRight: 10},
-  searchInputWrap: {flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: '#F5F5F5', borderRadius: 12, paddingHorizontal: 12, height: 44},
-  searchInput: {flex: 1, fontSize: 14, fontFamily: 'ManropeRegular', color: '#1A1E25', marginLeft: 8, paddingVertical: 0},
-  filterIconBtn: {width: 40, height: 40, borderRadius: 12, backgroundColor: '#F5F5F5', justifyContent: 'center', alignItems: 'center', marginLeft: 8},
-  filterIconBtnActive: {backgroundColor: '#D97706'},
-  filterBadge: {position: 'absolute', top: 2, right: 2, width: 16, height: 16, borderRadius: 8, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center'},
-  filterBadgeText: {fontSize: 9, fontWeight: '800', color: '#D97706'},
-  listContent: {padding: 16},
-  card: {backgroundColor: '#FFFFFF', borderRadius: 14, marginBottom: 12, overflow: 'hidden', shadowColor: '#000', shadowOffset: {width: 0, height: 2}, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3},
-  cardImage: {width: '100%', height: 140},
-  cardBody: {padding: 12},
-  cardName: {fontFamily: 'ManropeRegular', fontSize: 15, fontWeight: '700', color: '#1A1E25', marginBottom: 4},
-  cardLocationRow: {flexDirection: 'row', alignItems: 'center', marginBottom: 8},
-  cardAddress: {fontFamily: 'ManropeRegular', fontSize: 12, color: '#7E8389', marginLeft: 4, flex: 1},
-  cardFooter: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
-  cardPrice: {fontFamily: 'ManropeRegular', fontSize: 14, fontWeight: '700', color: '#D97706'},
-  cardChip: {flexDirection: 'row', alignItems: 'center', backgroundColor: '#FEF8EB', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3, gap: 4},
-  cardChipText: {fontFamily: 'ManropeRegular', fontSize: 11, fontWeight: '600', color: '#D97706'},
-  centerState: {flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 40},
-  stateTitle: {fontFamily: 'ManropeRegular', fontSize: 16, fontWeight: '700', color: '#1A1E25', marginTop: 12},
-  stateText: {fontFamily: 'ManropeRegular', fontSize: 13, color: '#7E8389', textAlign: 'center', marginTop: 6, lineHeight: 18},
+  backBtn: { width: 36, height: 36, borderRadius: 12, backgroundColor: '#F5F5F5', justifyContent: 'center', alignItems: 'center', marginRight: 10 },
+  searchInputWrap: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: '#F5F5F5', borderRadius: 12, paddingHorizontal: 12, height: 44 },
+  searchInput: { flex: 1, fontSize: 14, fontFamily: 'ManropeRegular', color: '#1A1E25', marginLeft: 8, paddingVertical: 0 },
+  filterIconBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: '#F5F5F5', justifyContent: 'center', alignItems: 'center', marginLeft: 8 },
+  headerSubtitle: {
+    fontSize: 14,
+    color: '#7D7F88',
+    fontFamily: 'ManropeRegular',
+    marginTop: 16,
+    marginHorizontal: 16,
+  },
+  filterIconBtnActive: { backgroundColor: '#D97706' },
+  filterBadge: { position: 'absolute', top: 2, right: 2, width: 16, height: 16, borderRadius: 8, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center' },
+  filterBadgeText: { fontSize: 9, fontWeight: '800', color: '#D97706' },
+  listContent: { padding: 16 },
+  card: { backgroundColor: '#FFFFFF', borderRadius: 14, marginBottom: 12, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 },
+  cardImage: { width: '100%', height: 140 },
+  cardBody: { padding: 12 },
+  cardName: { fontFamily: 'ManropeRegular', fontSize: 15, fontWeight: '700', color: '#1A1E25', marginBottom: 4 },
+  cardLocationRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  cardAddress: { fontFamily: 'ManropeRegular', fontSize: 12, color: '#7E8389', marginLeft: 4, flex: 1 },
+  cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  cardPrice: { fontFamily: 'ManropeRegular', fontSize: 14, fontWeight: '700', color: '#D97706' },
+  cardChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FEF8EB', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3, gap: 4 },
+  cardChipText: { fontFamily: 'ManropeRegular', fontSize: 11, fontWeight: '600', color: '#D97706' },
+  centerState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 40 },
+  stateTitle: { fontFamily: 'ManropeRegular', fontSize: 16, fontWeight: '700', color: '#1A1E25', marginTop: 12 },
+  stateText: { fontFamily: 'ManropeRegular', fontSize: 13, color: '#7E8389', textAlign: 'center', marginTop: 6, lineHeight: 18 },
   // Filter Sheet
-  actionSheet: {backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingTop: 16},
-  filterTitle: {fontFamily: 'ManropeRegular', fontSize: 18, fontWeight: '800', color: '#1A1E25', paddingHorizontal: 20, marginBottom: 16},
-  filterSectionLabel: {fontFamily: 'ManropeRegular', fontSize: 14, fontWeight: '700', color: '#1A1E25', paddingHorizontal: 20, marginTop: 16, marginBottom: 10},
-  filterChipsWrap: {flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 20, gap: 8},
-  filterChip: {paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: '#E5E5E5', backgroundColor: '#F8F9FA'},
-  filterChipActive: {backgroundColor: '#FEF3E2', borderColor: '#D97706'},
-  filterChipText: {fontFamily: 'ManropeRegular', fontSize: 12, fontWeight: '600', color: '#7E8389'},
-  filterChipTextActive: {color: '#D97706'},
-  switchRow: {flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'space-between', marginTop: 10, paddingRight: 4},
-  switchLabel: {fontFamily: 'ManropeRegular', fontSize: 13, fontWeight: '600', color: '#1A1E25'},
-  filterFooter: {flexDirection: 'row', paddingHorizontal: 20, paddingVertical: 14, borderTopWidth: 1, borderTopColor: '#F0F0F0', gap: 12},
-  filterClearBtn: {flex: 1, paddingVertical: 14, borderRadius: 12, borderWidth: 1, borderColor: '#E5E5E5', alignItems: 'center'},
-  filterClearText: {fontFamily: 'ManropeRegular', fontSize: 14, fontWeight: '600', color: '#7E8389'},
-  filterApplyWrap: {flex: 1, borderRadius: 12, overflow: 'hidden'},
-  filterApplyBtn: {paddingVertical: 14, alignItems: 'center', borderRadius: 12},
-  filterApplyText: {fontFamily: 'ManropeRegular', fontSize: 14, fontWeight: '700', color: '#FFFFFF'},
+  actionSheet: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingTop: 16 },
+  filterTitle: { fontFamily: 'ManropeRegular', fontSize: 18, fontWeight: '800', color: '#1A1E25', paddingHorizontal: 20, marginBottom: 16 },
+  filterSectionLabel: { fontFamily: 'ManropeRegular', fontSize: 14, fontWeight: '700', color: '#1A1E25', paddingHorizontal: 20, marginTop: 16, marginBottom: 10 },
+  filterChipsWrap: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 20, gap: 8 },
+  filterChip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: '#E5E5E5', backgroundColor: '#F8F9FA' },
+  filterChipActive: { backgroundColor: '#FEF3E2', borderColor: '#D97706' },
+  filterChipText: { fontFamily: 'ManropeRegular', fontSize: 12, fontWeight: '600', color: '#7E8389' },
+  filterChipTextActive: { color: '#D97706' },
+  switchRow: { flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'space-between', marginTop: 10, paddingRight: 4 },
+  switchLabel: { fontFamily: 'ManropeRegular', fontSize: 13, fontWeight: '600', color: '#1A1E25' },
+  filterFooter: { flexDirection: 'row', paddingHorizontal: 20, paddingVertical: 14, borderTopWidth: 1, borderTopColor: '#F0F0F0', gap: 12 },
+  filterClearBtn: { flex: 1, paddingVertical: 14, borderRadius: 12, borderWidth: 1, borderColor: '#E5E5E5', alignItems: 'center' },
+  filterClearText: { fontFamily: 'ManropeRegular', fontSize: 14, fontWeight: '600', color: '#7E8389' },
+  filterApplyWrap: { flex: 1, borderRadius: 12, overflow: 'hidden' },
+  filterApplyBtn: { paddingVertical: 14, alignItems: 'center', borderRadius: 12 },
+  filterApplyText: { fontFamily: 'ManropeRegular', fontSize: 14, fontWeight: '700', color: '#FFFFFF' },
 });
 
 export default SearchVenues;

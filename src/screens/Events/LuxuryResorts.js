@@ -24,10 +24,10 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // Resort theme palette
 const RESORT_DARK = '#0A1628';
-const RESORT_BLUE = '#8195D7';
+const RESORT_BLUE = '#CD6DBB';
 const RESORT_GOLD = '#ECA73C';
 const RESORT_GOLD2 = '#B8860B';
-const RESORT_LIGHT = '#E6EAF7';
+const RESORT_LIGHT = '#eed2e9ff';
 
 const VENUE_CATEGORY = 'Luxury Resort';
 
@@ -487,7 +487,7 @@ const LuxuryResorts = () => {
 
             {/* ── RESORT HERO HEADER ── */}
             <LinearGradient
-                colors={['#181818', '#2A2A2A', '#3D3D3D']}
+                colors={['#4A1942', '#803D7A', '#CD6DBB']}
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                 style={styles.heroHeader}
             >

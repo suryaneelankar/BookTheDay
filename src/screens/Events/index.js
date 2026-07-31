@@ -20,7 +20,6 @@ import LocationMarkIcon from '../../assets/svgs/location.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
 import { useSelector } from "react-redux";
-import themevariable from "../../utils/themevariable";
 import ActionSheet from 'react-native-actions-sheet';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -582,7 +581,7 @@ const Events = () => {
 
             {/* ── FUNCTION HALLS HERO HEADER ── */}
             <LinearGradient
-                colors={['#ECA73C', '#B8860B']}
+                colors={['#78350F', '#A16207', '#EAB308']}
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                 style={styles.heroHeader}
             >
@@ -593,14 +592,14 @@ const Events = () => {
                 <View style={styles.heroRow}>
                     <View style={{ flex: 1 }}>
                         <View style={styles.heroBadge}>
-                            <IonIcon name="business" size={11} color="#ECA73C" />
+                            <IonIcon name="business" size={11} color="#e9e4ddff" />
                             <Text style={styles.heroBadgeText}>Premium Venues</Text>
                         </View>
                         <Text style={styles.heroTitle}>Function Halls</Text>
-                        <Text style={styles.heroSub}>Grand banquets & event spaces</Text>
+                        <Text style={styles.heroSub}>Grand halls & event spaces</Text>
                     </View>
                     <View style={styles.heroIconWrap}>
-                        <IonIcon name="business" size={32} color="#ECA73C" />
+                       <IonIcon name="sparkles" size={32} color="#f8f5f2ff" />
                     </View>
                 </View>
 
@@ -743,11 +742,11 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(217,119,6,0.1)',
         borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5,
         alignSelf: 'flex-start', marginBottom: 10,
-        borderWidth: 1, borderColor: 'rgba(217,119,6,0.2)',
+        borderWidth: 1, borderColor: 'rgba(239, 236, 233, 1)',
     },
-    heroBadgeText: { fontFamily: 'ManropeRegular', fontSize: 11, fontWeight: '700', color: '#D97706' },
+    heroBadgeText: { fontFamily: 'ManropeRegular', fontSize: 11, fontWeight: '700', color: '#f5f1ecff' },
     heroTitle: { fontFamily: 'ManropeRegular', fontSize: 24, fontWeight: '800', color: '#1A1E25', letterSpacing: 0.3 },
-    heroSub: { fontFamily: 'ManropeRegular', fontSize: 13, color: '#7E8389', marginTop: 4 },
+    heroSub: { fontFamily: 'ManropeRegular', fontSize: 13, color: '#00050aff', marginTop: 4 },
     heroIconWrap: {
         width: 60, height: 60, borderRadius: 16,
         backgroundColor: 'rgba(217,119,6,0.1)',

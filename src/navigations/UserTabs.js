@@ -64,7 +64,7 @@ const UserTabs = () => {
 
       {/* ── Resorts ── */}
       <Tab.Screen
-        name="Luxury Resorts"
+        name="LuxuryResorts"
         component={LuxuryResorts}
         options={{
           tabBarIcon: ({ focused }) => (
@@ -77,7 +77,7 @@ const UserTabs = () => {
 
       {/* ── Farm Houses ── */}
       <Tab.Screen
-        name="Farm House"
+        name="FarmHouseTab"
         component={FarmHouse}
         options={{
           tabBarIcon: ({ focused }) => (

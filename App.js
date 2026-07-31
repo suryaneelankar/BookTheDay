@@ -15,6 +15,7 @@ import { Provider } from "react-redux";
 import MainNavigation from './src/navigations';
 import SplashScreen from 'react-native-splash-screen';
 import { AlertProvider, AlertBridge } from './src/components/CustomAlert';
+import { ScrollProvider } from './src/context/ScrollContext';
 // import RazorpayCheckout from 'react-native-razorpay';
 
 const App = () => {
@@ -54,10 +55,12 @@ const App = () => {
 
   return (
     <Provider store={store}>
-      <AlertProvider>
-        <AlertBridge />
-        <MainNavigation />
-      </AlertProvider>
+      <ScrollProvider>
+        <AlertProvider>
+          <AlertBridge />
+          <MainNavigation />
+        </AlertProvider>
+      </ScrollProvider>
     </Provider>
   )
 }

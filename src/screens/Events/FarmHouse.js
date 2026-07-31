@@ -457,7 +457,7 @@ const FarmHouse = () => {
 
             {/* ── FARM HOUSE HERO HEADER ── */}
             <LinearGradient
-                colors={['#779B3F', '#779B3F', '#779B3F']}
+                colors={['#1B4332', '#2D6A4F', '#52B788']}
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                 style={styles.heroHeader}
             >

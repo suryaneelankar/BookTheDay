@@ -669,7 +669,7 @@ const HomeDashboard = () => {
             {/* Banner 2 - Farm Houses */}
             <TouchableOpacity
               activeOpacity={0.95}
-              onPress={() => navigation.navigate('FarmHouse')}
+              onPress={() => navigation.navigate('FarmHouseTab')}
               style={styles.heroBannerSlide}>
               <LinearGradient
                 colors={['#1B4332', '#2D6A4F', '#52B788']}
@@ -733,7 +733,7 @@ const HomeDashboard = () => {
              {/* Banner 4 - Banquet Halls */}
             <TouchableOpacity
               activeOpacity={0.95}
-              onPress={() => navigation.navigate('BanquetHalls')}
+              onPress={() => navigation.navigate('BanquetHallsTab')}
               style={styles.heroBannerSlide}>
               <LinearGradient
                 colors={['#92400E', '#D97706', '#FBBF24']}
@@ -824,7 +824,7 @@ const HomeDashboard = () => {
 
             <TouchableOpacity
               activeOpacity={0.8}
-              onPress={() => navigation.navigate('FarmHouse')}
+              onPress={() => navigation.navigate('FarmHouseTab')}
               style={styles.catItem}>
               <View style={styles.catCircle}>
                 <Image source={FarmHouseIconPng} style={{width: 62, height: 62, borderRadius: 34}} resizeMode="cover" />
@@ -844,7 +844,7 @@ const HomeDashboard = () => {
 
             <TouchableOpacity
               activeOpacity={0.8}
-              onPress={() => navigation.navigate('BanquetHalls')}
+              onPress={() => navigation.navigate('BanquetHallsTab')}
               style={styles.catItem}>
               <View style={styles.catCircle}>
                 <DestinationIcon width={68} height={68} />
@@ -927,7 +927,7 @@ const HomeDashboard = () => {
                 We are here for your every need.{'\n'}Premium venues at best prices.
               </Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate('BanquetHalls')}
+                onPress={() => navigation.navigate('BanquetHallstab')}
                 style={styles.destCta}>
                 <Text style={styles.destCtaText}>About us »</Text>
               </TouchableOpacity>

@@ -19,6 +19,7 @@ import BookingDetailsScreen from "../screens/Categories/ViewCartDetails";
 import RequestConfirmation from "../screens/VendorScreens/VendorDashBoard/RequestConfirmation";
 import EditProfile from "../screens/Profile/EditProfile";
 import SearchVenues from "../screens/Search/SearchVenues";
+import BudgetPlanner from "../screens/Search/BudgetPlanner";
 import ViewMyBookings from "../screens/Profile/MyBookings";
 import RentOnProducts from "../screens/GiveOnRent/RentOnProducts";
 import LocationAdded from "../screens/Location/LocationAdded";
@@ -199,6 +200,12 @@ const MainNavigation = () => {
             <Stack.Screen
                 name="SearchVenues"
                 component={SearchVenues}
+                options={{ headerShown: false }}
+            />
+
+            <Stack.Screen
+                name="BudgetPlanner"
+                component={BudgetPlanner}
                 options={{ headerShown: false }}
             />
 
