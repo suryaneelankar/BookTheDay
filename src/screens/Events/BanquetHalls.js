@@ -2,11 +2,11 @@ import React, { useEffect, useState, useRef, useMemo, useCallback } from "react"
 import {
     View, Text, TouchableOpacity, StyleSheet, Dimensions,
     FlatList, SafeAreaView, ActivityIndicator, ScrollView,
-    Switch, TextInput, Animated, Easing
+    Switch, TextInput, Animated
 } from 'react-native';
 import BASE_URL from "../../apiconfig";
 import axios from "axios";
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../utils/GlobalFunctions';
 import LocationMarkIcon from '../../assets/svgs/location.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
@@ -39,8 +39,8 @@ const chipColors = {
     Luxury: '#D3C0FF', Premium: '#C8FACC', Elite: '#FFD6E8',
 };
 const categoryPriceMapping = {
-    Budget: '10k-50k', Standard: '1L-2L',
-    Premium: '3L-5L', Luxury: '5L-10L', Elite: '10L+',
+    Budget: '50k-1L', Standard: '2L-3L',
+    Premium: '5L-10L', Luxury: '12L-15L', Elite: '20L+',
 };
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
@@ -60,7 +60,49 @@ const SkeletonCard = () => (
 
 const BanquetHalls = () => {
     const navigation = useNavigation();
+    const isScreenFocused = useIsFocused();
     const actionSheetRef = useRef(null);
+    const heroProgress = useRef(new Animated.Value(0)).current;
+    const isHeroCollapsedRef = useRef(false);
+    const isHeroAnimatingRef = useRef(false);
+    const lastScrollYRef = useRef(0);
+
+    const heroContentHeight = heroProgress.interpolate({
+        inputRange: [0, 1], outputRange: [105, 0], extrapolate: 'clamp',
+    });
+    const heroContentOpacity = heroProgress.interpolate({
+        inputRange: [0, 0.55, 1], outputRange: [1, 0.35, 0], extrapolate: 'clamp',
+    });
+    const heroContentTranslateY = heroProgress.interpolate({
+        inputRange: [0, 1], outputRange: [0, -18], extrapolate: 'clamp',
+    });
+
+    const setHeroCollapsed = useCallback((collapsed) => {
+        if (isHeroCollapsedRef.current === collapsed || isHeroAnimatingRef.current) return;
+
+        isHeroCollapsedRef.current = collapsed;
+        isHeroAnimatingRef.current = true;
+        Animated.timing(heroProgress, {
+            toValue: collapsed ? 1 : 0,
+            duration: 220,
+            useNativeDriver: false,
+        }).start(() => {
+            isHeroAnimatingRef.current = false;
+        });
+    }, [heroProgress]);
+
+    const handleListScroll = useCallback((event) => {
+        const y = Math.max(0, event.nativeEvent.contentOffset.y);
+        const delta = y - lastScrollYRef.current;
+
+        if (delta > 6 && y > 35) {
+            setHeroCollapsed(true);
+        } else if (delta < -12 || y <= 4) {
+            setHeroCollapsed(false);
+        }
+
+        lastScrollYRef.current = y;
+    }, [setHeroCollapsed]);
 
     const [eventsData, setEventsData] = useState([]);
     const [filteredList, setFilteredList] = useState([]);
@@ -83,7 +125,18 @@ const BanquetHalls = () => {
     const [loading, setLoading] = useState(false);
     const [query, setQuery] = useState('');
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const [headerHeight, setHeaderHeight] = useState(0);
+    const [activeAutoplayCardId, setActiveAutoplayCardId] = useState(null);
+
+    // Only one banquet card that remains mostly visible can autoplay.
+    const viewabilityConfig = useRef({
+        itemVisiblePercentThreshold: 70,
+        minimumViewTime: 250,
+    }).current;
+    const onViewableItemsChanged = useRef(({ viewableItems }) => {
+        const visibleCard = viewableItems.find(({ isViewable }) => isViewable);
+        const nextId = visibleCard?.item?._id ?? null;
+        setActiveAutoplayCardId(currentId => currentId === nextId ? currentId : nextId);
+    }).current;
 
     const isFetchingRef = useRef(false);
     const isFetchingFilterRef = useRef(false);
@@ -94,64 +147,6 @@ const BanquetHalls = () => {
     const hasMoreFilterRef = useRef(true);
     const totalFilterPagesRef = useRef(0);
     const isFilterAppliedRef = useRef(false);
-
-    const scrollY = useRef(new Animated.Value(0)).current;
-    const lastScrollY = useRef(0);
-    const headerAnim = useRef(new Animated.Value(1)).current; // 1 = visible, 0 = hidden
-    const HEADER_MAX_HEIGHT = 220; // adjust to your hero/header size
-
-    // const lastScrollY = useRef(0);
-    const headerVisibleRef = useRef(true);
-
-    const HIDE_THRESHOLD = 20;
-    const SHOW_THRESHOLD = 8;
-
-    const handleScroll = (y) => {
-        const diff = y - lastScrollY.current;
-
-        if (diff > HIDE_THRESHOLD && headerVisibleRef.current) {
-            hideHeader();
-            headerVisibleRef.current = false;
-        } else if (diff < -SHOW_THRESHOLD && !headerVisibleRef.current) {
-            showHeader();
-            headerVisibleRef.current = true;
-        }
-
-        lastScrollY.current = y;
-    };
-
-    const HEADER_HEIGHT = 220;
-
-    const diffClamp = Animated.diffClamp(scrollY, 0, HEADER_HEIGHT);
-
-    const translateY = diffClamp.interpolate({
-        inputRange: [0, HEADER_HEIGHT],
-        outputRange: [0, -HEADER_HEIGHT],
-        extrapolate: 'clamp',
-    });
-
-    const hideHeader = () => {
-        Animated.timing(headerTranslateY, {
-            toValue: -HEADER_HEIGHT,
-            duration: 250,
-            easing: Easing.out(Easing.cubic),
-            useNativeDriver: true,
-        }).start();
-    };
-
-    const showHeader = () => {
-        Animated.timing(headerTranslateY, {
-            toValue: 0,
-            duration: 250,
-            easing: Easing.out(Easing.cubic),
-            useNativeDriver: true,
-        }).start();
-    };
-
-    const headerOpacity = headerAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, 1],
-    });
 
     useEffect(() => { getAllEvents(1); getAllLocations(); }, []);
 
@@ -312,12 +307,18 @@ const BanquetHalls = () => {
         const imageUrls = [heroImage, ...(item?.additionalImages?.flat()?.map(img => img?.url) || [])].filter(Boolean);
         const totalPhotos = imageUrls.length;
         const hasVideo = item?.hallVideos?.length > 0;
+        const shouldAutoplay =
+            isScreenFocused &&
+            activeAutoplayCardId === item._id &&
+            imageUrls.length > 1;
         return (
             <View style={styles.card}>
                 <View style={styles.cardImageWrapper}>
                     <Swiper
+                        key={`${item._id}-${shouldAutoplay ? 'playing' : 'paused'}`}
                         loop={true}
-                        autoplay={false}
+                        autoplay={shouldAutoplay}
+                        autoplayTimeout={4}
                         showsPagination={true}
                         activeDotColor="#fff"
                         dotColor="rgba(255,255,255,0.5)"
@@ -394,7 +395,7 @@ const BanquetHalls = () => {
                 </TouchableOpacity>
             </View>
         );
-    }, [navigation]);
+    }, [navigation, activeAutoplayCardId, isScreenFocused]);
 
     const isApplyDisabled = !selectedPriceRange && !selectedSeatingCapacity && isACSelected === null && !selectedChip && !switchCateringVal;
 
@@ -495,76 +496,70 @@ const BanquetHalls = () => {
             </ActionSheet>
 
             {/* ── BANQUET HALLS HERO ── */}
-            <View style={{flex:1 }}>
-            <Animated.View style={[
-                {
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    zIndex: 100,
-                    elevation: 100,
-                    transform: [{ translateY }],
-                },
-            ]}
-                onLayout={(e) => {
-                    setHeaderHeight(e.nativeEvent.layout.height);
-                }}
-            >
-                <LinearGradient colors={['#5C1E3E', '#7A2D52', '#9B3D6A']}
-                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.heroHeader}>
-                    <View style={styles.heroCircle1} />
-                    <View style={styles.heroCircle2} />
-                    <View style={styles.heroRow}>
-                        <View style={{ flex: 1 }}>
-                            <View style={styles.heroBadge}>
-                                <IonIcon name="ribbon" size={11} color={BH_GOLD} />
-                                <Text style={styles.heroBadgeText}>Grand Venues</Text>
-                            </View>
-                            <Text style={styles.heroTitle}>Banquet Halls</Text>
-                            <Text style={styles.heroSub}>Premium halls for all occasions</Text>
-                        </View>
-                        <View style={styles.heroIconWrap}>
-                            <IonIcon name="ribbon" size={32} color={BH_GOLD} />
-                        </View>
-                    </View>
-                    <View style={styles.searchBar}>
-                        <IonIcon name="search-outline" size={16} color="black" style={{ marginRight: 8 }} />
-                        <TextInput style={styles.searchInput} value={query} onChangeText={handleQueryChange}
-                            placeholder="Search banquet halls by name or area..."
-                            placeholderTextColor="black" returnKeyType="search" />
-                        {query.length > 0 && (
-                            <TouchableOpacity onPress={() => { setQuery(''); setDropdownVisible(false); setLocationBasedData([]); }}>
-                                <IonIcon name="close-circle" size={16} color="rgba(236,167,60,0.7)" />
-                            </TouchableOpacity>)}
-                    </View>
-                    {dropdownVisible && (locationSuggestions.length > 0 || nameFilteredData.length > 0) && (
-                        <View style={styles.dropdown}>
-                            {locationSuggestions.map((item, index) => (
-                                <TouchableOpacity key={`area-${item._id}`}
-                                    style={[styles.dropdownItem, index < locationSuggestions.length - 1 && styles.dropdownDivider]}
-                                    onPress={() => { setQuery(item.value); setDropdownVisible(false); getAllEventsByLocation(item.value); }}>
-                                    <IonIcon name="location-outline" size={13} color={BH_GOLD} style={{ marginRight: 8 }} />
-                                    <Text style={styles.dropdownText}>{item.value}</Text>
-                                </TouchableOpacity>))}
-                            {nameFilteredData.slice(0, 4).map((item, index) => (
-                                <TouchableOpacity key={`bh-${item._id}`}
-                                    style={[styles.dropdownItem, index < 3 && styles.dropdownDivider]}
-                                    onPress={() => { setDropdownVisible(false); navigation.navigate('ViewEvents', { categoryId: item._id }); }}>
-                                    <IonIcon name="business-outline" size={13} color="#939393" style={{ marginRight: 8 }} />
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={styles.dropdownText} numberOfLines={1}>{item.functionHallName}</Text>
-                                        <Text style={styles.dropdownSubText} numberOfLines={1}>{item?.functionHallAddress?.address}</Text>
+                    <LinearGradient colors={['#B63282', '#93186C', '#68133F']}
+                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.heroHeader}>
+                        <View style={styles.heroCircle1} />
+                        <View style={styles.heroCircle2} />
+                        <Animated.View
+                            style={[
+                                styles.heroCollapsible,
+                                {
+                                    height: heroContentHeight,
+                                    opacity: heroContentOpacity,
+                                    transform: [{ translateY: heroContentTranslateY }],
+                                },
+                            ]}
+                            pointerEvents="none"
+                        >
+                            <View style={styles.heroRow}>
+                                <View style={{ flex: 1 }}>
+                                    <View style={styles.heroBadge}>
+                                        <IonIcon name="ribbon" size={11} color={BH_GOLD} />
+                                        <Text style={styles.heroBadgeText}>Grand Venues</Text>
                                     </View>
-                                    <IonIcon name="chevron-forward" size={12} color="#ccc" />
-                                </TouchableOpacity>))}
-                        </View>)}
-                </LinearGradient>
-            </Animated.View>
-            </View>
+                                    <Text style={styles.heroTitle}>Banquet Halls</Text>
+                                    <Text style={styles.heroSub}>Premium halls for all occasions</Text>
+                                </View>
+                                <View style={styles.heroIconWrap}>
+                                    <IonIcon name="ribbon" size={32} color={BH_GOLD} />
+                                </View>
+                            </View>
+                        </Animated.View>
+                        <View style={styles.searchBar}>
+                            <IonIcon name="search-outline" size={16} color="black" style={{ marginRight: 8 }} />
+                            <TextInput style={styles.searchInput} value={query} onChangeText={handleQueryChange}
+                                placeholder="Search banquet halls by name or area..."
+                                placeholderTextColor="black" returnKeyType="search" />
+                            {query.length > 0 && (
+                                <TouchableOpacity onPress={() => { setQuery(''); setDropdownVisible(false); setLocationBasedData([]); }}>
+                                    <IonIcon name="close-circle" size={16} color="rgba(236,167,60,0.7)" />
+                                </TouchableOpacity>)}
+                        </View>
+                        {dropdownVisible && (locationSuggestions.length > 0 || nameFilteredData.length > 0) && (
+                            <View style={styles.dropdown}>
+                                {locationSuggestions.map((item, index) => (
+                                    <TouchableOpacity key={`area-${item._id}`}
+                                        style={[styles.dropdownItem, index < locationSuggestions.length - 1 && styles.dropdownDivider]}
+                                        onPress={() => { setQuery(item.value); setDropdownVisible(false); getAllEventsByLocation(item.value); }}>
+                                        <IonIcon name="location-outline" size={13} color={BH_GOLD} style={{ marginRight: 8 }} />
+                                        <Text style={styles.dropdownText}>{item.value}</Text>
+                                    </TouchableOpacity>))}
+                                {nameFilteredData.slice(0, 4).map((item, index) => (
+                                    <TouchableOpacity key={`bh-${item._id}`}
+                                        style={[styles.dropdownItem, index < 3 && styles.dropdownDivider]}
+                                        onPress={() => { setDropdownVisible(false); navigation.navigate('ViewEvents', { categoryId: item._id }); }}>
+                                        <IonIcon name="business-outline" size={13} color="#939393" style={{ marginRight: 8 }} />
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={styles.dropdownText} numberOfLines={1}>{item.functionHallName}</Text>
+                                            <Text style={styles.dropdownSubText} numberOfLines={1}>{item?.functionHallAddress?.address}</Text>
+                                        </View>
+                                        <IonIcon name="chevron-forward" size={12} color="#ccc" />
+                                    </TouchableOpacity>))}
+                            </View>)}
+                    </LinearGradient>
 
             {/* ── HEADER ROW ── */}
-            
+
             <View style={{ flex: 1 }}>
 
                 <View style={styles.headerRow}>
@@ -588,24 +583,26 @@ const BanquetHalls = () => {
                         {[1, 2, 3].map(i => <SkeletonCard key={i} />)}
                     </ScrollView>
                 ) : (
-                    <Animated.FlatList data={dataSource} renderItem={renderItem} keyExtractor={keyExtractor}
-                        onEndReached={onEndReached} onEndReachedThreshold={0.6}
-                        onScroll={Animated.event(
-                            [
-                                {
-                                    nativeEvent: {
-                                        contentOffset: { y: scrollY },
-                                    },
-                                },
-                            ],
-                            { useNativeDriver: true }
-                        )}
-                        scrollEventThrottle={1}
-                        // scrollEventThrottle={16}
-                        ListFooterComponent={ListFooter} ListEmptyComponent={ListEmpty}
+                    <FlatList
+                        data={dataSource}
+                        renderItem={renderItem}
+                        keyExtractor={keyExtractor}
+                        onScroll={handleListScroll}
+                        scrollEventThrottle={16}
+                        onViewableItemsChanged={onViewableItemsChanged}
+                        viewabilityConfig={viewabilityConfig}
+                        extraData={`${activeAutoplayCardId}-${isScreenFocused}`}
+                        onEndReached={onEndReached}
+                        onEndReachedThreshold={0.6}
+                        ListFooterComponent={ListFooter}
+                        ListEmptyComponent={ListEmpty}
                         contentContainerStyle={styles.listContent}
-                        removeClippedSubviews maxToRenderPerBatch={6} windowSize={10}
-                        initialNumToRender={5} showsVerticalScrollIndicator={false} />
+                        removeClippedSubviews={true}
+                        maxToRenderPerBatch={6}
+                        windowSize={10}
+                        initialNumToRender={5}
+                        showsVerticalScrollIndicator={false}
+                    />
                 )}
             </View>
         </SafeAreaView>
@@ -617,10 +614,11 @@ const styles = StyleSheet.create({
     listContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24 },
 
     // ── HERO ──
-    heroHeader: { paddingHorizontal: 16, paddingTop: 18, paddingBottom: 20, overflow: 'hidden' },
+    heroHeader: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 10, overflow: 'hidden' },
     heroCircle1: { position: 'absolute', width: 200, height: 200, borderRadius: 100, backgroundColor: 'rgba(255,255,255,0.06)', top: -60, right: -50 },
     heroCircle2: { position: 'absolute', width: 120, height: 120, borderRadius: 60, backgroundColor: 'rgba(255,255,255,0.04)', bottom: -30, left: -20 },
-    heroRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+    heroCollapsible: { overflow: 'hidden' },
+    heroRow: { flexDirection: 'row', alignItems: 'center', paddingTop: 10, paddingBottom: 16 },
     heroBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 5, alignSelf: 'flex-start', marginBottom: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
     heroBadgeText: { fontFamily: 'ManropeRegular', fontSize: 11, fontWeight: '700', color: '#FFFFFF' },
     heroTitle: { fontFamily: 'ManropeRegular', fontSize: 24, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.3 },
@@ -628,7 +626,7 @@ const styles = StyleSheet.create({
     heroIconWrap: { width: 60, height: 60, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.12)', justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.2)' },
 
     // ── SEARCH ──
-    searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.2)' },
+    searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.2)', marginTop: 20, bottom:10 },
     searchInput: { flex: 1, fontSize: 13, fontFamily: 'ManropeRegular', color: 'black', padding: 0 },
     dropdown: { backgroundColor: '#fff', borderRadius: 12, marginTop: 6, elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.12, shadowRadius: 6, overflow: 'hidden' },
     dropdownItem: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 11 },

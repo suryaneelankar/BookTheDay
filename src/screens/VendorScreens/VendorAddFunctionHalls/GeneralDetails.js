@@ -19,6 +19,7 @@ import { getVendorAuthToken } from '../../../utils/StoreAuthToken';
 import LocationPicker from '../../../components/LocationPicker';
 import DetectLocation from '../../../assets/svgs/detectLocation.svg';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../../utils/GlobalFunctions';
 import DocumentPicker from 'react-native-document-picker';
@@ -945,68 +946,53 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     };
 
 
-    const ItemList = () => {
-        const screenWidth = Dimensions.get('window').width;
+    const ItemList = () => null; // replaced by AmenitiesGrid
 
-        // Function to render items in rows
-        const renderItemsInRows = () => {
-            const itemsPerRow = [];
-            let currentRow = [];
-            let currentRowWidth = 0;
+    const RentalItemsList = () => null; // replaced by AmenitiesGrid
 
-            selectedItemArray.forEach((itemName) => {
-                const itemWidth = measureTextWidth(itemName) + 20; // Add padding and margin
-
-                if (currentRowWidth + itemWidth > screenWidth) {
-                    itemsPerRow.push(currentRow);
-                    currentRow = [itemName];
-                    currentRowWidth = itemWidth;
-                } else {
-                    currentRow.push(itemName);
-                    currentRowWidth += itemWidth;
-                }
-            });
-
-            // Push the last row
-            if (currentRow.length > 0) {
-                itemsPerRow.push(currentRow);
-            }
-
-            return itemsPerRow;
-        };
-
-        // Function to measure text width (simplified, should be improved for real scenarios)
-        const measureTextWidth = (text) => {
-            // Adjust the base width as needed
-            return text.length * 10;
-        };
-
-        const itemsPerRow = renderItemsInRows();
-
-        return (
-            <View style={styles.amenitiesContainer}>
-                {itemsPerRow.map((row, rowIndex) => (
-                    <View key={rowIndex} style={styles.row}>
-                        {row.map((itemName, itemIndex) => {
-                            const itemDetails = rentalItemPricingDetails[itemName]?.[0];
-                            // const price = itemDetails?.perDayPrice?.toString() || '';
-
-                            return (
-                                <View key={itemIndex} style={styles.itemContainer}>
-                                    <TouchableOpacity style={styles.itemButton}>
-                                        <Text style={styles.itemText}>{itemName}</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={() => addRentalItemOnPress(itemName)}>
-                                        <CrossIcon />
-                                    </TouchableOpacity>
-                                </View>
-                            );
-                        })}
-                    </View>
-                ))}
-            </View>
-        );
+    const amenityIcons = {
+        'Tables with basic covers': 'grid-outline',
+        'Chairs': 'person-outline',
+        'Restrooms/Toilets': 'water-outline',
+        'Parking': 'car-outline',
+        'Wheelchair access': 'accessibility-outline',
+        'Coolers / Fans': 'thermometer-outline',
+        'Air Conditioners (AC)': 'snow-outline',
+        'Bedrooms': 'bed-outline',
+        'Sound/music license': 'musical-notes-outline',
+        'Lighting': 'bulb-outline',
+        'Power Backup': 'battery-charging-outline',
+        'Bridal Room': 'rose-outline',
+        'Kitchen Space': 'restaurant-outline',
     };
+
+    const AmenitiesGrid = () => (
+        <View style={styles.amenitiesGrid}>
+            {rentalItems.map((item, index) => {
+                const isSelected = selectedItemArray.includes(item.name);
+                const iconName = amenityIcons[item.name] || 'checkmark-circle-outline';
+                return (
+                    <TouchableOpacity
+                        key={index}
+                        style={[styles.amenityChip, isSelected && styles.amenityChipSelected]}
+                        onPress={() => addRentalItemOnPress(item.name)}
+                        activeOpacity={0.75}>
+                        <Icon
+                            name={iconName}
+                            size={16}
+                            color={isSelected ? '#fff' : '#606060'}
+                        />
+                        <Text style={[styles.amenityChipText, isSelected && styles.amenityChipTextSelected]}>
+                            {item.name}
+                        </Text>
+                        {isSelected && (
+                            <Icon name="checkmark-circle" size={14} color="#fff" />
+                        )}
+                    </TouchableOpacity>
+                );
+            })}
+        </View>
+    );
 
     const addRentalItemOnPress = (itemName) => {
         setSelectedItemArray((previous) => {
@@ -1025,49 +1011,6 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                 return [...previous, itemName];
             }
         });
-    };
-
-    const RentalItemsList = () => {
-
-        const toggleCollapse = () => {
-            setIsCollapsed(!isCollapsed);
-        };
-
-        const renderItem = ({ item }) => {
-            const IconImage = item?.icon;
-            return (
-                <TouchableOpacity style={styles.item} onPress={() => { addRentalItemOnPress(item.name) }}>
-                    <View style={{ borderColor: 'green', borderWidth: 2, width: 20, height: 20, borderRadius: 5 }}>
-                        {/* <View style={{ backgroundColor: selectedItemArray.includes(item.name) ? 'green' : 'white', width: 10, height: 10, alignSelf: 'center', marginTop: 3 }}>
-
-                        </View> */}
-                        {selectedItemArray.includes(item.name) ? <FontAwesome5 style={{ marginHorizontal: 1 }} name={'check'} size={14} color={'green'} /> : null}
-                    </View>
-                    <View style={{ flexDirection: 'row', marginHorizontal: 5, alignItems: "center" }} onPress={() => { }}>
-
-                        <Text style={styles.itemText}>{item.name}</Text>
-                    </View>
-                </TouchableOpacity>
-            )
-        }
-
-        return (
-            <View style={styles.container}>
-                <TouchableOpacity onPress={toggleCollapse} style={styles.header}>
-                    <Text style={styles.headerText}>Available Amenities <Text style={{ color: "red" }}>*</Text></Text>
-                    <Icon name={isCollapsed ? 'arrow-down' : 'arrow-up'} size={20} />
-                </TouchableOpacity>
-                {!isCollapsed && (
-                    <View style={styles.itemsContainer}>
-                        <FlatList
-                            data={rentalItems}
-                            keyExtractor={(item, index) => index.toString()}
-                            renderItem={renderItem}
-                        />
-                    </View>
-                )}
-            </View>
-        );
     };
 
 
@@ -1103,51 +1046,73 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
     const RentalFoodTypeList = () => {
 
-        const toggleCollapse = () => {
-            setIsFoodDropDownCollapsed(!isFoodDropDownCollapsed);
-            // setSelectedFoodType(name);
-        };
-
         const onSelectFoodType = (name) => {
             setSelectedFoodType(name);
-        }
+        };
 
-
-        const renderItem = ({ item }) => {
-            const IconImage = item?.icon;
-            return (
-                <TouchableOpacity style={styles.item} onPress={() => { onSelectFoodType(item?.name) }}>
-                    <View style={{ borderColor: 'green', borderWidth: 2, width: 20, height: 20, borderRadius: 5 }}>
-                        {/* <View style={{ backgroundColor: selectedFoodType === item.name ? 'green' : 'white', width: 10, height: 10, alignSelf: 'center', marginTop: 3 }}>
-
-                        </View> */}
-                        {selectedFoodType === item.name ? <FontAwesome5 style={{ marginHorizontal: 1 }} name={'check'} size={14} color={'green'} /> : null}
-                    </View>
-                    <View style={{ flexDirection: 'row', marginHorizontal: 5, alignItems: "center" }} onPress={() => { }}>
-                        {/* <Icon name={item.icon} size={20} style={styles.icon} /> */}
-
-                        <IconImage style={{ marginHorizontal: 2 }} />
-                        <Text style={styles.itemText}>{item.name}</Text>
-                    </View>
-                </TouchableOpacity>
-            )
-        }
+        const foodTypeConfig = [
+            {
+                name: 'veg',
+                label: 'Veg Only',
+                Icon: VegIcon,
+                color: '#16A34A',
+                bgColor: '#F0FDF4',
+                borderColor: '#86EFAC',
+            },
+            {
+                name: 'non-veg',
+                label: 'Non-Veg',
+                Icon: NonVegIcon,
+                color: '#DC2626',
+                bgColor: '#FEF2F2',
+                borderColor: '#FCA5A5',
+            },
+            {
+                name: 'Both',
+                label: 'Veg & Non-Veg',
+                Icon: VegNonVegIcon,
+                color: '#D97706',
+                bgColor: '#FFFBEB',
+                borderColor: '#FCD34D',
+            },
+        ];
 
         return (
-            <View style={styles.container}>
-                <TouchableOpacity onPress={toggleCollapse} style={styles.header}>
-                    <Text style={styles.headerText}>Select Food Type</Text>
-                    <Icon name={isFoodDropDownCollapsed ? 'arrow-down' : 'arrow-up'} size={20} />
-                </TouchableOpacity>
-                {!isFoodDropDownCollapsed && (
-                    <View style={styles.itemsContainer}>
-                        <FlatList
-                            data={foodTypes}
-                            keyExtractor={(item, index) => index.toString()}
-                            renderItem={renderItem}
-                        />
-                    </View>
-                )}
+            <View style={styles.foodTypeWrapper}>
+                <Text style={styles.labelText}>
+                    Select Food Type<Text style={{color: 'red'}}>*</Text>
+                </Text>
+                <View style={styles.foodTypeRow}>
+                    {foodTypeConfig.map((type) => {
+                        const isSelected = selectedFoodType === type.name;
+                        const FoodIcon = type.Icon;
+                        return (
+                            <TouchableOpacity
+                                key={type.name}
+                                style={[
+                                    styles.foodTypeCard,
+                                    {borderColor: isSelected ? type.color : '#E5E7EB'},
+                                    isSelected && {backgroundColor: type.bgColor},
+                                ]}
+                                onPress={() => onSelectFoodType(type.name)}
+                                activeOpacity={0.75}>
+                                {/* Selected tick */}
+                                {isSelected && (
+                                    <View style={[styles.foodTypeTick, {backgroundColor: type.color}]}>
+                                        <Icon name="checkmark" size={10} color="#fff" />
+                                    </View>
+                                )}
+                                <FoodIcon width={36} height={36} />
+                                <Text style={[
+                                    styles.foodTypeLabel,
+                                    isSelected && {color: type.color, fontWeight: '800'},
+                                ]}>
+                                    {type.label}
+                                </Text>
+                            </TouchableOpacity>
+                        );
+                    })}
+                </View>
             </View>
         );
     };
@@ -1357,102 +1322,75 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         <Text style={styles.labelText}>
                             Select Venue Category<Text style={{ color: 'red' }}>*</Text>
                         </Text>
-                        <View style={styles.categoryRow}>
+                        <Text style={styles.amenitiesHint}>Choose the type that best describes your venue</Text>
+                        <View style={styles.venueCategoryGrid}>
                             {[
                                 {
                                     label: 'Function Hall',
+                                    desc: 'Indoor venues for weddings & events',
                                     iconName: 'business',
                                     color: '#FD813B',
+                                    bg: '#FFF3EA',
                                 },
                                 {
                                     label: 'Farm House',
+                                    desc: 'Open-air spaces & nature retreats',
                                     iconName: 'leaf',
                                     color: '#06BE66',
+                                    bg: '#EDFBF3',
                                 },
                                 {
                                     label: 'Luxury Resort',
+                                    desc: 'Premium venues & destination stays',
                                     iconName: 'water',
                                     color: '#ECA73C',
+                                    bg: '#FFFBEA',
                                 },
                                 {
                                     label: 'Banquet Hall',
+                                    desc: 'Elegant halls for grand celebrations',
                                     iconName: 'flower',
                                     color: '#A0143E',
+                                    bg: '#FEF2F5',
                                 },
                             ].map(cat => {
                                 const selected = venueCategory === cat.label;
-
                                 return (
                                     <TouchableOpacity
                                         key={cat.label}
-                                        activeOpacity={0.92}
+                                        activeOpacity={0.88}
                                         onPress={() => setVenueCategory(cat.label)}
-                                        style={styles.categoryItem}
-                                    >
-                                        {/* CARD */}
-                                        <View
-                                            style={[
-                                                styles.categoryCard,
-                                                {
-                                                    borderColor: selected
-                                                        ? cat.color
-                                                        : '#F3F3F3',
-
-                                                    backgroundColor: selected
-                                                        ? `${cat.color}10`
-                                                        : '#FFFFFF',
-                                                },
-                                            ]}
-                                        >
-                                            {/* TOP ICON */}
-                                            <View
-                                                style={[
-                                                    styles.iconWrapper,
-                                                    {
-                                                        backgroundColor: selected
-                                                            ? cat.color
-                                                            : `${cat.color}12`,
-                                                    },
-                                                ]}
-                                            >
-                                                <Icon
-                                                    name={`${cat.iconName}-outline`}
-                                                    size={24}
-                                                    color={
-                                                        selected
-                                                            ? '#FFFFFF'
-                                                            : cat.color
-                                                    }
-                                                />
+                                        style={[
+                                            styles.venueCategoryCard,
+                                            {borderColor: selected ? cat.color : '#EBEBEB'},
+                                            selected && {backgroundColor: cat.bg},
+                                        ]}>
+                                        {/* Selected checkmark */}
+                                        {selected && (
+                                            <View style={[styles.venueCategoryTick, {backgroundColor: cat.color}]}>
+                                                <Icon name="checkmark" size={11} color="#fff" />
                                             </View>
-
-                                            {/* LABEL */}
-                                            <Text
-                                                style={[
-                                                    styles.categoryText,
-                                                    {
-                                                        color: selected
-                                                            ? '#121212'
-                                                            : '#555',
-                                                    },
-                                                ]}
-                                                numberOfLines={2}
-                                            >
-                                                {cat.label}
-                                            </Text>
-
-                                            {/* SMALL INDICATOR */}
-                                            <View
-                                                style={[
-                                                    styles.bottomIndicator,
-                                                    {
-                                                        backgroundColor: selected
-                                                            ? cat.color
-                                                            : 'transparent',
-                                                    },
-                                                ]}
+                                        )}
+                                        {/* Icon circle */}
+                                        <View style={[
+                                            styles.venueCategoryIcon,
+                                            {backgroundColor: selected ? cat.color : `${cat.color}18`},
+                                        ]}>
+                                            <Icon
+                                                name={`${cat.iconName}-outline`}
+                                                size={26}
+                                                color={selected ? '#fff' : cat.color}
                                             />
                                         </View>
+                                        <Text style={[
+                                            styles.venueCategoryLabel,
+                                            selected && {color: cat.color, fontWeight: '800'},
+                                        ]}>
+                                            {cat.label}
+                                        </Text>
+                                        <Text style={styles.venueCategoryDesc} numberOfLines={2}>
+                                            {cat.desc}
+                                        </Text>
                                     </TouchableOpacity>
                                 );
                             })}
@@ -1492,8 +1430,11 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
 
                         <Text style={styles.labelText}>Available Hall Amenities<Text style={{ color: "red" }}>*</Text></Text>
-                        {RentalItemsList()}
-                        {ItemList()}
+                        <Text style={styles.amenitiesHint}>Tap to select all that apply</Text>
+                        {AmenitiesGrid()}
+                        {selectedItemArray.length > 0 && (
+                            <Text style={styles.amenitiesCount}>{selectedItemArray.length} amenit{selectedItemArray.length === 1 ? 'y' : 'ies'} selected</Text>
+                        )}
 
                         <View style={{ transform: [{ scale: 1.0 }], width: "100%", flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Text style={{ alignSelf: "center", fontWeight: "800", fontSize: 15, fontFamily: 'ManropeRegular', color: "black" }}>Do you have in house catering?</Text>
@@ -1725,11 +1666,27 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                     />
 
                     {/* <Text style={{ fontFamily: 'InterRegular', color: '#5F6377', fontSize: 15, fontWeight: '600' }}>I Accept Terms and Conditions</Text> */}
-                    <TouchableOpacity onPress={() => { onPressSaveAndPost() }} style={{ padding: 10, backgroundColor: '#FFF5E3', alignSelf: 'center', borderRadius: 5, borderColor: '#ECA73C', borderWidth: 2, marginTop: 40, bottom: 20 }}>
-                        <Text style={{ color: '#ECA73C' }}> Save & Post </Text>
-                    </TouchableOpacity>
 
                 </View>}
+
+            {/* ── STICKY PUBLISH BUTTON ── */}
+            {!loading && (
+                // <View style={styles.stickyBar}>
+                    <TouchableOpacity
+                        onPress={() => { onPressSaveAndPost(); }}
+                        style={styles.publishBtn}
+                        activeOpacity={0.85}>
+                        <LinearGradient
+                            colors={['#D2453B', '#A0153E']}
+                            start={{x: 0, y: 0}}
+                            end={{x: 1, y: 0}}
+                            style={styles.publishBtnGradient}>
+                            <Icon name="cloud-upload-outline" size={20} color="#fff" />
+                            <Text style={styles.publishBtnText}>Publish Listing</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                // </View>
+            )}
 
         </View>
     )
@@ -1989,5 +1946,185 @@ const styles = StyleSheet.create({
         height: 4,
         borderRadius: 10,
         marginTop: 12,
+    },
+    // ── VENUE CATEGORY ──
+    venueCategoryGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 10,
+        marginTop: 10,
+        marginBottom: 6,
+    },
+    venueCategoryCard: {
+        width: '47.5%',
+        backgroundColor: '#fff',
+        borderRadius: 14,
+        borderWidth: 2,
+        borderColor: '#EBEBEB',
+        padding: 14,
+        alignItems: 'flex-start',
+        position: 'relative',
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.05,
+        shadowRadius: 6,
+    },
+    venueCategoryTick: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    venueCategoryIcon: {
+        width: 50,
+        height: 50,
+        borderRadius: 14,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    venueCategoryLabel: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: '#100D25',
+        fontFamily: 'ManropeRegular',
+        marginBottom: 4,
+    },
+    venueCategoryDesc: {
+        fontSize: 11,
+        color: '#939393',
+        fontFamily: 'ManropeRegular',
+        lineHeight: 15,
+    },
+
+    amenitiesGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 10,
+        marginTop: 10,
+        marginBottom: 6,
+    },
+    amenityChip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        borderRadius: 10,
+        borderWidth: 1.5,
+        borderColor: '#E0E0E0',
+        backgroundColor: '#F9F9F9',
+    },
+    amenityChipSelected: {
+        backgroundColor: '#A0153E',
+        borderColor: '#A0153E',
+    },
+    amenityChipText: {
+        fontSize: 13,
+        color: '#606060',
+        fontFamily: 'ManropeRegular',
+        fontWeight: '600',
+    },
+    amenityChipTextSelected: {
+        color: '#fff',
+    },
+    amenitiesHint: {
+        fontSize: 12,
+        color: '#939393',
+        fontFamily: 'ManropeRegular',
+        marginTop: 2,
+        marginBottom: 4,
+    },
+    amenitiesCount: {
+        fontSize: 12,
+        color: '#A0153E',
+        fontFamily: 'ManropeRegular',
+        fontWeight: '700',
+        marginTop: 8,
+    },
+    // ── FOOD TYPE ──
+    foodTypeWrapper: {
+        marginTop: 10,
+        marginBottom: 6,
+    },
+    foodTypeRow: {
+        flexDirection: 'row',
+        gap: 10,
+        marginTop: 10,
+    },
+    foodTypeCard: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 16,
+        paddingHorizontal: 8,
+        borderRadius: 14,
+        borderWidth: 2,
+        borderColor: '#E5E7EB',
+        backgroundColor: '#fff',
+        gap: 8,
+        position: 'relative',
+        elevation: 1,
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 1},
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+    },
+    foodTypeTick: {
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        width: 18,
+        height: 18,
+        borderRadius: 9,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    foodTypeLabel: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: '#606060',
+        fontFamily: 'ManropeRegular',
+        textAlign: 'center',
+    },
+    publishBtn: {
+        flex: 1,
+    },
+    publishBtnGradient: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+        borderRadius: 14,
+        paddingVertical: 12,
+    },
+    publishBtnText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: '800',
+        fontFamily: 'ManropeRegular',
+        letterSpacing: 0.3,
+    },
+    stickyBar: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        paddingBottom: 20,
+        backgroundColor: '#fff',
+        borderTopWidth: 1,
+        borderTopColor: '#EFEFEF',
+        elevation: 12,
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: -3},
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
     },
 })

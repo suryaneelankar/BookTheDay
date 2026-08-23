@@ -2,11 +2,11 @@ import React, { useEffect, useState, useRef, useMemo, useCallback } from "react"
 import {
     View, Text, TouchableOpacity, StyleSheet, Dimensions,
     FlatList, SafeAreaView, ActivityIndicator, ScrollView,
-    Switch, TextInput,
+    Switch, TextInput, Animated,
 } from 'react-native';
 import BASE_URL from "../../apiconfig";
 import axios from "axios";
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../utils/GlobalFunctions';
 import LocationMarkIcon from '../../assets/svgs/location.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
@@ -43,7 +43,7 @@ const categoryPriceMapping = {
     Premium: '3L-5L', Luxury: '5L-10L', Elite: '10L+',
 };
 
-// ─── Skeleton ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Skeleton â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const SkeletonCard = () => (
     <View style={[styles.card, { marginBottom: 16 }]}>
         <View style={styles.skeletonImage} />
@@ -60,7 +60,57 @@ const SkeletonCard = () => (
 
 const LuxuryResorts = () => {
     const navigation = useNavigation();
+    const isScreenFocused = useIsFocused();
     const actionSheetRef = useRef(null);
+    const heroProgress = useRef(new Animated.Value(0)).current;
+    const isHeroCollapsedRef = useRef(false);
+    const isHeroAnimatingRef = useRef(false);
+    const lastScrollYRef = useRef(0);
+
+    const heroContentHeight = heroProgress.interpolate({
+        inputRange: [0, 1],
+        outputRange: [105, 0],
+        extrapolate: 'clamp',
+    });
+    const heroContentOpacity = heroProgress.interpolate({
+        inputRange: [0, 0.55, 1],
+        outputRange: [1, 0.35, 0],
+        extrapolate: 'clamp',
+    });
+    const heroContentTranslateY = heroProgress.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, -18],
+        extrapolate: 'clamp',
+    });
+
+    const setHeroCollapsed = useCallback((collapsed) => {
+        if (isHeroCollapsedRef.current === collapsed || isHeroAnimatingRef.current) return;
+
+        isHeroCollapsedRef.current = collapsed;
+        isHeroAnimatingRef.current = true;
+        Animated.timing(heroProgress, {
+            toValue: collapsed ? 1 : 0,
+            duration: 220,
+            useNativeDriver: false,
+        }).start(() => {
+            isHeroAnimatingRef.current = false;
+        });
+    }, [heroProgress]);
+
+    const handleListScroll = useCallback((event) => {
+        const y = Math.max(0, event.nativeEvent.contentOffset.y);
+        const delta = y - lastScrollYRef.current;
+
+        // Separate thresholds prevent tiny finger movements and layout changes
+        // from repeatedly reversing the animation.
+        if (delta > 6 && y > 35) {
+            setHeroCollapsed(true);
+        } else if (delta < -12 || y <= 4) {
+            setHeroCollapsed(false);
+        }
+
+        lastScrollYRef.current = y;
+    }, [setHeroCollapsed]);
 
     const [eventsData, setEventsData] = useState([]);
     const [filteredList, setFilteredList] = useState([]);
@@ -83,8 +133,20 @@ const LuxuryResorts = () => {
     const [loading, setLoading] = useState(false);
     const [query, setQuery] = useState('');
     const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [activeAutoplayCardId, setActiveAutoplayCardId] = useState(null);
 
-    // Pagination refs — always current, no stale closures
+    // Only one resort card that remains mostly visible can autoplay.
+    const viewabilityConfig = useRef({
+        itemVisiblePercentThreshold: 70,
+        minimumViewTime: 250,
+    }).current;
+    const onViewableItemsChanged = useRef(({ viewableItems }) => {
+        const visibleCard = viewableItems.find(({ isViewable }) => isViewable);
+        const nextId = visibleCard?.item?._id ?? null;
+        setActiveAutoplayCardId(currentId => currentId === nextId ? currentId : nextId);
+    }).current;
+
+    // Pagination refs â€” always current, no stale closures
     const isFetchingRef = useRef(false);
     const isFetchingFilterRef = useRef(false);
     const currentPageRef = useRef(1);
@@ -97,7 +159,7 @@ const LuxuryResorts = () => {
 
     useEffect(() => { getAllEvents(1); getAllLocations(); }, []);
 
-    // ── API: fetch all halls, filter client-side to Luxury Resort ────────────
+    // â”€â”€ API: fetch all halls, filter client-side to Luxury Resort â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const getAllEvents = async (page) => {
         if (isFetchingRef.current) return;
         isFetchingRef.current = true;
@@ -118,7 +180,7 @@ const LuxuryResorts = () => {
                 }
             );
             const allData = Array.isArray(response?.data?.data) ? response.data.data : [];
-            // Filter client-side — only show Luxury Resort category
+            // Filter client-side â€” only show Luxury Resort category
             // console.log('allData is ::>>>>>',allData);
             const newData = allData.filter(item => item?.venueCategory === VENUE_CATEGORY);
             const total = response?.data?.totalPages ?? 0;
@@ -231,7 +293,7 @@ const LuxuryResorts = () => {
         setIsFilterApplied(true); isFilterAppliedRef.current = true;
     };
 
-    // ── Search ────────────────────────────────────────────────────────────────
+    // â”€â”€ Search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const locationSuggestions = useMemo(() => {
         if (!query) return [];
         return allLocations?.filter(i => i?.value?.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
@@ -271,16 +333,21 @@ const LuxuryResorts = () => {
         isFilterAppliedRef.current ? loadMoreFiltered() : loadMore();
     }, []);
 
-    // ── Resort-themed card ────────────────────────────────────────────────────
+    // â”€â”€ Resort-themed card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     const renderItem = useCallback(({ item }) => {
         const heroImage = item?.professionalImage?.url;
         const imageUrls = [heroImage, ...(item?.additionalImages?.flat()?.map(img => img?.url) || [])].filter(Boolean);
         const totalPhotos = imageUrls.length;
         const hasVideo = item?.hallVideos?.length > 0;
+        const shouldAutoplay =
+            isScreenFocused &&
+            activeAutoplayCardId === item._id &&
+            imageUrls.length > 1;
         return (
             <View style={styles.card}>
                 <View style={styles.cardImageWrapper}>
                     <Swiper
+                        key={`${item._id}-${shouldAutoplay ? 'playing' : 'paused'}`}
                         loop
                         showsPagination
                         activeDotColor="#fff"
@@ -289,6 +356,8 @@ const LuxuryResorts = () => {
                         dotStyle={{ width: 6, height: 6, borderRadius: 3 }}
                         paginationStyle={{ bottom: 10 }}
                         style={{ height: 200 }}
+                        autoplay={shouldAutoplay}
+                        autoplayTimeout={4}
                     >
                         {imageUrls.map((imgUrl, idx) => (
                             <TouchableOpacity key={idx} activeOpacity={0.93}
@@ -357,7 +426,7 @@ const LuxuryResorts = () => {
                 </TouchableOpacity>
             </View>
         );
-    }, [navigation]);
+    }, [navigation, activeAutoplayCardId, isScreenFocused]);
 
     const isApplyDisabled = !selectedPriceRange && !selectedSeatingCapacity && isACSelected === null && !selectedChip && !switchCateringVal;
 
@@ -389,7 +458,7 @@ const LuxuryResorts = () => {
     return (
         <SafeAreaView style={styles.safeArea}>
 
-            {/* ── FILTER SHEET ── */}
+            {/* â”€â”€ FILTER SHEET â”€â”€ */}
             <ActionSheet
                 ref={actionSheetRef}
                 statusBarTranslucent
@@ -485,27 +554,39 @@ const LuxuryResorts = () => {
                 </View>
             </ActionSheet>
 
-            {/* ── RESORT HERO HEADER ── */}
+            {/* â”€â”€ RESORT HERO HEADER â”€â”€ */}
             <LinearGradient
-                colors={['#4A1942', '#803D7A', '#CD6DBB']}
+                colors={['#B346A1', '#8D388F', '#672C83']}
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                 style={styles.heroHeader}
             >
                 {/* decorative circle */}
                 <View style={styles.heroCircle} />
-                <View style={styles.heroRow}>
-                    <View style={{ flex: 1 }}>
-                        <View style={styles.heroBadge}>
-                            <IonIcon name="diamond" size={11} color={RESORT_GOLD} />
-                            <Text style={styles.heroBadgeText}>Premium Collection</Text>
+                <Animated.View
+                    style={[
+                        styles.heroCollapsible,
+                        {
+                            height: heroContentHeight,
+                            opacity: heroContentOpacity,
+                            transform: [{ translateY: heroContentTranslateY }],
+                        },
+                    ]}
+                    pointerEvents="none"
+                >
+                    <View style={styles.heroRow}>
+                        <View style={{ flex: 1 }}>
+                            <View style={styles.heroBadge}>
+                                <IonIcon name="diamond" size={11} color={RESORT_GOLD} />
+                                <Text style={styles.heroBadgeText}>Premium Collection</Text>
+                            </View>
+                            <Text style={styles.heroTitle}>Luxury Resorts</Text>
+                            <Text style={styles.heroSub}>5-star stays & celebrations</Text>
                         </View>
-                        <Text style={styles.heroTitle}>Luxury Resorts</Text>
-                        <Text style={styles.heroSub}>5-star stays & celebrations</Text>
+                        <View style={styles.heroIconWrap}>
+                            <IonIcon name="sparkles" size={36} color={RESORT_GOLD} />
+                        </View>
                     </View>
-                    <View style={styles.heroIconWrap}>
-                        <IonIcon name="sparkles" size={36} color={RESORT_GOLD} />
-                    </View>
-                </View>
+                </Animated.View>
 
                 {/* search bar inside hero */}
                 <View style={styles.searchBar}>
@@ -556,7 +637,7 @@ const LuxuryResorts = () => {
                 )}
             </LinearGradient>
 
-            {/* ── HEADER ROW ── */}
+            {/* â”€â”€ HEADER ROW â”€â”€ */}
             <View style={styles.headerRow}>
                 <View>
                     <Text style={styles.headerTitle}>Luxury Resorts</Text>
@@ -576,7 +657,7 @@ const LuxuryResorts = () => {
                 </TouchableOpacity>
             </View>
 
-            {/* ── LIST ── */}
+            {/* â”€â”€ LIST â”€â”€ */}
             {loading && eventsData.length === 0 ? (
                 <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8 }}>
                     {[1, 2, 3].map(i => <SkeletonCard key={i} />)}
@@ -586,6 +667,11 @@ const LuxuryResorts = () => {
                     data={dataSource}
                     renderItem={renderItem}
                     keyExtractor={keyExtractor}
+                    onScroll={handleListScroll}
+                    scrollEventThrottle={16}
+                    onViewableItemsChanged={onViewableItemsChanged}
+                    viewabilityConfig={viewabilityConfig}
+                    extraData={`${activeAutoplayCardId}-${isScreenFocused}`}
                     onEndReached={onEndReached}
                     onEndReachedThreshold={0.6}
                     ListFooterComponent={ListFooter}
@@ -606,11 +692,11 @@ const styles = StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: '#F4F6FB' },
     listContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24 },
 
-    // ── HERO HEADER ──
+    // â”€â”€ HERO HEADER â”€â”€
     heroHeader: {
         paddingHorizontal: 16,
-        paddingTop: 18,
-        paddingBottom: 20,
+        paddingTop: 8,
+        paddingBottom: 10,
         overflow: 'hidden',
         // borderBottomLeftRadius: 20,
         // borderBottomRightRadius: 20,
@@ -619,7 +705,8 @@ const styles = StyleSheet.create({
         position: 'absolute', width: 200, height: 200, borderRadius: 100,
         backgroundColor: 'rgba(255,255,255,0.04)', top: -50, right: -50,
     },
-    heroRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+    heroCollapsible: { overflow: 'hidden' },
+    heroRow: { flexDirection: 'row', alignItems: 'center', paddingTop: 10, paddingBottom: 16 },
     heroBadge: {
         flexDirection: 'row', alignItems: 'center', gap: 5,
         backgroundColor: 'rgba(255,255,255,0.1)',
@@ -637,12 +724,12 @@ const styles = StyleSheet.create({
         borderWidth: 1.5, borderColor: 'rgba(236,167,60,0.2)',
     },
 
-    // ── SEARCH ──
+    // â”€â”€ SEARCH â”€â”€
     searchBar: {
         flexDirection: 'row', alignItems: 'center',
         backgroundColor: 'white',
         borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12,
-        borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.15)',
+        borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.15)',bottom: 10,marginTop:20,
     },
     searchInput: { flex: 1, fontSize: 13, fontFamily: 'ManropeRegular', color: 'black', padding: 0 },
     dropdown: {
@@ -655,7 +742,7 @@ const styles = StyleSheet.create({
     dropdownText: { fontSize: 13, fontFamily: 'ManropeRegular', color: '#333', flex: 1 },
     dropdownSubText: { fontSize: 11, fontFamily: 'ManropeRegular', color: '#939393', marginTop: 1 },
 
-    // ── HEADER ROW ──
+    // â”€â”€ HEADER ROW â”€â”€
     headerRow: {
         flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
         paddingHorizontal: 16, paddingTop: 14, paddingBottom: 10,
@@ -678,7 +765,7 @@ const styles = StyleSheet.create({
     },
     filterBadgeText: { fontSize: 10, fontWeight: '800', color: RESORT_BLUE, fontFamily: 'ManropeRegular' },
 
-    // ── CARD ──
+    // â”€â”€ CARD â”€â”€
     card: {
         backgroundColor: '#fff', borderRadius: 20, marginBottom: 16,
         elevation: 3, shadowColor: '#000',
@@ -733,7 +820,7 @@ const styles = StyleSheet.create({
     },
     chipText: { fontSize: 11, color: RESORT_DARK, fontFamily: 'ManropeRegular', fontWeight: '500', marginLeft: 3 },
 
-    // ── FILTER SHEET ──
+    // â”€â”€ FILTER SHEET â”€â”€
     actionSheetContainer: { backgroundColor: '#fff', paddingBottom: 20, borderTopRightRadius: 20, borderTopLeftRadius: 20 },
     filterSectionLabel: { fontFamily: 'ManropeRegular', fontWeight: '700', color: RESORT_DARK, fontSize: 14, paddingLeft: 16, paddingTop: 18, paddingBottom: 4 },
     filterChipsWrap: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 12, paddingBottom: 4, gap: 8, alignItems: 'center' },
@@ -754,7 +841,7 @@ const styles = StyleSheet.create({
     filterApplyGradient: { paddingVertical: 13, alignItems: 'center' },
     filterApplyText: { fontSize: 14, fontWeight: '700', color: '#fff', fontFamily: 'ManropeRegular' },
 
-    // ── FOOTER / EMPTY / SKELETON ──
+    // â”€â”€ FOOTER / EMPTY / SKELETON â”€â”€
     footerLoader: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, paddingVertical: 20 },
     footerLoaderText: { fontSize: 13, color: '#939393', fontFamily: 'ManropeRegular' },
     emptyState: { alignItems: 'center', paddingTop: 80, paddingHorizontal: 32 },

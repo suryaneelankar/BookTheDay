@@ -1,4 +1,4 @@
-package com.book_the_day
+package com.booktheday.app
 import android.os.Bundle
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

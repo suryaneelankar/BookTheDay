@@ -11,10 +11,11 @@ import {
     ScrollView,
     Switch,
     TextInput,
+    Animated,
 } from 'react-native';
 import BASE_URL from "../../apiconfig";
 import axios from "axios";
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../utils/GlobalFunctions';
 import LocationMarkIcon from '../../assets/svgs/location.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
@@ -34,15 +35,15 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 32;
 
 const seatingCapacity = ['50-100', '100-200', '200-400', '400-600', '600-800', '800-1000', '1000-1200', '1200+'];
-const priceRanges = ['10k-50k','50k-1L','1L-2L','2L-3L','3L-5L','5L-10L','10L-12L','12L-15L','15L-20L','20L+'];
+const priceRanges = ['10k-50k', '50k-1L', '1L-2L', '2L-3L', '3L-5L', '5L-10L', '10L-12L', '12L-15L', '15L-20L', '20L+'];
 const chips = ['Budget', 'Standard', 'Premium', 'Luxury', 'Elite'];
 const chipColors = {
     Budget: '#FFE8B3', Standard: '#B3E5FF',
     Luxury: '#D3C0FF', Premium: '#C8FACC', Elite: '#FFD6E8',
 };
 const categoryPriceMapping = {
-    Budget: '10k-50k', Standard: '1L-2L',
-    Premium: '3L-5L', Luxury: '5L-10L', Elite: '10L+',
+    Budget: '50k-1L', Standard: '2L-3L',
+    Premium: '5L-10L', Luxury: '12L-15L', Elite: '20L+',
 };
 
 // ─── Skeleton card shown while first page loads ───────────────────────────────
@@ -63,8 +64,50 @@ const SkeletonCard = () => (
 
 const Events = () => {
     const navigation = useNavigation();
+    const isScreenFocused = useIsFocused();
     const actionSheetRef = useRef(null);
     const userLocationFetched = useSelector((state) => state.userLocation);
+    const heroProgress = useRef(new Animated.Value(0)).current;
+    const isHeroCollapsedRef = useRef(false);
+    const isHeroAnimatingRef = useRef(false);
+    const lastScrollYRef = useRef(0);
+
+    const heroContentHeight = heroProgress.interpolate({
+        inputRange: [0, 1], outputRange: [105, 0], extrapolate: 'clamp',
+    });
+    const heroContentOpacity = heroProgress.interpolate({
+        inputRange: [0, 0.55, 1], outputRange: [1, 0.35, 0], extrapolate: 'clamp',
+    });
+    const heroContentTranslateY = heroProgress.interpolate({
+        inputRange: [0, 1], outputRange: [0, -18], extrapolate: 'clamp',
+    });
+
+    const setHeroCollapsed = useCallback((collapsed) => {
+        if (isHeroCollapsedRef.current === collapsed || isHeroAnimatingRef.current) return;
+
+        isHeroCollapsedRef.current = collapsed;
+        isHeroAnimatingRef.current = true;
+        Animated.timing(heroProgress, {
+            toValue: collapsed ? 1 : 0,
+            duration: 220,
+            useNativeDriver: false,
+        }).start(() => {
+            isHeroAnimatingRef.current = false;
+        });
+    }, [heroProgress]);
+
+    const handleListScroll = useCallback((event) => {
+        const y = Math.max(0, event.nativeEvent.contentOffset.y);
+        const delta = y - lastScrollYRef.current;
+
+        if (delta > 6 && y > 35) {
+            setHeroCollapsed(true);
+        } else if (delta < -12 || y <= 4) {
+            setHeroCollapsed(false);
+        }
+
+        lastScrollYRef.current = y;
+    }, [setHeroCollapsed]);
 
     // Data states
     const [eventsData, setEventsData] = useState([]);
@@ -95,6 +138,19 @@ const Events = () => {
     const [query, setQuery] = useState('');
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [getUserAuth, setGetUserAuth] = useState('');
+    const [activeAutoplayCardId, setActiveAutoplayCardId] = useState(null);
+
+    // Only one card that remains mostly visible is allowed to autoplay.
+    // Stable refs ensure the existing FlatList is not recreated while scrolling.
+    const viewabilityConfig = useRef({
+        itemVisiblePercentThreshold: 70,
+        minimumViewTime: 250,
+    }).current;
+    const onViewableItemsChanged = useRef(({ viewableItems }) => {
+        const visibleCard = viewableItems.find(({ isViewable }) => isViewable);
+        const nextId = visibleCard?.item?._id ?? null;
+        setActiveAutoplayCardId(currentId => currentId === nextId ? currentId : nextId);
+    }).current;
 
     // ── Refs: hold latest pagination values without stale-closure issues ──────
     // These mirror the state values so callbacks always read the current value
@@ -352,12 +408,17 @@ const Events = () => {
         const imageUrls = [heroImage, ...(item?.additionalImages?.flat()?.map(img => img?.url) || [])].filter(Boolean);
         const totalPhotos = imageUrls.length;
         const hasVideo = item?.hallVideos?.length > 0;
+        const shouldAutoplay =
+            isScreenFocused &&
+            activeAutoplayCardId === item._id &&
+            imageUrls.length > 1;
 
         return (
             <View style={styles.card}>
                 {/* ── image swiper ── */}
                 <View style={styles.cardImageWrapper}>
                     <Swiper
+                        key={`${item._id}-${shouldAutoplay ? 'playing' : 'paused'}`}
                         loop
                         showsPagination
                         activeDotColor="#fff"
@@ -366,6 +427,8 @@ const Events = () => {
                         dotStyle={{ width: 6, height: 6, borderRadius: 3 }}
                         paginationStyle={{ bottom: 10 }}
                         style={{ height: 200 }}
+                        autoplay={shouldAutoplay}
+                        autoplayTimeout={4}
                     >
                         {imageUrls.map((imgUrl, idx) => (
                             <TouchableOpacity key={idx} activeOpacity={0.93}
@@ -398,50 +461,50 @@ const Events = () => {
                 {/* ── card body ── */}
                 <TouchableOpacity activeOpacity={0.93}
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}>
-                <View style={styles.cardBody}>
-                    <View style={styles.cardTitleRow}>
-                        <Text style={styles.cardTitle} numberOfLines={2}>{item?.functionHallName}</Text>
-                        <View style={styles.cardPriceWrap}>
-                        {item?.menuImages?.length > 0
-                            ? <Text style={styles.cardPriceText}>Menu Based</Text>
-                            : <Text style={styles.cardPriceText}>{formatAmount(item?.rentPricePerDay)}<Text style={styles.cardPriceUnit}>/day</Text></Text>
-                        }
-                    </View>
-                    </View>
-
-                    <View style={styles.cardAddressRow}>
-                        <LocationMarkIcon width={12} height={12} />
-                        <Text numberOfLines={1} style={styles.cardAddress}>
-                            {item?.functionHallAddress?.address}
-                        </Text>
-                    </View>
-
-                    <View style={styles.cardChipsRow}>
-                        <View style={styles.cardChip}>
-                            <IonIcon name="people-outline" size={11} color="#FD813B" />
-                            <Text style={styles.cardChipText}>{item?.seatingCapacity} pax</Text>
-                        </View>
-                        {item?.bedRooms > 0 && (
-                            <View style={styles.cardChip}>
-                                <IonIcon name="bed-outline" size={11} color="#FD813B" />
-                                <Text style={styles.cardChipText}>{item?.bedRooms} Rooms</Text>
+                    <View style={styles.cardBody}>
+                        <View style={styles.cardTitleRow}>
+                            <Text style={styles.cardTitle} numberOfLines={2}>{item?.functionHallName}</Text>
+                            <View style={styles.cardPriceWrap}>
+                                {item?.menuImages?.length > 0
+                                    ? <Text style={styles.cardPriceText}>Menu Based</Text>
+                                    : <Text style={styles.cardPriceText}>{formatAmount(item?.rentPricePerDay)}<Text style={styles.cardPriceUnit}>/day</Text></Text>
+                                }
                             </View>
-                        )}
-                        <View style={styles.cardChip}>
-                            {item?.foodType === 'Both' ? <VegNonVegIcon width={14} height={14} /> :
-                             item?.foodType === 'veg' ? <VegIcon width={14} height={14} /> :
-                             <NonVegIcon width={14} height={14} />}
-                            <Text style={styles.cardChipText}>
-                                {item?.foodType === 'Both' ? 'Veg & Non-Veg' :
-                                 item?.foodType === 'veg' ? 'Veg' : 'Non-Veg'}
+                        </View>
+
+                        <View style={styles.cardAddressRow}>
+                            <LocationMarkIcon width={12} height={12} />
+                            <Text numberOfLines={1} style={styles.cardAddress}>
+                                {item?.functionHallAddress?.address}
                             </Text>
                         </View>
+
+                        <View style={styles.cardChipsRow}>
+                            <View style={styles.cardChip}>
+                                <IonIcon name="people-outline" size={11} color="#FD813B" />
+                                <Text style={styles.cardChipText}>{item?.seatingCapacity} pax</Text>
+                            </View>
+                            {item?.bedRooms > 0 && (
+                                <View style={styles.cardChip}>
+                                    <IonIcon name="bed-outline" size={11} color="#FD813B" />
+                                    <Text style={styles.cardChipText}>{item?.bedRooms} Rooms</Text>
+                                </View>
+                            )}
+                            <View style={styles.cardChip}>
+                                {item?.foodType === 'Both' ? <VegNonVegIcon width={14} height={14} /> :
+                                    item?.foodType === 'veg' ? <VegIcon width={14} height={14} /> :
+                                        <NonVegIcon width={14} height={14} />}
+                                <Text style={styles.cardChipText}>
+                                    {item?.foodType === 'Both' ? 'Veg & Non-Veg' :
+                                        item?.foodType === 'veg' ? 'Veg' : 'Non-Veg'}
+                                </Text>
+                            </View>
+                        </View>
                     </View>
-                </View>
                 </TouchableOpacity>
             </View>
         );
-    }, [navigation]);
+    }, [navigation, activeAutoplayCardId, isScreenFocused]);
 
     const isApplyDisabled = !selectedPriceRange && !selectedSeatingCapacity &&
         isACSelected === null && !selectedChip && !switchCateringVal;
@@ -530,9 +593,9 @@ const Events = () => {
                             <TouchableOpacity
                                 key={item}
                                 style={[styles.filterChip,
-                                    { backgroundColor: chipColors[item] },
-                                    selectedChip === item && styles.filterChipActive,
-                                    switchCateringVal && { opacity: 0.4 }]}
+                                { backgroundColor: chipColors[item] },
+                                selectedChip === item && styles.filterChipActive,
+                                switchCateringVal && { opacity: 0.4 }]}
                                 disabled={switchCateringVal}
                                 onPress={() => { setSelectedChip(selectedChip === item ? '' : item); setSelectedPriceRange(''); }}
                             >
@@ -547,8 +610,8 @@ const Events = () => {
                             <TouchableOpacity
                                 key={item}
                                 style={[styles.filterChip,
-                                    selectedPriceRange === item && styles.filterChipActive,
-                                    switchCateringVal && { opacity: 0.4 }]}
+                                selectedPriceRange === item && styles.filterChipActive,
+                                switchCateringVal && { opacity: 0.4 }]}
                                 disabled={switchCateringVal}
                                 onPress={() => { setSelectedPriceRange(selectedPriceRange === item ? '' : item); setSelectedChip(''); }}
                             >
@@ -581,7 +644,7 @@ const Events = () => {
 
             {/* ── FUNCTION HALLS HERO HEADER ── */}
             <LinearGradient
-                colors={['#78350F', '#A16207', '#EAB308']}
+                colors={['#F4C44E', '#E0A321', '#C77A05']}
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                 style={styles.heroHeader}
             >
@@ -589,19 +652,31 @@ const Events = () => {
                 <View style={styles.heroCircle1} />
                 <View style={styles.heroCircle2} />
 
-                <View style={styles.heroRow}>
-                    <View style={{ flex: 1 }}>
-                        <View style={styles.heroBadge}>
-                            <IonIcon name="business" size={11} color="#e9e4ddff" />
-                            <Text style={styles.heroBadgeText}>Premium Venues</Text>
+                <Animated.View
+                    style={[
+                        styles.heroCollapsible,
+                        {
+                            height: heroContentHeight,
+                            opacity: heroContentOpacity,
+                            transform: [{ translateY: heroContentTranslateY }],
+                        },
+                    ]}
+                    pointerEvents="none"
+                >
+                    <View style={styles.heroRow}>
+                        <View style={{ flex: 1 }}>
+                            <View style={styles.heroBadge}>
+                                <IonIcon name="business" size={11} color="#e9e4ddff" />
+                                <Text style={styles.heroBadgeText}>Premium Venues</Text>
+                            </View>
+                            <Text style={styles.heroTitle}>Function Halls</Text>
+                            <Text style={styles.heroSub}>Grand halls & event spaces</Text>
                         </View>
-                        <Text style={styles.heroTitle}>Function Halls</Text>
-                        <Text style={styles.heroSub}>Grand halls & event spaces</Text>
+                        <View style={styles.heroIconWrap}>
+                            <IonIcon name="sparkles" size={32} color="#f8f5f2ff" />
+                        </View>
                     </View>
-                    <View style={styles.heroIconWrap}>
-                       <IonIcon name="sparkles" size={32} color="#f8f5f2ff" />
-                    </View>
-                </View>
+                </Animated.View>
 
                 {/* search bar inside hero */}
                 <View style={styles.searchBar}>
@@ -699,6 +774,11 @@ const Events = () => {
                     data={dataSource}
                     renderItem={renderItem}
                     keyExtractor={keyExtractor}
+                    onScroll={handleListScroll}
+                    scrollEventThrottle={16}
+                    onViewableItemsChanged={onViewableItemsChanged}
+                    viewabilityConfig={viewabilityConfig}
+                    extraData={`${activeAutoplayCardId}-${isScreenFocused}`}
                     onEndReached={onEndReached}
                     onEndReachedThreshold={0.6}
                     ListFooterComponent={ListFooter}
@@ -722,8 +802,8 @@ const styles = StyleSheet.create({
     // ── HERO HEADER ──
     heroHeader: {
         paddingHorizontal: 16,
-        paddingTop: 18,
-        paddingBottom: 20,
+        paddingTop: 8,
+        paddingBottom: 10,
         overflow: 'hidden',
         // borderBottomLeftRadius: 20,
         // borderBottomRightRadius: 20,
@@ -736,7 +816,8 @@ const styles = StyleSheet.create({
         position: 'absolute', width: 120, height: 120, borderRadius: 60,
         backgroundColor: 'rgba(255,255,255,0.05)', bottom: -30, left: -20,
     },
-    heroRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+    heroCollapsible: { overflow: 'hidden' },
+    heroRow: { flexDirection: 'row', alignItems: 'center', paddingTop: 10, paddingBottom: 16 },
     heroBadge: {
         flexDirection: 'row', alignItems: 'center', gap: 5,
         backgroundColor: 'rgba(217,119,6,0.1)',
@@ -763,7 +844,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row', alignItems: 'center',
         backgroundColor: 'white',
         borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10,
-        borderWidth: 1, borderColor: 'rgba(236,167,60,0.3)',
+        borderWidth: 1, borderColor: 'rgba(236,167,60,0.3)', marginTop: 20, bottom: 10
     },
     searchInput: {
         flex: 1, fontSize: 13, fontFamily: 'ManropeRegular',

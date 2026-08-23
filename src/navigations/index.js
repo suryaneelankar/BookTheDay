@@ -53,7 +53,7 @@ import VendorTermsAndCond from "../screens/VendorScreens/VendorProfile/VendorTer
 import VendorRefundPolicy from "../screens/VendorScreens/VendorProfile/VendorRefundPolicy";
 import TermsAndConditionsScreen from "../screens/Profile/ProfileSubScreens/TermsAndConditions";
 import { getUserAuthToken, getUserMobileNumber, getVendorAuthToken, getVendorMobileNumber } from "../utils/StoreAuthToken";
-import { ActivityIndicator, SafeAreaView, View } from "react-native";
+import { ActivityIndicator, SafeAreaView, View, Platform, PermissionsAndroid } from "react-native";
 import UserAndVendorRegister from "../screens/LandingScreen/UserAndVendorRegister";
 import BookingReview from "../screens/Profile/BookingReview";
 import MyBookings from "../screens/VendorScreens/VendorProfile/MyBookings";
@@ -74,10 +74,30 @@ const MainNavigation = () => {
         getToken();
     }, [checkIfAnyTokenStored, switchtab]);
 
+    const setupNotifications = async () => {
+        if (Platform.OS === 'android' && Platform.Version >= 33) {
+            const result = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+            );
+            console.log('Notification permission:', result);
+        }
+        const token = await messaging().getToken();
+        console.log('FCM TOKEN:', token);
+        return messaging().onMessage(async remoteMessage => {
+            console.log('Foreground FCM received:', remoteMessage);
+        });
+    };
+
     const getToken = async () => {
+        try {
+            await setupNotifications();
+        } catch (e) {
+            console.warn('Notification setup failed:', e);
+        }
         // COMMENTED OUT — Firebase FCM token fetch
         try {
             const fcmToken = await messaging().getToken();
+            console.log('fcmToken is ::>>>>',fcmToken);
             dispatch(getDeviceFCMToken(fcmToken));
         } catch (e) {
             console.warn('FCM token fetch failed:', e);

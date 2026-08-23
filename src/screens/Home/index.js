@@ -12,9 +12,11 @@ import {
   TouchableOpacity,
   Platform,
   Modal,
+  Button,
   ActivityIndicator,
 } from 'react-native';
 import IonIcon from 'react-native-vector-icons/Ionicons';
+import crashlytics from '@react-native-firebase/crashlytics';
 import { useFocusEffect, useNavigation, useIsFocused } from '@react-navigation/native';
 import BASE_URL from '../../apiconfig';
 import axios from 'axios';
@@ -27,6 +29,10 @@ import {
 import LocationMarkIcon from '../../assets/svgs/location.svg';
 import { LinearGradient } from 'react-native-linear-gradient';
 import { formatAmount } from '../../utils/GlobalFunctions';
+import BannerFunctionHalls from '../../assets/categories/BookTheDay_Function_Halls.png';
+import BannerFarmHouses from '../../assets/categories/BookTheDay_Farm_Houses.png';
+import BannerResorts from '../../assets/categories/BookTheDay_Resorts.png';
+import BannerBanquetHalls from '../../assets/categories/BookTheDay_Banquet_Halls.png';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
 import {
   getCurrentLoggedInUserName,
@@ -68,10 +74,10 @@ import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
 import VegIcon from '../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 */
-import CatHalls from '../../assets/svgs/categories/home_categories_hall_icon.svg';
-import ResortIcon from '../../assets/svgs/categories/home_categories_resort_icon.svg';
-import DestinationIcon from '../../assets/svgs/categories/home_categories_destination_icon.svg';
-const FarmHouseIconPng = require('../../assets/categories/hall_category.png');
+const FunctionHallImg = require('../../assets/categories/function_hall_category.png');
+const ResortImg = require('../../assets/categories/resort_category.png');
+const BanquetHallImg = require('../../assets/categories/banquet_hall_category.png');
+const FarmHouseIconPng = require('../../assets/categories/farm_house_category.png');
 import CustomAlert from '../../components/CustomAlert';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -117,6 +123,42 @@ const HomeDashboard = () => {
   const longitude = userLocationFetched?.geometry?.location?.lng
     ? userLocationFetched?.geometry?.location?.lng
     : userLocationFetched?.longitude;
+
+
+  const WHY_BOOK_FEATURES = [
+    {
+      id: 'verified',
+      icon: 'shield-checkmark-outline',
+      title: 'Verified Venues',
+      description: 'Explore approved venue listings with reliable details.',
+      iconColor: '#07875D',
+      iconBackground: '#DDF7ED',
+    },
+    {
+      id: 'nearby',
+      icon: 'location-outline',
+      title: 'Nearby Options',
+      description: 'Quickly find venues available around your location.',
+      iconColor: '#D97706',
+      iconBackground: '#FFF0C7',
+    },
+    {
+      id: 'pricing',
+      icon: 'pricetag-outline',
+      title: 'Clear Pricing',
+      description: 'Compare venue prices and choose within your budget.',
+      iconColor: '#7C3AED',
+      iconBackground: '#EEE5FF',
+    },
+    {
+      id: 'payments',
+      icon: 'lock-closed-outline',
+      title: 'Secure Payments',
+      description: 'Protected booking payments powered by Razorpay.',
+      iconColor: '#B31861',
+      iconBackground: '#FBE2EF',
+    },
+  ];
 
   /* COMMENTED OUT — trendingData array
   const trendingData = [
@@ -575,543 +617,543 @@ const HomeDashboard = () => {
         locations={[0, 0.4, 0.5, 0.64, 0.77, 1]}
         style={{ flex: 1 }}
       >
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
+        <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
 
-        {/* ════════════════════════════════════════
+          {/* ════════════════════════════════════════
             TOP BAR
         ════════════════════════════════════════ */}
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            style={styles.locationPill}
-            onPress={() => navigation.navigate('LocationAdded')}>
-            <LocationMarkIcon width={16} height={16} />
-            <View style={{ flex: 1 }}>
-              <Text numberOfLines={1} style={styles.locationSubText}>
-                Your current location
-              </Text>
-              <Text numberOfLines={1} style={styles.locationMainText}>
-                {userLocationFetched?.formatted_address
-                  ? userLocationFetched.formatted_address
-                  : userLocationFetched?.address
-                    ? userLocationFetched.address
-                    : 'Select Location'}
-              </Text>
-            </View>
-            <IonIcon name="chevron-down" size={14} color="#7D7F88" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.profileBtn}
-            onPress={() => navigation.navigate('ProfileScreen')}>
-            <IonIcon name="person-circle-outline" size={40} color="#131313" />
-          </TouchableOpacity>
-        </View>
+          <View style={styles.topBar}>
+            <TouchableOpacity
+              style={styles.locationPill}
+              onPress={() => navigation.navigate('LocationAdded')}>
+              <LocationMarkIcon width={16} height={16} />
+              <View style={{ flex: 1 }}>
+                <Text numberOfLines={1} style={styles.locationSubText}>
+                  Your current location
+                </Text>
+                <Text numberOfLines={1} style={styles.locationMainText}>
+                  {userLocationFetched?.formatted_address
+                    ? userLocationFetched.formatted_address
+                    : userLocationFetched?.address
+                      ? userLocationFetched.address
+                      : 'Select Location'}
+                </Text>
+              </View>
+              <IonIcon name="chevron-down" size={14} color="#7D7F88" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.profileBtn}
+              onPress={() => navigation.navigate('ProfileScreen')}>
+              <IonIcon name="person-circle-outline" size={40} color="#131313" />
+            </TouchableOpacity>
+          </View>
 
-        {/* ── Search Bar + Filter ── */}
-        <View style={styles.homeSearchRow}>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => navigation.navigate('SearchVenues')}
-            style={styles.homeSearchBar}>
-            <IonIcon name="search-outline" size={18} color="#7E8389" />
-            <Text style={styles.homeSearchPlaceholder}>Search venues, halls, resorts...</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('SearchVenues')}
-            style={styles.homeFilterIcon}>
-            <IonIcon name="options-outline" size={20} color="#D97706" />
-          </TouchableOpacity>
-        </View>
+          {/* ── Search Bar + Filter ── */}
+          <View style={styles.homeSearchRow}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate('SearchVenues')}
+              style={styles.homeSearchBar}>
+              <IonIcon name="search-outline" size={18} color="#7E8389" />
+              <Text style={styles.homeSearchPlaceholder}>Search venues, halls, resorts...</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('SearchVenues')}
+              style={styles.homeFilterIcon}>
+              <IonIcon name="options-outline" size={20} color="#D97706" />
+            </TouchableOpacity>
+          </View>
+          {/* <Button
+            title="Test Crashlytics"
+            color="red"
+            onPress={() => {
+              crashlytics().log('BookTheDay Crashlytics test started');
+              crashlytics().crash();
+            }}
+          /> */}
 
-        {/* ════════════════════════════════════════
+          {/* ════════════════════════════════════════
             HERO — Auto-scrolling banners
         ════════════════════════════════════════ */}
-        <View style={styles.heroWrapper}>
-          <ScrollView
-            ref={bannerScrollRef}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onMomentumScrollEnd={handleBannerScroll}
-            style={styles.heroBannerScroll}>
-           
-            {/* Banner 1 - Function Halls */}
-            <TouchableOpacity
-              activeOpacity={0.95}
-              onPress={() => navigation.navigate('Events')}
-              style={styles.heroBannerSlide}>
-              <LinearGradient
-                colors={['#78350F', '#A16207', '#EAB308']}
-                start={{x: 0, y: 0}}
-                end={{x: 1, y: 1}}
-                style={styles.heroBannerGradient}>
-                <View style={styles.heroBannerDecor1} />
-                <View style={styles.heroBannerDecor2} />
-                <View style={styles.heroBannerContent}>
-                  <View style={styles.heroBannerTextArea}>
-                    <View style={styles.heroBannerBadge}>
-                      <IonIcon name="business" size={10} color="#fff" />
-                      <Text style={styles.heroBannerBadgeText}>Best Value</Text>
-                    </View>
-                    <Text style={styles.heroBannerTitle}>Function{'\n'}Halls</Text>
-                    <Text style={styles.heroBannerDesc}>Spacious venues with AC, catering & all amenities</Text>
-                    <View style={styles.heroBannerCtaPill}>
-                      <Text style={styles.heroBannerCtaText}>Explore Now</Text>
-                      <IonIcon name="arrow-forward" size={13} color="#fff" />
-                    </View>
-                  </View>
-                  <View style={styles.heroBannerIconWrap}>
-                    <IonIcon name="business" size={40} color="rgba(255,255,255,0.85)" />
-                  </View>
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
+          <View style={styles.heroWrapper}>
+            <ScrollView
+              ref={bannerScrollRef}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onMomentumScrollEnd={handleBannerScroll}
+              style={styles.heroBannerScroll}>
 
-            {/* Banner 2 - Farm Houses */}
-            <TouchableOpacity
-              activeOpacity={0.95}
-              onPress={() => navigation.navigate('FarmHouseTab')}
-              style={styles.heroBannerSlide}>
-              <LinearGradient
-                colors={['#1B4332', '#2D6A4F', '#52B788']}
-                start={{x: 0, y: 0}}
-                end={{x: 1, y: 1}}
-                style={styles.heroBannerGradient}>
-                <View style={styles.heroBannerDecor1} />
-                <View style={styles.heroBannerDecor2} />
-                <View style={styles.heroBannerContent}>
-                  <View style={styles.heroBannerTextArea}>
-                    <View style={styles.heroBannerBadge}>
-                      <IonIcon name="leaf" size={10} color="#fff" />
-                      <Text style={styles.heroBannerBadgeText}>Popular Choice</Text>
-                    </View>
-                    <Text style={styles.heroBannerTitle}>Scenic Farm{'\n'}Houses</Text>
-                    <Text style={styles.heroBannerDesc}>Open-air retreats for unforgettable celebrations</Text>
-                    <View style={styles.heroBannerCtaPill}>
-                      <Text style={styles.heroBannerCtaText}>Explore Now</Text>
-                      <IonIcon name="arrow-forward" size={13} color="#fff" />
-                    </View>
-                  </View>
-                  <View style={styles.heroBannerIconWrap}>
-                    <IonIcon name="leaf" size={40} color="rgba(255,255,255,0.85)" />
-                  </View>
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
+              {/* Banner 1 - Function Halls */}
+              <TouchableOpacity
+                activeOpacity={0.95}
+                onPress={() => navigation.navigate('Events')}
+                style={styles.heroBannerSlide}>
+                <Image
+                  source={BannerFunctionHalls}
+                  style={styles.heroBannerGradient}
+                  resizeMode="cover"
+                />
+              </TouchableOpacity>
 
-            {/* Banner 3 - Luxury Resorts */}
-            <TouchableOpacity
-              activeOpacity={0.95}
-              onPress={() => navigation.navigate('LuxuryResorts')}
-              style={styles.heroBannerSlide}>
-              <LinearGradient
-                colors={['#4A1942', '#803D7A', '#CD6DBB']}
-                start={{x: 0, y: 0}}
-                end={{x: 1, y: 1}}
-                style={styles.heroBannerGradient}>
-                <View style={styles.heroBannerDecor1} />
-                <View style={styles.heroBannerDecor2} />
-                <View style={styles.heroBannerContent}>
-                  <View style={styles.heroBannerTextArea}>
-                    <View style={styles.heroBannerBadge}>
-                      <IonIcon name="sparkles" size={10} color="#fff" />
-                      <Text style={styles.heroBannerBadgeText}>Premium</Text>
-                    </View>
-                    <Text style={styles.heroBannerTitle}>Luxury{'\n'}Resorts</Text>
-                    <Text style={styles.heroBannerDesc}>World-class venues for grand weddings & parties</Text>
-                    <View style={styles.heroBannerCtaPill}>
-                      <Text style={styles.heroBannerCtaText}>Explore Now</Text>
-                      <IonIcon name="arrow-forward" size={13} color="#fff" />
-                    </View>
-                  </View>
-                  <View style={styles.heroBannerIconWrap}>
-                    <IonIcon name="sparkles" size={40} color="rgba(255,255,255,0.85)" />
-                  </View>
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
+              {/* Banner 2 - Farm Houses */}
+              <TouchableOpacity
+                activeOpacity={0.95}
+                onPress={() => navigation.navigate('FarmHouseTab')}
+                style={styles.heroBannerSlide}>
+                <Image
+                  source={BannerFarmHouses}
+                  style={styles.heroBannerGradient}
+                  resizeMode="cover"
+                />
+              </TouchableOpacity>
 
-             {/* Banner 4 - Banquet Halls */}
-            <TouchableOpacity
-              activeOpacity={0.95}
-              onPress={() => navigation.navigate('BanquetHallsTab')}
-              style={styles.heroBannerSlide}>
-              <LinearGradient
-                colors={['#92400E', '#D97706', '#FBBF24']}
-                start={{x: 0, y: 0}}
-                end={{x: 1, y: 1}}
-                style={styles.heroBannerGradient}>
-                <View style={styles.heroBannerDecor1} />
-                <View style={styles.heroBannerDecor2} />
-                <View style={styles.heroBannerContent}>
-                  <View style={styles.heroBannerTextArea}>
-                    <View style={styles.heroBannerBadge}>
-                      <IonIcon name="ribbon" size={10} color="#fff" />
-                      <Text style={styles.heroBannerBadgeText}>Elegant</Text>
-                    </View>
-                    <Text style={styles.heroBannerTitle}>Banquet{'\n'}Halls</Text>
-                    <Text style={styles.heroBannerDesc}>Elegant spaces for receptions, sangeets & celebrations</Text>
-                    <View style={styles.heroBannerCtaPill}>
-                      <Text style={styles.heroBannerCtaText}>Explore Now</Text>
-                      <IonIcon name="arrow-forward" size={13} color="#fff" />
-                    </View>
-                  </View>
-                  <View style={styles.heroBannerIconWrap}>
-                    <IonIcon name="ribbon" size={40} color="rgba(255,255,255,0.85)" />
-                  </View>
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
+              {/* Banner 3 - Luxury Resorts */}
+              <TouchableOpacity
+                activeOpacity={0.95}
+                onPress={() => navigation.navigate('LuxuryResorts')}
+                style={styles.heroBannerSlide}>
+                <Image
+                  source={BannerResorts}
+                  style={styles.heroBannerGradient}
+                  resizeMode="cover"
+                />
+              </TouchableOpacity>
 
-          </ScrollView>
-        </View>
+              {/* Banner 4 - Banquet Halls */}
+              <TouchableOpacity
+                activeOpacity={0.95}
+                onPress={() => navigation.navigate('BanquetHallsTab')}
+                style={styles.heroBannerSlide}>
+                <Image
+                  source={BannerBanquetHalls}
+                  style={styles.heroBannerGradient}
+                  resizeMode="cover"
+                />
+              </TouchableOpacity>
 
-        {/* Pagination dots */}
-        <View style={styles.bannerDots}>
-          {[0, 1, 2, 3].map(i => (
-            <View
-              key={i}
-              style={[
-                styles.bannerDotIndicator,
-                activeBanner === i && styles.bannerDotActive,
-              ]}
-            />
-          ))}
-        </View>
+            </ScrollView>
+          </View>
 
-        {/* Stats card — below dots */}
-        <View style={styles.statsFloat}>
-          <View style={styles.statItem}>
-            <IonIcon name="business" size={18} color="#D97706" style={{marginRight: 8}} />
-            <View>
-              <Text style={styles.statNum}>{totalVenueCount > 0 ? `${totalVenueCount}+` : '—'}</Text>
-              <Text style={styles.statLbl}>Venues</Text>
+          {/* Pagination dots */}
+          <View style={styles.bannerDots}>
+            {[0, 1, 2, 3].map(i => (
+              <View
+                key={i}
+                style={[
+                  styles.bannerDotIndicator,
+                  activeBanner === i && styles.bannerDotActive,
+                ]}
+              />
+            ))}
+          </View>
+
+          {/* Stats card — below dots */}
+          <View style={styles.statsFloat}>
+            <View style={styles.statItem}>
+              <IonIcon name="business" size={18} color="#D97706" style={{ marginRight: 8 }} />
+              <View>
+                <Text style={styles.statNum}>{totalVenueCount > 0 ? `${totalVenueCount}+` : '—'}</Text>
+                <Text style={styles.statLbl}>Venues</Text>
+              </View>
+            </View>
+            <View style={styles.statSep} />
+            <View style={styles.statItem}>
+              <IonIcon name="location" size={18} color="#D97706" style={{ marginRight: 8 }} />
+              <View>
+                <Text style={styles.statNum}>Hyderabad</Text>
+                <Text style={styles.statLbl}>Location</Text>
+              </View>
+            </View>
+            <View style={styles.statSep} />
+            <View style={styles.statItem}>
+              <IonIcon name="headset" size={18} color="#D97706" style={{ marginRight: 8 }} />
+              <View>
+                <Text style={styles.statNum}>24/7</Text>
+                <Text style={styles.statLbl}>Support</Text>
+              </View>
             </View>
           </View>
-          <View style={styles.statSep} />
-          <View style={styles.statItem}>
-            <IonIcon name="location" size={18} color="#D97706" style={{marginRight: 8}} />
-            <View>
-              <Text style={styles.statNum}>Hyderabad</Text>
-              <Text style={styles.statLbl}>Location</Text>
-            </View>
-          </View>
-          <View style={styles.statSep} />
-          <View style={styles.statItem}>
-            <IonIcon name="headset" size={18} color="#D97706" style={{marginRight: 8}} />
-            <View>
-              <Text style={styles.statNum}>24/7</Text>
-              <Text style={styles.statLbl}>Support</Text>
-            </View>
-          </View>
-        </View>
 
-        {/* ════════════════════════════════════════
+          {/* ════════════════════════════════════════
             CATEGORIES — round circles like Figma
         ════════════════════════════════════════ */}
-        <View style={styles.categoriesSection}>
-          <Text style={styles.categoriesTitle}>Categories</Text>
+          <View style={styles.categoriesSection}>
+            <Text style={styles.categoriesTitle}>Categories</Text>
 
-          <View style={styles.catGrid}>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => navigation.navigate('Events')}
-              style={styles.catItem}>
-              <View style={styles.catCircle}>
-                <CatHalls width={68} height={68} />
-              </View>
-              <Text style={styles.catLabel}>Halls</Text>
-            </TouchableOpacity>
+            <View style={styles.catGrid}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => navigation.navigate('Events')}
+                style={styles.catItem}>
+                <View style={styles.catCircle}>
+                  <Image source={FunctionHallImg} style={{ width: 70, height: 70 }} resizeMode="cover" />
+                </View>
+                <Text style={styles.catLabel}>Halls</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => navigation.navigate('FarmHouseTab')}
-              style={styles.catItem}>
-              <View style={styles.catCircle}>
-                <Image source={FarmHouseIconPng} style={{width: 62, height: 62, borderRadius: 34}} resizeMode="cover" />
-              </View>
-              <Text style={styles.catLabel}>Farm House</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => navigation.navigate('FarmHouseTab')}
+                style={styles.catItem}>
+                <View style={styles.catCircle}>
+                  <Image source={FarmHouseIconPng} style={{ width: 70, height: 70 }} resizeMode="cover" />
+                </View>
+                <Text style={styles.catLabel}>Farm House</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => navigation.navigate('LuxuryResorts')}
-              style={styles.catItem}>
-              <View style={styles.catCircle}>
-                <ResortIcon width={68} height={68} />
-              </View>
-              <Text style={styles.catLabel}>Resorts</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => navigation.navigate('LuxuryResorts')}
+                style={styles.catItem}>
+                <View style={styles.catCircle}>
+                  <Image source={ResortImg} style={{ width: 70, height: 70 }} resizeMode="cover" />
+                </View>
+                <Text style={styles.catLabel}>Resorts</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => navigation.navigate('BanquetHallsTab')}
-              style={styles.catItem}>
-              <View style={styles.catCircle}>
-                <DestinationIcon width={68} height={68} />
-              </View>
-              <Text style={styles.catLabel}>Banquets</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => navigation.navigate('BanquetHallsTab')}
+                style={styles.catItem}>
+                <View style={styles.catCircle}>
+                  <Image source={BanquetHallImg} style={{ width: 70, height: 70 }} resizeMode="cover" />
+                </View>
+                <Text style={styles.catLabel}>Banquets</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
 
-        {/* ════════════════════════════════════════
+          {/* ════════════════════════════════════════
             HALLS NEAR YOU
         ════════════════════════════════════════ */}
-        {nearByEventsData?.length > 0 && (
-          <View style={{ marginTop: verticalScale(24) }}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Function Halls Near You</Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('NearByEvents')}
-                style={styles.seeAllBtn}>
-                <Text style={styles.seeAllText}>See All</Text>
-                <View style={styles.seeAllArrow}>
-                  <IonIcon name="arrow-forward" size={16} color="#fff" />
-                </View>
-              </TouchableOpacity>
-            </View>
-            <FlatList
-              data={nearByEventsData}
-              renderItem={renderNearbyCard}
-              horizontal
-              keyExtractor={item => item?._id}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.listPadding}
-            />
-          </View>
-        )}
-
-        {/* ════════════════════════════════════════
-            PREMIUM HALLS
-        ════════════════════════════════════════ */}
-        {eventsData?.length > 0 && (
-          <View style={{ marginTop: verticalScale(24) }}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Popular Event Halls</Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('Events')}
-                style={styles.seeAllBtn}>
-                <Text style={styles.seeAllText}>See All</Text>
-                <View style={styles.seeAllArrow}>
-                  <IonIcon name="arrow-forward" size={16} color="#fff" />
-                </View>
-              </TouchableOpacity>
-            </View>
-            <FlatList
-              data={eventsData?.slice(0, 6)}
-              renderItem={renderPremiumCard}
-              horizontal
-              keyExtractor={item => item?._id}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.listPadding}
-            />
-          </View>
-        )}
-
-        {/* ════════════════════════════════════════
-            BANQUET HALLS BANNER
-        ════════════════════════════════════════ */}
-        <View style={styles.destBannerWrapper}>
-          <LinearGradient
-            colors={['#FFF3CD', '#FFDB7E']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.destBanner}>
-            <View style={styles.destCircle} />
-            <View style={styles.destLeft}>
-              <View style={styles.destNewPill}>
-                <Text style={styles.destNewText}>✦ Exclusive</Text>
-              </View>
-              <Text style={styles.destTitle}>Expect More{'\n'}With Less</Text>
-              <Text style={styles.destSub}>
-                We are here for your every need.{'\n'}Premium venues at best prices.
-              </Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('BanquetHallstab')}
-                style={styles.destCta}>
-                <Text style={styles.destCtaText}>About us »</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.destRight}>
-              <IonIcon name="flower" size={80} color="rgba(217,119,6,0.2)" />
-            </View>
-          </LinearGradient>
-        </View>
-
-        {/* ════════════════════════════════════════
-            WHY BOOKTHEDAY
-        ════════════════════════════════════════ */}
-        <View style={styles.whyBookContainer}>
-          {/* header */}
-          <View style={styles.whyBookHeader}>
-            <View style={styles.whyBookBadge}>
-              <IonIcon name="sparkles" size={12} color="#FD813B" />
-              <Text style={styles.whyBookBadgeText}>Why Us</Text>
-            </View>
-            <Text style={styles.whyBookTitle}>Why BookTheDay?</Text>
-            <Text style={styles.whyBookSubtitle}>
-              Everything you need for a perfect event, guaranteed.
-            </Text>
-          </View>
-
-          {/* feature cards — 2x2 grid */}
-          <View style={styles.whyBookGrid}>
-            <View style={[styles.whyBookCard, {backgroundColor: '#ECFDF5'}]}>
-              <View style={[styles.whyBookCardIcon, {backgroundColor: '#D1FAE5'}]}>
-                <IonIcon name="flash" size={20} color="#059669" />
-              </View>
-              <Text style={styles.whyBookCardTitle}>Instant{'\n'}Confirmation</Text>
-              <Text style={styles.whyBookCardDesc}>Booking confirmed immediately</Text>
-            </View>
-
-            <View style={[styles.whyBookCard, {backgroundColor: '#FFF7ED'}]}>
-              <View style={[styles.whyBookCardIcon, {backgroundColor: '#FED7AA'}]}>
-                <IonIcon name="refresh" size={20} color="#EA580C" />
-              </View>
-              <Text style={styles.whyBookCardTitle}>Easy{'\n'}Cancellation</Text>
-              <Text style={styles.whyBookCardDesc}>Flexible policy with quick refunds</Text>
-            </View>
-
-            <View style={[styles.whyBookCard, {backgroundColor: '#EFF6FF'}]}>
-              <View style={[styles.whyBookCardIcon, {backgroundColor: '#BFDBFE'}]}>
-                <IonIcon name="headset" size={20} color="#2563EB" />
-              </View>
-              <Text style={styles.whyBookCardTitle}>24/7{'\n'}Support</Text>
-              <Text style={styles.whyBookCardDesc}>Our team is always here for you</Text>
-            </View>
-
-            <View style={[styles.whyBookCard, {backgroundColor: '#FDF2F8'}]}>
-              <View style={[styles.whyBookCardIcon, {backgroundColor: '#FBCFE8'}]}>
-                <IonIcon name="shield-checkmark" size={20} color="#DB2777" />
-              </View>
-              <Text style={styles.whyBookCardTitle}>Secure{'\n'}Payments</Text>
-              <Text style={styles.whyBookCardDesc}>100% safe via Razorpay</Text>
-            </View>
-          </View>
-
-          {/* trust badge */}
-          <View style={styles.whyBookTrustBadge}>
-            <IonIcon name="checkmark-circle" size={14} color="#059669" />
-            <Text style={styles.whyBookTrustText}>Every venue personally verified in Hyderabad</Text>
-          </View>
-        </View>
-
-        {/* ════════════════════════════════════════
-            POPULAR VENUES — vertical list
-        ════════════════════════════════════════ */}
-        {premiumHalls?.length > 0 && (
-          <View style={{ marginTop: verticalScale(24) }}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Popular Venues</Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('Events')}
-                style={styles.seeAllBtn}>
-                <Text style={styles.seeAllText}>View All</Text>
-                <View style={styles.seeAllArrow}>
-                  <IonIcon name="arrow-forward" size={16} color="#fff" />
-                </View>
-              </TouchableOpacity>
-            </View>
-            <FlatList
-              data={premiumHalls}
-              scrollEnabled={false}
-              keyExtractor={item => item?._id}
-              contentContainerStyle={{ paddingHorizontal: horizontalScale(16) }}
-              renderItem={({item}) => (
+          {nearByEventsData?.length > 0 && (
+            <View style={{ marginTop: verticalScale(24) }}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Function Halls Near You</Text>
                 <TouchableOpacity
-                  activeOpacity={0.92}
-                  onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
-                  style={styles.popularVenueCard}>
-                  <FastImage
-                    source={{ uri: item?.professionalImage?.url, priority: FastImage.priority.normal, cache: FastImage.cacheControl.immutable }}
-                    style={styles.popularVenueImage}
-                    resizeMode={FastImage.resizeMode.cover}
-                  />
-                  <View style={styles.popularVenueBody}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Text numberOfLines={1} style={styles.popularVenueName}>{item?.functionHallName}</Text>
-                      <Text style={styles.popularVenuePrice}>
-                        {item?.menuImages?.length > 0 ? 'Menu Based' : `${formatAmount(item?.rentPricePerDay)}/day`}
-                      </Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-                      <IonIcon name="location-sharp" size={12} color="#FD813B" />
-                      <Text numberOfLines={1} style={styles.popularVenueAddress}>
-                        {item?.functionHallAddress?.address || ''}
-                      </Text>
-                    </View>
-                    {item?.seatingCapacity ? (
-                      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
-                        <View style={styles.popularVenueChip}>
-                          <IonIcon name="people-outline" size={11} color="#D97706" />
-                          <Text style={styles.popularVenueChipText}>{item?.seatingCapacity} pax</Text>
-                        </View>
-                        {item?.bedRooms > 0 && (
-                          <View style={styles.popularVenueChip}>
-                            <IonIcon name="bed-outline" size={11} color="#D97706" />
-                            <Text style={styles.popularVenueChipText}>{item?.bedRooms} Rooms</Text>
-                          </View>
-                        )}
-                      </View>
-                    ) : null}
+                  onPress={() => navigation.navigate('NearByEvents')}
+                  style={styles.seeAllBtn}>
+                  <Text style={styles.seeAllText}>See All</Text>
+                  <View style={styles.seeAllArrow}>
+                    <IonIcon name="arrow-forward" size={16} color="#fff" />
                   </View>
                 </TouchableOpacity>
-              )}
-              ListFooterComponent={premiumHasMore ? (
-                <TouchableOpacity
-                  onPress={loadMorePremiumHalls}
-                  style={{ alignSelf: 'center', marginTop: 12, marginBottom: 8, paddingVertical: 10, paddingHorizontal: 24, borderRadius: 10, borderWidth: 1, borderColor: '#D97706' }}>
-                  {premiumLoading ? (
-                    <ActivityIndicator size="small" color="#D97706" />
-                  ) : (
-                    <Text style={{ fontFamily: 'ManropeRegular', fontSize: 13, fontWeight: '700', color: '#D97706' }}>Load More</Text>
-                  )}
-                </TouchableOpacity>
-              ) : null}
-            />
-          </View>
-        )}
+              </View>
+              <FlatList
+                data={nearByEventsData}
+                renderItem={renderNearbyCard}
+                horizontal
+                keyExtractor={item => item?._id}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.listPadding}
+              />
+            </View>
+          )}
 
-        {/* ════════════════════════════════════════
-            EXPLORE ALL CTA
+          {/* ════════════════════════════════════════
+            PREMIUM HALLS
         ════════════════════════════════════════ */}
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Events')}
-          style={styles.exploreAllBtn}
-          activeOpacity={0.88}>
-          <LinearGradient
-            colors={['#D2453B', '#A0143E']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.exploreAllGradient}>
-            <IonIcon name="business-outline" size={18} color="#FFDB7E" />
-            <Text style={styles.exploreAllText}>Explore All Venues</Text>
-            <IonIcon name="arrow-forward" size={16} color="#FFDB7E" />
-          </LinearGradient>
-        </TouchableOpacity>
+          {eventsData?.length > 0 && (
+            <View style={{ marginTop: verticalScale(24) }}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Popular Event Halls</Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('Events')}
+                  style={styles.seeAllBtn}>
+                  <Text style={styles.seeAllText}>See All</Text>
+                  <View style={styles.seeAllArrow}>
+                    <IonIcon name="arrow-forward" size={16} color="#fff" />
+                  </View>
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                data={eventsData?.slice(0, 6)}
+                renderItem={renderPremiumCard}
+                horizontal
+                keyExtractor={item => item?._id}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.listPadding}
+              />
+            </View>
+          )}
 
-        <View style={{ height: 32 }} />
+          {/* ════════════════════════════════════════
+            BANQUET HALLS BANNER
+        ════════════════════════════════════════ */}
+          <View style={styles.destBannerWrapper}>
+            <LinearGradient
+              colors={['#FFF8E7', '#FFE6A7', '#FFD57C']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.destBanner}>
 
-        {/* ── Location modal ── */}
-        <Modal transparent visible={isModalVisible} animationType="slide">
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              <Text style={styles.modalText}>
-                For a better experience, your device will need to use Location Accuracy
+              {/* Lightweight decorative elements */}
+              <View style={styles.destCircleLarge} />
+              <View style={styles.destCircleSmall} />
+
+              <View style={styles.destContent}>
+                <View style={styles.destPill}>
+                  <IonIcon
+                    name="sparkles"
+                    size={moderateScale(12)}
+                    color="#93186C"
+                  />
+                  <Text style={styles.destPillText}>BOOKTHEDAY EXCLUSIVE</Text>
+                </View>
+
+                <Text style={styles.destTitle}>
+                  Better Venues.{'\n'}
+                  <Text style={styles.destTitleAccent}>Smarter Prices.</Text>
+                </Text>
+
+                <Text style={styles.destSub}>
+                  Discover beautiful venues that match your occasion and budget.
+                </Text>
+
+                <TouchableOpacity
+                  activeOpacity={0.85}
+                  accessibilityRole="button"
+                  accessibilityLabel="Explore venues"
+                  onPress={() => navigation.navigate('BanquetHallstab')}
+                  style={styles.destCta}>
+
+                  <Text style={styles.destCtaText}>Explore venues</Text>
+
+                  <IonIcon
+                    name="arrow-forward"
+                    size={moderateScale(15)}
+                    color="#FFFFFF"
+                  />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.destVisual}>
+                <View style={styles.destIconOuter}>
+                  <View style={styles.destIconInner}>
+                    <IonIcon
+                      name="business-outline"
+                      size={moderateScale(47)}
+                      color="#93186C"
+                    />
+                  </View>
+                </View>
+
+                <View style={styles.destPriceBadge}>
+                  <IonIcon
+                    name="pricetag"
+                    size={moderateScale(11)}
+                    color="#D97706"
+                  />
+                  <Text style={styles.destPriceText}>Best prices</Text>
+                </View>
+              </View>
+            </LinearGradient>
+          </View>
+
+          {/* ════════════════════════════════════════
+            WHY BOOKTHEDAY
+        ════════════════════════════════════════ */}
+          <View style={styles.whyBookContainer}>
+            {/* Decorative elements */}
+            <View style={styles.whyBookGlow} />
+
+            {/* Section header */}
+            <View style={styles.whyBookHeader}>
+              <View style={styles.whyBookBadge}>
+                <IonIcon
+                  name="sparkles"
+                  size={moderateScale(12)}
+                  color="#93186C"
+                />
+
+                <Text style={styles.whyBookBadgeText}>
+                  THE BOOKTHEDAY ADVANTAGE
+                </Text>
+              </View>
+
+              <Text style={styles.whyBookTitle}>
+                Why choose{' '}
+                <Text style={styles.whyBookTitleAccent}>BookTheDay?</Text>
               </Text>
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity onPress={() => setIsModalVisible(false)}>
-                  <Text style={styles.noThanksText}>No, thanks</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={getPermissions}>
-                  <Text style={styles.turnOnText}>Turn on</Text>
-                </TouchableOpacity>
+
+              <Text style={styles.whyBookSubtitle}>
+                A simpler and safer way to discover the right venue for your special day.
+              </Text>
+            </View>
+
+            {/* Feature grid */}
+            <View style={styles.whyBookGrid}>
+              {WHY_BOOK_FEATURES.map(feature => (
+                <View key={feature.id} style={styles.whyBookCard}>
+                  <View
+                    style={[
+                      styles.whyBookCardIcon,
+                      { backgroundColor: feature.iconBackground },
+                    ]}>
+                    <IonIcon
+                      name={feature.icon}
+                      size={moderateScale(21)}
+                      color={feature.iconColor}
+                    />
+                  </View>
+
+                  <Text style={styles.whyBookCardTitle}>
+                    {feature.title}
+                  </Text>
+
+                  <Text style={styles.whyBookCardDesc}>
+                    {feature.description}
+                  </Text>
+
+                  <View
+                    style={[
+                      styles.whyBookCardAccent,
+                      { backgroundColor: feature.iconColor },
+                    ]}
+                  />
+                </View>
+              ))}
+            </View>
+
+            {/* Trust strip */}
+            <View style={styles.whyBookTrustBadge}>
+              <View style={styles.whyBookTrustIcon}>
+                <IonIcon
+                  name="checkmark"
+                  size={moderateScale(13)}
+                  color="#FFFFFF"
+                />
+              </View>
+
+              <View style={styles.whyBookTrustContent}>
+                <Text style={styles.whyBookTrustTitle}>
+                  Built for Hyderabad celebrations
+                </Text>
+
+                <Text style={styles.whyBookTrustText}>
+                  Discover function halls, banquet halls, farm houses and resorts.
+                </Text>
               </View>
             </View>
           </View>
-        </Modal>
 
-      </ScrollView>
+          {/* ════════════════════════════════════════
+            POPULAR VENUES — vertical list
+        ════════════════════════════════════════ */}
+          {premiumHalls?.length > 0 && (
+            <View style={{ marginTop: verticalScale(24) }}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Popular Venues</Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('Events')}
+                  style={styles.seeAllBtn}>
+                  <Text style={styles.seeAllText}>View All</Text>
+                  <View style={styles.seeAllArrow}>
+                    <IonIcon name="arrow-forward" size={16} color="#fff" />
+                  </View>
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                data={premiumHalls}
+                scrollEnabled={false}
+                keyExtractor={item => item?._id}
+                contentContainerStyle={{ paddingHorizontal: horizontalScale(16) }}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    activeOpacity={0.92}
+                    onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
+                    style={styles.popularVenueCard}>
+                    <FastImage
+                      source={{ uri: item?.professionalImage?.url, priority: FastImage.priority.normal, cache: FastImage.cacheControl.immutable }}
+                      style={styles.popularVenueImage}
+                      resizeMode={FastImage.resizeMode.cover}
+                    />
+                    <View style={styles.popularVenueBody}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Text numberOfLines={1} style={styles.popularVenueName}>{item?.functionHallName}</Text>
+                        <Text style={styles.popularVenuePrice}>
+                          {item?.menuImages?.length > 0 ? 'Menu Based' : `${formatAmount(item?.rentPricePerDay)}/day`}
+                        </Text>
+                      </View>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                        <IonIcon name="location-sharp" size={12} color="#FD813B" />
+                        <Text numberOfLines={1} style={styles.popularVenueAddress}>
+                          {item?.functionHallAddress?.address || ''}
+                        </Text>
+                      </View>
+                      {item?.seatingCapacity ? (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}>
+                          <View style={styles.popularVenueChip}>
+                            <IonIcon name="people-outline" size={11} color="#D97706" />
+                            <Text style={styles.popularVenueChipText}>{item?.seatingCapacity} pax</Text>
+                          </View>
+                          {item?.bedRooms > 0 && (
+                            <View style={styles.popularVenueChip}>
+                              <IonIcon name="bed-outline" size={11} color="#D97706" />
+                              <Text style={styles.popularVenueChipText}>{item?.bedRooms} Rooms</Text>
+                            </View>
+                          )}
+                        </View>
+                      ) : null}
+                    </View>
+                  </TouchableOpacity>
+                )}
+                ListFooterComponent={premiumHasMore ? (
+                  <TouchableOpacity
+                    onPress={loadMorePremiumHalls}
+                    style={{ alignSelf: 'center', marginTop: 12, marginBottom: 8, paddingVertical: 10, paddingHorizontal: 24, borderRadius: 10, borderWidth: 1, borderColor: '#D97706' }}>
+                    {premiumLoading ? (
+                      <ActivityIndicator size="small" color="#D97706" />
+                    ) : (
+                      <Text style={{ fontFamily: 'ManropeRegular', fontSize: 13, fontWeight: '700', color: '#D97706' }}>Load More</Text>
+                    )}
+                  </TouchableOpacity>
+                ) : null}
+              />
+            </View>
+          )}
+
+          {/* ════════════════════════════════════════
+            EXPLORE ALL CTA
+        ════════════════════════════════════════ */}
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Events')}
+            style={styles.exploreAllBtn}
+            activeOpacity={0.88}>
+            <LinearGradient
+              colors={['#D2453B', '#A0143E']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.exploreAllGradient}>
+              <IonIcon name="business-outline" size={18} color="#FFDB7E" />
+              <Text style={styles.exploreAllText}>Explore All Venues</Text>
+              <IonIcon name="arrow-forward" size={16} color="#FFDB7E" />
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <View style={{ height: 32 }} />
+
+          {/* ── Location modal ── */}
+          <Modal transparent visible={isModalVisible} animationType="slide">
+            <View style={styles.modalBackground}>
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalText}>
+                  For a better experience, your device will need to use Location Accuracy
+                </Text>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity onPress={() => setIsModalVisible(false)}>
+                    <Text style={styles.noThanksText}>No, thanks</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={getPermissions}>
+                    <Text style={styles.turnOnText}>Turn on</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+
+        </ScrollView>
       </LinearGradient>
     </SafeAreaView>
   );
@@ -1218,11 +1260,9 @@ const styles = StyleSheet.create({
   },
   heroBannerGradient: {
     borderRadius: moderateScale(16),
-    paddingVertical: verticalScale(24),
-    paddingHorizontal: horizontalScale(20),
-    minHeight: verticalScale(170),
+    width: screenWidth - 32,
+    height: 220,
     overflow: 'hidden',
-    justifyContent: 'center',
   },
   heroBannerDecor1: {
     position: 'absolute',
@@ -1629,221 +1669,387 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 
-  // ── DESTINATION BANNER ────────────────────────────────────────────────────────
+  // ── PREMIUM DISCOVERY BANNER ────────────────────────────────────────────────
+
   destBannerWrapper: {
     marginHorizontal: horizontalScale(16),
-    marginTop: verticalScale(28),
-    borderRadius: moderateScale(14),
+    marginTop: verticalScale(24),
+    borderRadius: moderateScale(18),
     overflow: 'hidden',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
+
+    elevation: 3,
+    shadowColor: '#5C1E3E',
+    shadowOffset: {
+      width: 0,
+      height: verticalScale(3),
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: moderateScale(8),
   },
+
   destBanner: {
+    minHeight: verticalScale(190),
     flexDirection: 'row',
     alignItems: 'center',
-    padding: horizontalScale(22),
+    paddingHorizontal: horizontalScale(20),
+    paddingVertical: verticalScale(20),
     overflow: 'hidden',
   },
-  destCircle: {
+
+  destCircleLarge: {
     position: 'absolute',
-    width: moderateScale(200),
-    height: moderateScale(200),
-    borderRadius: moderateScale(100),
-    backgroundColor: 'rgba(253,129,59,0.06)',
-    right: -60,
-    top: -40,
+    width: moderateScale(190),
+    height: moderateScale(190),
+    borderRadius: moderateScale(95),
+    right: horizontalScale(-60),
+    top: verticalScale(-55),
+    backgroundColor: 'rgba(147,24,108,0.07)',
   },
-  destLeft: { flex: 1 },
-  destRight: { justifyContent: 'center', alignItems: 'center', paddingLeft: 8 },
-  destNewPill: {
+
+  destCircleSmall: {
+    position: 'absolute',
+    width: moderateScale(90),
+    height: moderateScale(90),
+    borderRadius: moderateScale(45),
+    right: horizontalScale(35),
+    bottom: verticalScale(-48),
+    backgroundColor: 'rgba(217,119,6,0.09)',
+  },
+
+  destContent: {
+    flex: 1,
+    zIndex: 2,
+    paddingRight: horizontalScale(10),
+  },
+
+  destPill: {
     alignSelf: 'flex-start',
-    backgroundColor: '#FD813B',
-    borderRadius: moderateScale(12),
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: horizontalScale(5),
+
+    backgroundColor: 'rgba(255,255,255,0.72)',
+    borderRadius: moderateScale(20),
     paddingHorizontal: horizontalScale(10),
-    paddingVertical: verticalScale(3),
+    paddingVertical: verticalScale(5),
     marginBottom: verticalScale(10),
+
+    borderWidth: 1,
+    borderColor: 'rgba(147,24,108,0.12)',
   },
-  destNewText: {
+
+  destPillText: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(10),
-    fontWeight: '700',
-    color: '#fff',
+    fontSize: moderateScale(9.5),
+    fontWeight: '800',
+    letterSpacing: 0.7,
+    color: '#7A144F',
   },
+
   destTitle: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(22),
     fontWeight: '800',
-    color: '#1A1E25',
     lineHeight: moderateScale(28),
-    marginBottom: verticalScale(6),
+    color: '#2A1A14',
+    marginBottom: verticalScale(7),
   },
+
+  destTitleAccent: {
+    color: '#93186C',
+  },
+
   destSub: {
+    maxWidth: horizontalScale(210),
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(12),
-    color: '#555',
-    lineHeight: moderateScale(18),
-    marginBottom: verticalScale(16),
+    fontSize: moderateScale(11.5),
+    lineHeight: moderateScale(17),
+    color: '#654F42',
+    marginBottom: verticalScale(14),
   },
+
   destCta: {
+    alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(160,20,62,0.75)',
-    borderRadius: moderateScale(20),
-    paddingHorizontal: horizontalScale(16),
-    paddingVertical: verticalScale(8),
-    gap: 6,
+    gap: horizontalScale(7),
+
+    backgroundColor: '#93186C',
+    borderRadius: moderateScale(22),
+    paddingHorizontal: horizontalScale(15),
+    paddingVertical: verticalScale(9),
+
+    elevation: 2,
+    shadowColor: '#93186C',
+    shadowOffset: {
+      width: 0,
+      height: verticalScale(2),
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: moderateScale(4),
   },
+
   destCtaText: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(13),
-    fontWeight: '700',
-    color: '#fff',
-  },
-
-  // ── TRUST CARDS ───────────────────────────────────────────────────────────────
-  trustRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  trustCard: {
-    flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: moderateScale(16),
-    padding: horizontalScale(14),
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-  },
-  trustIconCircle: {
-    width: moderateScale(44),
-    height: moderateScale(44),
-    borderRadius: moderateScale(22),
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: verticalScale(8),
-  },
-  trustTitle: {
-    fontFamily: 'ManropeRegular',
     fontSize: moderateScale(12),
-    fontWeight: '700',
-    color: '#131313',
-    textAlign: 'center',
-  },
-  trustSub: {
-    fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(10),
-    color: '#939393',
-    textAlign: 'center',
-    marginTop: 3,
-    lineHeight: moderateScale(14),
+    fontWeight: '800',
+    color: '#FFFFFF',
   },
 
-  // ── WHY BOOKTHEDAY ───────────────────────────────────────────────────────────
-  whyBookContainer: {
-    marginTop: verticalScale(28),
-    marginHorizontal: horizontalScale(16),
-    backgroundColor: '#fff',
-    borderRadius: moderateScale(16),
-    padding: horizontalScale(18),
-    borderWidth: 1,
-    borderColor: '#F0F0F0',
+  destVisual: {
+    width: horizontalScale(105),
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
+  },
+
+  destIconOuter: {
+    width: moderateScale(100),
+    height: moderateScale(100),
+    borderRadius: moderateScale(50),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.35)',
+    borderWidth: moderateScale(1),
+    borderColor: 'rgba(255,255,255,0.65)',
+  },
+
+  destIconInner: {
+    width: moderateScale(78),
+    height: moderateScale(78),
+    borderRadius: moderateScale(39),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.82)',
+
     elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
+    shadowColor: '#7A144F',
+    shadowOffset: {
+      width: 0,
+      height: verticalScale(2),
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: moderateScale(5),
   },
-  whyBookHeader: {
-    marginBottom: verticalScale(16),
-  },
-  whyBookBadge: {
+
+  destPriceBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(253, 129, 59, 0.08)',
-    borderRadius: 20,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    gap: 4,
+    gap: horizontalScale(4),
+
+    backgroundColor: '#FFFFFF',
+    borderRadius: moderateScale(16),
+    paddingHorizontal: horizontalScale(9),
+    paddingVertical: verticalScale(5),
+    marginTop: verticalScale(-8),
+
+    elevation: 2,
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: verticalScale(1),
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: moderateScale(3),
   },
+
+  destPriceText: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(9.5),
+    fontWeight: '800',
+    color: '#8A4B08',
+  },
+  // ── WHY BOOKTHEDAY ──────────────────────────────────────────────────────────
+
+  whyBookContainer: {
+    position: 'relative',
+    marginTop: verticalScale(26),
+    marginHorizontal: horizontalScale(16),
+    paddingHorizontal: horizontalScale(16),
+    paddingTop: verticalScale(20),
+    paddingBottom: verticalScale(16),
+    backgroundColor: '#FFFCF8',
+    borderRadius: moderateScale(20),
+    borderWidth: 1,
+    borderColor: '#F2E9DF',
+    overflow: 'hidden',
+    elevation: 3,
+    shadowColor: '#5C1E3E',
+    shadowOffset: {
+      width: 0,
+      height: verticalScale(3),
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: moderateScale(9),
+  },
+
+  whyBookGlow: {
+    position: 'absolute',
+    width: moderateScale(150),
+    height: moderateScale(150),
+    borderRadius: moderateScale(75),
+    top: verticalScale(-85),
+    right: horizontalScale(-55),
+    backgroundColor: 'rgba(255,219,126,0.18)',
+  },
+
+  whyBookHeader: {
+    marginBottom: verticalScale(17),
+    zIndex: 1,
+  },
+
+  whyBookBadge: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: horizontalScale(5),
+
+    paddingHorizontal: horizontalScale(10),
+    paddingVertical: verticalScale(5),
+    marginBottom: verticalScale(10),
+
+    backgroundColor: '#FAEAF3',
+    borderRadius: moderateScale(20),
+  },
+
   whyBookBadgeText: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(11),
-    fontWeight: '600',
-    color: '#FD813B',
+    fontSize: moderateScale(9.5),
+    fontWeight: '800',
+    letterSpacing: 0.7,
+    color: '#93186C',
   },
+
   whyBookTitle: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(18),
+    fontSize: moderateScale(21),
     fontWeight: '800',
-    color: '#1A1E25',
-    marginBottom: 4,
+    lineHeight: moderateScale(27),
+    color: '#201A1D',
+    marginBottom: verticalScale(6),
   },
+
+  whyBookTitleAccent: {
+    color: '#93186C',
+  },
+
   whyBookSubtitle: {
+    maxWidth: '92%',
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(12),
-    color: '#7E8389',
+    fontSize: moderateScale(11.5),
     lineHeight: moderateScale(17),
+    color: '#74666D',
   },
+
   whyBookGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    justifyContent: 'space-between',
+    rowGap: verticalScale(10),
   },
+
+
   whyBookCard: {
-    width: '48%',
-    borderRadius: moderateScale(14),
-    padding: moderateScale(14),
-    flexGrow: 1,
+    position: 'relative', 
+    width: '48.4%',
+    minHeight: verticalScale(138),
+
+    paddingHorizontal: horizontalScale(12),
+    paddingTop: verticalScale(13),
+    paddingBottom: verticalScale(12),
+
+    backgroundColor: '#FFFFFF',
+    borderRadius: moderateScale(15),
+    borderWidth: 1,
+    borderColor: '#EEE8EA',
+    overflow: 'hidden',
+
+    elevation: 1,
+    shadowColor: '#4A2638',
+    shadowOffset: {
+      width: 0,
+      height: verticalScale(2),
+    },
+    shadowOpacity: 0.04,
+    shadowRadius: moderateScale(4),
   },
+
   whyBookCardIcon: {
     width: moderateScale(38),
     height: moderateScale(38),
-    borderRadius: moderateScale(10),
-    justifyContent: 'center',
+    borderRadius: moderateScale(12),
     alignItems: 'center',
-    marginBottom: 10,
+    justifyContent: 'center',
+    marginBottom: verticalScale(10),
   },
+
   whyBookCardTitle: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(13),
-    fontWeight: '700',
-    color: '#1A1E25',
-    marginBottom: 4,
+    fontWeight: '800',
     lineHeight: moderateScale(17),
+    color: '#211A1E',
+    marginBottom: verticalScale(5),
   },
+
   whyBookCardDesc: {
     fontFamily: 'ManropeRegular',
-    fontSize: moderateScale(10.5),
-    color: '#7E8389',
-    lineHeight: moderateScale(14),
+    fontSize: moderateScale(10),
+    lineHeight: moderateScale(14.5),
+    color: '#786C72',
   },
+
+  whyBookCardAccent: {
+    position: 'absolute',
+    width: horizontalScale(26),
+    height: verticalScale(3),
+    left: horizontalScale(12),
+    bottom: 0,
+    borderTopLeftRadius: moderateScale(3),
+    borderTopRightRadius: moderateScale(3),
+  },
+
   whyBookTrustBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
+    gap: horizontalScale(10),
+
     marginTop: verticalScale(14),
-    backgroundColor: '#F0FDF4',
-    borderRadius: moderateScale(20),
-    paddingVertical: verticalScale(8),
-    paddingHorizontal: horizontalScale(14),
+    paddingHorizontal: horizontalScale(12),
+    paddingVertical: verticalScale(11),
+
+    backgroundColor: '#FFF5D9',
+    borderRadius: moderateScale(14),
     borderWidth: 1,
-    borderColor: '#FFDB7E',
+    borderColor: '#F4D789',
   },
-  whyBookTrustText: {
+
+  whyBookTrustIcon: {
+    width: moderateScale(30),
+    height: moderateScale(30),
+    borderRadius: moderateScale(15),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#07875D',
+  },
+
+  whyBookTrustContent: {
+    flex: 1,
+  },
+
+  whyBookTrustTitle: {
     fontFamily: 'ManropeRegular',
     fontSize: moderateScale(11),
-    fontWeight: '600',
-    color: '#D97706',
+    fontWeight: '800',
+    color: '#684306',
+    marginBottom: verticalScale(2),
+  },
+
+  whyBookTrustText: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(9.5),
+    lineHeight: moderateScale(13),
+    color: '#88631F',
   },
 
   // ── POPULAR VENUES ─────────────────────────────────────────────────────────────

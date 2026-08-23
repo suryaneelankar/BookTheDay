@@ -2,6 +2,7 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 apply plugin: "com.google.gms.google-services"
+apply plugin: "com.google.firebase.crashlytics"
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -77,13 +78,13 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.book_the_day"
+    namespace "com.booktheday.app"
     defaultConfig {
-        applicationId "com.book_the_day"
+        applicationId "com.booktheday.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 22
-        versionName "2.2"
+        versionCode 2
+        versionName "1.0.1"
     }
     signingConfigs {
         debug {
@@ -131,6 +132,7 @@ dependencies {
     implementation project(':react-native-video')
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-messaging")
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

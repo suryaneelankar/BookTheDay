@@ -103,9 +103,11 @@ const LoginScreen = ({route}) => {
       }
     } catch (error) {
       console.error('Error during login:', error);
+      console.error('Login error response:', error.response?.data);
+      console.error('Login error status:', error.response?.status);
       CustomAlert.alert(
         'Login Failed',
-        error.response?.data?.message || 'Please try again',
+        error.response?.data?.message || error.response?.data || 'Please try again',
         undefined,
         {type: 'error'},
       );

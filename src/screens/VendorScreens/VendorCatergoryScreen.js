@@ -17,7 +17,6 @@ import {getVendorAuthToken} from '../../utils/StoreAuthToken';
 import BASE_URL from '../../apiconfig';
 import VendorHowItWorks from '../../components/VendorHowItWorks';
 import ProfileIcon from '../../assets/vendorIcons/profileIcon.svg';
-import RightSideIcon from '../../assets/profilesvgs/zoomRight.svg';
 import HallImage from '../../assets/HallImage1.jpeg';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 
@@ -54,19 +53,15 @@ const VendorCategoryScreen = ({navigation}) => {
       ...cateringsBookingsData,
       ...clothJewelBookingsData,
     ];
-
     setTotalBookings(combinedData?.length);
-
     const completedCount = combinedData.filter(
       item =>
         item?.bookingStatus === 'approved' ||
         item?.bookingStatus === 'payment successful',
     );
-
     const pendingCount = combinedData.filter(
       booking => booking?.bookingStatus === 'requested',
     );
-
     setCompleted(completedCount?.length);
     setPending(pendingCount?.length);
     storeVendorDeviceToken();
@@ -82,15 +77,10 @@ const VendorCategoryScreen = ({navigation}) => {
       const vendorTokenRes = await axios.post(
         `${BASE_URL}/addVendorFCMToken`,
         payload,
-        {
-          headers: {Authorization: `Bearer ${token}`},
-        },
+        {headers: {Authorization: `Bearer ${token}`}},
       );
       if (vendorTokenRes?.status === 200) {
-        console.log(
-          'Vendor token added successfully:',
-          vendorTokenRes?.data?.message,
-        );
+        console.log('Vendor token added successfully:', vendorTokenRes?.data?.message);
       }
     } catch (error) {
       console.error('Error during add vendor token:', error);
@@ -102,9 +92,7 @@ const VendorCategoryScreen = ({navigation}) => {
     try {
       const response = await axios.get(
         `${BASE_URL}/clothJewelBookingsGotForVendor/${vendorLoggedInMobileNum}`,
-        {
-          headers: {Authorization: `Bearer ${token}`},
-        },
+        {headers: {Authorization: `Bearer ${token}`}},
       );
       const activeBookings = response?.data?.data.filter(
         booking => booking.isActiveBooking === true,
@@ -120,9 +108,7 @@ const VendorCategoryScreen = ({navigation}) => {
     try {
       const response = await axios.get(
         `${BASE_URL}/functionHallBookingsGotForVendor/${vendorLoggedInMobileNum}`,
-        {
-          headers: {Authorization: `Bearer ${token}`},
-        },
+        {headers: {Authorization: `Bearer ${token}`}},
       );
       const activeBookings = response?.data?.data.filter(
         booking => booking.isActiveBooking === true,
@@ -138,9 +124,7 @@ const VendorCategoryScreen = ({navigation}) => {
     try {
       const response = await axios.get(
         `${BASE_URL}/foodCateringBookingsGotForVendor/${vendorLoggedInMobileNum}`,
-        {
-          headers: {Authorization: `Bearer ${token}`},
-        },
+        {headers: {Authorization: `Bearer ${token}`}},
       );
       const activeBookings = response?.data?.data.filter(
         booking => booking.isActiveBooking === true,
@@ -156,14 +140,10 @@ const VendorCategoryScreen = ({navigation}) => {
     try {
       const response = await axios.get(
         `${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`,
-        {
-          headers: {Authorization: `Bearer ${token}`},
-        },
+        {headers: {Authorization: `Bearer ${token}`}},
       );
       setProfileData(response?.data?.data);
-      dispatch(
-        getCurrentVendorLoggedInUserName(response?.data?.data?.fullName),
-      );
+      dispatch(getCurrentVendorLoggedInUserName(response?.data?.data?.fullName));
     } catch (error) {
       console.log('Profile fetch error:', error);
     }
@@ -185,41 +165,81 @@ const VendorCategoryScreen = ({navigation}) => {
       id: 1,
       CatImg: HallImage,
       navScreen: 'AddFunctionalHall',
-      title: 'Add Function Hall',
-      description: 'Manage listings for events, celebrations, and weddings.',
+      title: 'Function Halls',
+      subtitle: 'Venues & Event Spaces',
+      description: 'Add and manage hall listings for weddings, receptions, and corporate events.',
+      icon: 'business-outline',
+      features: ['Add & Edit Halls', 'Manage Bookings', 'Set Pricing'],
       catType: 'funtionHalls',
     },
   ];
 
-  const renderItem = ({item}) => {
-    return (
-      <TouchableOpacity
-        style={styles.categoryCard}
-        activeOpacity={0.85}
-        onPress={() => {
-          navigation.navigate(item.navScreen, {
-            isAadharUpdate: profileData?.aadharImage?.url ? true : false,
-          });
-        }}>
-        <Image
-          source={item.CatImg}
-          style={styles.categoryImage}
-        />
-        <View style={styles.categoryBottom}>
-          <View style={styles.categoryInfo}>
-            <Text style={styles.categoryTitle}>{item.title}</Text>
-            <Text style={styles.categoryDescription}>{item.description}</Text>
-            <View style={styles.categoryCtaRow}>
-              <Text style={styles.categoryCtaText}>Manage</Text>
-            </View>
+  const renderItem = ({item}) => (
+    <TouchableOpacity
+      style={styles.categoryCard}
+      activeOpacity={0.88}
+      onPress={() =>
+        navigation.navigate(item.navScreen, {
+          isAadharUpdate: profileData?.aadharImage?.url ? true : false,
+        })
+      }>
+
+      {/* ── Image with overlaid info ── */}
+      <View style={styles.categoryImageWrapper}>
+        <Image source={item.CatImg} style={styles.categoryImage} resizeMode="cover" />
+
+        {/* Dark scrim */}
+        <View style={styles.categoryScrim} />
+
+        {/* Active badge top-right */}
+        <View style={styles.activeBadge}>
+          <View style={styles.activeDot} />
+          <Text style={styles.activeBadgeText}>Active</Text>
+        </View>
+
+        {/* Title + subtitle bottom-left */}
+        <View style={styles.categoryImageFooter}>
+          <View style={styles.categoryIconCircle}>
+            <IonIcon name={item.icon} size={18} color="#fff" />
           </View>
-          <View style={styles.categoryChevron}>
-            <IonIcon name="chevron-forward" size={20} color="#FD813B" />
+          <View>
+            <Text style={styles.categoryImageTitle}>{item.title}</Text>
+            <Text style={styles.categoryImageSubtitle}>{item.subtitle}</Text>
           </View>
         </View>
-      </TouchableOpacity>
-    );
-  };
+      </View>
+
+      {/* ── Body ── */}
+      <View style={styles.categoryBody}>
+        <Text style={styles.categoryDescription}>{item.description}</Text>
+
+        {/* Feature chips */}
+        <View style={styles.chipsRow}>
+          {item.features.map((f, i) => (
+            <View key={i} style={styles.chip}>
+              <IonIcon name="checkmark-circle" size={12} color="#059669" />
+              <Text style={styles.chipText}>{f}</Text>
+            </View>
+          ))}
+        </View>
+
+        {/* Divider */}
+        <View style={styles.cardDivider} />
+
+        {/* CTA row */}
+        <View style={styles.ctaRow}>
+          <View>
+            <Text style={styles.ctaLabel}>Ready to manage?</Text>
+            <Text style={styles.ctaHint}>Tap to open your listings</Text>
+          </View>
+          <View style={styles.ctaBtn}>
+            <Text style={styles.ctaBtnText}>Open</Text>
+            <IonIcon name="arrow-forward" size={14} color="#fff" />
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -228,6 +248,7 @@ const VendorCategoryScreen = ({navigation}) => {
         end={{x: 0, y: 1}}
         colors={['#FFF7E7', '#FFF7E7']}
         style={styles.background}>
+
         {/* Profile Header */}
         <View style={styles.profileRow}>
           <ProfileIcon />
@@ -268,6 +289,7 @@ const VendorCategoryScreen = ({navigation}) => {
           renderItem={renderItem}
           keyExtractor={item => item.id.toString()}
           contentContainerStyle={styles.listContainer}
+          scrollEnabled={false}
         />
 
         {/* Quick Tips */}
@@ -286,6 +308,7 @@ const VendorCategoryScreen = ({navigation}) => {
 
         {/* How It Works */}
         <VendorHowItWorks />
+
       </LinearGradient>
     </ScrollView>
   );
@@ -359,66 +382,161 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingBottom: 20,
   },
+
+  // ── CATEGORY CARD ──
   categoryCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 15,
+    backgroundColor: '#fff',
+    borderRadius: 18,
     marginVertical: 10,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-    borderColor: '#EDEDED',
-    borderWidth: 1,
     overflow: 'hidden',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 3},
+    shadowOpacity: 0.09,
+    shadowRadius: 10,
+    borderWidth: 1,
+    borderColor: '#EFEFEF',
+  },
+  categoryImageWrapper: {
+    position: 'relative',
   },
   categoryImage: {
-    height: 140,
+    height: 175,
     width: '100%',
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
   },
-  categoryBottom: {
+  categoryScrim: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(10,10,20,0.38)',
+  },
+  activeBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
+    gap: 5,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.4)',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
-  categoryInfo: {
-    flex: 1,
+  activeDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: '#34D399',
   },
-  categoryChevron: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#FFF2CF',
+  activeBadgeText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '700',
+    fontFamily: 'ManropeRegular',
+  },
+  categoryImageFooter: {
+    position: 'absolute',
+    bottom: 14,
+    left: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  categoryIconCircle: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#FD813B',
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 10,
   },
-  categoryTitle: {
+  categoryImageTitle: {
+    color: '#fff',
     fontSize: 18,
-    fontWeight: '700',
-    color: '#1A1E25',
-    marginBottom: 4,
+    fontWeight: '800',
     fontFamily: 'ManropeRegular',
+  },
+  categoryImageSubtitle: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 12,
+    fontFamily: 'ManropeRegular',
+    marginTop: 1,
+  },
+  categoryBody: {
+    padding: 16,
   },
   categoryDescription: {
     fontSize: 13,
     color: '#7E8389',
     fontFamily: 'ManropeRegular',
-    marginBottom: 12,
+    lineHeight: 20,
+    marginBottom: 14,
   },
-  categoryCtaRow: {
+  chipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 14,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#F0FDF6',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderWidth: 1,
+    borderColor: '#D1FAE5',
+  },
+  chipText: {
+    fontSize: 12,
+    color: '#059669',
+    fontWeight: '600',
+    fontFamily: 'ManropeRegular',
+  },
+  cardDivider: {
+    height: 1,
+    backgroundColor: '#F3F3F3',
+    marginBottom: 14,
+  },
+  ctaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  ctaLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#100D25',
+    fontFamily: 'ManropeRegular',
+  },
+  ctaHint: {
+    fontSize: 11,
+    color: '#ABABAB',
+    fontFamily: 'ManropeRegular',
+    marginTop: 2,
+  },
+  ctaBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    backgroundColor: '#FD813B',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 24,
   },
-  categoryCtaText: {
-    fontSize: 13,
+  ctaBtnText: {
+    color: '#fff',
+    fontSize: 14,
     fontWeight: '700',
-    color: '#FD813B',
     fontFamily: 'ManropeRegular',
   },
+
   tip: {
     fontSize: 14,
     color: '#333333',

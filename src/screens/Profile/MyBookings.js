@@ -1,4 +1,4 @@
-import React, {useCallback, useRef, useState} from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -16,13 +16,13 @@ import {
 import CustomAlert from '../../components/CustomAlert';
 import BASE_URL from '../../apiconfig';
 import axios from 'axios';
-import {getUserAuthToken} from '../../utils/StoreAuthToken';
+import { getUserAuthToken } from '../../utils/StoreAuthToken';
 import FastImage from 'react-native-fast-image';
-import {formatAmount} from '../../utils/GlobalFunctions';
+import { formatAmount } from '../../utils/GlobalFunctions';
 import RazorpayCheckout from 'react-native-razorpay';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import StepIndicator from 'react-native-step-indicator';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 import LocationIcon from '../../assets/vendorIcons/locationIcon.svg';
 import PayNowButton from './PayNowButton';
 import ActionSheet from 'react-native-actions-sheet';
@@ -30,18 +30,34 @@ import FloatingCloseButton from '../Events/floatingCloseButton';
 import moment from 'moment';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 
-const {height: SCREEN_HEIGHT} = Dimensions.get('window');
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 const COLORS = {
-  orange: '#FD813B',
+  primary: '#93186C',
+  primaryDark: '#68133F',
+  primaryLight: '#FBEAF4',
+
+  gold: '#D9A95A',
+  goldLight: '#FFF7E6',
+
+  dark: '#211A1E',
+  gray: '#746B70',
+  lightGray: '#A49CA0',
+
+  background: '#FAF8F9',
+  surface: '#FFFFFF',
+  surfaceMuted: '#F7F3F5',
+
+  green: '#07875D',
+  greenLight: '#E7F8F1',
+
   amber: '#D97706',
-  dark: '#1A1E25',
-  gray: '#7E8389',
-  lightBg: '#F8F9FA',
+  amberLight: '#FFF4DB',
+
+  red: '#B4234D',
+  redLight: '#FDECF1',
+
   white: '#FFFFFF',
-  green: '#2E7D32',
-  red: '#C62828',
-  cancelRed: '#A0153E',
 };
 
 const ViewMyBookings = () => {
@@ -69,29 +85,41 @@ const ViewMyBookings = () => {
     'Other (Please specify...)',
   ];
 
-  const labels = ['Initiated', 'Confirmed', 'Payment Done'];
+  const labels = ['Request Sent', 'Venue Approved', 'Payment Completed'];
   const customStyles = {
-    stepIndicatorSize: 25,
-    currentStepIndicatorSize: 30,
-    separatorStrokeWidth: 1,
-    currentStepStrokeWidth: 3,
-    stepStrokeCurrentColor: COLORS.orange,
+    stepIndicatorSize: 24,
+    currentStepIndicatorSize: 28,
+
+    separatorStrokeWidth: 2,
+    currentStepStrokeWidth: 2,
     stepStrokeWidth: 2,
-    stepStrokeFinishedColor: COLORS.orange,
-    stepStrokeUnFinishedColor: '#aaaaaa',
-    separatorFinishedColor: COLORS.orange,
-    separatorUnFinishedColor: '#aaaaaa',
-    stepIndicatorFinishedColor: COLORS.orange,
+
+    stepStrokeCurrentColor: COLORS.primary,
+    stepStrokeFinishedColor: COLORS.primary,
+    stepStrokeUnFinishedColor: '#DDD5D9',
+
+    separatorFinishedColor: COLORS.primary,
+    separatorUnFinishedColor: '#E8E1E4',
+
+    stepIndicatorFinishedColor: COLORS.primary,
+
+    // Changed
+    stepIndicatorCurrentColor: COLORS.primary,
+
     stepIndicatorUnFinishedColor: COLORS.white,
-    stepIndicatorCurrentColor: COLORS.white,
-    stepIndicatorLabelFontSize: 13,
-    currentStepIndicatorLabelFontSize: 13,
-    stepIndicatorLabelCurrentColor: 'green',
+
+    // Changed
+    stepIndicatorLabelCurrentColor: COLORS.white,
+
     stepIndicatorLabelFinishedColor: COLORS.white,
-    stepIndicatorLabelUnFinishedColor: '#aaaaaa',
-    labelColor: COLORS.orange,
-    labelSize: 13,
-    currentStepLabelColor: COLORS.dark,
+    stepIndicatorLabelUnFinishedColor: '#A49CA0',
+
+    stepIndicatorLabelFontSize: 11,
+    currentStepIndicatorLabelFontSize: 12,
+
+    labelColor: COLORS.gray,
+    currentStepLabelColor: COLORS.primary,
+    labelSize: 11,
   };
 
   useFocusEffect(
@@ -104,6 +132,22 @@ const ViewMyBookings = () => {
       };
     }, []),
   );
+
+  const getBookingStep = status => {
+    switch (status) {
+      case 'requested':
+        return 0;
+
+      case 'approved':
+        return 1;
+
+      case 'payment successful':
+        return 2;
+
+      default:
+        return 0;
+    }
+  };
 
   const getMyBookings = async () => {
     const token = await getUserAuthToken();
@@ -161,7 +205,9 @@ const ViewMyBookings = () => {
   const cancelFunctionHallBooking = async bookingId => {
     const token = await getUserAuthToken();
     const reasonToSend =
-      selectedReason === 'Other' ? otherReasonText : selectedReason;
+      selectedReason === 'Other (Please specify...)'
+        ? otherReasonText.trim()
+        : selectedReason;
 
     const bookingParams = {
       bookingId: bookingId,
@@ -203,16 +249,16 @@ const ViewMyBookings = () => {
               },
             },
           ],
-          {cancelable: false, type: 'success'},
+          { cancelable: false, type: 'success' },
         );
       }
     } catch (error) {
       CustomAlert.alert(
         'Error',
         error?.response?.data?.message ||
-          'Something went wrong while cancelling the booking',
+        'Something went wrong while cancelling the booking',
         undefined,
-        {type: 'error'},
+        { type: 'error' },
       );
       console.log(
         'cancelBookingResp error>>::',
@@ -237,7 +283,7 @@ const ViewMyBookings = () => {
     totalAmount,
   ) => {
     const token = await getUserAuthToken();
-    const {key, defaultMethod} = await fetchRazorpayKey();
+    const { key, defaultMethod } = await fetchRazorpayKey();
     let initiatePaymentPayload = {
       orderAmount: advanceAmount,
       currency: 'INR',
@@ -295,7 +341,7 @@ const ViewMyBookings = () => {
               name: userLoggedInName,
               method: defaultMethod,
             },
-            theme: {color: '#FFDB7E'},
+            theme: { color: '#FFDB7E' },
           };
 
           console.log('options is::>>', options);
@@ -410,7 +456,7 @@ const ViewMyBookings = () => {
     }
   };
 
-  const renderItem = ({item}) => {
+  const renderItem = ({ item }) => {
     const updatedImgUrl = item?.professionalImage?.url;
 
     const bookingDate = item?.startDate;
@@ -427,8 +473,8 @@ const ViewMyBookings = () => {
       item?.catType === 'caterings'
         ? item?.foodCateringName
         : item?.catType === 'functionHalls'
-        ? item?.functionHallName
-        : item?.productName;
+          ? item?.functionHallName
+          : item?.productName;
 
     const advanceLabel =
       item?.catType === 'caterings' || item?.catType === 'functionHalls'
@@ -436,8 +482,8 @@ const ViewMyBookings = () => {
           ? 'Advance Paid'
           : 'Advance Amount'
         : item?.securityDepositAmountPaid > 0
-        ? 'Security Paid'
-        : 'Security Deposit';
+          ? 'Security Paid'
+          : 'Security Deposit';
 
     const advanceValue = item?.advanceAmountToPay
       ? item?.advanceAmountToPay
@@ -449,14 +495,14 @@ const ViewMyBookings = () => {
 
     const statusText = item.bookingStatus
       ? item.bookingStatus.charAt(0).toUpperCase() +
-        item.bookingStatus.slice(1)
+      item.bookingStatus.slice(1)
       : '';
 
     return (
       <View style={styles.card}>
         <FastImage
           resizeMode="cover"
-          source={{uri: updatedImgUrl}}
+          source={{ uri: updatedImgUrl }}
           style={styles.cardImage}
         />
         <View style={styles.cardContent}>
@@ -495,7 +541,7 @@ const ViewMyBookings = () => {
 
           <View style={styles.dateSection}>
             {item?.catType === 'caterings' ||
-            item?.catType === 'functionHalls' ? (
+              item?.catType === 'functionHalls' ? (
               <View style={styles.dateRow}>
                 <IonIcon name="calendar-outline" size={14} color={COLORS.gray} />
                 <Text style={styles.dateText}>
@@ -534,15 +580,7 @@ const ViewMyBookings = () => {
           <View style={styles.stepIndicatorContainer}>
             <StepIndicator
               customStyles={customStyles}
-              currentPosition={
-                item?.bookingStatus === 'requested'
-                  ? 1
-                  : item?.bookingStatus === 'approved'
-                  ? 2
-                  : item?.bookingStatus === 'payment successful'
-                  ? 3
-                  : 0
-              }
+              currentPosition={getBookingStep(item?.bookingStatus)}
               labels={labels}
               stepCount={3}
             />
@@ -683,7 +721,7 @@ const ViewMyBookings = () => {
             style={[
               styles.confirmCancelButton,
               (!selectedReason || !selectedBookingId) &&
-                styles.confirmCancelButtonDisabled,
+              styles.confirmCancelButtonDisabled,
             ]}
             disabled={!selectedReason || !selectedBookingId}
             onPress={() => {
@@ -694,8 +732,8 @@ const ViewMyBookings = () => {
                 CustomAlert.alert(
                   'Alert',
                   'Please enter your custom reason!',
-                  [{text: 'Ok', onPress: () => {}}],
-                  {cancelable: false, type: 'warning'},
+                  [{ text: 'Ok', onPress: () => { } }],
+                  { cancelable: false, type: 'warning' },
                 );
                 return;
               }
@@ -703,8 +741,8 @@ const ViewMyBookings = () => {
                 CustomAlert.alert(
                   'Alert',
                   'Please agree the terms & conditions upon cancellation.',
-                  [{text: 'Ok', onPress: () => {}}],
-                  {cancelable: false, type: 'warning'},
+                  [{ text: 'Ok', onPress: () => { } }],
+                  { cancelable: false, type: 'warning' },
                 );
                 return;
               }
@@ -713,7 +751,7 @@ const ViewMyBookings = () => {
                   'Alert',
                   'Are you sure you want to cancel the booking? This will apply the refund policy mentioned.',
                   [
-                    {text: 'Cancel', onPress: () => {}},
+                    { text: 'Cancel', onPress: () => { } },
                     {
                       text: 'Yes',
                       onPress: () => {
@@ -721,7 +759,7 @@ const ViewMyBookings = () => {
                       },
                     },
                   ],
-                  {cancelable: false},
+                  { cancelable: false },
                 );
               }
             }}>
@@ -732,34 +770,72 @@ const ViewMyBookings = () => {
 
       {loading ? (
         <View style={styles.loadingState}>
-          <ActivityIndicator size="large" color={COLORS.orange} />
-          <Text style={styles.loadingText}>Loading your bookings...</Text>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+
+          <Text style={styles.loadingText}>
+            Loading your bookings...
+          </Text>
         </View>
       ) : hallsBookings?.length > 0 ? (
-        <ScrollView style={styles.scrollContainer}>
-          {hallsBookings?.length > 0 ? (
-            <>
-              <Text style={styles.sectionTitle}>Halls bookings</Text>
-              <FlatList
-                data={hallsBookings}
-                renderItem={renderItem}
-                keyExtractor={item => item?.id}
-                scrollEnabled={false}
-              />
-            </>
-          ) : null}
-        </ScrollView>
+        <FlatList
+          data={hallsBookings}
+          renderItem={renderItem}
+          keyExtractor={item =>
+            String(item?._id ?? item?.bookingId)
+          }
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.bookingList}
+          ListHeaderComponent={
+            <View style={styles.bookingHeader}>
+              <View>
+                <Text style={styles.bookingHeaderTitle}>
+                  My Bookings
+                </Text>
+
+                <Text style={styles.bookingHeaderSubtitle}>
+                  View and manage your venue reservations
+                </Text>
+              </View>
+
+              <View style={styles.bookingCount}>
+                <Text style={styles.bookingCountText}>
+                  {hallsBookings.length}
+                </Text>
+              </View>
+            </View>
+          }
+        />
       ) : (
         <View style={styles.emptyState}>
-          <IonIcon
-            name="calendar-outline"
-            size={64}
-            color={COLORS.gray}
-          />
-          <Text style={styles.emptyTitle}>No Bookings Yet</Text>
+          <View style={styles.emptyIcon}>
+            <IonIcon
+              name="calendar-outline"
+              size={moderateScale(34)}
+              color={COLORS.primary}
+            />
+          </View>
+
+          <Text style={styles.emptyTitle}>No bookings yet</Text>
+
           <Text style={styles.emptySubtitle}>
-            Your venue bookings will appear here once you make a reservation.
+            When you reserve a venue, your booking details will appear here.
           </Text>
+
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => navigation.navigate('BanquetHallstab')}
+            style={styles.exploreButton}>
+
+            <Text style={styles.exploreButtonText}>
+              Explore venues
+            </Text>
+
+            <IonIcon
+              name="arrow-forward"
+              size={15}
+              color={COLORS.white}
+            />
+          </TouchableOpacity>
         </View>
       )}
     </SafeAreaView>
@@ -767,9 +843,186 @@ const ViewMyBookings = () => {
 };
 
 const styles = StyleSheet.create({
+  // container: {
+  //   flex: 1,
+  //   backgroundColor: COLORS.lightBg,
+  // },
+  cardFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingTop: 13,
+    borderTopWidth: 1,
+    borderTopColor: '#EEE7EA',
+  },
+
+  cancelButton: {
+    flex: 1,
+    minHeight: 42,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.red,
+    borderRadius: 21,
+  },
+
+  cancelButtonDisabled: {
+    backgroundColor: '#F5F3F4',
+    borderColor: '#DDD7DA',
+  },
+
+  cancelButtonText: {
+    fontFamily: 'ManropeRegular',
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: COLORS.red,
+  },
+
+  cancelButtonTextDisabled: {
+    color: COLORS.lightGray,
+  },
   container: {
     flex: 1,
-    backgroundColor: COLORS.lightBg,
+    backgroundColor: COLORS.background,
+  },
+  statusRequested: {
+    backgroundColor: COLORS.amberLight,
+    color: COLORS.amber,
+  },
+
+  statusApproved: {
+    backgroundColor: COLORS.primaryLight,
+    color: COLORS.primary,
+  },
+
+  statusRejected: {
+    backgroundColor: COLORS.redLight,
+    color: COLORS.red,
+  },
+
+  statusSuccess: {
+    backgroundColor: COLORS.greenLight,
+    color: COLORS.green,
+  },
+
+  card: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 18,
+    marginHorizontal: 16,
+    marginVertical: 8,
+    overflow: 'hidden',
+
+    borderWidth: 1,
+    borderColor: '#EEE7EA',
+
+    elevation: 3,
+    shadowColor: COLORS.primaryDark,
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+  },
+
+  cardImage: {
+    width: '100%',
+    height: 155,
+    backgroundColor: '#EFEAEC',
+  },
+
+  cardContent: {
+    padding: 15,
+  },
+
+  venueName: {
+    flex: 1,
+    marginRight: 8,
+    fontFamily: 'ManropeRegular',
+    fontSize: 16,
+    lineHeight: 21,
+    fontWeight: '800',
+    color: COLORS.dark,
+  },
+
+  totalAmount: {
+    fontFamily: 'ManropeRegular',
+    fontSize: 19,
+    fontWeight: '800',
+    color: COLORS.primary,
+    marginBottom: 12,
+  },
+
+  amountGrid: {
+    flexDirection: 'row',
+    padding: 12,
+    marginBottom: 13,
+    backgroundColor: COLORS.surfaceMuted,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#EEE7EA',
+  },
+
+  amountDivider: {
+    width: 1,
+    marginHorizontal: 8,
+    backgroundColor: '#E2D9DD',
+  },
+
+  amountValueGreen: {
+    fontFamily: 'ManropeRegular',
+    fontSize: 14,
+    fontWeight: '800',
+    color: COLORS.green,
+  },
+
+  amountValueOrange: {
+    fontFamily: 'ManropeRegular',
+    fontSize: 14,
+    fontWeight: '800',
+    color: COLORS.amber,
+  },
+  bookingList: {
+    paddingBottom: 30,
+  },
+
+  bookingHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: 16,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+
+  bookingHeaderTitle: {
+    fontFamily: 'ManropeRegular',
+    fontSize: 21,
+    fontWeight: '800',
+    color: COLORS.dark,
+  },
+
+  bookingHeaderSubtitle: {
+    fontFamily: 'ManropeRegular',
+    fontSize: 11.5,
+    color: COLORS.gray,
+    marginTop: 3,
+  },
+
+  bookingCount: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.primaryLight,
+  },
+
+  bookingCountText: {
+    fontFamily: 'ManropeRegular',
+    fontSize: 13,
+    fontWeight: '800',
+    color: COLORS.primary,
   },
   scrollContainer: {
     flex: 1,
@@ -789,7 +1042,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 8,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 3,

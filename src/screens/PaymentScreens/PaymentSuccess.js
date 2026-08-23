@@ -57,7 +57,7 @@ const PaymentSuccess = () => {
   }, []);
 
   const handleViewBookings = () => {
-    navigation.navigate('MyBookings');
+    navigation.navigate('ViewMyBookings');
   };
 
   const handleHome = () => {

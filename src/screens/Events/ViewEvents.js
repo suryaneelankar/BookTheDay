@@ -116,26 +116,24 @@ const ViewEvents = ({ route, navigation }) => {
     return url?.replace("localhost", LocalHostUrl);
   };
 
-  const handleQuantityChange = (menuType, value) => {
+  const handleQuantityChange = (menuKey, value) => {
     if (/^\d*$/.test(value)) {
       setMenuQuantities(prev => ({
         ...prev,
-        [menuType]: value
+        [menuKey]: value
       }));
     }
   };
 
-  const getMenuTypeTotal = (menuType) => {
-    const qty = parseInt(menuQuantities[menuType] || '0', 10);
-    const menu = menuImages.find(img => img.menuType === menuType);
-    const price = menu ? parseInt(menu.menuPrice || '0', 10) : 0;
+  const getMenuTypeTotal = (menuKey, menuPrice) => {
+    const qty = parseInt(menuQuantities[menuKey] || '0', 10);
+    const price = parseInt(menuPrice || '0', 10);
     return qty * price;
   };
 
-
-  const menuTypes = [...new Set((menuImages || []).map(img => img.menuType))];
-  const totalAmountWithMenu = menuTypes.reduce((sum, type) => {
-    return sum + getMenuTypeTotal(type);
+  const totalAmountWithMenu = (menuImages || []).reduce((sum, img, index) => {
+    const menuKey = `${img.menuType}_${img._id || index}`;
+    return sum + getMenuTypeTotal(menuKey, img.menuPrice);
   }, 0);
 
 
@@ -143,72 +141,94 @@ const ViewEvents = ({ route, navigation }) => {
   const totalAdvacneAmountAfterPercentageCalculation = (totalAmountWithMenu * eventsDetails?.advanceAmountInPercentageForMenu) / 100;
 
   const CateringMenuSection = () => {
-
     if (menuImages.length === 0) return null;
 
     return (
       <View style={styles.menuContainer}>
-        <Text style={{ fontSize: 16, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular', marginBottom: 12 }}>In House Catering Menu</Text>
+        {/* Section header */}
+        <View style={styles.menuSectionHeader}>
+          <View style={styles.menuSectionTitleRow}>
+            <View style={styles.menuSectionAccent} />
+            <Text style={styles.menuSectionTitle}>In House Catering Menu</Text>
+          </View>
+          <Text style={styles.menuSectionSubtitle}>Tap image to preview • Set plates per menu</Text>
+        </View>
+
         <FlatList
           data={menuImages}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item, index) => item._id || index.toString()}
-          renderItem={({ item, index }) => (
-            <TouchableOpacity
-              onPress={() => [setMenuImageCurrentIndex(index), setIsMenuImageModalVisible(true)]}
-              style={[{ height: 310, width: Dimensions.get("window").width }]}
-            >
-              <View style={styles.menuCard}>
-                <Image
-                  source={{
-                    uri: item.url,
-                    // headers: { Authorization: `Bearer ${getUserAuth}` }
-                  }}
-                  resizeMethod="auto"
-                  resizeMode="cover"
-                  style={styles.menuImageStyle}
-                />
-                <View style={{
-                  padding: 8,
-                  justifyContent: "space-between",
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.25,
-                  borderWidth: 1,
-                  borderColor: '#E0E0E0', borderBottomLeftRadius: 10,
-                  borderBottomRightRadius: 10,
-                  marginRight: 39,
-                }}>
-                  <View style={{
-                    justifyContent: "space-between",
-                    flexDirection: "row"
-                  }}>
+          renderItem={({ item, index }) => {
+            const menuKey = `${item.menuType}_${item._id || index}`;
+            const qty = parseInt(menuQuantities[menuKey] || '0', 10);
+            const lineTotal = qty * parseInt(item.menuPrice || '0', 10);
 
-                    <Text style={styles.menuTypeStyle}>{item.menuType}</Text>
-                    <Text style={styles.menuPriceStyle}>₹ {item.menuPrice}/-</Text>
-                  </View>
-                  <TextInput
-                    style={{
-                      borderWidth: 1,
-                      borderColor: '#FD813B',
-                      borderRadius: 5,
-                      padding: 8,
-                      marginTop: 8,
-                    }}
-                    placeholderTextColor={"#939393"}
-                    placeholder="Enter number of plates"
-                    keyboardType="numeric"
-                    value={menuQuantities[item.menuType] || ''}
-                    onChangeText={value => handleQuantityChange(item.menuType, value)}
+            return (
+              <View style={styles.menuCard}>
+                {/* Image with overlay badges */}
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={() => { setMenuImageCurrentIndex(index); setIsMenuImageModalVisible(true); }}
+                  style={styles.menuImageWrapper}>
+                  <Image
+                    source={{uri: item.url}}
+                    resizeMode="cover"
+                    style={styles.menuImageStyle}
                   />
+                  {/* Menu type badge top-left */}
+                  <View style={styles.menuTypeBadge}>
+                    <Text style={styles.menuTypeBadgeText}>{item.menuType}</Text>
+                  </View>
+                  {/* Price badge top-right */}
+                  <View style={styles.menuPriceBadge}>
+                    <Text style={styles.menuPriceBadgeText}>₹{item.menuPrice}<Text style={{fontSize: 10}}>/plate</Text></Text>
+                  </View>
+                  {/* Zoom hint */}
+                  <View style={styles.menuZoomHint}>
+                    <Text style={styles.menuZoomHintText}>🔍 Tap to zoom</Text>
+                  </View>
+                </TouchableOpacity>
+
+                {/* Bottom action area */}
+                <View style={styles.menuCardBody}>
+                  {/* Plate count label */}
+                  <View style={styles.menuPlateRow}>
+                    <Text style={styles.menuPlateLabel}>Number of Plates</Text>
+                    {qty > 0 && (
+                      <View style={styles.menuSubtotalBadge}>
+                        <Text style={styles.menuSubtotalText}>Subtotal: ₹{lineTotal.toLocaleString('en-IN')}</Text>
+                      </View>
+                    )}
+                  </View>
+
+                  {/* Plate input */}
+                  <View style={styles.menuInputWrapper}>
+                    <TextInput
+                      style={styles.menuPlateInput}
+                      placeholderTextColor="#BDBDBD"
+                      placeholder="e.g. 150"
+                      keyboardType="numeric"
+                      value={menuQuantities[menuKey] || ''}
+                      onChangeText={value => handleQuantityChange(menuKey, value)}
+                    />
+                    <View style={styles.menuInputSuffix}>
+                      <Text style={styles.menuInputSuffixText}>plates</Text>
+                    </View>
+                  </View>
+
+                  {qty === 0 && (
+                    <Text style={styles.menuHintText}>Enter number of plates to include this menu</Text>
+                  )}
                 </View>
               </View>
-            </TouchableOpacity>
-          )}
+            );
+          }}
         />
       </View>
     );
   };
+
+  // console.log('BASE_URL is ::>>>>>',BASE_URL);
 
   const getEventsDetails = async () => {
     setLoading(true);
@@ -222,7 +242,7 @@ const ViewEvents = ({ route, navigation }) => {
       });
       setEventsDetails(response?.data);
 
-      console.log("events resp details::::::::::", JSON.stringify(response?.data));
+      // console.log("events resp details::::::::::", JSON.stringify(response?.data));
 
       const professionalImageUrl = response?.data?.professionalImage?.url;
 
@@ -235,10 +255,11 @@ const ViewEvents = ({ route, navigation }) => {
 
       const menuImagesArr = response?.data?.menuImages
         ?.flat()
-        .map(image => ({
+        .map((image, index) => ({
           url: image?.url,
           menuType: image?.menuType,
           menuPrice: image?.menuPrice,
+          _id: image?._id || index.toString(),
         }));
       setMenuImages(menuImagesArr);
       setHallVideos(response?.data?.hallVideos || []);
@@ -250,7 +271,7 @@ const ViewEvents = ({ route, navigation }) => {
       setAmenitiesData(amenities);
 
     } catch (error) {
-      console.log("events error::::::::::", error);
+      // console.log("events error::::::::::", error);
 
     } finally {
       setLoading(false); // Stop loader
@@ -359,8 +380,6 @@ const ViewEvents = ({ route, navigation }) => {
   };
 
   const rows = chunkArray(amenitiesData, 4); // Split data into rows of 4 items
-
-  console.log("hall amenities data is::::::::::", amenitiesData, rows);
 
   const renderHallAmenities = ({ item }) => {
 
@@ -830,7 +849,43 @@ const ViewEvents = ({ route, navigation }) => {
             )}
           </View>
 
-          <View style={{ marginBottom: "20%" }} />
+          {/* ── MENU SELECTION SUMMARY (only for menu-based halls) ── */}
+          {menuImages?.length > 0 && menuImages.some((img, index) => {
+            const menuKey = `${img.menuType}_${img._id || index}`;
+            return parseInt(menuQuantities[menuKey] || '0', 10) > 0;
+          }) && (
+            <View style={[styles.summaryCard, {marginTop: 12}]}>
+              <View style={styles.summaryCardHeader}>
+                <IonIcon name="restaurant-outline" size={18} color="#FD813B" />
+                <Text style={styles.summaryCardTitle}>Menu Selection</Text>
+              </View>
+              <View style={styles.summaryDivider} />
+              {menuImages.map((img, index) => {
+                const menuKey = `${img.menuType}_${img._id || index}`;
+                const qty = parseInt(menuQuantities[menuKey] || '0', 10);
+                if (qty === 0) return null;
+                const lineTotal = qty * parseInt(img.menuPrice || '0', 10);
+                return (
+                  <View key={menuKey} style={styles.summaryRow}>
+                    <View style={{flex: 1}}>
+                      <Text style={styles.summaryRowLabel}>{img.menuType}</Text>
+                      <Text style={[styles.summaryRowLabel, {fontSize: 11, color: '#939393', fontWeight: '400'}]}>
+                        {qty} {qty === 1 ? 'plate' : 'plates'} × ₹{img.menuPrice}
+                      </Text>
+                    </View>
+                    <Text style={styles.summaryRowValue}>{formatAmount(lineTotal)}</Text>
+                  </View>
+                );
+              })}
+              <View style={styles.summaryDivider} />
+              <View style={styles.summaryRow}>
+                <Text style={[styles.summaryRowLabel, {fontSize: 15, color: '#121212'}]}>Menu Total</Text>
+                <Text style={styles.summaryTotalValue}>{formatAmount(totalAmountWithMenu)}</Text>
+              </View>
+            </View>
+          )}
+
+          <View style={{ marginBottom: "10%" }} />
 
 
         </View>
@@ -1008,7 +1063,8 @@ const ViewEvents = ({ route, navigation }) => {
           onPress={() => {
             const selectedMenus = menuImages
               .map(menu => {
-                const qty = parseInt(menuQuantities[menu.menuType] || '0', 10);
+                const menuKey = `${menu.menuType}_${menu._id}`;
+                const qty = parseInt(menuQuantities[menuKey] || '0', 10);
                 if (qty > 0) {
                   return {
                     menuType: menu.menuType,
@@ -1019,9 +1075,8 @@ const ViewEvents = ({ route, navigation }) => {
                 return null;
               })
               .filter(Boolean);
-            console.log("selectedMenus are::>>", selectedMenus);
             if (menuImages?.length > 0 && totalAdvacneAmountAfterPercentageCalculation == 0) {
-              setModalMessage("Select number of plates you need to place the order");
+              setModalMessage("Enter number of plates you need to place the order");
               setModalVisible(true);
               return;
             }
@@ -1060,7 +1115,164 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'white' },
   menuContainer: {
     marginTop: 8,
-    width: Dimensions.get("window").width,
+  },
+  menuSectionHeader: {
+    marginBottom: 16,
+  },
+  menuSectionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  menuSectionAccent: {
+    width: 4,
+    height: 20,
+    borderRadius: 2,
+    backgroundColor: '#FD813B',
+    marginRight: 8,
+  },
+  menuSectionTitle: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#100D25',
+    fontFamily: 'ManropeRegular',
+  },
+  menuSectionSubtitle: {
+    fontSize: 12,
+    color: '#939393',
+    fontFamily: 'ManropeRegular',
+    marginLeft: 12,
+  },
+  menuCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 16,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+  },
+  menuImageWrapper: {
+    position: 'relative',
+  },
+  menuImageStyle: {
+    width: '100%',
+    height: 180,
+  },
+  menuTypeBadge: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    backgroundColor: 'rgba(16,13,37,0.75)',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  menuTypeBadgeText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '700',
+    fontFamily: 'ManropeRegular',
+  },
+  menuPriceBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: '#FD813B',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  menuPriceBadgeText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '800',
+    fontFamily: 'ManropeRegular',
+  },
+  menuZoomHint: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  menuZoomHintText: {
+    color: '#fff',
+    fontSize: 11,
+    fontFamily: 'ManropeRegular',
+  },
+  menuCardBody: {
+    padding: 14,
+  },
+  menuPlateRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  menuPlateLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#100D25',
+    fontFamily: 'ManropeRegular',
+  },
+  menuSubtotalBadge: {
+    backgroundColor: '#FFF3EA',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  menuSubtotalText: {
+    color: '#FD813B',
+    fontSize: 12,
+    fontWeight: '700',
+    fontFamily: 'ManropeRegular',
+  },
+  menuInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#E0E0E0',
+    borderRadius: 10,
+    overflow: 'hidden',
+    backgroundColor: '#fff',
+  },
+  menuPlateInput: {
+    flex: 1,
+    height: 46,
+    paddingHorizontal: 14,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#100D25',
+    fontFamily: 'ManropeRegular',
+  },
+  menuInputSuffix: {
+    height: 46,
+    paddingHorizontal: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderLeftWidth: 1,
+    borderLeftColor: '#E0E0E0',
+    backgroundColor: '#F7F7F7',
+  },
+  menuInputSuffixText: {
+    color: '#606060',
+    fontSize: 13,
+    fontWeight: '600',
+    fontFamily: 'ManropeRegular',
+  },
+  menuHintText: {
+    fontSize: 11,
+    color: '#BDBDBD',
+    fontFamily: 'ManropeRegular',
+    marginTop: 6,
+    textAlign: 'center',
   },
   // ── OLD DIVIDER (kept for reference, replaced by waveConnector) ──
   mediaDividerContainer: {
@@ -1535,42 +1747,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 
-  menuCard: {
-    backgroundColor: '#fff',
-    borderRadius: 24,
-    overflow: 'hidden',
-    marginBottom: 20,
-    elevation: 4,
-  },
-
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
-  },
-  // menuCard: {
-  //   backgroundColor: '#fff',
-  //   borderRadius: 10,
-  //   shadowColor: '#000',
-  //   // shadowOffset: { width: 0, height: 2 },
-  //   // shadowOpacity: 0.25,
-  //   // shadowRadius: 3.84,
-  //   // borderWidth: 1,
-  //   // borderColor: '#E0E0E0',
-  //   // overflow: 'hidden',
-  //   // elevation: 2,
-  //   // width: Dimensions.get("window").width - 20,
-  //   // alignSelf: 'center',
-  //   // alignItems: 'center',
-  // },
-  menuImageStyle: {
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    width: "90%",
-    height: 200,
-    // padding: 16,
-    resizeMode: 'cover',
-  },
   menuTypeStyle: {
     fontSize: 16,
     fontWeight: '600',

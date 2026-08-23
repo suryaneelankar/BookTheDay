@@ -2,11 +2,11 @@ import React, { useEffect, useState, useRef, useMemo, useCallback } from "react"
 import {
     View, Text, TouchableOpacity, StyleSheet, Dimensions,
     FlatList, SafeAreaView, ActivityIndicator, ScrollView,
-    Switch, TextInput,
+    Switch, TextInput, Animated,
 } from 'react-native';
 import BASE_URL from "../../apiconfig";
 import axios from "axios";
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../utils/GlobalFunctions';
 import LocationMarkIcon from '../../assets/svgs/location.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
@@ -41,8 +41,8 @@ const chipColors = {
     Luxury: '#D3C0FF', Premium: '#C8FACC', Elite: '#FFD6E8',
 };
 const categoryPriceMapping = {
-    Budget: '10k-50k', Standard: '1L-2L',
-    Premium: '3L-5L', Luxury: '5L-10L', Elite: '10L+',
+    Budget: '50k-1L', Standard: '2L-3L',
+    Premium: '5L-10L', Luxury: '12L-15L', Elite: '20L+',
 };
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
@@ -62,7 +62,55 @@ const SkeletonCard = () => (
 
 const FarmHouse = () => {
     const navigation = useNavigation();
+    const isScreenFocused = useIsFocused();
     const actionSheetRef = useRef(null);
+    const heroProgress = useRef(new Animated.Value(0)).current;
+    const isHeroCollapsedRef = useRef(false);
+    const isHeroAnimatingRef = useRef(false);
+    const lastScrollYRef = useRef(0);
+
+    const heroContentHeight = heroProgress.interpolate({
+        inputRange: [0, 1],
+        outputRange: [105, 0],
+        extrapolate: 'clamp',
+    });
+    const heroContentOpacity = heroProgress.interpolate({
+        inputRange: [0, 0.55, 1],
+        outputRange: [1, 0.35, 0],
+        extrapolate: 'clamp',
+    });
+    const heroContentTranslateY = heroProgress.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, -18],
+        extrapolate: 'clamp',
+    });
+
+    const setHeroCollapsed = useCallback((collapsed) => {
+        if (isHeroCollapsedRef.current === collapsed || isHeroAnimatingRef.current) return;
+
+        isHeroCollapsedRef.current = collapsed;
+        isHeroAnimatingRef.current = true;
+        Animated.timing(heroProgress, {
+            toValue: collapsed ? 1 : 0,
+            duration: 220,
+            useNativeDriver: false,
+        }).start(() => {
+            isHeroAnimatingRef.current = false;
+        });
+    }, [heroProgress]);
+
+    const handleListScroll = useCallback((event) => {
+        const y = Math.max(0, event.nativeEvent.contentOffset.y);
+        const delta = y - lastScrollYRef.current;
+
+        if (delta > 6 && y > 35) {
+            setHeroCollapsed(true);
+        } else if (delta < -12 || y <= 4) {
+            setHeroCollapsed(false);
+        }
+
+        lastScrollYRef.current = y;
+    }, [setHeroCollapsed]);
 
     const [eventsData, setEventsData] = useState([]);
     const [filteredList, setFilteredList] = useState([]);
@@ -85,6 +133,19 @@ const FarmHouse = () => {
     const [loading, setLoading] = useState(false);
     const [query, setQuery] = useState('');
     const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [activeAutoplayCardId, setActiveAutoplayCardId] = useState(null);
+
+    // A card must be mostly visible before its carousel is allowed to autoplay.
+    // Keeping these refs stable prevents FlatList viewability warnings/rework.
+    const viewabilityConfig = useRef({
+        itemVisiblePercentThreshold: 70,
+        minimumViewTime: 250,
+    }).current;
+    const onViewableItemsChanged = useRef(({ viewableItems }) => {
+        const visibleCard = viewableItems.find(({ isViewable }) => isViewable);
+        const nextId = visibleCard?.item?._id ?? null;
+        setActiveAutoplayCardId(currentId => currentId === nextId ? currentId : nextId);
+    }).current;
 
     const isFetchingRef = useRef(false);
     const isFetchingFilterRef = useRef(false);
@@ -257,24 +318,39 @@ const FarmHouse = () => {
         const imageUrls = [heroImage, ...(item?.additionalImages?.flat()?.map(img => img?.url) || [])].filter(Boolean);
         const totalPhotos = imageUrls.length;
         const hasVideo = item?.hallVideos?.length > 0;
+        const shouldAutoplay =
+            isScreenFocused &&
+            activeAutoplayCardId === item._id &&
+            imageUrls.length > 1;
         return (
             <View style={styles.card}>
                 <View style={styles.cardImageWrapper}>
                     <Swiper
-                        loop
-                        showsPagination
+                        key={`${item._id}-${shouldAutoplay ? 'playing' : 'paused'}`}
+                        loop={imageUrls.length > 1}
+                        showsPagination={imageUrls.length > 1}
                         activeDotColor="#fff"
                         dotColor="rgba(255,255,255,0.5)"
                         activeDotStyle={{ width: 12, height: 6, borderRadius: 3 }}
                         dotStyle={{ width: 6, height: 6, borderRadius: 3 }}
                         paginationStyle={{ bottom: 10 }}
                         style={{ height: 200 }}
+                        autoplay={shouldAutoplay}
+                        autoplayTimeout={4}
+                        loadMinimal
+                        loadMinimalSize={1}
                     >
                         {imageUrls.map((imgUrl, idx) => (
-                            <TouchableOpacity key={idx} activeOpacity={0.93}
+                            <TouchableOpacity key={`${item._id}-${idx}`} activeOpacity={0.93}
                                 onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}
                                 style={{ flex: 1 }}>
-                                <FastImage source={{ uri: imgUrl, priority: FastImage.priority.normal }}
+                                <FastImage source={{
+                                    uri: imgUrl,
+                                    priority: shouldAutoplay
+                                        ? FastImage.priority.high
+                                        : FastImage.priority.normal,
+                                    cache: FastImage.cacheControl.immutable,
+                                }}
                                     style={styles.cardImage} resizeMode={FastImage.resizeMode.cover} />
                             </TouchableOpacity>
                         ))}
@@ -337,7 +413,7 @@ const FarmHouse = () => {
                 </TouchableOpacity>
             </View>
         );
-    }, [navigation]);
+    }, [navigation, activeAutoplayCardId, isScreenFocused]);
 
     const isApplyDisabled = !selectedPriceRange && !selectedSeatingCapacity && isACSelected === null && !selectedChip && !switchCateringVal;
 
@@ -457,7 +533,7 @@ const FarmHouse = () => {
 
             {/* ── FARM HOUSE HERO HEADER ── */}
             <LinearGradient
-                colors={['#1B4332', '#2D6A4F', '#52B788']}
+                colors={['#37B578', '#159B65', '#08734C']}
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                 style={styles.heroHeader}
             >
@@ -465,19 +541,31 @@ const FarmHouse = () => {
                 <View style={styles.heroCircle1} />
                 <View style={styles.heroCircle2} />
 
-                <View style={styles.heroRow}>
-                    <View style={{ flex: 1 }}>
-                        <View style={styles.heroBadge}>
-                            <IonIcon name="leaf" size={11} color={FH_GREEN} />
-                            <Text style={styles.heroBadgeText}>Open-Air Retreats</Text>
+                <Animated.View
+                    style={[
+                        styles.heroCollapsible,
+                        {
+                            height: heroContentHeight,
+                            opacity: heroContentOpacity,
+                            transform: [{ translateY: heroContentTranslateY }],
+                        },
+                    ]}
+                    pointerEvents="none"
+                >
+                    <View style={styles.heroRow}>
+                        <View style={{ flex: 1 }}>
+                            <View style={styles.heroBadge}>
+                                <IonIcon name="leaf" size={11} color={FH_GREEN} />
+                                <Text style={styles.heroBadgeText}>Open-Air Retreats</Text>
+                            </View>
+                            <Text style={styles.heroTitle}>Farm Houses</Text>
+                            <Text style={styles.heroSub}>Nature escapes & scenic celebrations</Text>
                         </View>
-                        <Text style={styles.heroTitle}>Farm Houses</Text>
-                        <Text style={styles.heroSub}>Nature escapes & scenic celebrations</Text>
+                        <View style={styles.heroIconWrap}>
+                            <IonIcon name="leaf" size={32} color={FH_GREEN} />
+                        </View>
                     </View>
-                    <View style={styles.heroIconWrap}>
-                        <IonIcon name="leaf" size={32} color={FH_GREEN} />
-                    </View>
-                </View>
+                </Animated.View>
 
                 {/* search bar */}
                 <View style={styles.searchBar}>
@@ -558,15 +646,21 @@ const FarmHouse = () => {
                     data={dataSource}
                     renderItem={renderItem}
                     keyExtractor={keyExtractor}
+                    onScroll={handleListScroll}
+                    scrollEventThrottle={16}
+                    onViewableItemsChanged={onViewableItemsChanged}
+                    viewabilityConfig={viewabilityConfig}
+                    extraData={`${activeAutoplayCardId}-${isScreenFocused}`}
                     onEndReached={onEndReached}
                     onEndReachedThreshold={0.6}
                     ListFooterComponent={ListFooter}
                     ListEmptyComponent={ListEmpty}
                     contentContainerStyle={styles.listContent}
                     removeClippedSubviews={true}
-                    maxToRenderPerBatch={6}
-                    windowSize={10}
-                    initialNumToRender={5}
+                    maxToRenderPerBatch={4}
+                    updateCellsBatchingPeriod={50}
+                    windowSize={5}
+                    initialNumToRender={4}
                     showsVerticalScrollIndicator={false}
                 />
             )}
@@ -579,7 +673,7 @@ const styles = StyleSheet.create({
     listContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 24 },
 
     // ── HERO ──
-    heroHeader: { paddingHorizontal: 16, paddingTop: 18, paddingBottom: 20, overflow: 'hidden', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 },
+    heroHeader: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 10, overflow: 'hidden', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 },
     heroCircle1: {
         position: 'absolute', width: 200, height: 200, borderRadius: 100,
         backgroundColor: 'rgba(6,190,102,0.06)', top: -50, right: -50,
@@ -588,7 +682,8 @@ const styles = StyleSheet.create({
         position: 'absolute', width: 120, height: 120, borderRadius: 60,
         backgroundColor: 'rgba(6,190,102,0.04)', bottom: -30, left: -20,
     },
-    heroRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
+    heroCollapsible: { overflow: 'hidden' },
+    heroRow: { flexDirection: 'row', alignItems: 'center', paddingTop: 10, paddingBottom: 16 },
     heroBadge: {
         flexDirection: 'row', alignItems: 'center', gap: 5,
         backgroundColor: 'rgba(255,255,255,0.2)',
@@ -611,7 +706,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row', alignItems: 'center',
         backgroundColor: 'white',
         borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12,
-        borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.2)',
+        borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.2)',bottom: 10,marginTop:20,
     },
     searchInput: { flex: 1, fontSize: 13, fontFamily: 'ManropeRegular', color: 'black', padding: 0 },
     dropdown: {
