@@ -7,20 +7,20 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import {useCallback, useEffect, useState} from 'react';
-import {useSelector, useDispatch} from 'react-redux';
-import {getCurrentVendorLoggedInUserName} from '../../../redux/actions';
-import {useFocusEffect} from '@react-navigation/native';
+import { useCallback, useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { getCurrentVendorLoggedInUserName } from '../../../redux/actions';
+import { useFocusEffect } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import axios from 'axios';
-import {getVendorAuthToken} from '../../utils/StoreAuthToken';
+import { getVendorAuthToken } from '../../utils/StoreAuthToken';
 import BASE_URL from '../../apiconfig';
 import VendorHowItWorks from '../../components/VendorHowItWorks';
 import ProfileIcon from '../../assets/vendorIcons/profileIcon.svg';
 import HallImage from '../../assets/HallImage1.jpeg';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 
-const VendorCategoryScreen = ({navigation}) => {
+const VendorCategoryScreen = ({ navigation }) => {
   const vendorLoggedInMobileNum = useSelector(
     state => state.vendorLoggedInMobileNum,
   );
@@ -77,7 +77,7 @@ const VendorCategoryScreen = ({navigation}) => {
       const vendorTokenRes = await axios.post(
         `${BASE_URL}/addVendorFCMToken`,
         payload,
-        {headers: {Authorization: `Bearer ${token}`}},
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       if (vendorTokenRes?.status === 200) {
         console.log('Vendor token added successfully:', vendorTokenRes?.data?.message);
@@ -92,7 +92,7 @@ const VendorCategoryScreen = ({navigation}) => {
     try {
       const response = await axios.get(
         `${BASE_URL}/clothJewelBookingsGotForVendor/${vendorLoggedInMobileNum}`,
-        {headers: {Authorization: `Bearer ${token}`}},
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       const activeBookings = response?.data?.data.filter(
         booking => booking.isActiveBooking === true,
@@ -108,7 +108,7 @@ const VendorCategoryScreen = ({navigation}) => {
     try {
       const response = await axios.get(
         `${BASE_URL}/functionHallBookingsGotForVendor/${vendorLoggedInMobileNum}`,
-        {headers: {Authorization: `Bearer ${token}`}},
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       const activeBookings = response?.data?.data.filter(
         booking => booking.isActiveBooking === true,
@@ -124,7 +124,7 @@ const VendorCategoryScreen = ({navigation}) => {
     try {
       const response = await axios.get(
         `${BASE_URL}/foodCateringBookingsGotForVendor/${vendorLoggedInMobileNum}`,
-        {headers: {Authorization: `Bearer ${token}`}},
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       const activeBookings = response?.data?.data.filter(
         booking => booking.isActiveBooking === true,
@@ -140,7 +140,7 @@ const VendorCategoryScreen = ({navigation}) => {
     try {
       const response = await axios.get(
         `${BASE_URL}/vendor/getVendorProfile/${vendorLoggedInMobileNum}`,
-        {headers: {Authorization: `Bearer ${token}`}},
+        { headers: { Authorization: `Bearer ${token}` } },
       );
       setProfileData(response?.data?.data);
       dispatch(getCurrentVendorLoggedInUserName(response?.data?.data?.fullName));
@@ -153,7 +153,7 @@ const VendorCategoryScreen = ({navigation}) => {
     const token = await getVendorAuthToken();
     try {
       await axios.get(`${BASE_URL}/vendor/bookingsOverview`, {
-        headers: {Authorization: `Bearer ${token}`},
+        headers: { Authorization: `Bearer ${token}` },
       });
     } catch (error) {
       console.log('Bookings fetch error:', error);
@@ -174,7 +174,7 @@ const VendorCategoryScreen = ({navigation}) => {
     },
   ];
 
-  const renderItem = ({item}) => (
+  const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.categoryCard}
       activeOpacity={0.88}
@@ -242,81 +242,263 @@ const VendorCategoryScreen = ({navigation}) => {
   );
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <LinearGradient
-        start={{x: 0, y: 0}}
-        end={{x: 0, y: 1}}
-        colors={['#FFF7E7', '#FFF7E7']}
-        style={styles.background}>
+    <View style={styles.screenContainer}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <LinearGradient
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          colors={['#FFF7E7', '#FFF7E7']}
+          style={[
+            styles.background,
+            pending > 0 && styles.backgroundWithPendingCard,
+          ]}>
 
-        {/* Profile Header */}
-        <View style={styles.profileRow}>
-          <ProfileIcon />
-          <View style={{flex: 1}}>
-            <Text numberOfLines={2} style={styles.vendorNameText}>
-              Hi, {vendorLoggedInName}
-            </Text>
-            <Text style={styles.vendorPhoneText}>
-              +91 {vendorLoggedInMobileNum}
-            </Text>
-          </View>
-        </View>
-
-        {/* Bookings Overview */}
-        <View style={styles.bookingsOverview}>
-          <View style={styles.overviewCards}>
-            <View style={styles.overviewCard}>
-              <Text style={styles.overviewCount}>{totalBookings}</Text>
-              <Text style={styles.overviewLabel}>Total Bookings</Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Events')}
-              style={styles.overviewCard}>
-              <Text style={styles.overviewCount}>{pending}</Text>
-              <Text style={styles.overviewLabel}>Pending</Text>
-            </TouchableOpacity>
-            <View style={styles.overviewCard}>
-              <Text style={styles.overviewCount}>{completed}</Text>
-              <Text style={styles.overviewLabel}>Completed</Text>
+          {/* Profile Header */}
+          <View style={styles.profileRow}>
+            <ProfileIcon />
+            <View style={{ flex: 1 }}>
+              <Text numberOfLines={2} style={styles.vendorNameText}>
+                Hi, {vendorLoggedInName}
+              </Text>
+              <Text style={styles.vendorPhoneText}>
+                +91 {vendorLoggedInMobileNum}
+              </Text>
             </View>
           </View>
-        </View>
 
-        {/* Vendor Categories */}
-        <Text style={styles.sectionTitle}>Vendor Categories</Text>
-        <FlatList
-          data={categoriesData}
-          renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
-          contentContainerStyle={styles.listContainer}
-          scrollEnabled={false}
-        />
+          {/* Bookings Overview */}
+          <View style={styles.bookingsOverview}>
+            <View style={styles.overviewCards}>
+              <View style={styles.overviewCard}>
+                <Text style={styles.overviewCount}>{totalBookings}</Text>
+                <Text style={styles.overviewLabel}>Total Bookings</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Events')}
+                style={styles.overviewCard}>
+                <Text style={styles.overviewCount}>{pending}</Text>
+                <Text style={styles.overviewLabel}>Pending</Text>
+              </TouchableOpacity>
+              <View style={styles.overviewCard}>
+                <Text style={styles.overviewCount}>{completed}</Text>
+                <Text style={styles.overviewLabel}>Completed</Text>
+              </View>
+            </View>
+          </View>
 
-        {/* Quick Tips */}
-        <View>
-          <Text style={styles.sectionTitle}>Quick Tips</Text>
-          <Text style={styles.tip}>
-            1. Update your profile regularly to attract more customers.
-          </Text>
-          <Text style={styles.tip}>
-            2. Respond to inquiries quickly to improve customer satisfaction.
-          </Text>
-          <Text style={styles.tip}>
-            3. Keep your pricing competitive for better conversions.
-          </Text>
-        </View>
+          {/* Vendor Categories */}
+          <Text style={styles.sectionTitle}>Vendor Categories</Text>
+          <FlatList
+            data={categoriesData}
+            renderItem={renderItem}
+            keyExtractor={item => item.id.toString()}
+            contentContainerStyle={styles.listContainer}
+            scrollEnabled={false}
+          />
 
-        {/* How It Works */}
-        <VendorHowItWorks />
+          {/* Quick Tips */}
+          <View>
+            <Text style={styles.sectionTitle}>Quick Tips</Text>
+            <Text style={styles.tip}>
+              1. Update your profile regularly to attract more customers.
+            </Text>
+            <Text style={styles.tip}>
+              2. Respond to inquiries quickly to improve customer satisfaction.
+            </Text>
+            <Text style={styles.tip}>
+              3. Keep your pricing competitive for better conversions.
+            </Text>
+          </View>
 
-      </LinearGradient>
-    </ScrollView>
+          {/* How It Works */}
+          <VendorHowItWorks />
+
+        </LinearGradient>
+      </ScrollView>
+
+      {pending > 0 && (
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={`${pending} pending booking ${pending === 1 ? 'request' : 'requests'
+            }`}
+          activeOpacity={0.9}
+          onPress={() => navigation.navigate('Events')}
+          style={styles.pendingCardWrapper}>
+
+          <LinearGradient
+            colors={['#FFFDF9', '#FFF1E8']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.pendingCard}>
+
+            <View style={styles.pendingIconContainer}>
+              <IonIcon
+                name="notifications"
+                size={22}
+                color="#FD813B"
+              />
+
+              <View style={styles.pendingCountBadge}>
+                <Text style={styles.pendingCountText}>
+                  {pending > 9 ? '9+' : pending}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.pendingCardContent}>
+              <Text style={styles.pendingCardTitle}>
+                {pending === 1
+                  ? 'New booking request'
+                  : `${pending} new booking requests`}
+              </Text>
+
+              <Text style={styles.pendingCardSubtitle}>
+                Review and respond to the customer’s request.
+              </Text>
+            </View>
+
+            <View style={styles.pendingArrowContainer}>
+              <IonIcon
+                name="arrow-forward"
+                size={17}
+                color="#FD813B"
+              />
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
+      )}
+    </View >
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  screenContainer: {
+    flex: 1,
+    backgroundColor: '#FFF7E7',
+  },
+
+  backgroundWithPendingCard: {
+    paddingBottom: 112,
+  },
+
+  pendingCardWrapper: {
+    position: 'absolute',
+    left: 16,
+    right: 16,
+
+    // Keeps it above the bottom tabs
+    bottom: 78,
+
+    borderRadius: 18,
+    overflow: 'hidden',
+
+    borderWidth: 1,
+    borderColor: '#F6D6C4',
+
+    // Floating appearance
+    elevation: 10,
+    shadowColor: '#7A3514',
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+
+    backgroundColor: '#FFF9F4',
+  },
+
+  pendingCard: {
+    // minHeight: 76,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 13,
+    paddingVertical: 6,
+  },
+
+  pendingIconContainer: {
+    width: 46,
+    height: 46,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#FFE0CF',
+
+    elevation: 2,
+    shadowColor: '#B94C16',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+
+  pendingCountBadge: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+
+    minWidth: 21,
+    height: 21,
+    paddingHorizontal: 4,
+    borderRadius: 11,
+
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    backgroundColor: '#FD813B',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+
+  pendingCountText: {
+    fontFamily: 'ManropeRegular',
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+
+  pendingCardContent: {
+    flex: 1,
+    marginHorizontal: 11,
+  },
+
+  pendingCardTitle: {
+    fontFamily: 'ManropeRegular',
+    fontSize: 13.5,
+    fontWeight: '800',
+    color: '#2A211D',
+  },
+
+  pendingCardSubtitle: {
+    marginTop: 3,
+    fontFamily: 'ManropeRegular',
+    fontSize: 10.5,
+    lineHeight: 14,
+    color: '#786B64',
+  },
+
+  pendingArrowContainer: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#FFD7C1',
+  },
+
+  backgroundWithPendingCard: {
+    paddingBottom: 175,
   },
   background: {
     flex: 1,
@@ -361,7 +543,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 5,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
@@ -391,7 +573,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     elevation: 4,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 3},
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.09,
     shadowRadius: 10,
     borderWidth: 1,

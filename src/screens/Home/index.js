@@ -124,6 +124,12 @@ const HomeDashboard = () => {
     ? userLocationFetched?.geometry?.location?.lng
     : userLocationFetched?.longitude;
 
+  const [paymentReadyBookings, setPaymentReadyBookings] = useState([]);
+  const [showPaymentReadyCard, setShowPaymentReadyCard] = useState(true);
+
+  const paymentReadyCount = paymentReadyBookings.length;
+  const firstPaymentReadyBooking = paymentReadyBookings[0];
+
 
   const WHY_BOOK_FEATURES = [
     {
@@ -189,6 +195,42 @@ const HomeDashboard = () => {
   ];
   */
 
+  const getHallsBookings = async cachedToken => {
+    const token = cachedToken || (await getUserAuthToken());
+
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/getUserFunctionHallBookings`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const bookings = Array.isArray(response?.data?.data)
+        ? response.data.data
+        : [];
+
+      const approvedAndUnpaidBookings = bookings.filter(booking => {
+        const status = booking?.bookingStatus?.toLowerCase();
+
+        return (
+          status === 'approved' &&
+          Number(booking?.advanceAmountPaid || 0) === 0 &&
+          booking?.isActiveBooking === true
+        );
+      });
+
+      setPaymentReadyBookings(approvedAndUnpaidBookings);
+    } catch (error) {
+      console.log(
+        'Payment-ready bookings error:',
+        error?.response?.data || error,
+      );
+    }
+  };
+
   // ─── useFocusEffect: halls + auth + profile ──────────────────────────────────
   useFocusEffect(
     useCallback(() => {
@@ -199,6 +241,7 @@ const HomeDashboard = () => {
         getPremiumHalls(1, false, token);
         getUserAuthTokenRes(token);
         getProfileData(token);
+        getHallsBookings(token);
       };
       bootstrap();
       return () => {
@@ -617,7 +660,13 @@ const HomeDashboard = () => {
         locations={[0, 0.4, 0.5, 0.64, 0.77, 1]}
         style={{ flex: 1 }}
       >
-        <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
+        <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}
+          contentContainerStyle={
+            paymentReadyCount > 0 && showPaymentReadyCard
+              ? styles.scrollContentWithPaymentCard
+              : undefined
+          }
+        >
 
           {/* ════════════════════════════════════════
             TOP BAR
@@ -644,7 +693,20 @@ const HomeDashboard = () => {
             <TouchableOpacity
               style={styles.profileBtn}
               onPress={() => navigation.navigate('ProfileScreen')}>
-              <IonIcon name="person-circle-outline" size={40} color="#131313" />
+
+              <IonIcon
+                name="person-circle-outline"
+                size={40}
+                color="#131313"
+              />
+
+              {paymentReadyCount > 0 && (
+                <View style={styles.profilePaymentBadge}>
+                  <Text style={styles.profilePaymentBadgeText}>
+                    {paymentReadyCount > 9 ? '9+' : paymentReadyCount}
+                  </Text>
+                </View>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -1154,6 +1216,98 @@ const HomeDashboard = () => {
           </Modal>
 
         </ScrollView>
+
+        {paymentReadyCount > 0 && showPaymentReadyCard && (
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={`${paymentReadyCount} approved booking ${paymentReadyCount === 1 ? 'is' : 'are'
+              } ready for payment`}
+            activeOpacity={0.92}
+            onPress={() => navigation.navigate('ViewMyBookings')}
+            style={styles.paymentReadyCardWrapper}>
+
+            <LinearGradient
+              colors={['#FFFDF9', '#FFF1E8']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.paymentReadyCard}>
+
+              {/* Wallet icon */}
+              <View style={styles.paymentReadyIcon}>
+                <IonIcon
+                  name="wallet-outline"
+                  size={moderateScale(18)}
+                  color="#FD813B"
+                />
+
+                <View style={styles.paymentReadyCountBadge}>
+                  <Text style={styles.paymentReadyCountText}>
+                    {paymentReadyCount > 9 ? '9+' : paymentReadyCount}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Vertically stacked title and subtitle */}
+              <View style={styles.paymentReadyContent}>
+                <Text
+                  numberOfLines={1}
+                  style={styles.paymentReadyTitle}>
+                  {paymentReadyCount === 1
+                    ? 'Booking approved!'
+                    : `${paymentReadyCount} bookings approved!`}
+                </Text>
+
+                <Text
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                  style={styles.paymentReadySubtitle}>
+                  {paymentReadyCount === 1
+                    ? `${firstPaymentReadyBooking?.functionHallName} is ready for payment`
+                    : 'Your bookings are ready for payment'}
+                </Text>
+              </View>
+
+              {/* View bookings */}
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="View bookings"
+                activeOpacity={0.8}
+                onPress={event => {
+                  event.stopPropagation?.();
+                  navigation.navigate('ViewMyBookings');
+                }}
+                style={styles.viewBookingsButton}>
+
+                <Text numberOfLines={2} style={styles.viewBookingsButtonText}>
+                  View{'\n'}Bookings
+                </Text>
+              </TouchableOpacity>
+
+              {/* Close */}
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Dismiss payment reminder"
+                hitSlop={{
+                  top: 12,
+                  bottom: 12,
+                  left: 8,
+                  right: 12,
+                }}
+                onPress={event => {
+                  event.stopPropagation?.();
+                  setShowPaymentReadyCard(false);
+                }}
+                style={styles.paymentReadyClose}>
+
+                <IonIcon
+                  name="close"
+                  size={moderateScale(16)}
+                  color="#786B64"
+                />
+              </TouchableOpacity>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
       </LinearGradient>
     </SafeAreaView>
   );
@@ -1245,6 +1399,182 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(217,119,6,0.15)',
+  },
+
+  // bottom floating card
+  viewBookingsButton: {
+    height: moderateScale(38),
+
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    paddingHorizontal: horizontalScale(8),
+    borderRadius: moderateScale(12),
+
+    backgroundColor: '#FD813B',
+  },
+
+  viewBookingsButtonText: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(12),
+    lineHeight: moderateScale(12),
+    fontWeight: '800',
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+
+  scrollContentWithPaymentCard: {
+    paddingBottom: verticalScale(175),
+  },
+
+  profileBtn: {
+    position: 'relative',
+    width: moderateScale(38),
+    height: moderateScale(38),
+    borderRadius: moderateScale(19),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  profilePaymentBadge: {
+    position: 'absolute',
+    top: moderateScale(-4),
+    right: moderateScale(-5),
+
+    minWidth: moderateScale(20),
+    height: moderateScale(20),
+    paddingHorizontal: horizontalScale(4),
+    borderRadius: moderateScale(10),
+
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    backgroundColor: '#FD813B',
+    borderWidth: 2,
+    borderColor: '#FFF7E7',
+  },
+
+  profilePaymentBadgeText: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(8.5),
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+
+  paymentReadyCardWrapper: {
+    position: 'absolute',
+    left: horizontalScale(18),
+    right: horizontalScale(18),
+
+    // Above bottom tabs
+    bottom: verticalScale(78),
+
+    borderRadius: moderateScale(16),
+    overflow: 'hidden',
+
+    backgroundColor: '#FFF9F4',
+    borderWidth: 1,
+    borderColor: '#F4D6C5',
+
+    elevation: 8,
+    shadowColor: '#7A3514',
+    shadowOffset: {
+      width: 0,
+      height: verticalScale(4),
+    },
+    shadowOpacity: 0.16,
+    shadowRadius: moderateScale(8),
+  },
+
+  paymentReadyCard: {
+    minHeight: verticalScale(60),
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    paddingLeft: horizontalScale(9),
+    paddingRight: horizontalScale(6),
+    paddingVertical: verticalScale(7),
+  },
+
+  paymentReadyIcon: {
+    width: moderateScale(34),
+    height: moderateScale(34),
+    borderRadius: moderateScale(11),
+
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#FFDDCA',
+  },
+
+  paymentReadyCountBadge: {
+    position: 'absolute',
+    top: moderateScale(-6),
+    right: moderateScale(-6),
+
+    minWidth: moderateScale(18),
+    height: moderateScale(18),
+    paddingHorizontal: horizontalScale(3),
+    borderRadius: moderateScale(9),
+
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    backgroundColor: '#FD813B',
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
+  },
+
+  paymentReadyCountText: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(7.5),
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+
+  paymentReadyContent: {
+    flex: 1,
+    minWidth: 0,
+    marginLeft: horizontalScale(9),
+    marginRight: horizontalScale(6),
+    justifyContent: 'center',
+  },
+
+  paymentReadyTitle: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(11),
+    lineHeight: moderateScale(14),
+    fontWeight: '800',
+    color: '#2A211D',
+  },
+
+  paymentReadySubtitle: {
+    marginTop: verticalScale(1),
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(8.5),
+    lineHeight: moderateScale(12),
+    color: '#786B64',
+  },
+
+  paymentReadyClose: {
+    width: moderateScale(26),
+    height: moderateScale(26),
+    borderRadius: moderateScale(13),
+
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    marginLeft: horizontalScale(4),
+
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderWidth: 1,
+    borderColor: '#F1E2DA',
+  },
+
+  scrollContentWithPaymentCard: {
+    paddingBottom: verticalScale(150),
   },
 
   // ── HERO ─────────────────────────────────────────────────────────────────────
@@ -1950,7 +2280,7 @@ const styles = StyleSheet.create({
 
 
   whyBookCard: {
-    position: 'relative', 
+    position: 'relative',
     width: '48.4%',
     minHeight: verticalScale(138),
 
