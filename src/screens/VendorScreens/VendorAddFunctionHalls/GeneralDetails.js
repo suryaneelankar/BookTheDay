@@ -27,7 +27,7 @@ import Video from 'react-native-video';
 
 const GeneralDetails = ({ isAadharUpdate }) => {
     const navigation = useNavigation();
-    const [BedRooms, setBedRooms] = useState();
+    const [BedRooms, setBedRooms] = useState('');
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [functionHallName, setfunctionHallName] = useState('');
     const [venueCategory, setVenueCategory] = useState(''); // Function Hall | Farm House | Luxury Resort | Banquet Hall
@@ -109,6 +109,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         "Bridal Room": [{ name: 'Bridal Room', icon: 'ios-basket' }],
         "Sound/music license": [{ name: 'Sound/music license', icon: 'ios-volume-high' }]
     });
+
+    const [includedGuestCount, setIncludedGuestCount] = useState('');
 
     const handleBackPress = () => {
         if (isLocationPickerVisible) {
@@ -263,7 +265,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         if (!res.didCancel && !res.errorCode) {
                             const asset = res.assets?.[0];
                             if (asset?.fileSize > VIDEO_SIZE_LIMIT) {
-                                CustomAlert.alert('File too large', 'Please select a video under 35 MB.', undefined, {type: 'warning'});
+                                CustomAlert.alert('File too large', 'Please select a video under 35 MB.', undefined, { type: 'warning' });
                             } else {
                                 picked = asset;
                             }
@@ -274,7 +276,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
             } else {
                 const result = await DocumentPicker.pickSingle({ type: [DocumentPicker.types.video] });
                 if (result.size > VIDEO_SIZE_LIMIT) {
-                    CustomAlert.alert('File too large', 'Please select a video under 35 MB.', undefined, {type: 'warning'});
+                    CustomAlert.alert('File too large', 'Please select a video under 35 MB.', undefined, { type: 'warning' });
                 } else {
                     picked = { uri: result.uri, fileName: result.name, type: result.type, fileSize: result.size };
                 }
@@ -688,23 +690,66 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
     const onPressSaveAndPost = async () => {
         const { finalEarningAfterDiscount, earningAmount, serviceCharges } = calculateCharges();
-        if (!mainImageUrl || functionHallName === '' || functionHallAreaInSft === '' ||
-            selectedItemArray?.length === 0 || selectedItemArray === '' || functionHallAddress === '' || venueCategory === ''
-        ) {
-            CustomAlert.alert('Please fill Mandatory fields', 'Hall image, name, area, amenities, address and venue category are required.', undefined, {type: 'warning'});
+        const missingField = [
+            {
+                invalid: !mainImageUrl,
+                message: 'Please upload a main venue image.',
+            },
+            {
+                invalid: !functionHallName?.trim(),
+                message: 'Please enter the venue name.',
+            },
+            {
+                invalid:
+                    !selectedItemArray ||
+                    selectedItemArray.length === 0,
+                message: 'Please select at least one amenity.',
+            },
+            {
+                invalid: !functionHallAddress,
+                message: 'Please select the venue location on Google Maps.',
+            },
+            {
+                invalid: !venueCategory?.trim(),
+                message: 'Please select a venue category.',
+            },
+        ].find(field => field.invalid);
+
+        if (missingField) {
+            CustomAlert.alert(
+                'Required field',
+                missingField.message,
+                undefined,
+                { type: 'warning' },
+            );
             return;
         }
         // console.log('menuAvailable is::>>>',menuAvailable);
         if (!menuAvailable) {
             if ((perDayRentPrice === 0 || perDayRentPrice === undefined) || (advanceAmount === undefined || advanceAmount === 0)) {
-                CustomAlert.alert('Please fill Per Day Rent Price & Advance amount', undefined, undefined, {type: 'warning'});
+                CustomAlert.alert('Please fill Mandatory fields', 'Please fill Per Day Rent Price & Advance amount', undefined, { type: 'warning' });
                 return;
             }
         } else {
             if ((basicVegPrice === 0 || basicVegPrice === undefined) || (advanceAmountPercentage === 0 || advanceAmountPercentage === undefined)) {
-                CustomAlert.alert('Please fill Veg Menu Price & Advance percentage', undefined, undefined, {type: 'warning'});
+                CustomAlert.alert('Please fill Mandatory fields', 'Please fill Veg Menu Price & Advance percentage', undefined, { type: 'warning' });
                 return;
             }
+        }
+
+        if (selectedSeatingCapacity === '') {
+            CustomAlert.alert('Please fill Mandatory fields', 'Please select the seating capacity of your venue', undefined, { type: 'warning' });
+            return;
+        }
+
+        if (selectedFoodType === '') {
+            CustomAlert.alert('Please fill Mandatory fields', 'Please select the food type allowed in your venue', undefined, { type: 'warning' });
+            return;
+        }
+
+        if (BedRooms === '') {
+            CustomAlert.alert('Please fill Mandatory fields', 'Please enter total rooms count', undefined, { type: 'warning' });
+            return;
         }
 
         if (basicVegPrice > 0 && basicVegMenuName === '') {
@@ -729,7 +774,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         Object.entries(menuImages).forEach(([key, value]) => {
             console.log('value is ::>>', value);
             if (value?.menuPrice && (!value?.assets || value.assets.length === 0)) {
-                CustomAlert.alert('Missing Image', `Please upload an image for menu.`, undefined, {type: 'warning'});
+                CustomAlert.alert('Missing Image', `Please upload an image for menu.`, undefined, { type: 'warning' });
                 return;
             }
         });
@@ -737,23 +782,39 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         const uploadedImagesCount = Object.values(additionalImages).filter(value => value !== undefined).length;
 
         if (uploadedImagesCount < 4) {
-            CustomAlert.alert('Incomplete Details', 'Please upload at least 4 images.', undefined, {type: 'warning'});
+            CustomAlert.alert('Incomplete Details', 'Please upload at least 4 images.', undefined, { type: 'warning' });
             return; // Exit immediately if the total uploaded images are less than 4
         }
 
         for (const [key, value] of Object.entries(additionalImages)) {
             if (uploadedImagesCount < 4) {
                 if (value === undefined) {
-                    CustomAlert.alert('Incomplete Details', `Please fill ${key.replace('additionalImage', 'Image ')}`, undefined, {type: 'warning'});
+                    CustomAlert.alert('Incomplete Details', `Please fill ${key.replace('additionalImage', 'Image ')}`, undefined, { type: 'warning' });
                     return; // Exit immediately if any image is undefined
                 }
             }
         }
 
+        // if (venueCategory === 'Farm House') {
+        //     const guestCount = Number(includedGuestCount);
+
+        //     if (
+        //         !Number.isInteger(guestCount) ||
+        //         guestCount < 1 ||
+        //         guestCount > 10000
+        //     ) {
+        //         Alert.alert(
+        //             'Guests included',
+        //             'Enter a whole number between 1 and 10,000.',
+        //         );
+        //         return;
+        //     }
+        // }
+
         const vendorMobileNumber = vendorLoggedInMobileNum
         const formData = new FormData();
-        console.log('mainImageUrl is ::>>>',mainImageUrl);
-        console.log('additionalImages is::>>>',additionalImages);
+        // console.log('mainImageUrl is ::>>>', mainImageUrl);
+        // console.log('additionalImages is::>>>', additionalImages);
 
         // Helper: sanitize filename — remove spaces, parentheses, special chars
         const sanitizeFileName = (name) => {
@@ -766,6 +827,15 @@ const GeneralDetails = ({ isAadharUpdate }) => {
             type: mainImageUrl?.assets[0]?.type || 'image/jpeg',
             name: sanitizeFileName(mainImageUrl?.assets[0]?.fileName),
         });
+
+        if (venueCategory === 'Farm House') {
+            if (String(includedGuestCount ?? '').trim() !== '') {
+                formData.append(
+                    'includedGuestCount',
+                    String(includedGuestCount).trim(),
+                );
+            }
+        }
 
         Object.entries(additionalImages).forEach(([key, value]) => {
             const imageAsset = value?.assets?.[0];
@@ -918,25 +988,22 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                 <FlatList
                     data={discountPercentageArr}
                     numColumns={4}
+                    scrollEnabled={false}
                     keyExtractor={(item, index) => index.toString()}
-                    contentContainerStyle={{ paddingVertical: 15 }}
+                    contentContainerStyle={styles.discountGrid}
                     renderItem={({ item }) => {
                         const isSelected = item === selectedDiscountVal;
-                        const backgroundColor = isSelected ? '#FFD700' : '#FFF5E3';
 
                         return (
                             <TouchableOpacity
-                                style={{
-                                    backgroundColor,
-                                    flex: 1,
-                                    margin: 5,
-                                    borderRadius: 5,
-                                    padding: 10,
-                                    alignItems: 'center',
-                                }}
+                                accessibilityRole="radio"
+                                accessibilityState={{ selected: isSelected }}
+                                style={[styles.discountOption, isSelected && styles.discountOptionSelected]}
                                 onPress={() => onPressDiscountPercentage(item)}
                             >
-                                <Text style={{ color: themevariable.Color_000000 }}>{item} %</Text>
+                                <Text style={[styles.discountOptionText, isSelected && styles.discountOptionTextSelected]}>
+                                    {item}%
+                                </Text>
                             </TouchableOpacity>
                         );
                     }}
@@ -968,26 +1035,22 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
     const AmenitiesGrid = () => (
         <View style={styles.amenitiesGrid}>
-            {rentalItems.map((item, index) => {
+            {rentalItems.map((item) => {
                 const isSelected = selectedItemArray.includes(item.name);
-                const iconName = amenityIcons[item.name] || 'checkmark-circle-outline';
                 return (
                     <TouchableOpacity
-                        key={index}
-                        style={[styles.amenityChip, isSelected && styles.amenityChipSelected]}
+                        key={item.name}
+                        accessibilityRole="checkbox"
+                        accessibilityState={{ checked: isSelected }}
+                        style={[styles.amenityOption, isSelected && styles.amenityOptionSelected]}
                         onPress={() => addRentalItemOnPress(item.name)}
                         activeOpacity={0.75}>
-                        <Icon
-                            name={iconName}
-                            size={16}
-                            color={isSelected ? '#fff' : '#606060'}
-                        />
-                        <Text style={[styles.amenityChipText, isSelected && styles.amenityChipTextSelected]}>
+                        <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
+                            {isSelected && <Text style={styles.checkboxTick}>✓</Text>}
+                        </View>
+                        <Text style={[styles.amenityText, isSelected && styles.amenityTextSelected]}>
                             {item.name}
                         </Text>
-                        {isSelected && (
-                            <Icon name="checkmark-circle" size={14} color="#fff" />
-                        )}
                     </TouchableOpacity>
                 );
             })}
@@ -1021,24 +1084,27 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         }
 
         return (
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
-                {seatingCapacity.map((item) =>
+            <View style={styles.seatingGrid}>
+                {seatingCapacity.map((item) => {
+                    const isSelected = item === selectedSeatingCapacity;
+                    return (
                     <TouchableOpacity
                         key={item}
-                        style={{
-                            borderWidth: item === selectedSeatingCapacity ? 2 : 0,
-                            borderColor: item === selectedSeatingCapacity ? '#ECA73C' : 'transparent',
-                            backgroundColor: '#FFF5E3',
-                            marginHorizontal: 5,
-                            marginVertical: 5, // Add vertical margin for spacing between rows
-                            borderRadius: 5,
-                            padding: 10,
-                        }}
+                        accessibilityRole="radio"
+                        accessibilityState={{ selected: isSelected }}
+                        style={[styles.seatingOption, isSelected && styles.seatingOptionSelected]}
                         onPress={() => onPressSeatingCapacity(item)}
                     >
-                        <Text style={{ color: themevariable.Color_000000 }}>{item}</Text>
+                        <Text style={[styles.seatingValue, isSelected && styles.seatingValueSelected]}>
+                            {item}
+                        </Text>
+                        <Text style={[styles.seatingUnit, isSelected && styles.seatingUnitSelected]}>
+                            guests
+                        </Text>
+                        {isSelected && <View style={styles.selectedDot} />}
                     </TouchableOpacity>
-                )}
+                    );
+                })}
             </View>
         );
     }
@@ -1051,62 +1117,32 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         };
 
         const foodTypeConfig = [
-            {
-                name: 'veg',
-                label: 'Veg Only',
-                Icon: VegIcon,
-                color: '#16A34A',
-                bgColor: '#F0FDF4',
-                borderColor: '#86EFAC',
-            },
-            {
-                name: 'non-veg',
-                label: 'Non-Veg',
-                Icon: NonVegIcon,
-                color: '#DC2626',
-                bgColor: '#FEF2F2',
-                borderColor: '#FCA5A5',
-            },
-            {
-                name: 'Both',
-                label: 'Veg & Non-Veg',
-                Icon: VegNonVegIcon,
-                color: '#D97706',
-                bgColor: '#FFFBEB',
-                borderColor: '#FCD34D',
-            },
+            { name: 'veg', label: 'Veg' },
+            { name: 'non-veg', label: 'Non-Veg' },
+            { name: 'Both', label: 'Both' },
         ];
 
         return (
             <View style={styles.foodTypeWrapper}>
                 <Text style={styles.labelText}>
-                    Select Food Type<Text style={{color: 'red'}}>*</Text>
+                    Food Type<Text style={{ color: 'red' }}>*</Text>
                 </Text>
+                <Text style={styles.fieldHint}>Select the food options supported by this venue.</Text>
                 <View style={styles.foodTypeRow}>
                     {foodTypeConfig.map((type) => {
                         const isSelected = selectedFoodType === type.name;
-                        const FoodIcon = type.Icon;
                         return (
                             <TouchableOpacity
                                 key={type.name}
-                                style={[
-                                    styles.foodTypeCard,
-                                    {borderColor: isSelected ? type.color : '#E5E7EB'},
-                                    isSelected && {backgroundColor: type.bgColor},
-                                ]}
+                                accessibilityRole="radio"
+                                accessibilityState={{ selected: isSelected }}
+                                style={[styles.foodTypeCard, isSelected && styles.foodTypeCardSelected]}
                                 onPress={() => onSelectFoodType(type.name)}
                                 activeOpacity={0.75}>
-                                {/* Selected tick */}
-                                {isSelected && (
-                                    <View style={[styles.foodTypeTick, {backgroundColor: type.color}]}>
-                                        <Icon name="checkmark" size={10} color="#fff" />
-                                    </View>
-                                )}
-                                <FoodIcon width={36} height={36} />
-                                <Text style={[
-                                    styles.foodTypeLabel,
-                                    isSelected && {color: type.color, fontWeight: '800'},
-                                ]}>
+                                <View style={[styles.radioOuter, isSelected && styles.radioOuterSelected]}>
+                                    {isSelected && <View style={styles.radioInner} />}
+                                </View>
+                                <Text style={[styles.foodTypeLabel, isSelected && styles.foodTypeLabelSelected]}>
                                     {type.label}
                                 </Text>
                             </TouchableOpacity>
@@ -1227,7 +1263,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
     ];
 
     return (
-        <View style={{ flex: 1, backgroundColor: "#EBEDF3", paddingHorizontal: 10 }}>
+        <View style={styles.screen}>
             {loading ? (
                 <View style={{ alignSelf: 'center', flex: 1, width: '100%', height: Dimensions.get('window').height, justifyContent: 'center' }}>
                     <ActivityIndicator size="large" color="orange" />
@@ -1241,8 +1277,19 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
 
 
-                    <Text style={[styles.mainHeading, { marginHorizontal: 10 }]}>General Details</Text>
+                    <View style={styles.sectionHeader}>
+                        <View style={styles.sectionIcon}>
+                            <Icon name="business-outline" size={18} color="#A44A1F" />
+                        </View>
+                        <View style={styles.sectionHeaderCopy}>
+                            <Text style={styles.mainHeading}>Venue details</Text>
+                            <Text style={styles.sectionDescription}>Add accurate information customers can trust.</Text>
+                        </View>
+                    </View>
                     <View style={styles.mainContainer}>
+                        <View style={styles.fieldBlock}>
+                            <Text style={styles.fieldTitle}>Cover photo<Text style={styles.required}>*</Text></Text>
+                            <Text style={styles.fieldHint}>Use a clear, well-lit photo that represents the venue.</Text>
                         <ChooseFileField
                             label={'Hall Image'}
                             isRequired={true}
@@ -1255,58 +1302,60 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                     source={{ uri: mainImageUrl?.assets[0].uri }}
                                     width={'100%'}
                                     height={300}
-                                    style={{ borderRadius: 5 }}
+                                    style={styles.coverImage}
                                     resizeMode='cover'
                                 /> : null}
                         </TouchableOpacity>
+                        </View>
 
-                        <Text style={styles.title}>Additional Images<Text style={{ color: "red" }}>*</Text></Text>
-                        <Text style={styles.subTitle}>Please add up to 4 images atleast</Text>
+                        <View style={styles.fieldBlock}>
+                        <Text style={styles.fieldTitle}>Gallery photos<Text style={styles.required}>*</Text></Text>
+                        <Text style={styles.fieldHint}>Upload at least 4 and up to 8 additional photos.</Text>
                         <FlatList
                             data={data}
                             numColumns={4}
+                            scrollEnabled={false}
                             renderItem={ListItem}
                             keyExtractor={item => item.id}
-                            contentContainerStyle={{ width: '100%', alignItems: 'center' }}
+                            contentContainerStyle={styles.photoGrid}
                         />
+                        </View>
 
-                        <Text style={styles.title}>Hall Videos</Text>
-                        <Text style={styles.subTitle}>Upload up to 3 videos (optional, max 35 MB each)</Text>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
+                        <View style={styles.fieldBlock}>
+                        <Text style={styles.fieldTitle}>Venue videos</Text>
+                        <Text style={styles.fieldHint}>Optional · up to 3 videos · maximum 35 MB each.</Text>
+                        <View style={styles.videoRow}>
                             {videos.map((video, idx) => (
                                 <TouchableOpacity
                                     key={idx}
                                     onPress={() => setVideoPickerModal({ visible: true, index: idx })}
-                                    style={{
-                                        flex: 1, marginHorizontal: 4, borderWidth: 1,
-                                        borderColor: video ? '#ECA73C' : '#ccc',
-                                        borderRadius: 8, padding: 10, alignItems: 'center',
-                                        backgroundColor: video ? '#FFF5E3' : '#f9f9f9',
-                                        minHeight: 80, justifyContent: 'center'
-                                    }}
+                                    style={[styles.videoSlot, video && styles.videoSlotSelected]}
                                 >
-                                    <Text style={{ fontSize: 24 }}>{video ? '🎬' : '🎥'}</Text>
-                                    <Text style={{ color: video ? '#ECA73C' : '#999', fontSize: 11, marginTop: 4, textAlign: 'center' }} numberOfLines={2}>
+                                    <View style={styles.videoIconCircle}>
+                                        <Icon name={video ? 'videocam' : 'videocam-outline'} size={20} color={video ? '#A44A1F' : '#8B817B'} />
+                                    </View>
+                                    <Text style={[styles.videoSlotText, video && styles.videoSlotTextSelected]} numberOfLines={2}>
                                         {video ? (video.fileName || 'Video ' + (idx + 1)) : `Upload Video ${idx + 1}`}
                                     </Text>
                                     {video && (
                                         <>
                                             <TouchableOpacity
                                                 onPress={(e) => { e.stopPropagation?.(); setVideoPaused(false); setVideoPreview({ visible: true, uri: video.uri }); }}
-                                                style={{ marginTop: 6, backgroundColor: '#ECA73C', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 }}
+                                                style={styles.previewButton}
                                             >
-                                                <Text style={{ color: '#fff', fontSize: 11, fontWeight: '600' }}>▶ Preview</Text>
+                                                <Text style={styles.previewButtonText}>Preview</Text>
                                             </TouchableOpacity>
                                             <TouchableOpacity
                                                 onPress={(e) => { e.stopPropagation?.(); setVideos(prev => { const u = [...prev]; u[idx] = null; return u; }); }}
-                                                style={{ position: 'absolute', top: 4, right: 4 }}
+                                                style={styles.removeVideoButton}
                                             >
-                                                <Text style={{ color: '#e74c3c', fontSize: 14, fontWeight: 'bold' }}>✕</Text>
+                                                <Icon name="close" size={13} color="#A13A3A" />
                                             </TouchableOpacity>
                                         </>
                                     )}
                                 </TouchableOpacity>
                             ))}
+                        </View>
                         </View>
 
                         <TextField
@@ -1320,9 +1369,9 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
                         {/* ── Venue Category ── */}
                         <Text style={styles.labelText}>
-                            Select Venue Category<Text style={{ color: 'red' }}>*</Text>
+                            Venue Category<Text style={styles.required}>*</Text>
                         </Text>
-                        <Text style={styles.amenitiesHint}>Choose the type that best describes your venue</Text>
+                        <Text style={styles.fieldHint}>Choose the type that best describes your venue.</Text>
                         <View style={styles.venueCategoryGrid}>
                             {[
                                 {
@@ -1362,29 +1411,28 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                         onPress={() => setVenueCategory(cat.label)}
                                         style={[
                                             styles.venueCategoryCard,
-                                            {borderColor: selected ? cat.color : '#EBEBEB'},
-                                            selected && {backgroundColor: cat.bg},
+                                            selected && styles.venueCategoryCardSelected,
                                         ]}>
                                         {/* Selected checkmark */}
                                         {selected && (
-                                            <View style={[styles.venueCategoryTick, {backgroundColor: cat.color}]}>
+                                            <View style={styles.venueCategoryTick}>
                                                 <Icon name="checkmark" size={11} color="#fff" />
                                             </View>
                                         )}
                                         {/* Icon circle */}
                                         <View style={[
                                             styles.venueCategoryIcon,
-                                            {backgroundColor: selected ? cat.color : `${cat.color}18`},
+                                            selected && styles.venueCategoryIconSelected,
                                         ]}>
                                             <Icon
                                                 name={`${cat.iconName}-outline`}
                                                 size={26}
-                                                color={selected ? '#fff' : cat.color}
+                                                color={selected ? '#FFFFFF' : '#8B5A3C'}
                                             />
                                         </View>
                                         <Text style={[
                                             styles.venueCategoryLabel,
-                                            selected && {color: cat.color, fontWeight: '800'},
+                                            selected && styles.venueCategoryLabelSelected,
                                         ]}>
                                             {cat.label}
                                         </Text>
@@ -1407,8 +1455,33 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             isDescriptionField={true}
                         />
 
-                        <Text style={styles.labelText}>Seating Capacity pax<Text style={{ color: "red" }}>*</Text></Text>
+                        <Text style={styles.labelText}>Seating Capacity<Text style={styles.required}>*</Text></Text>
+                        <Text style={styles.fieldHint}>Choose the maximum comfortable seating range.</Text>
                         {seatingCapacityList()}
+
+
+                        {venueCategory === 'Farm House' && (
+                            <View style={styles.guestCountContainer}>
+                                <TextField
+                                    label='Guests Included'
+                                    value={includedGuestCount}
+                                    onChangeHandler={value => setIncludedGuestCount(value.replace(/[^0-9]/g, ''))}
+                                    placeholder="Example: 12"
+                                    placeholderTextColor="#999"
+                                    keyboardType="number-pad"
+                                    maxLength={5}
+                                    accessibilityLabel="Guests included in the price"
+                                    isRequired={false}
+                                />
+
+
+
+                                <Text style={styles.guestCountHint}>
+                                    If your price is ₹15,000 for 12 members, enter 12.
+                                    This is not the maximum venue capacity.
+                                </Text>
+                            </View>
+                        )}
 
                         <TextField
                             label='Bedrooms'
@@ -1425,23 +1498,26 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             value={functionHallAreaInSft}
                             onChangeHandler={(text) => setfunctionHallAreaInSft(text)}
                             keyboardType='number-pad'
-                            isRequired={true}
+                            isRequired={false}
                         />
 
 
-                        <Text style={styles.labelText}>Available Hall Amenities<Text style={{ color: "red" }}>*</Text></Text>
-                        <Text style={styles.amenitiesHint}>Tap to select all that apply</Text>
+                        <View style={styles.fieldTitleRow}>
+                            <Text style={styles.labelText}>Amenities<Text style={styles.required}>*</Text></Text>
+                            <Text style={styles.selectedCount}>{selectedItemArray.length} selected</Text>
+                        </View>
+                        <Text style={styles.fieldHint}>Select every facility available at the venue.</Text>
                         {AmenitiesGrid()}
-                        {selectedItemArray.length > 0 && (
-                            <Text style={styles.amenitiesCount}>{selectedItemArray.length} amenit{selectedItemArray.length === 1 ? 'y' : 'ies'} selected</Text>
-                        )}
 
-                        <View style={{ transform: [{ scale: 1.0 }], width: "100%", flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text style={{ alignSelf: "center", fontWeight: "800", fontSize: 15, fontFamily: 'ManropeRegular', color: "black" }}>Do you have in house catering?</Text>
+                        <View style={styles.cateringCard}>
+                            <View style={styles.cateringCopy}>
+                                <Text style={styles.cateringTitle}>In-house catering</Text>
+                                <Text style={styles.cateringHint}>Enable this to add menus and per-plate prices.</Text>
+                            </View>
                             <Switch
-                                trackColor={{ false: '#3e3e3e', true: '#FD813B' }}
-                                thumbColor={menuAvailable ? '#ECA73C' : '#FD813B'}
-                                ios_backgroundColor="#3e3e3e"
+                                trackColor={{ false: '#D5D0CC', true: '#F0A374' }}
+                                thumbColor={menuAvailable ? '#D96A2B' : '#FFFFFF'}
+                                ios_backgroundColor="#D5D0CC"
                                 // onValueChange={() => setMenuAvailable(!menuAvailable)}
                                 onValueChange={handleMenuAvailableSwitch}
                                 style={{ marginLeft: 10 }}
@@ -1449,10 +1525,11 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             />
                         </View>
                         {menuAvailable && (
-                            <View>
-                                <Text style={styles.subTitle}>Please upload menu images if you have in house catering</Text>
+                            <View style={styles.menuSection}>
+                                <Text style={styles.fieldTitle}>Menu packages</Text>
+                                <Text style={styles.fieldHint}>Add only the menu packages currently offered by your venue.</Text>
                                 {menuTypes.map((type, idx) => (
-                                    <View key={type.key}>
+                                    <View key={type.key} style={styles.menuPackageCard}>
                                         <ChooseMenuField
                                             label={type.label}
                                             isRequired={false}
@@ -1497,8 +1574,16 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         )}
 
                     </View>
-                    <Text style={[styles.title, { marginHorizontal: 10 }]}>Pricing Details<Text style={{ color: "red" }}>*</Text></Text>
-                    <View style={[styles.mainContainer, { paddingVertical: 0 }]}>
+                    <View style={styles.sectionHeader}>
+                        <View style={styles.sectionIcon}>
+                            <Icon name="pricetag-outline" size={18} color="#A44A1F" />
+                        </View>
+                        <View style={styles.sectionHeaderCopy}>
+                            <Text style={styles.mainHeading}>Pricing details<Text style={styles.required}>*</Text></Text>
+                            <Text style={styles.sectionDescription}>Keep rent, advance and additional charges transparent.</Text>
+                        </View>
+                    </View>
+                    <View style={styles.mainContainer}>
                         {!menuAvailable ? (
                             <TextField
                                 label='Per Day Charge (₹/ Per Day)'
@@ -1521,7 +1606,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                         const finalEarning = discountedPrice - serviceFee;
 
                                         return (
-                                            <>
+                                            <View style={styles.earningSummary}>
+                                                <Text style={styles.earningSummaryTitle}>Earning estimate</Text>
                                                 <Text style={styles.discountlabel}>
                                                     Your Product Price (After Discount):
                                                     <Text style={styles.highlightedValue}>{formatAmount(discountedPrice.toFixed(2))}</Text>
@@ -1534,14 +1620,16 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                                                     Your Earning (After Service Fee):
                                                     <Text style={styles.highlightedValue}>{formatAmount(finalEarning.toFixed(2))}</Text>
                                                 </Text>
-                                            </>
+                                            </View>
                                         );
                                     })()}
                                 </>
                             ) : null
                         ) : null}
-                        <Text style={styles.commissionLabel}>Service Fee Details:</Text>
-                        <Text style={styles.discountlabel}>3% for all orders</Text>
+                        <View style={styles.feeNotice}>
+                            <Icon name="information-circle-outline" size={17} color="#8A4A22" />
+                            <Text style={styles.feeNoticeText}>BookTheDay service fee: 3% for all orders.</Text>
+                        </View>
                         {/* <Text style={styles.discountlabel}>5% for orders above ₹30,000</Text> */}
 
                         {!menuAvailable ? (
@@ -1572,10 +1660,19 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             isRequired={false}
                         />
 
-                        <Text style={styles.textInputlabel}>Discount if any</Text>
+                        <Text style={styles.labelText}>Discount, if any</Text>
+                        <Text style={styles.fieldHint}>Select the discount applied to the venue rent.</Text>
                         {discountPercentageList()}
                     </View>
-                    <Text style={[styles.title, { marginHorizontal: 10, marginTop: 25 }]}>Item Available Address</Text>
+                    <View style={styles.sectionHeader}>
+                        <View style={styles.sectionIcon}>
+                            <Icon name="location-outline" size={18} color="#A44A1F" />
+                        </View>
+                        <View style={styles.sectionHeaderCopy}>
+                            <Text style={styles.mainHeading}>Venue location</Text>
+                            <Text style={styles.sectionDescription}>Pick the exact location so customers can find the venue.</Text>
+                        </View>
+                    </View>
                     <View style={styles.mainContainer}>
 
                         <Text style={[styles.textInputlabel, { marginTop: 0 }]}>
@@ -1672,19 +1769,19 @@ const GeneralDetails = ({ isAadharUpdate }) => {
             {/* ── STICKY PUBLISH BUTTON ── */}
             {!loading && (
                 // <View style={styles.stickyBar}>
-                    <TouchableOpacity
-                        onPress={() => { onPressSaveAndPost(); }}
-                        style={styles.publishBtn}
-                        activeOpacity={0.85}>
-                        <LinearGradient
-                            colors={['#D2453B', '#A0153E']}
-                            start={{x: 0, y: 0}}
-                            end={{x: 1, y: 0}}
-                            style={styles.publishBtnGradient}>
-                            <Icon name="cloud-upload-outline" size={20} color="#fff" />
-                            <Text style={styles.publishBtnText}>Publish Listing</Text>
-                        </LinearGradient>
-                    </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => { onPressSaveAndPost(); }}
+                    style={styles.publishBtn}
+                    activeOpacity={0.85}>
+                    <LinearGradient
+                        colors={['#E47A3A', '#C75B24']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.publishBtnGradient}>
+                        <Icon name="cloud-upload-outline" size={20} color="#fff" />
+                        <Text style={styles.publishBtnText}>Submit for Review</Text>
+                    </LinearGradient>
+                </TouchableOpacity>
                 // </View>
             )}
 
@@ -1695,23 +1792,61 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 export default GeneralDetails
 
 const styles = StyleSheet.create({
-    mainContainer: {
-        backgroundColor: themevariable.Color_FFFFFF,
-        paddingVertical: 20,
+    screen: {
+        flex: 1,
         paddingHorizontal: 10,
-        borderRadius: 6,
-        marginTop: 10,
-        flex: 1
+        backgroundColor: '#F7F5F3',
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 20,
+        marginHorizontal: 4,
+        marginBottom: 9,
+    },
+    sectionIcon: {
+        width: 38,
+        height: 38,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 10,
+        borderWidth: 1,
+        borderColor: '#EDD3C2',
+        borderRadius: 12,
+        backgroundColor: '#FFF4EC',
+    },
+    sectionHeaderCopy: {
+        flex: 1,
+    },
+    sectionDescription: {
+        marginTop: 2,
+        color: '#81756D',
+        fontSize: 11,
+        lineHeight: 15,
+        fontFamily: 'ManropeRegular',
+    },
+    mainContainer: {
+        paddingVertical: 16,
+        paddingHorizontal: 13,
+        borderWidth: 1,
+        borderColor: '#ECE5E0',
+        borderRadius: 15,
+        backgroundColor: '#FFFFFF',
+        elevation: 1,
+        shadowColor: '#5A3925',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.04,
+        shadowRadius: 6,
     },
     detailsContainer: {
         backgroundColor: 'red',
         borderRadius: 10,
     },
     mainHeading: {
-        marginTop: 20,
-        fontWeight: 'bold',
-        fontSize: 20,
-        color: themevariable.Color_000000
+        color: '#302A27',
+        fontSize: 17,
+        fontWeight: '800',
+        fontFamily: 'ManropeRegular',
     },
     title: {
         fontFamily: 'ManropeRegular',
@@ -1720,13 +1855,156 @@ const styles = StyleSheet.create({
         fontSize: 18,
         marginTop: 10
     },
+    guestCountContainer: {
+        padding: 11,
+        marginTop: 8,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: '#EFE4DD',
+        borderRadius: 11,
+        backgroundColor: '#FFFAF6',
+    },
+    guestCountLabel: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#333',
+        marginBottom: 8,
+    },
+    guestCountInput: {
+        borderWidth: 1,
+        borderColor: '#D1D5DB',
+        borderRadius: 10,
+        paddingHorizontal: 14,
+        paddingVertical: 12,
+        fontSize: 16,
+        color: '#111',
+        backgroundColor: '#FFF',
+    },
+    guestCountHint: {
+        marginTop: 6,
+        fontSize: 12,
+        lineHeight: 18,
+        color: '#786D66',
+    },
     labelText: {
         fontFamily: 'ManropeRegular',
-        fontWeight: 'bold',
-        color: themevariable.Color_000000,
+        fontWeight: '700',
+        color: '#2F2925',
         fontSize: 15,
-        marginTop: 20,
-        bottom: 10
+        marginTop: 16,
+        marginBottom: 3,
+    },
+    required: {
+        color: '#D14343',
+        fontWeight: '800',
+    },
+    fieldBlock: {
+        marginBottom: 18,
+    },
+    fieldTitleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: 4,
+    },
+    fieldTitle: {
+        color: '#2F2925',
+        fontSize: 14,
+        fontWeight: '700',
+        fontFamily: 'ManropeRegular',
+    },
+    fieldHint: {
+        color: '#81756D',
+        fontSize: 13,
+        lineHeight: 16,
+        marginTop: 3,
+        marginBottom: 10,
+        fontFamily: 'ManropeRegular',
+    },
+    selectedCount: {
+        color: '#9A431B',
+        fontSize: 10,
+        fontWeight: '700',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 10,
+        backgroundColor: '#FFF0E5',
+    },
+    coverImage: {
+        width: '100%',
+        height: 230,
+        marginTop: 9,
+        borderRadius: 12,
+    },
+    photoGrid: {
+        width: '100%',
+        alignItems: 'center',
+        paddingBottom: 4,
+    },
+    videoRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    videoSlot: {
+        flex: 1,
+        minHeight: 108,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 7,
+        marginHorizontal: 3,
+        borderWidth: 1,
+        borderStyle: 'dashed',
+        borderColor: '#DDD3CC',
+        borderRadius: 11,
+        backgroundColor: '#FBFAF9',
+    },
+    videoSlotSelected: {
+        borderStyle: 'solid',
+        borderColor: '#E6B494',
+        backgroundColor: '#FFF7F1',
+    },
+    videoIconCircle: {
+        width: 34,
+        height: 34,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 11,
+        backgroundColor: '#FFF0E5',
+    },
+    videoSlotText: {
+        marginTop: 6,
+        color: '#847A73',
+        fontSize: 9,
+        lineHeight: 12,
+        textAlign: 'center',
+        fontFamily: 'ManropeRegular',
+    },
+    videoSlotTextSelected: {
+        color: '#8B3E19',
+        fontWeight: '600',
+    },
+    previewButton: {
+        marginTop: 6,
+        paddingHorizontal: 9,
+        paddingVertical: 4,
+        borderRadius: 10,
+        backgroundColor: '#D96A2B',
+    },
+    previewButtonText: {
+        color: '#FFFFFF',
+        fontSize: 9,
+        fontWeight: '700',
+    },
+    removeVideoButton: {
+        position: 'absolute',
+        top: 5,
+        right: 5,
+        width: 22,
+        height: 22,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 11,
+        backgroundColor: '#FDECEC',
     },
     subTitle: {
         fontFamily: 'ManropeRegular',
@@ -1738,7 +2016,12 @@ const styles = StyleSheet.create({
     imageContainer: {
         alignSelf: 'center',
         marginHorizontal: 3,
-        marginTop: 20
+        marginVertical: 4,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#E8DDD6',
+        borderRadius: 8,
+        backgroundColor: '#FAF8F6',
     },
     dropdown: {
         height: 50,
@@ -1846,17 +2129,18 @@ const styles = StyleSheet.create({
     discountlabel: {
         fontFamily: 'ManropeRegular',
         fontWeight: '600',
-        color: themevariable.Color_000000,
-        fontSize: 15,
-        marginTop: 15
+        color: '#4F6256',
+        fontSize: 13,
+        lineHeight: 16,
+        marginTop: 5,
     },
     highlightedValue: {
-        fontWeight: 'bold',
-        color: '#FD813B', // Blue color for highlighting values
+        fontWeight: '800',
+        color: '#277047',
     },
     textTnputView: {
         borderWidth: 1,
-        marginTop: 10,
+        marginTop: 13,
         borderColor: themevariable.Color_C8C8C6,
         // paddingHorizontal:12,
         borderRadius: 5,
@@ -1951,24 +2235,25 @@ const styles = StyleSheet.create({
     venueCategoryGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 10,
+        justifyContent: 'space-between',
         marginTop: 10,
         marginBottom: 6,
     },
     venueCategoryCard: {
-        width: '47.5%',
-        backgroundColor: '#fff',
-        borderRadius: 14,
-        borderWidth: 2,
-        borderColor: '#EBEBEB',
-        padding: 14,
+        width: '48.5%',
+        minHeight: 130,
+        padding: 12,
+        marginBottom: 9,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#E9E2DD',
+        backgroundColor: '#FCFBFA',
         alignItems: 'flex-start',
         position: 'relative',
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: {width: 0, height: 2},
-        shadowOpacity: 0.05,
-        shadowRadius: 6,
+    },
+    venueCategoryCardSelected: {
+        borderColor: '#E6A77F',
+        backgroundColor: '#FFF4EC',
     },
     venueCategoryTick: {
         position: 'absolute',
@@ -1979,14 +2264,19 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#D96A2B',
     },
     venueCategoryIcon: {
-        width: 50,
-        height: 50,
-        borderRadius: 14,
+        width: 42,
+        height: 42,
+        borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: 9,
+        backgroundColor: '#F7EBE3',
+    },
+    venueCategoryIconSelected: {
+        backgroundColor: '#D96A2B',
     },
     venueCategoryLabel: {
         fontSize: 14,
@@ -1994,6 +2284,10 @@ const styles = StyleSheet.create({
         color: '#100D25',
         fontFamily: 'ManropeRegular',
         marginBottom: 4,
+    },
+    venueCategoryLabelSelected: {
+        color: '#8B3E19',
+        fontWeight: '800',
     },
     venueCategoryDesc: {
         fontSize: 11,
@@ -2005,36 +2299,62 @@ const styles = StyleSheet.create({
     amenitiesGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 10,
+        justifyContent: 'space-between',
         marginTop: 10,
         marginBottom: 6,
     },
-    amenityChip: {
+    amenityOption: {
+        width: '48.5%',
+        minHeight: 48,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-        borderRadius: 10,
+        paddingHorizontal: 9,
+        paddingVertical: 8,
+        marginBottom: 8,
+        borderWidth: 1,
+        borderColor: '#ECE6E1',
+        borderRadius: 9,
+        backgroundColor: '#FCFBFA',
+    },
+    amenityOptionSelected: {
+        borderColor: '#EDB28B',
+        backgroundColor: '#FFF7F1',
+    },
+    checkbox: {
+        width: 19,
+        height: 19,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 7,
         borderWidth: 1.5,
-        borderColor: '#E0E0E0',
-        backgroundColor: '#F9F9F9',
+        borderColor: '#BDB3AC',
+        borderRadius: 5,
+        backgroundColor: '#FFFFFF',
     },
-    amenityChipSelected: {
-        backgroundColor: '#A0153E',
-        borderColor: '#A0153E',
+    checkboxSelected: {
+        borderColor: '#D96A2B',
+        backgroundColor: '#D96A2B',
     },
-    amenityChipText: {
+    checkboxTick: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        lineHeight: 14,
+        fontWeight: '900',
+    },
+    amenityText: {
+        flex: 1,
+        color: '#5F5752',
         fontSize: 13,
-        color: '#606060',
+        lineHeight: 14,
+        fontWeight: '500',
         fontFamily: 'ManropeRegular',
+    },
+    amenityTextSelected: {
+        color: '#713716',
         fontWeight: '600',
     },
-    amenityChipTextSelected: {
-        color: '#fff',
-    },
     amenitiesHint: {
-        fontSize: 12,
+        fontSize: 14,
         color: '#939393',
         fontFamily: 'ManropeRegular',
         marginTop: 2,
@@ -2049,51 +2369,226 @@ const styles = StyleSheet.create({
     },
     // ── FOOD TYPE ──
     foodTypeWrapper: {
-        marginTop: 10,
-        marginBottom: 6,
+        marginTop: 5,
+        marginBottom: 12,
     },
     foodTypeRow: {
         flexDirection: 'row',
-        gap: 10,
-        marginTop: 10,
+        marginHorizontal: -3,
     },
     foodTypeCard: {
         flex: 1,
+        minHeight: 44,
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 16,
-        paddingHorizontal: 8,
-        borderRadius: 14,
-        borderWidth: 2,
-        borderColor: '#E5E7EB',
-        backgroundColor: '#fff',
-        gap: 8,
-        position: 'relative',
-        elevation: 1,
-        shadowColor: '#000',
-        shadowOffset: {width: 0, height: 1},
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
+        marginHorizontal: 3,
+        paddingHorizontal: 7,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#E8E1DC',
+        backgroundColor: '#FCFBFA',
     },
-    foodTypeTick: {
-        position: 'absolute',
-        top: 8,
-        right: 8,
-        width: 18,
-        height: 18,
-        borderRadius: 9,
-        justifyContent: 'center',
+    foodTypeCardSelected: {
+        borderColor: '#ECA170',
+        backgroundColor: '#FFF3EA',
+    },
+    radioOuter: {
+        width: 17,
+        height: 17,
         alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 6,
+        borderWidth: 1.5,
+        borderColor: '#B9AEA7',
+        borderRadius: 9,
+        backgroundColor: '#FFFFFF',
+    },
+    radioOuterSelected: {
+        borderColor: '#D96A2B',
+    },
+    radioInner: {
+        width: 9,
+        height: 9,
+        borderRadius: 5,
+        backgroundColor: '#D96A2B',
     },
     foodTypeLabel: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: '600',
-        color: '#606060',
+        color: '#625A55',
         fontFamily: 'ManropeRegular',
         textAlign: 'center',
     },
-    publishBtn: {
+    foodTypeLabelSelected: {
+        color: '#8F3D17',
+        fontWeight: '700',
+    },
+    seatingGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        marginBottom: 8,
+    },
+    seatingOption: {
+        position: 'relative',
+        width: '48.5%',
+        minHeight: 55,
+        justifyContent: 'center',
+        paddingHorizontal: 12,
+        paddingVertical: 9,
+        marginBottom: 8,
+        borderWidth: 1,
+        borderColor: '#E8E1DC',
+        borderRadius: 10,
+        backgroundColor: '#FCFBFA',
+    },
+    seatingOptionSelected: {
+        borderColor: '#E99A67',
+        backgroundColor: '#FFF3EA',
+    },
+    seatingValue: {
+        color: '#403A36',
+        fontSize: 13,
+        fontWeight: '700',
+    },
+    seatingValueSelected: {
+        color: '#8F3D17',
+    },
+    seatingUnit: {
+        color: '#91857D',
+        fontSize: 9,
+        marginTop: 2,
+    },
+    seatingUnitSelected: {
+        color: '#A65B32',
+    },
+    selectedDot: {
+        position: 'absolute',
+        top: 9,
+        right: 9,
+        width: 7,
+        height: 7,
+        borderRadius: 4,
+        backgroundColor: '#D96A2B',
+    },
+    cateringCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 12,
+        marginTop: 14,
+        borderWidth: 1,
+        borderColor: '#E9DFD8',
+        borderRadius: 12,
+        backgroundColor: '#FFFAF6',
+    },
+    cateringCopy: {
         flex: 1,
+        marginRight: 12,
+    },
+    cateringTitle: {
+        color: '#332D29',
+        fontSize: 14,
+        fontWeight: '700',
+        fontFamily: 'ManropeRegular',
+    },
+    cateringHint: {
+        marginTop: 3,
+        color: '#81756D',
+        fontSize: 10,
+        lineHeight: 15,
+        fontFamily: 'ManropeRegular',
+    },
+    menuSection: {
+        marginTop: 14,
+    },
+    menuPackageCard: {
+        padding: 10,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: '#EEE5DF',
+        borderRadius: 12,
+        backgroundColor: '#FCFBFA',
+    },
+    discountGrid: {
+        paddingVertical: 7,
+    },
+    discountOption: {
+        flex: 1,
+        alignItems: 'center',
+        margin: 4,
+        paddingVertical: 9,
+        borderWidth: 1,
+        borderColor: '#E7DED8',
+        borderRadius: 9,
+        backgroundColor: '#FCFBFA',
+    },
+    discountOptionSelected: {
+        borderColor: '#E79C6C',
+        backgroundColor: '#FFF1E7',
+    },
+    discountOptionText: {
+        color: '#655C57',
+        fontSize: 11,
+        fontWeight: '600',
+    },
+    discountOptionTextSelected: {
+        color: '#8F3D17',
+        fontWeight: '800',
+    },
+    earningSummary: {
+        padding: 12,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: '#DCEEE3',
+        borderRadius: 12,
+        backgroundColor: '#F3FAF6',
+    },
+    earningSummaryTitle: {
+        color: '#28613F',
+        fontSize: 14,
+        fontWeight: '800',
+        fontFamily: 'ManropeRegular',
+    },
+    feeNotice: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 10,
+        marginVertical: 10,
+        borderRadius: 10,
+        backgroundColor: '#FFF5ED',
+    },
+    feeNoticeText: {
+        flex: 1,
+        marginLeft: 7,
+        color: '#71503C',
+        fontSize: 10,
+        lineHeight: 15,
+        fontFamily: 'ManropeRegular',
+    },
+    locationPickerCard: {
+        minHeight: 100,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 9,
+        borderWidth: 1,
+        borderColor: '#E5D9D1',
+        borderRadius: 11,
+        backgroundColor: '#FBFAF9',
+    },
+    locationIconWrap: {
+        width: 40,
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 12,
+        backgroundColor: '#FFF0E5',
+    },
+    publishBtn: {
+        marginTop: 18,
+        marginHorizontal: 4,
+        marginBottom: 24,
     },
     publishBtnGradient: {
         flexDirection: 'row',
@@ -2123,7 +2618,7 @@ const styles = StyleSheet.create({
         borderTopColor: '#EFEFEF',
         elevation: 12,
         shadowColor: '#000',
-        shadowOffset: {width: 0, height: -3},
+        shadowOffset: { width: 0, height: -3 },
         shadowOpacity: 0.08,
         shadowRadius: 8,
     },

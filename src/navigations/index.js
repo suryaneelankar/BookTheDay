@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import UserTabs from "./UserTabs";
 import { useDispatch, useSelector } from 'react-redux';
 import VendorTabs from "./VendorTabs";
+import axios from 'axios';
+import BASE_URL from '../apiconfig';
 import ViewTrendingDetails from "../screens/Home/ViewTrendingDetails";
 import CategoriesList from "../screens/Categories/categoriesList";
 import ViewEvents from "../screens/Events/ViewEvents";
@@ -58,100 +60,22 @@ import UserAndVendorRegister from "../screens/LandingScreen/UserAndVendorRegiste
 import BookingReview from "../screens/Profile/BookingReview";
 import MyBookings from "../screens/VendorScreens/VendorProfile/MyBookings";
 import EditFunctionHall from "../screens/VendorScreens/VendorAddFunctionHalls/EditFunctionHall";
+import VendorVenueListings from "../screens/VendorScreens/VendorProfile/VendorVenueListings";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import SmartVenueMatch from "../screens/Search/SmartVenueMatch";
 
-const MainNavigation = () => {
+const Stack = createNativeStackNavigator();
+const AuthStack = createNativeStackNavigator();
+const HomeStack = createNativeStackNavigator();
 
-    const Stack = createNativeStackNavigator();
-    const AuthStack = createNativeStackNavigator();
-    const HomeStack = createNativeStackNavigator();
+// ── HomeScreen reads switchtab from Redux — stable component outside MainNavigation ──
+const HomeScreen = () => {
     const switchtab = useSelector((state) => state.userId);
-    const checkIfAnyTokenStored = useSelector((state) => state.checkStoredToken);
-    const dispatch = useDispatch();
-    const [loading, setLoading] = useState(true);
+    return switchtab ? <VendorTabs /> : <UserTabs />;
+};
 
-    useEffect(() => {
-        getToken();
-    }, [checkIfAnyTokenStored, switchtab]);
-
-    const setupNotifications = async () => {
-        if (Platform.OS === 'android' && Platform.Version >= 33) {
-            const result = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-            );
-            console.log('Notification permission:', result);
-        }
-        const token = await messaging().getToken();
-        console.log('FCM TOKEN:', token);
-        return messaging().onMessage(async remoteMessage => {
-            console.log('Foreground FCM received:', remoteMessage);
-        });
-    };
-
-    const getToken = async () => {
-        try {
-            await setupNotifications();
-        } catch (e) {
-            console.warn('Notification setup failed:', e);
-        }
-        // COMMENTED OUT — Firebase FCM token fetch
-        try {
-            const fcmToken = await messaging().getToken();
-            console.log('fcmToken is ::>>>>',fcmToken);
-            dispatch(getDeviceFCMToken(fcmToken));
-        } catch (e) {
-            console.warn('FCM token fetch failed:', e);
-        }
-        try {
-            const userToken = await getUserAuthToken();
-            const vendorToken = await getVendorAuthToken();
-            const vendorMobileNumber = await getVendorMobileNumber();
-            const userMobileNumber = await getUserMobileNumber();
-            console.log("user token for auto login is ::>>>>", userToken);
-            console.log("vendorToken token for auto login is ::>>>>", vendorToken);
-            console.log("switch tab id:::::::::::", switchtab);
-            if (userToken || vendorToken) {
-                dispatch(checkIsTokenStored(true));
-            } else {
-                dispatch(checkIsTokenStored(false));
-            }
-            console.log("checkIfAnyTokenStored is ::>>>", checkIfAnyTokenStored);
-            if (vendorToken) {
-                dispatch(getLoginUserId(true));
-                dispatch(getCurrentLoggedInVendorMobileNum(vendorMobileNumber));
-                return;
-            }
-            if (userToken) {
-                dispatch(getLoginUserId(false));
-                dispatch(getCurrentLoggedInUserMobileNum(userMobileNumber));
-                return;
-            }
-        } catch (e) {
-            console.error('getToken error:', e);
-        } finally {
-            // Always unblock the loading screen — even if FCM or keychain fails
-            setLoading(false);
-        }
-    }
-
-    // console.log("switch tab id:::::::::::", switchtab)
-
-    const HomeScreen = () => {
-        return (
-            <>
-                {switchtab ?
-                    <VendorTabs />
-                    :
-                    <UserTabs />
-                }
-            </>
-        );
-    };
-
-    const AuthNavigator = () => (
-        <AuthStack.Navigator
-            initialRouteName="LandingScreen"
-        >
+const AuthNavigator = () => (
+    <AuthStack.Navigator initialRouteName="LandingScreen">
             <Stack.Screen
                 name="LandingScreen"
                 component={LandingScreen}
@@ -185,12 +109,12 @@ const MainNavigation = () => {
                 }}
             />
         </AuthStack.Navigator>
-    );
+);
 
-    const HomeNavigator = () => (
-        <HomeStack.Navigator
-            initialRouteName="Home"
-        >
+const HomeNavigator = () => (
+    <HomeStack.Navigator
+        initialRouteName="Home"
+    >
             <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
             <Stack.Screen name="ViewTrendingDetails" component={ViewTrendingDetails} options={{
                 header: () => (
@@ -216,6 +140,12 @@ const MainNavigation = () => {
                 )
                 , headerShown: true
             }} />
+
+            <Stack.Screen
+                name="SmartVenueMatch"
+                component={SmartVenueMatch}
+                 options={{ headerShown: false }}
+            />
 
             <Stack.Screen
                 name="SearchVenues"
@@ -633,6 +563,14 @@ const MainNavigation = () => {
                 ),
                 headerShown: true,
             }} />
+            <Stack.Screen name="VendorVenueListings" component={VendorVenueListings} options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="My Listings" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }} />
             {/* EditFunctionHallScreen */}
 
 
@@ -655,7 +593,94 @@ const MainNavigation = () => {
             }} />
 
         </HomeStack.Navigator>
-    );
+);
+
+const MainNavigation = () => {
+
+    const switchtab = useSelector((state) => state.userId);
+    const checkIfAnyTokenStored = useSelector((state) => state.checkStoredToken);
+    const dispatch = useDispatch();
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        getToken();
+    }, [checkIfAnyTokenStored, switchtab]);
+
+    const setupNotifications = async () => {
+        if (Platform.OS === 'android' && Platform.Version >= 33) {
+            const result = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+            );
+            console.log('Notification permission:', result);
+        }
+        const token = await messaging().getToken();
+        console.log('FCM TOKEN:', token);
+        return messaging().onMessage(async remoteMessage => {
+            console.log('Foreground FCM received:', remoteMessage);
+        });
+    };
+
+    const getToken = async () => {
+        try {
+            await setupNotifications();
+        } catch (e) {
+            console.warn('Notification setup failed:', e);
+        }
+        let fcmToken = null;
+        try {
+            fcmToken = await messaging().getToken();
+            console.log('fcmToken is ::>>>>', fcmToken);
+            dispatch(getDeviceFCMToken(fcmToken));
+        } catch (e) {
+            console.warn('FCM token fetch failed:', e);
+        }
+        try {
+            const userToken = await getUserAuthToken();
+            const vendorToken = await getVendorAuthToken();
+            const vendorMobileNumber = await getVendorMobileNumber();
+            const userMobileNumber = await getUserMobileNumber();
+            if (userToken || vendorToken) {
+                dispatch(checkIsTokenStored(true));
+            } else {
+                dispatch(checkIsTokenStored(false));
+            }
+            if (fcmToken) {
+                try {
+                    if (vendorToken && vendorMobileNumber) {
+                        await axios.post(
+                            `${BASE_URL}/addVendorFCMToken`,
+                            { mobileNumber: String(vendorMobileNumber), fcmToken },
+                            { headers: { Authorization: `Bearer ${vendorToken}` } },
+                        );
+                        console.log('Vendor FCM token saved to backend');
+                    } else if (userToken && userMobileNumber) {
+                        await axios.post(
+                            `${BASE_URL}/addUserFCMToken`,
+                            { mobileNumber: String(userMobileNumber), fcmToken },
+                            { headers: { Authorization: `Bearer ${userToken}` } },
+                        );
+                        console.log('User FCM token saved to backend');
+                    }
+                } catch (e) {
+                    console.warn('Failed to save FCM token to backend:', e?.message);
+                }
+            }
+            if (vendorToken) {
+                dispatch(getLoginUserId(true));
+                dispatch(getCurrentLoggedInVendorMobileNum(vendorMobileNumber));
+                return;
+            }
+            if (userToken) {
+                dispatch(getLoginUserId(false));
+                dispatch(getCurrentLoggedInUserMobileNum(userMobileNumber));
+                return;
+            }
+        } catch (e) {
+            console.error('getToken error:', e);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -666,13 +691,10 @@ const MainNavigation = () => {
     }
 
     return (
-            <NavigationContainer>
-
-
-                {checkIfAnyTokenStored ? <HomeNavigator /> : <AuthNavigator />}
-
-            </NavigationContainer>
-    )
-}
+        <NavigationContainer>
+            {checkIfAnyTokenStored ? <HomeNavigator /> : <AuthNavigator />}
+        </NavigationContainer>
+    );
+};
 
 export default MainNavigation;

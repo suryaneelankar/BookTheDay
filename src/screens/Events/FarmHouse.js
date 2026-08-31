@@ -34,7 +34,7 @@ const FH_GOLD = '#ECA73C';   // harvest gold accent
 const VENUE_CATEGORY = 'Farm House';
 
 const seatingCapacity = ['50-100', '100-200', '200-400', '400-600', '600-800', '800-1000', '1000-1200', '1200+'];
-const priceRanges = ['10k-50k','50k-1L','1L-2L','2L-3L','3L-5L','5L-10L','10L-12L','12L-15L','15L-20L','20L+'];
+const priceRanges = ['10k-50k', '50k-1L', '1L-2L', '2L-3L', '3L-5L', '5L-10L', '10L-12L', '12L-15L', '15L-20L', '20L+'];
 const chips = ['Budget', 'Standard', 'Premium', 'Luxury', 'Elite'];
 const chipColors = {
     Budget: '#FFE8B3', Standard: '#B3E5FF',
@@ -44,6 +44,23 @@ const categoryPriceMapping = {
     Budget: '50k-1L', Standard: '2L-3L',
     Premium: '5L-10L', Luxury: '12L-15L', Elite: '20L+',
 };
+
+// Display helpers only: preserve existing styles, filters and navigation.
+const cleanText = value => typeof value === 'string' ? value.trim() : '';
+const venueLocality = item => cleanText(item?.county) || cleanText(item?.locality) ||
+    cleanText(item?.functionHallAddress?.city) || 'Location not provided';
+const mediaList = value => Array.isArray(value) ? value.flat(Infinity).filter(Boolean) : [];
+const positiveNumber = value => {
+    if (!['string', 'number'].includes(typeof value)) return null;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+};
+const startingMenuPrice = item => {
+    const prices = mediaList(item?.menuImages).map(menu => positiveNumber(menu?.menuPrice))
+        .filter(price => price !== null);
+    return prices.length ? Math.min(...prices) : null;
+};
+const formatPlatePrice = price => `₹${price.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 const SkeletonCard = () => (
@@ -315,9 +332,17 @@ const FarmHouse = () => {
     // ── Farm House themed card ────────────────────────────────────────────────
     const renderItem = useCallback(({ item }) => {
         const heroImage = item?.professionalImage?.url;
-        const imageUrls = [heroImage, ...(item?.additionalImages?.flat()?.map(img => img?.url) || [])].filter(Boolean);
+        const imageUrls = [...new Set([heroImage, ...mediaList(item?.additionalImages).map(img => img?.url)]
+            .filter(url => typeof url === 'string' && url.trim()).map(url => url.trim()))];
         const totalPhotos = imageUrls.length;
         const hasVideo = item?.hallVideos?.length > 0;
+        const isMenuBased = item?.pricingType === 'menu_based' || item?.menuAvailable === true ||
+            mediaList(item?.menuImages).length > 0;
+        const menuPrice = startingMenuPrice(item);
+        const rent = positiveNumber(item?.rentPricePerDay);
+        const includedGuests = Number(item?.includedGuestCount);
+        const showIncludedGuests = !isMenuBased &&
+            Number.isInteger(includedGuests) && includedGuests > 0;
         const shouldAutoplay =
             isScreenFocused &&
             activeAutoplayCardId === item._id &&
@@ -325,36 +350,45 @@ const FarmHouse = () => {
         return (
             <View style={styles.card}>
                 <View style={styles.cardImageWrapper}>
-                    <Swiper
-                        key={`${item._id}-${shouldAutoplay ? 'playing' : 'paused'}`}
-                        loop={imageUrls.length > 1}
-                        showsPagination={imageUrls.length > 1}
-                        activeDotColor="#fff"
-                        dotColor="rgba(255,255,255,0.5)"
-                        activeDotStyle={{ width: 12, height: 6, borderRadius: 3 }}
-                        dotStyle={{ width: 6, height: 6, borderRadius: 3 }}
-                        paginationStyle={{ bottom: 10 }}
-                        style={{ height: 200 }}
-                        autoplay={shouldAutoplay}
-                        autoplayTimeout={4}
-                        loadMinimal
-                        loadMinimalSize={1}
-                    >
-                        {imageUrls.map((imgUrl, idx) => (
-                            <TouchableOpacity key={`${item._id}-${idx}`} activeOpacity={0.93}
-                                onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}
-                                style={{ flex: 1 }}>
-                                <FastImage source={{
-                                    uri: imgUrl,
-                                    priority: shouldAutoplay
-                                        ? FastImage.priority.high
-                                        : FastImage.priority.normal,
-                                    cache: FastImage.cacheControl.immutable,
-                                }}
-                                    style={styles.cardImage} resizeMode={FastImage.resizeMode.cover} />
-                            </TouchableOpacity>
-                        ))}
-                    </Swiper>
+                    {totalPhotos > 0 ? (
+                        <Swiper
+                            key={`${item._id}-${shouldAutoplay ? 'playing' : 'paused'}`}
+                            loop={imageUrls.length > 1}
+                            showsPagination={imageUrls.length > 1}
+                            activeDotColor="#fff"
+                            dotColor="rgba(255,255,255,0.5)"
+                            activeDotStyle={{ width: 12, height: 6, borderRadius: 3 }}
+                            dotStyle={{ width: 6, height: 6, borderRadius: 3 }}
+                            paginationStyle={{ bottom: 10 }}
+                            style={{ height: 200 }}
+                            autoplay={shouldAutoplay}
+                            autoplayTimeout={4}
+                            loadMinimal
+                            loadMinimalSize={1}
+                        >
+                            {imageUrls.map((imgUrl, idx) => (
+                                <TouchableOpacity key={`${item._id}-${idx}`} activeOpacity={0.93}
+                                    onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}
+                                    style={{ flex: 1 }}>
+                                    <FastImage source={{
+                                        uri: imgUrl,
+                                        priority: shouldAutoplay
+                                            ? FastImage.priority.high
+                                            : FastImage.priority.normal,
+                                        cache: FastImage.cacheControl.immutable,
+                                    }}
+                                        style={styles.cardImage} resizeMode={FastImage.resizeMode.cover} />
+                                </TouchableOpacity>
+                            ))}
+                        </Swiper>
+                    ) : (
+                        <TouchableOpacity
+                            style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E8F0E8' }}
+                            onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}>
+                            <IonIcon name="image-outline" size={36} color="#939393" />
+                            <Text style={[styles.addressText, { flex: 0, marginTop: 8 }]}>Photo not available</Text>
+                        </TouchableOpacity>
+                    )}
                     <LinearGradient colors={['transparent', 'rgba(26,46,26,0.72)']} style={styles.cardImageGradient} pointerEvents="none" />
                     <View style={styles.scenicBadge}>
                         <IonIcon name="leaf" size={10} color="#fff" />
@@ -370,50 +404,63 @@ const FarmHouse = () => {
                         <IonIcon name="images-outline" size={11} color="#fff" />
                         <Text style={styles.badgeText}>{totalPhotos}</Text>
                     </View>
-                    <View style={styles.priceOverlay}>
-                        {item?.menuImages?.length > 0
-                            ? <Text style={styles.priceText}>Menu Based</Text>
-                            : <Text style={styles.priceText}>{formatAmount(item?.rentPricePerDay)}<Text style={styles.priceUnit}>/day</Text></Text>
-                        }
-                    </View>
                 </View>
                 <TouchableOpacity activeOpacity={0.93}
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}>
-                <View style={styles.cardBody}>
-                    <View style={styles.cardTitleRow}>
-                        <Text style={styles.cardTitle} numberOfLines={1}>{item?.functionHallName}</Text>
-                    </View>
-                    <View style={styles.addressRow}>
-                        <LocationMarkIcon width={12} height={12} />
-                        <Text numberOfLines={1} style={styles.addressText}>{item?.functionHallAddress?.address}</Text>
-                    </View>
-                    <View style={styles.chipsRow}>
-                        {item?.seatingCapacity ? (
-                            <View style={styles.chip}>
-                                <IonIcon name="people-outline" size={11} color={FH_GREEN} />
-                                <Text style={styles.chipText}>{item?.seatingCapacity} pax</Text>
+                    <View style={styles.cardBody}>
+                        <View style={styles.cardTitleRow}>
+                            <Text style={styles.cardTitle} numberOfLines={2}>{item?.functionHallName}</Text>
+                            <View style={styles.priceOverlay}>
+                                {isMenuBased ? (
+                                    menuPrice !== null
+                                        ? <Text style={styles.priceText}>From {formatPlatePrice(menuPrice)}<Text style={styles.priceUnit}>/plate</Text></Text>
+                                        : <Text style={styles.priceText}>Menu price on request</Text>
+                                ) : (
+                                    <>
+                                        {rent !== null ? <Text style={styles.priceText}>
+                                            {formatAmount(rent)}
+                                            <Text style={styles.priceUnit}>/day</Text>
+                                        </Text> : <Text style={styles.priceText}>Price on request</Text>}
+                                        {showIncludedGuests && (
+                                            <Text style={styles.includedGuestsText}>
+                                                per {includedGuests} {includedGuests === 1 ? 'guest' : 'guests'}
+                                            </Text>
+                                        )}
+                                    </>
+                                )}
                             </View>
-                        ) : null}
-                        {item?.bedRooms > 0 && (
+                        </View>
+                        <View style={styles.addressRow}>
+                            <LocationMarkIcon width={12} height={12} />
+                            <Text numberOfLines={1} style={styles.addressText}>{venueLocality(item)}</Text>
+                        </View>
+                        <View style={styles.chipsRow}>
+                            {item?.seatingCapacity ? (
+                                <View style={styles.chip}>
+                                    <IonIcon name="people-outline" size={11} color={FH_GREEN} />
+                                    <Text style={styles.chipText}>Seating: {item?.seatingCapacity}</Text>
+                                </View>
+                            ) : null}
+                            {item?.bedRooms > 0 && (
+                                <View style={styles.chip}>
+                                    <IonIcon name="bed-outline" size={11} color={FH_GREEN} />
+                                    <Text style={styles.chipText}>{item?.bedRooms} Rooms</Text>
+                                </View>
+                            )}
                             <View style={styles.chip}>
-                                <IonIcon name="bed-outline" size={11} color={FH_GREEN} />
-                                <Text style={styles.chipText}>{item?.bedRooms} Rooms</Text>
+                                {item?.foodType === 'Both' ? <VegNonVegIcon width={14} height={14} /> :
+                                    item?.foodType === 'veg' ? <VegIcon width={14} height={14} /> :
+                                        <NonVegIcon width={14} height={14} />}
+                                <Text style={styles.chipText}>
+                                    {item?.foodType === 'Both' ? 'Veg & Non-Veg' : item?.foodType === 'veg' ? 'Veg' : 'Non-Veg'}
+                                </Text>
                             </View>
-                        )}
-                        <View style={styles.chip}>
-                            {item?.foodType === 'Both' ? <VegNonVegIcon width={14} height={14} /> :
-                                item?.foodType === 'veg' ? <VegIcon width={14} height={14} /> :
-                                    <NonVegIcon width={14} height={14} />}
-                            <Text style={styles.chipText}>
-                                {item?.foodType === 'Both' ? 'Veg & Non-Veg' : item?.foodType === 'veg' ? 'Veg' : 'Non-Veg'}
-                            </Text>
                         </View>
                     </View>
-                </View>
                 </TouchableOpacity>
             </View>
         );
-    }, [navigation, activeAutoplayCardId, isScreenFocused]);
+    }, [navigation]);
 
     const isApplyDisabled = !selectedPriceRange && !selectedSeatingCapacity && isACSelected === null && !selectedChip && !switchCateringVal;
 
@@ -491,9 +538,9 @@ const FarmHouse = () => {
                         {chips.map(item => (
                             <TouchableOpacity key={item}
                                 style={[styles.filterChip,
-                                    { backgroundColor: chipColors[item] },
-                                    selectedChip === item && styles.filterChipActive,
-                                    switchCateringVal && { opacity: 0.4 }]}
+                                { backgroundColor: chipColors[item] },
+                                selectedChip === item && styles.filterChipActive,
+                                switchCateringVal && { opacity: 0.4 }]}
                                 disabled={switchCateringVal}
                                 onPress={() => { setSelectedChip(selectedChip === item ? '' : item); setSelectedPriceRange(''); }}>
                                 <Text style={[styles.filterChipText, selectedChip === item && styles.filterChipTextActive]}>{item}</Text>
@@ -505,8 +552,8 @@ const FarmHouse = () => {
                         {priceRanges.map(item => (
                             <TouchableOpacity key={item}
                                 style={[styles.filterChip,
-                                    selectedPriceRange === item && styles.filterChipActive,
-                                    switchCateringVal && { opacity: 0.4 }]}
+                                selectedPriceRange === item && styles.filterChipActive,
+                                switchCateringVal && { opacity: 0.4 }]}
                                 disabled={switchCateringVal}
                                 onPress={() => { setSelectedPriceRange(selectedPriceRange === item ? '' : item); setSelectedChip(''); }}>
                                 <Text style={[styles.filterChipText, selectedPriceRange === item && styles.filterChipTextActive]}>{item}</Text>
@@ -607,7 +654,7 @@ const FarmHouse = () => {
                                 <IonIcon name="home-outline" size={13} color="#939393" style={{ marginRight: 8 }} />
                                 <View style={{ flex: 1 }}>
                                     <Text style={styles.dropdownText} numberOfLines={1}>{item.functionHallName}</Text>
-                                    <Text style={styles.dropdownSubText} numberOfLines={1}>{item?.functionHallAddress?.address}</Text>
+                                    <Text style={styles.dropdownSubText} numberOfLines={1}>{venueLocality(item)}</Text>
                                 </View>
                                 <IonIcon name="chevron-forward" size={12} color="#ccc" />
                             </TouchableOpacity>
@@ -706,7 +753,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row', alignItems: 'center',
         backgroundColor: 'white',
         borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12,
-        borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.2)',bottom: 10,marginTop:20,
+        borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.2)', bottom: 10, marginTop: 20,
     },
     searchInput: { flex: 1, fontSize: 13, fontFamily: 'ManropeRegular', color: 'black', padding: 0 },
     dropdown: {
@@ -773,14 +820,16 @@ const styles = StyleSheet.create({
     },
     badgeText: { color: '#fff', fontSize: 11, fontWeight: '700', fontFamily: 'ManropeRegular' },
     priceOverlay: {
-        position: 'absolute', bottom: 10, right: 12,
-        backgroundColor: 'rgba(26,46,26,0.72)',
-        paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20,
+        flexShrink: 0, maxWidth: '52%', alignItems: 'flex-end',
     },
-    priceText: { color: '#fff', fontSize: 13, fontWeight: '800', fontFamily: 'ManropeRegular' },
-    priceUnit: { fontSize: 10, fontWeight: '400', color: 'rgba(255,255,255,0.75)' },
+    priceText: { color: '#2F653B', fontSize: 13, fontWeight: '800', fontFamily: 'ManropeRegular', textAlign: 'right' },
+    priceUnit: { fontSize: 10, fontWeight: '400', color: '#2F653B' },
+    includedGuestsText: {
+        marginTop: 4, color: '#2F653B', fontSize: 12, textAlign: 'right',
+        fontWeight: '600', fontFamily: 'ManropeRegular',
+    },
     cardBody: { padding: 14 },
-    cardTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    cardTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
     cardTitle: { fontFamily: 'ManropeRegular', fontSize: 15, fontWeight: '700', color: FH_DARK, flex: 1, marginRight: 8 },
     ratingPill: {
         flexDirection: 'row', alignItems: 'center', gap: 3,

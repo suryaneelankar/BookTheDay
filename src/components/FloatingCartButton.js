@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet, Dimensions } from "react-native";
 import FastImage from "react-native-fast-image";
 import Swiper from "react-native-swiper";
@@ -18,8 +18,8 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
   const userLoggedInName = useSelector((state) => state.userLoggedInName);
   const navigation = useNavigation();
 
-  // Merge all data into a single array
-  const allItems = [
+  // Merge all data into a single array — memoized so it only recomputes when inputs change
+  const allItems = useMemo(() => [
     ...(cateringData || []).map(item => ({
       name: item.foodCateringName || "Unnamed",
       catType: item.catType,
@@ -54,20 +54,20 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
       startDate: item?.startDate || '',
       endDate: item?.endDate || '',
     })),
-  ];
+  ], [cateringData, clothsData, hallsData]);
 
-  const fetchRazorpayKey = async (token) => {
+  const fetchRazorpayKey = useCallback(async (token) => {
     const res = await fetch(`${BASE_URL}/razorpay-key`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
     console.log('Razorpay key data is floating cart ::>>', data);
     return data;
-  };
+  }, []);
 
   const [paymentInProgress, setPaymentInProgress] = useState(false);
 
-  const handlePayment = async (advanceAmount, bookingId, catType, vendorMobileNumber, productName, totalAmount) => {
+  const handlePayment = useCallback(async (advanceAmount, bookingId, catType, vendorMobileNumber, productName, totalAmount) => {
     if (paymentInProgress) return;
     setPaymentInProgress(true);
 
@@ -200,7 +200,17 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
       console.log("Initiate Payment error>>::", initiateErr);
       setPaymentInProgress(false);
     }
-  };
+  }, [authToken, userLoggedInName, userLoggedInMobileNum, navigation, fetchRazorpayKey]);
+
+  const paymentModalMessage = useMemo(() => {
+    const advance = selectedObjectedforPayment?.advanceAmountToPay
+      ? selectedObjectedforPayment.advanceAmountToPay
+      : selectedObjectedforPayment?.securityDepositAmount;
+    const balance = advance
+      ? selectedObjectedforPayment.totalAmount - advance
+      : 0;
+    return `Redirecting you to Pay Advance Amount: ${formatAmount(advance)}\n\n\nBalance Payable Amount: ${formatAmount(balance)}`;
+  }, [selectedObjectedforPayment]);
 
   return (
     <View style={styles.container}>
@@ -249,8 +259,7 @@ const FloatingCartList = ({ onPress, onClose, hallsData, cateringData, clothsDat
 
       <PaymentConfirmationModal
         visible={paymentModal}
-        message={`Redirecting you to Pay Advance Amount: ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount)} \n \n \n Balance Payable Amount: ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? (selectedObjectedforPayment?.totalAmount - selectedObjectedforPayment?.advanceAmountToPay) : (selectedObjectedforPayment?.totalAmount - selectedObjectedforPayment?.securityDepositAmount))}`}
-        // message={`Redirecting you to Pay Advance Amount: ${formatAmount(payDetails(selectedObjectedforPayment?.catType, selectedObjectedforPayment?.advanceAmountToPay, selectedObjectedforPayment?.totalAmount, selectedObjectedforPayment?.securityDepositAmount))} \n \n \n Balance Payable Amount: ${formatAmount(selectedObjectedforPayment?.advanceAmountToPay ? (selectedObjectedforPayment?.totalAmount - payDetails(selectedObjectedforPayment?.catType, selectedObjectedforPayment?.advanceAmountToPay, selectedObjectedforPayment?.totalAmount, selectedObjectedforPayment?.securityDepositAmount)) : (selectedObjectedforPayment?.totalAmount - payDetails(selectedObjectedforPayment?.catType, selectedObjectedforPayment?.advanceAmountToPay, selectedObjectedforPayment?.totalAmount, selectedObjectedforPayment?.securityDepositAmount)))}`}
+        message={paymentModalMessage}
         onSubmit={() => [setPaymentModal(false), handlePayment(selectedObjectedforPayment?.advanceAmountToPay ? selectedObjectedforPayment?.advanceAmountToPay : selectedObjectedforPayment?.securityDepositAmount, selectedObjectedforPayment?.bookingId, selectedObjectedforPayment?.catType, selectedObjectedforPayment?.vendorMobileNumber, selectedObjectedforPayment?.name, selectedObjectedforPayment?.totalAmount)]}
         onClose={() => setPaymentModal(false)}
       />

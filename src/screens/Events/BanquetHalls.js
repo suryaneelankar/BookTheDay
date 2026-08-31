@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import BASE_URL from "../../apiconfig";
 import axios from "axios";
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../utils/GlobalFunctions';
 import LocationMarkIcon from '../../assets/svgs/location.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
@@ -18,7 +18,6 @@ import VegIcon from '../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 import FloatingCloseButton from "./floatingCloseButton";
 import LinearGradient from "react-native-linear-gradient";
-import Swiper from "react-native-swiper";
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -30,6 +29,7 @@ const BH_CREAM = '#FDF5F5';   // warm rose-cream background
 const BH_LIGHT = '#FAE8EC';   // light crimson tint for chips
 
 const VENUE_CATEGORY = 'Banquet Hall';
+const PAGE_SIZE = 20;
 
 const seatingCapacity = ['50-100', '100-200', '200-400', '400-600', '600-800', '800-1000', '1000-1200', '1200+'];
 const priceRanges = ['10k-50k', '50k-1L', '1L-2L', '2L-3L', '3L-5L', '5L-10L', '10L-12L', '12L-15L', '15L-20L', '20L+'];
@@ -44,6 +44,23 @@ const categoryPriceMapping = {
 };
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
+// Display helpers only; preserve existing styles and data-loading behaviour.
+const cleanText = value => typeof value === 'string' ? value.trim() : '';
+const venueLocality = item => cleanText(item?.county) || cleanText(item?.locality) ||
+    cleanText(item?.functionHallAddress?.city) || 'Location not provided';
+const mediaList = value => Array.isArray(value) ? value.flat(Infinity).filter(Boolean) : [];
+const positiveNumber = value => {
+    if (!['string', 'number'].includes(typeof value)) return null;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+};
+const startingMenuPrice = item => {
+    const prices = mediaList(item?.menuImages).map(menu => positiveNumber(menu?.menuPrice))
+        .filter(price => price !== null);
+    return prices.length ? Math.min(...prices) : null;
+};
+const formatPlatePrice = price => `₹${price.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
+
 const SkeletonCard = () => (
     <View style={[styles.card, { marginBottom: 16 }]}>
         <View style={styles.skeletonImage} />
@@ -60,7 +77,6 @@ const SkeletonCard = () => (
 
 const BanquetHalls = () => {
     const navigation = useNavigation();
-    const isScreenFocused = useIsFocused();
     const actionSheetRef = useRef(null);
     const heroProgress = useRef(new Animated.Value(0)).current;
     const isHeroCollapsedRef = useRef(false);
@@ -116,27 +132,17 @@ const BanquetHalls = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [totalEventPages, setTotalEventPages] = useState(0);
+    const [totalEventItems, setTotalEventItems] = useState(0);
     const [filterDataCurrentPage, setFilterDataCurrentPage] = useState(1);
-    const [filterDataLimit] = useState(10);
+    const [filterDataLimit] = useState(PAGE_SIZE);
     const [hasMoreFilterData, setHasMoreFilterData] = useState(true);
     const [filterDataLoading, setFilterDataLoading] = useState(false);
     const [isFilterApplied, setIsFilterApplied] = useState(false);
     const [totalFilterDataPages, setTotalFilterDataPages] = useState(0);
+    const [totalFilterItems, setTotalFilterItems] = useState(0);
     const [loading, setLoading] = useState(false);
     const [query, setQuery] = useState('');
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const [activeAutoplayCardId, setActiveAutoplayCardId] = useState(null);
-
-    // Only one banquet card that remains mostly visible can autoplay.
-    const viewabilityConfig = useRef({
-        itemVisiblePercentThreshold: 70,
-        minimumViewTime: 250,
-    }).current;
-    const onViewableItemsChanged = useRef(({ viewableItems }) => {
-        const visibleCard = viewableItems.find(({ isViewable }) => isViewable);
-        const nextId = visibleCard?.item?._id ?? null;
-        setActiveAutoplayCardId(currentId => currentId === nextId ? currentId : nextId);
-    }).current;
 
     const isFetchingRef = useRef(false);
     const isFetchingFilterRef = useRef(false);
@@ -147,6 +153,14 @@ const BanquetHalls = () => {
     const hasMoreFilterRef = useRef(true);
     const totalFilterPagesRef = useRef(0);
     const isFilterAppliedRef = useRef(false);
+    const authTokenRef = useRef(null);
+
+    const getCachedAuthToken = useCallback(async () => {
+        if (authTokenRef.current) return authTokenRef.current;
+        const token = await getUserAuthToken();
+        authTokenRef.current = token;
+        return token;
+    }, []);
 
     useEffect(() => { getAllEvents(1); getAllLocations(); }, []);
 
@@ -154,15 +168,16 @@ const BanquetHalls = () => {
         if (isFetchingRef.current) return;
         isFetchingRef.current = true;
         setLoading(true);
-        const token = await getUserAuthToken();
         try {
+            const token = await getCachedAuthToken();
             const response = await axios.get(
                 `${BASE_URL}/filterFunctionHalls`,
                 {
                     params: {
                         page,
-                        limit: 10,
+                        limit: PAGE_SIZE,
                         venueCategory: "Banquet Hall",
+                        cardView: 'true',
                     },
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -172,18 +187,24 @@ const BanquetHalls = () => {
             const allData = Array.isArray(response?.data?.data) ? response.data.data : [];
             const newData = allData.filter(item => item?.venueCategory === VENUE_CATEGORY);
             const total = response?.data?.totalPages ?? 0;
+            const totalItems = Number(response?.data?.totalItems ?? newData.length);
             currentPageRef.current = page;
             totalEventPagesRef.current = total;
             hasMoreRef.current = page < total;
             setCurrentPage(page); setTotalEventPages(total); setHasMore(page < total);
-            setEventsData(prev => page === 1 ? newData : [...prev, ...newData]);
+            setTotalEventItems(Number.isFinite(totalItems) ? totalItems : newData.length);
+            setEventsData(prev => {
+                if (page === 1) return newData;
+                const existingIds = new Set(prev.map(item => String(item?._id)));
+                return [...prev, ...newData.filter(item => !existingIds.has(String(item?._id)))];
+            });
         } catch (e) { console.error('FarmHouse fetch error:', e); }
         finally { isFetchingRef.current = false; setLoading(false); }
     };
 
     const getAllEventsByLocation = async (value) => {
-        const token = await getUserAuthToken();
         try {
+            const token = await getCachedAuthToken();
             const res = await axios.get(`${BASE_URL}/getAllFunctionHallsByLocation/${value}`,
                 { headers: { Authorization: `Bearer ${token}` } });
             setLocationBasedData((res?.data?.data ?? []).filter(i => i?.venueCategory === VENUE_CATEGORY));
@@ -191,8 +212,8 @@ const BanquetHalls = () => {
     };
 
     const getAllLocations = async () => {
-        const token = await getUserAuthToken();
         try {
+            const token = await getCachedAuthToken();
             const res = await axios.get(`${BASE_URL}/user/locationList`, { headers: { Authorization: `Bearer ${token}` } });
             setAllLocations(res?.data?.data ?? []);
         } catch (e) { console.error(e); }
@@ -202,7 +223,6 @@ const BanquetHalls = () => {
         if (isFetchingFilterRef.current) return;
         isFetchingFilterRef.current = true;
         setFilterDataLoading(true);
-        const token = await getUserAuthToken();
         const qp = new URLSearchParams();
         qp.append('venueCategory', VENUE_CATEGORY);
         if (isACSelected !== null) qp.append('ac', isACSelected === 'AC');
@@ -216,7 +236,9 @@ const BanquetHalls = () => {
         qp.append('withFoodOnly', switchCateringVal);
         qp.append('page', page);
         qp.append('limit', filterDataLimit);
+        qp.append('cardView', 'true');
         try {
+            const token = await getCachedAuthToken();
             const response = await axios.get(
                 `${BASE_URL}/filterFunctionHalls?${qp.toString()}`,
                 { headers: { Authorization: `Bearer ${token}` } },
@@ -224,13 +246,19 @@ const BanquetHalls = () => {
             const allData = response?.data?.data ?? [];
             const newData = allData.filter(item => item?.venueCategory === VENUE_CATEGORY);
             const total = response?.data?.totalPages ?? 1;
+            const totalItems = Number(response?.data?.totalItems ?? newData.length);
             filterPageRef.current = page;
             totalFilterPagesRef.current = total;
             hasMoreFilterRef.current = page < total;
             setFilterDataCurrentPage(page);
             setTotalFilterDataPages(total);
+            setTotalFilterItems(Number.isFinite(totalItems) ? totalItems : newData.length);
             setHasMoreFilterData(page < total);
-            setFilteredList(reset ? newData : prev => [...prev, ...newData]);
+            setFilteredList(prev => {
+                if (reset) return newData;
+                const existingIds = new Set(prev.map(item => String(item?._id)));
+                return [...prev, ...newData.filter(item => !existingIds.has(String(item?._id)))];
+            });
         } catch (e) { console.error(e); }
         finally { isFetchingFilterRef.current = false; setFilterDataLoading(false); }
     };
@@ -252,13 +280,13 @@ const BanquetHalls = () => {
         isFilterAppliedRef.current = false;
         currentPageRef.current = 1; hasMoreRef.current = true;
         totalEventPagesRef.current = 0; isFetchingRef.current = false;
-        setCurrentPage(1); setHasMore(true); getAllEvents(1);
+        setCurrentPage(1); setTotalEventItems(0); setHasMore(true); getAllEvents(1);
     };
     const applyFilters = () => {
         setFilteredList([]);
         filterPageRef.current = 1; hasMoreFilterRef.current = true;
         totalFilterPagesRef.current = 0; isFetchingFilterRef.current = false;
-        setFilterDataCurrentPage(1); setHasMoreFilterData(true);
+        setFilterDataCurrentPage(1); setTotalFilterItems(0); setHasMoreFilterData(true);
         fetchFilteredFunctionHalls(true, 1);
         actionSheetRef.current?.hide();
         setIsFilterApplied(true); isFilterAppliedRef.current = true;
@@ -292,9 +320,14 @@ const BanquetHalls = () => {
         if (query && nameFilteredData.length > 0) return `${nameFilteredData.length} Halls matching "${query}"`;
         if (query) return 'No banquet halls found';
         if (filteredList.length > 0 || isFilterApplied)
-            return filteredList.length === 0 ? 'No halls found' : `${filteredList.length} Halls found`;
-        return eventsData?.length === 0 ? 'No banquet halls found' : `${eventsData.length} Banquet Halls`;
-    }, [query, locationBasedData, nameFilteredData, filteredList, isFilterApplied, eventsData]);
+            return totalFilterItems === 0
+                ? 'No halls found'
+                : `${filteredList.length} of ${totalFilterItems} Filtered Banquet Halls`;
+        return totalEventItems === 0
+            ? 'No banquet halls found'
+            : `${eventsData.length} of ${totalEventItems} Banquet Halls`;
+    }, [query, locationBasedData, nameFilteredData, filteredList, isFilterApplied,
+        eventsData, totalEventItems, totalFilterItems]);
 
     const activeFilterCount = [selectedSeatingCapacity, selectedPriceRange, selectedChip, isACSelected, switchCateringVal || null].filter(Boolean).length;
     const keyExtractor = useCallback((item) => item._id, []);
@@ -304,44 +337,45 @@ const BanquetHalls = () => {
 
     const renderItem = useCallback(({ item }) => {
         const heroImage = item?.professionalImage?.url;
-        const imageUrls = [heroImage, ...(item?.additionalImages?.flat()?.map(img => img?.url) || [])].filter(Boolean);
-        const totalPhotos = imageUrls.length;
-        const hasVideo = item?.hallVideos?.length > 0;
-        const shouldAutoplay =
-            isScreenFocused &&
-            activeAutoplayCardId === item._id &&
-            imageUrls.length > 1;
+        const additionalImageCount = Number(item?.additionalImageCount);
+        const videoCount = Number(item?.videoCount);
+        const menuBased = item?.pricingType === 'menu_based' || item?.menuAvailable === true ||
+            mediaList(item?.menuImages).length > 0;
+        const menuPrice = startingMenuPrice(item);
+        const rent = positiveNumber(item?.rentPricePerDay);
+        const totalPhotos = (heroImage ? 1 : 0) +
+            (Number.isFinite(additionalImageCount)
+                ? additionalImageCount
+                : mediaList(item?.additionalImages).length);
+        const hasVideo = Number.isFinite(videoCount)
+            ? videoCount > 0
+            : mediaList(item?.hallVideos).length > 0;
         return (
             <View style={styles.card}>
                 <View style={styles.cardImageWrapper}>
-                    <Swiper
-                        key={`${item._id}-${shouldAutoplay ? 'playing' : 'paused'}`}
-                        loop={true}
-                        autoplay={shouldAutoplay}
-                        autoplayTimeout={4}
-                        showsPagination={true}
-                        activeDotColor="#fff"
-                        dotColor="rgba(255,255,255,0.5)"
-                        activeDotStyle={{ width: 12, height: 6, borderRadius: 3 }}
-                        dotStyle={{ width: 6, height: 6, borderRadius: 3 }}
-                        paginationStyle={{ bottom: 10 }}
-                        style={{ height: 200 }}
-                    >
-                        {imageUrls.map((imgUrl, idx) => (
-                            <TouchableOpacity
-                                key={idx}
-                                activeOpacity={0.93}
-                                onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}
-                                style={{ flex: 1 }}
-                            >
-                                <FastImage
-                                    source={{ uri: imgUrl, priority: FastImage.priority.normal }}
-                                    style={styles.cardImage}
-                                    resizeMode={FastImage.resizeMode.cover}
-                                />
-                            </TouchableOpacity>
-                        ))}
-                    </Swiper>
+                    {heroImage ? (
+                        <TouchableOpacity
+                            activeOpacity={0.93}
+                            onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}
+                            style={styles.cardImageWrapper}>
+                            <FastImage
+                                source={{
+                                    uri: heroImage,
+                                    priority: FastImage.priority.normal,
+                                    cache: FastImage.cacheControl.immutable,
+                                }}
+                                style={styles.cardImage}
+                                resizeMode={FastImage.resizeMode.cover}
+                            />
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity
+                            style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#EBEBEB' }}
+                            onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}>
+                            <IonIcon name="image-outline" size={36} color="#939393" />
+                            <Text style={[styles.addressText, { flex: 0, marginTop: 8 }]}>Photo not available</Text>
+                        </TouchableOpacity>
+                    )}
                     <LinearGradient colors={['transparent', 'rgba(26,8,8,0.72)']} style={styles.cardImageGradient} pointerEvents="none" />
                     <View style={styles.banquetBadge}>
                         <IonIcon name="ribbon" size={10} color="#fff" />
@@ -353,23 +387,31 @@ const BanquetHalls = () => {
                             <Text style={styles.badgeText}>Video</Text>
                         </View>
                     )}
-                    <View style={styles.photoBadge}>
-                        <IonIcon name="images-outline" size={11} color="#fff" />
-                        <Text style={styles.badgeText}>{totalPhotos}</Text>
-                    </View>
-                    <View style={styles.priceOverlay}>
-                        {item?.menuImages?.length > 0
-                            ? <Text style={styles.priceText}>Menu Based</Text>
-                            : <Text style={styles.priceText}>{formatAmount(item?.rentPricePerDay)}<Text style={styles.priceUnit}>/day</Text></Text>}
-                    </View>
+                    {totalPhotos > 0 && (
+                        <View style={styles.photoBadge}>
+                            <IonIcon name="images-outline" size={11} color="#fff" />
+                            <Text style={styles.badgeText}>{totalPhotos}</Text>
+                        </View>
+                    )}
                 </View>
                 <TouchableOpacity activeOpacity={0.93}
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}>
                     <View style={styles.cardBody}>
-                        <Text style={styles.cardTitle} numberOfLines={1}>{item?.functionHallName}</Text>
+                        <View style={styles.cardTitleRow}>
+                            <Text style={styles.cardTitle} numberOfLines={2}>{item?.functionHallName}</Text>
+                            <View style={styles.priceOverlay}>
+                                {menuBased
+                                    ? menuPrice !== null
+                                        ? <Text style={styles.priceText}>From {formatPlatePrice(menuPrice)}<Text style={styles.priceUnit}>/plate</Text></Text>
+                                        : <Text style={styles.priceText}>Menu price on request</Text>
+                                    : rent !== null
+                                        ? <Text style={styles.priceText}>{formatAmount(rent)}<Text style={styles.priceUnit}>/day</Text></Text>
+                                        : <Text style={styles.priceText}>Price on request</Text>}
+                            </View>
+                        </View>
                         <View style={styles.addressRow}>
                             <LocationMarkIcon width={12} height={12} />
-                            <Text numberOfLines={1} style={styles.addressText}>{item?.functionHallAddress?.address}</Text>
+                            <Text numberOfLines={1} style={styles.addressText}>{venueLocality(item)}</Text>
                         </View>
                         <View style={styles.chipsRow}>
                             {item?.seatingCapacity ? (
@@ -395,7 +437,7 @@ const BanquetHalls = () => {
                 </TouchableOpacity>
             </View>
         );
-    }, [navigation, activeAutoplayCardId, isScreenFocused]);
+    }, [navigation]);
 
     const isApplyDisabled = !selectedPriceRange && !selectedSeatingCapacity && isACSelected === null && !selectedChip && !switchCateringVal;
 
@@ -551,7 +593,7 @@ const BanquetHalls = () => {
                                         <IonIcon name="business-outline" size={13} color="#939393" style={{ marginRight: 8 }} />
                                         <View style={{ flex: 1 }}>
                                             <Text style={styles.dropdownText} numberOfLines={1}>{item.functionHallName}</Text>
-                                            <Text style={styles.dropdownSubText} numberOfLines={1}>{item?.functionHallAddress?.address}</Text>
+                                            <Text style={styles.dropdownSubText} numberOfLines={1}>{venueLocality(item)}</Text>
                                         </View>
                                         <IonIcon name="chevron-forward" size={12} color="#ccc" />
                                     </TouchableOpacity>))}
@@ -589,18 +631,16 @@ const BanquetHalls = () => {
                         keyExtractor={keyExtractor}
                         onScroll={handleListScroll}
                         scrollEventThrottle={16}
-                        onViewableItemsChanged={onViewableItemsChanged}
-                        viewabilityConfig={viewabilityConfig}
-                        extraData={`${activeAutoplayCardId}-${isScreenFocused}`}
                         onEndReached={onEndReached}
-                        onEndReachedThreshold={0.6}
+                        onEndReachedThreshold={0.8}
                         ListFooterComponent={ListFooter}
                         ListEmptyComponent={ListEmpty}
                         contentContainerStyle={styles.listContent}
                         removeClippedSubviews={true}
-                        maxToRenderPerBatch={6}
-                        windowSize={10}
-                        initialNumToRender={5}
+                        maxToRenderPerBatch={5}
+                        updateCellsBatchingPeriod={50}
+                        windowSize={7}
+                        initialNumToRender={4}
                         showsVerticalScrollIndicator={false}
                     />
                 )}
@@ -654,11 +694,12 @@ const styles = StyleSheet.create({
     videoBadge: { position: 'absolute', top: 12, left: 86, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(236,167,60,0.85)', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 20 },
     photoBadge: { position: 'absolute', bottom: 10, left: 12, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(0,0,0,0.45)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20 },
     badgeText: { color: '#fff', fontSize: 11, fontWeight: '700', fontFamily: 'ManropeRegular' },
-    priceOverlay: { position: 'absolute', bottom: 10, right: 12, backgroundColor: 'rgba(26,8,8,0.7)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
-    priceText: { color: '#fff', fontSize: 13, fontWeight: '800', fontFamily: 'ManropeRegular' },
-    priceUnit: { fontSize: 10, fontWeight: '400', color: 'rgba(255,255,255,0.75)' },
+    priceOverlay: { flexShrink: 0, maxWidth: '52%', alignItems: 'flex-end' },
+    priceText: { color: BH_ACCENT, fontSize: 13, fontWeight: '800', fontFamily: 'ManropeRegular', textAlign: 'right' },
+    priceUnit: { fontSize: 10, fontWeight: '400', color: BH_ACCENT },
     cardBody: { padding: 14 },
-    cardTitle: { fontFamily: 'ManropeRegular', fontSize: 15, fontWeight: '700', color: BH_DARK, marginBottom: 6 },
+    cardTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 },
+    cardTitle: { fontFamily: 'ManropeRegular', fontSize: 15, fontWeight: '700', color: BH_DARK, flex: 1, marginRight: 8 },
     addressRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 10 },
     addressText: { fontSize: 12, color: '#939393', fontFamily: 'ManropeRegular', flex: 1 },
     chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },

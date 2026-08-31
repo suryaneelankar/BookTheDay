@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, FlatList, SafeAreaView, ActivityIndicator } from 'react-native';
-import BASE_URL, { LocalHostUrl } from "../../apiconfig";
+import BASE_URL from "../../apiconfig";
 import axios from "axios";
 import { useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../utils/GlobalFunctions';
@@ -9,130 +9,69 @@ import LocationMarkIcon from '../../assets/svgs/location.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import FastImage from "react-native-fast-image";
 import { useSelector } from "react-redux";
-import themevariable from "../../utils/themevariable";
-import Autocomplete from 'react-native-autocomplete-input';
-import IonIcon from 'react-native-vector-icons/Ionicons';
 import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
 import VegIcon from '../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 import DistanceIcon from '../../assets/svgs/distanceIcon.svg';
+import themevariable from "../../utils/themevariable";
 
 const NearByEvents = () => {
     const navigation = useNavigation();
     const [eventsData, setEventsData] = useState([]);
-    const [getUserAuth, setGetUserAuth] = useState('');
     const [loading, setLoading] = useState(false);
     const userLocationFetched = useSelector((state) => state.userLocation);
-    const [allLocations, setAllLocations] = useState([]);
-    const [query, setQuery] = useState('');
-    const [dropdownVisible, setDropdownVisible] = useState(false);
     const [locationBasedData, setLoactionBasedData] = useState([]);
-    const latitude = userLocationFetched?.geometry?.location?.lat ? userLocationFetched?.geometry?.location?.lat : userLocationFetched?.latitude;
-    const longitude = userLocationFetched?.geometry?.location?.lng ? userLocationFetched?.geometry?.location?.lng : userLocationFetched?.longitude
-
+    const [query] = useState('');
+    const latitude = userLocationFetched?.geometry?.location?.lat ?? userLocationFetched?.latitude;
+    const longitude = userLocationFetched?.geometry?.location?.lng ?? userLocationFetched?.longitude;
 
     useEffect(() => {
         getAllEvents();
-        getAllLocations();
-    }, [])
+    }, []);
 
-    // This function loads more nearby function halls and ensures the page is incremented correctly
     const getAllEvents = async () => {
         setLoading(true);
         const token = await getUserAuthToken();
-        setGetUserAuth(token);
         try {
             const response = await axios.get(`${BASE_URL}/getNearByFunctionHalls?latitude=${latitude}&longitude=${longitude}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
             });
-
             const newFunctionHalls = Array.isArray(response?.data?.data) ? response?.data?.data : [];
-            // console.log("neareby loc events:::::::;", newFunctionHalls)
-            if (response?.data?.data?.length > 0) {
-                setEventsData(newFunctionHalls); // Append new data
+            if (newFunctionHalls.length > 0) {
+                setEventsData(newFunctionHalls);
             }
         } catch (error) {
-            setLoading(false);
             console.error('Error fetching function halls:', error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
-    const getAllEventsByLocation = async (value) => {
-        const token = await getUserAuthToken();
-        try {
-            const response = await axios.get(`${BASE_URL}/getAllFunctionHallsByLocation/${value}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            // console.log("location select res:::::::", response);
-            setLoactionBasedData(response?.data?.data);
-        } catch (error) {
-            setLoading(false);
-            console.error('Error fetching function halls:', error);
-        }
-        setLoading(false);
-    };
-
-    const getAllLocations = async () => {
-        const token = await getUserAuthToken();
-        try {
-            const response = await axios.get(`${BASE_URL}/user/locationList`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            // console.log("all locations resL::::", response?.data);
-            setAllLocations(response?.data?.data);
-        } catch (error) {
-            setLoading(false);
-            console.error('Error fetching function halls:', error);
-        }
-        setLoading(false);
-    };
-    const filteredData = allLocations?.filter(item =>
-        item?.value.toLowerCase().includes(query.toLowerCase())
-    );
-
-    const renderItem = ({ item }) => {
-
-        // console.log('items in nearby is::>>',item?.menuImages);
-
-        // const convertLocalhostUrls = (url) => {
-        //     return url?.replace("localhost", LocalHostUrl);
-        // };
+    const renderItem = useCallback(({ item }) => {
         const professionalImageUrl = item?.professionalImage?.url;
-
         const imageUrls = [
             professionalImageUrl,
-            ...item?.additionalImages.flat().map(image => image?.url)
-        ];
-        // console.log("imageUrls ::", imageUrls);
+            ...item?.additionalImages.flat().map(image => image?.url),
+        ].filter(Boolean);
+
         return (
             <View style={{ flex: 1, borderRadius: 20 }}>
                 <View style={[styles.container]}>
                     <Swiper
                         style={styles.wrapper}
                         loop={true}
-                        // autoplay={true}
-                        onIndexChanged={() => { }}
                         activeDotColor="#FFFFFF"
                         dotColor="#FFFFFF"
                         activeDotStyle={{ width: 12, height: 12, borderRadius: 6 }}
                         dot={<View style={{ backgroundColor: '#FFFFFF', width: 7, height: 7, borderRadius: 6, marginHorizontal: 8 }} />}
+                        loadMinimal
+                        loadMinimalSize={1}
                     >
                         {imageUrls.map((itemData, index) => (
                             <TouchableOpacity style={styles.slide} key={index}
                                 onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
                             >
-                                <FastImage source={{
-                                    uri: itemData,
-                                    // headers: { Authorization: `Bearer ${getUserAuth}` }
-                                }} style={styles.image} />
+                                <FastImage source={{ uri: itemData }} style={styles.image} />
                             </TouchableOpacity>
                         ))}
                     </Swiper>
@@ -141,34 +80,34 @@ const NearByEvents = () => {
                     onPress={() => navigation.navigate('ViewEvents', { categoryId: item?._id })}
                     style={{ width: Dimensions.get('window').width - 30, padding: 15, bottom: 15, alignSelf: 'center', backgroundColor: '#FFFFFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
-                        <View style={{ width: '60%', }}>
-                            <Text style={{ color: '#101010', fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular" }} >{item?.functionHallName}</Text>
+                        <View style={{ width: '60%' }}>
+                            <Text style={{ color: '#101010', fontSize: 16, fontWeight: "700", fontFamily: "ManropeRegular" }}>{item?.functionHallName}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
                                 <LocationMarkIcon />
                                 <Text numberOfLines={1} ellipsizeMode='tail' style={{ width: "90%", fontWeight: '400', marginHorizontal: 5, color: '#939393', fontSize: 13, fontFamily: "ManropeRegular" }}>{item?.county}</Text>
                             </View>
                         </View>
                         <View>
-                            {item?.menuImages && item?.menuImages.length > 0 ? <Text style={{ color: '#FD813B', fontFamily: "ManropeRegular", fontSize: 14, fontWeight: "700" }}>Menu based</Text> :
-                                <Text style={{ fontWeight: '800', color: '#FD813B', fontSize: 14, fontFamily: "ManropeRegular" }}>{formatAmount(item?.rentPricePerDay)}<Text style={{ color: '#FD813B', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}> /day</Text></Text>
+                            {item?.menuImages && item?.menuImages.length > 0
+                                ? <Text style={{ color: '#FD813B', fontFamily: "ManropeRegular", fontSize: 14, fontWeight: "700" }}>Menu based</Text>
+                                : <Text style={{ fontWeight: '800', color: '#FD813B', fontSize: 14, fontFamily: "ManropeRegular" }}>{formatAmount(item?.rentPricePerDay)}<Text style={{ color: '#FD813B', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400" }}> /day</Text></Text>
                             }
                         </View>
                     </View>
-
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', flexShrink: 1 }}>
-                        {/* Other Views */}
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
                             <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}> {item?.seatingCapacity} pax</Text>
                         </View>
                         <View style={{ flexDirection: 'row', alignSelf: "center", alignItems: "center", marginHorizontal: 5, backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, paddingVertical: 8 }}>
                             <DistanceIcon />
                             <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400", marginHorizontal: 5 }}>
-                                {item?.distance !== undefined && item?.distance !== null ? `${item.distance.toFixed(1)} km` : 'N/A'}</Text>
+                                {item?.distance !== undefined && item?.distance !== null ? `${item.distance.toFixed(1)} km` : 'N/A'}
+                            </Text>
                         </View>
                         <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 15, paddingHorizontal: 10, alignItems: "center" }}>
-                            <Text>{item?.foodType == 'Both' ? <VegNonVegIcon /> : item?.foodType == 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
+                            <Text>{item?.foodType === 'Both' ? <VegNonVegIcon /> : item?.foodType === 'veg' ? <VegIcon /> : <NonVegIcon />}</Text>
                             <Text style={{ marginHorizontal: 5, color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 11, fontWeight: "400" }}>
-                                {item?.foodType == 'Both' ? 'VEG/NON-VEG' : item?.foodType == 'veg' ? 'VEG' : 'NON-VEG'}
+                                {item?.foodType === 'Both' ? 'VEG/NON-VEG' : item?.foodType === 'veg' ? 'VEG' : 'NON-VEG'}
                             </Text>
                         </View>
                     </View>
@@ -176,99 +115,52 @@ const NearByEvents = () => {
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', flexShrink: 1, marginTop: 5 }}>
                             <View style={{ flexDirection: 'row', backgroundColor: "#FEF7DE", borderRadius: 20, paddingHorizontal: 5, paddingVertical: 5, marginTop: 5, alignItems: "center" }}>
                                 <Text style={{ color: '#4A4A4A', fontFamily: "ManropeRegular", fontSize: 12, fontWeight: "400", padding: 4 }}>
-                                    {item?.bedRooms} {item?.bedRooms > 1 ? 'Rooms' : 'Room'}</Text>
+                                    {item?.bedRooms} {item?.bedRooms > 1 ? 'Rooms' : 'Room'}
+                                </Text>
                             </View>
-                        </View>}
-
+                        </View>
+                    }
                 </TouchableOpacity>
             </View>
-        )
-    }
+        );
+    }, [navigation]);
 
+    const keyExtractor = useCallback((item) => item._id, []);
 
-    const returnCategoriesCount = () => {
-        let count = 0;
-        count = query ? locationBasedData?.length : eventsData?.length;
-        return count;
-    };
-
-    const handleQueryChange = (text) => {
-        setQuery(text);
-        if (text.length > 0) {
-            setDropdownVisible(true);  // Show dropdown when typing
-        } else {
-            setDropdownVisible(false);  // Hide dropdown if query is cleared
-        }
-    };
-
-    const handleSelect = (value) => {
-        setQuery(value);  // Set query to selected item value
-        setDropdownVisible(false);  // Hide dropdown after selection
-        if (value) {
-            getAllEventsByLocation(value)
-        }
-    };
+    const listData = query ? locationBasedData : eventsData;
+    const countText = useMemo(() => `${listData?.length ?? 0} Function Halls in Hyderabad`, [listData]);
 
 
     return (
         <SafeAreaView style={{ flex: 1, marginBottom: "10%" }}>
-            {/* <View style={styles.autocompleteContainer}>
-                <Autocomplete
-                    data={dropdownVisible && filteredData?.length > 0 ? filteredData : []}  // Conditionally hide results based on dropdownVisible
-                    value={query}
-                    onChangeText={handleQueryChange}  // Handle query changes
-                    placeholder="Search Location..."
-                    flatListProps={{
-                        keyExtractor: (item) => item?._id.toString(),
-                        renderItem: ({ item }) => (
-                            <TouchableOpacity onPress={() => handleSelect(item?.value)}>
-                                <Text style={{ padding: 10, fontSize: 12, color: "#000000", fontFamily: "ManropeRegular" }}>{item?.value}</Text>
-                            </TouchableOpacity>
-                        ),
-                    }}
-                    inputContainerStyle={{
-                        borderRadius: 15,
-                        height: 50,
-                        width: "90%",
-                        alignSelf: "center",
-                        marginTop: 10,
-                        backgroundColor: "#E3E3E7",
-
-                    }}
-                    style={{ marginTop: 3, borderRadius: 15, width: "90%", alignSelf: "center", backgroundColor: "#E3E3E7" }}
-                    hideResults={dropdownVisible === false || filteredData.length === 0}  // Hide results initially and when dropdownVisible is false
-                />
-                <TouchableOpacity style={{ position: 'absolute', justifyContent: 'flex-end', right: 30, marginTop: 20 }} onPress={() => {
-                    setQuery(''); // Clear the input value
-                    // You can also set dropdownVisible to false if needed
-                }}>
-                    <IonIcon name="close-circle" size={24} color="gray" style={{ marginTop: 0 }} />
-                </TouchableOpacity>
-            </View> */}
-
             <View style={{ marginHorizontal: 20, justifyContent: 'space-between', flexDirection: 'row' }}>
                 <View>
-                    <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular", }}>Near your location</Text>
-                    <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "400", fontFamily: "ManropeRegular", }}>{returnCategoriesCount()} Function Halls in Hyderabad</Text>
+                    <Text style={{ marginTop: 15, color: "#333333", fontSize: 16, fontWeight: "800", fontFamily: "ManropeRegular" }}>Near your location</Text>
+                    <Text style={{ marginTop: 15, color: "#7D7F88", bottom: 10, fontSize: 13, fontWeight: "400", fontFamily: "ManropeRegular" }}>{countText}</Text>
                 </View>
             </View>
 
             <FlatList
-                data={query ? locationBasedData : eventsData}
+                data={listData}
                 renderItem={renderItem}
-                keyExtractor={(item) => item._id}
+                keyExtractor={keyExtractor}
+                windowSize={5}
+                maxToRenderPerBatch={4}
+                initialNumToRender={4}
+                removeClippedSubviews={true}
+                showsVerticalScrollIndicator={false}
                 ListFooterComponent={() =>
                     loading ? <ActivityIndicator size="large" color="orange" /> : null
                 }
                 ListEmptyComponent={
                     <View style={{ alignItems: "center", alignSelf: "center", justifyContent: "center" }}>
-                        <Text style={{ color: "#333333", fontSize: 14, fontWeight: "400", fontFamily: 'ManropeRegular', }}>No Function halls found</Text>
+                        <Text style={{ color: "#333333", fontSize: 14, fontWeight: "400", fontFamily: 'ManropeRegular' }}>No Function halls found</Text>
                     </View>
                 }
             />
         </SafeAreaView>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     calendarViewStyle: {

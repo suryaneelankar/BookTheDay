@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   message: {
     fontFamily: 'ManropeRegular',
-    fontWeight: '500',
+    fontWeight: '400',
     fontSize: 14,
     color: '#7E8389',
     textAlign: 'center',

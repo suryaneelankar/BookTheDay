@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import BASE_URL from "../../apiconfig";
 import axios from "axios";
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { formatAmount } from '../../utils/GlobalFunctions';
 import LocationMarkIcon from '../../assets/svgs/location.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
@@ -29,10 +29,10 @@ import VegIcon from '../../assets/svgs/foodtype/veg.svg';
 import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 import FloatingCloseButton from "./floatingCloseButton";
 import LinearGradient from "react-native-linear-gradient";
-import Swiper from "react-native-swiper";
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 32;
+const PAGE_SIZE = 20;
 
 const seatingCapacity = ['50-100', '100-200', '200-400', '400-600', '600-800', '800-1000', '1000-1200', '1200+'];
 const priceRanges = ['10k-50k', '50k-1L', '1L-2L', '2L-3L', '3L-5L', '5L-10L', '10L-12L', '12L-15L', '15L-20L', '20L+'];
@@ -45,6 +45,23 @@ const categoryPriceMapping = {
     Budget: '50k-1L', Standard: '2L-3L',
     Premium: '5L-10L', Luxury: '12L-15L', Elite: '20L+',
 };
+
+// Card display helpers; no changes to requests, filters or existing styles.
+const cleanText = value => typeof value === 'string' ? value.trim() : '';
+const venueLocality = item => cleanText(item?.county) || cleanText(item?.locality) ||
+    cleanText(item?.functionHallAddress?.city) || 'Location not provided';
+const mediaList = value => Array.isArray(value) ? value.flat(Infinity).filter(Boolean) : [];
+const positiveNumber = value => {
+    if (!['string', 'number'].includes(typeof value)) return null;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+};
+const startingMenuPrice = item => {
+    const prices = mediaList(item?.menuImages).map(menu => positiveNumber(menu?.menuPrice))
+        .filter(price => price !== null);
+    return prices.length ? Math.min(...prices) : null;
+};
+const formatPlatePrice = price => `₹${price.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
 
 // ─── Skeleton card shown while first page loads ───────────────────────────────
 const SkeletonCard = () => (
@@ -64,7 +81,6 @@ const SkeletonCard = () => (
 
 const Events = () => {
     const navigation = useNavigation();
-    const isScreenFocused = useIsFocused();
     const actionSheetRef = useRef(null);
     const userLocationFetched = useSelector((state) => state.userLocation);
     const heroProgress = useRef(new Animated.Value(0)).current;
@@ -126,31 +142,20 @@ const Events = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [totalEventPages, setTotalEventPages] = useState(0);
+    const [totalEventItems, setTotalEventItems] = useState(0);
     const [filterDataCurrentPage, setFilterDataCurrentPage] = useState(1);
-    const [filterDataLimit] = useState(10);
+    const [filterDataLimit] = useState(PAGE_SIZE);
     const [hasMoreFilterData, setHasMoreFilterData] = useState(true);
     const [filterDataLoading, setFilterDataLoading] = useState(false);
     const [isFilterApplied, setIsFilterApplied] = useState(false);
     const [totalFilterDataPages, setTotalFilterDataPages] = useState(0);
+    const [totalFilterItems, setTotalFilterItems] = useState(0);
 
     // UI states
     const [loading, setLoading] = useState(false);
     const [query, setQuery] = useState('');
     const [dropdownVisible, setDropdownVisible] = useState(false);
     const [getUserAuth, setGetUserAuth] = useState('');
-    const [activeAutoplayCardId, setActiveAutoplayCardId] = useState(null);
-
-    // Only one card that remains mostly visible is allowed to autoplay.
-    // Stable refs ensure the existing FlatList is not recreated while scrolling.
-    const viewabilityConfig = useRef({
-        itemVisiblePercentThreshold: 70,
-        minimumViewTime: 250,
-    }).current;
-    const onViewableItemsChanged = useRef(({ viewableItems }) => {
-        const visibleCard = viewableItems.find(({ isViewable }) => isViewable);
-        const nextId = visibleCard?.item?._id ?? null;
-        setActiveAutoplayCardId(currentId => currentId === nextId ? currentId : nextId);
-    }).current;
 
     // ── Refs: hold latest pagination values without stale-closure issues ──────
     // These mirror the state values so callbacks always read the current value
@@ -163,6 +168,16 @@ const Events = () => {
     const hasMoreFilterRef = useRef(true);
     const totalFilterPagesRef = useRef(0);
     const isFilterAppliedRef = useRef(false);
+    const authTokenRef = useRef(null);
+
+    const getCachedAuthToken = useCallback(async () => {
+        if (authTokenRef.current) return authTokenRef.current;
+
+        const token = await getUserAuthToken();
+        authTokenRef.current = token;
+        setGetUserAuth(token);
+        return token;
+    }, []);
 
     useEffect(() => {
         getAllEvents(1);
@@ -174,16 +189,16 @@ const Events = () => {
         if (isFetchingRef.current) return;
         isFetchingRef.current = true;
         setLoading(true);
-        const token = await getUserAuthToken();
-        setGetUserAuth(token);
         try {
+            const token = await getCachedAuthToken();
             const response = await axios.get(
                 `${BASE_URL}/filterFunctionHalls`,
                 {
                     params: {
                         page,
-                        limit: 10,
+                        limit: PAGE_SIZE,
                         venueCategory: 'Function Hall',
+                        cardView: 'true',
                     },
                     headers: { Authorization: `Bearer ${token}` },
                 },
@@ -191,6 +206,7 @@ const Events = () => {
             const allData = Array.isArray(response?.data?.data) ? response.data.data : [];
             const newData = allData.filter(item => item?.venueCategory === 'Function Hall');
             const total = response?.data?.totalPages ?? 0;
+            const totalItems = Number(response?.data?.totalItems ?? newData.length);
 
             currentPageRef.current = page;
             totalEventPagesRef.current = total;
@@ -198,8 +214,17 @@ const Events = () => {
 
             setCurrentPage(page);
             setTotalEventPages(total);
+            setTotalEventItems(Number.isFinite(totalItems) ? totalItems : newData.length);
             setHasMore(page < total);
-            setEventsData(prev => page === 1 ? newData : [...prev, ...newData]);
+            setEventsData(prev => {
+                if (page === 1) return newData;
+
+                const existingIds = new Set(prev.map(item => String(item?._id)));
+                return [
+                    ...prev,
+                    ...newData.filter(item => !existingIds.has(String(item?._id))),
+                ];
+            });
         } catch (e) {
             console.error('Error fetching function halls:', e);
         } finally {
@@ -209,8 +234,8 @@ const Events = () => {
     };
 
     const getAllEventsByLocation = async (value) => {
-        const token = await getUserAuthToken();
         try {
+            const token = await getCachedAuthToken();
             const response = await axios.get(
                 `${BASE_URL}/getAllFunctionHallsByLocation/${value}`,
                 { headers: { Authorization: `Bearer ${token}` } },
@@ -222,8 +247,8 @@ const Events = () => {
     };
 
     const getAllLocations = async () => {
-        const token = await getUserAuthToken();
         try {
+            const token = await getCachedAuthToken();
             const response = await axios.get(
                 `${BASE_URL}/user/locationList`,
                 { headers: { Authorization: `Bearer ${token}` } },
@@ -239,7 +264,6 @@ const Events = () => {
         if (isFetchingFilterRef.current) return;
         isFetchingFilterRef.current = true;
         setFilterDataLoading(true);
-        const token = await getUserAuthToken();
         const queryParams = new URLSearchParams();
         queryParams.append('venueCategory', 'Function Hall');
         if (isACSelected !== null) queryParams.append('ac', isACSelected === 'AC');
@@ -253,7 +277,9 @@ const Events = () => {
         queryParams.append('withFoodOnly', switchCateringVal);
         queryParams.append('page', page);
         queryParams.append('limit', filterDataLimit);
+        queryParams.append('cardView', 'true');
         try {
+            const token = await getCachedAuthToken();
             const response = await axios.get(
                 `${BASE_URL}/filterFunctionHalls?${queryParams.toString()}`,
                 { headers: { Authorization: `Bearer ${token}` } },
@@ -261,6 +287,7 @@ const Events = () => {
             const allData = response?.data?.data ?? [];
             const newData = allData.filter(item => item?.venueCategory === 'Function Hall');
             const total = response?.data?.totalPages ?? 1;
+            const totalItems = Number(response?.data?.totalItems ?? newData.length);
 
             filterPageRef.current = page;
             totalFilterPagesRef.current = total;
@@ -268,8 +295,17 @@ const Events = () => {
 
             setFilterDataCurrentPage(page);
             setTotalFilterDataPages(total);
+            setTotalFilterItems(Number.isFinite(totalItems) ? totalItems : newData.length);
             setHasMoreFilterData(page < total);
-            setFilteredList(reset ? newData : prev => [...prev, ...newData]);
+            setFilteredList(prev => {
+                if (reset) return newData;
+
+                const existingIds = new Set(prev.map(item => String(item?._id)));
+                return [
+                    ...prev,
+                    ...newData.filter(item => !existingIds.has(String(item?._id))),
+                ];
+            });
         } catch (e) {
             console.error('Error fetching filtered halls:', e);
         } finally {
@@ -306,6 +342,7 @@ const Events = () => {
         totalEventPagesRef.current = 0;
         isFetchingRef.current = false;
         setCurrentPage(1);
+        setTotalEventItems(0);
         setHasMore(true);
         getAllEvents(1);
     };
@@ -318,6 +355,7 @@ const Events = () => {
         totalFilterPagesRef.current = 0;
         isFetchingFilterRef.current = false;
         setFilterDataCurrentPage(1);
+        setTotalFilterItems(0);
         setHasMoreFilterData(true);
         fetchFilteredFunctionHalls(true, 1);
         actionSheetRef.current?.hide();
@@ -383,9 +421,14 @@ const Events = () => {
         if (query)
             return 'No halls found';
         if (filteredList.length > 0 || isFilterApplied)
-            return filteredList.length === 0 ? 'No halls found' : `${filteredList.length} Filtered Halls`;
-        return eventsData?.length === 0 ? 'No halls found' : `${eventsData.length} Function Halls`;
-    }, [query, locationBasedData, nameFilteredData, filteredList, isFilterApplied, eventsData]);
+            return totalFilterItems === 0
+                ? 'No halls found'
+                : `${filteredList.length} of ${totalFilterItems} Filtered Halls`;
+        return totalEventItems === 0
+            ? 'No halls found'
+            : `${eventsData.length} of ${totalEventItems} Function Halls`;
+    }, [query, locationBasedData, nameFilteredData, filteredList, isFilterApplied,
+        eventsData, totalEventItems, totalFilterItems]);
 
     // active filter count badge
     const activeFilterCount = [selectedSeatingCapacity, selectedPriceRange, selectedChip,
@@ -403,47 +446,56 @@ const Events = () => {
     }, []); // empty deps — safe because handlers use refs
 
     // ─── Card ─────────────────────────────────────────────────────────────────
-    const renderItem = useCallback(({ item, index }) => {
+    const renderItem = useCallback(({ item }) => {
         const heroImage = item?.professionalImage?.url;
-        const imageUrls = [heroImage, ...(item?.additionalImages?.flat()?.map(img => img?.url) || [])].filter(Boolean);
-        const totalPhotos = imageUrls.length;
-        const hasVideo = item?.hallVideos?.length > 0;
-        const shouldAutoplay =
-            isScreenFocused &&
-            activeAutoplayCardId === item._id &&
-            imageUrls.length > 1;
+        const menuBased = item?.pricingType === 'menu_based' || item?.menuAvailable === true ||
+            mediaList(item?.menuImages).length > 0;
+        const menuPrice = startingMenuPrice(item);
+        const rent = positiveNumber(item?.rentPricePerDay);
+        const additionalImageCount = Number(item?.additionalImageCount);
+        const videoCount = Number(item?.videoCount);
+        const totalPhotos = (heroImage ? 1 : 0) +
+            (Number.isFinite(additionalImageCount)
+                ? additionalImageCount
+                : mediaList(item?.additionalImages).length);
+        const hasVideo = Number.isFinite(videoCount)
+            ? videoCount > 0
+            : mediaList(item?.hallVideos).length > 0;
 
         return (
             <View style={styles.card}>
-                {/* ── image swiper ── */}
+                {/* Use one cached cover image in the list. Full media stays in ViewEvents. */}
                 <View style={styles.cardImageWrapper}>
-                    <Swiper
-                        key={`${item._id}-${shouldAutoplay ? 'playing' : 'paused'}`}
-                        loop
-                        showsPagination
-                        activeDotColor="#fff"
-                        dotColor="rgba(255,255,255,0.5)"
-                        activeDotStyle={{ width: 12, height: 6, borderRadius: 3 }}
-                        dotStyle={{ width: 6, height: 6, borderRadius: 3 }}
-                        paginationStyle={{ bottom: 10 }}
-                        style={{ height: 200 }}
-                        autoplay={shouldAutoplay}
-                        autoplayTimeout={4}
-                    >
-                        {imageUrls.map((imgUrl, idx) => (
-                            <TouchableOpacity key={idx} activeOpacity={0.93}
-                                onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}
-                                style={{ flex: 1 }}>
-                                <FastImage source={{ uri: imgUrl, priority: FastImage.priority.normal }}
-                                    style={styles.cardImage} resizeMode={FastImage.resizeMode.cover} />
-                            </TouchableOpacity>
-                        ))}
-                    </Swiper>
+                    {heroImage ? (
+                        <TouchableOpacity
+                            activeOpacity={0.93}
+                            onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}
+                            style={styles.cardImageWrapper}>
+                            <FastImage
+                                source={{
+                                    uri: heroImage,
+                                    priority: FastImage.priority.normal,
+                                    cache: FastImage.cacheControl.immutable,
+                                }}
+                                style={styles.cardImage}
+                                resizeMode={FastImage.resizeMode.cover}
+                            />
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity
+                            style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#EBEBEB' }}
+                            onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}>
+                            <IonIcon name="image-outline" size={36} color="#939393" />
+                            <Text style={[styles.cardAddress, { flex: 0, marginTop: 8 }]}>Photo not available</Text>
+                        </TouchableOpacity>
+                    )}
                     <LinearGradient colors={['transparent', 'rgba(0,0,0,0.55)']} style={styles.cardImageGradient} pointerEvents="none" />
-                    <View style={styles.photoCountBadge}>
-                        <IonIcon name="images-outline" size={11} color="#fff" />
-                        <Text style={styles.photoCountText}>{totalPhotos}</Text>
-                    </View>
+                    {totalPhotos > 0 && (
+                        <View style={styles.photoCountBadge}>
+                            <IonIcon name="images-outline" size={11} color="#fff" />
+                            <Text style={styles.photoCountText}>{totalPhotos}</Text>
+                        </View>
+                    )}
                     {hasVideo && (
                         <View style={styles.videoBadge}>
                             <IonIcon name="videocam" size={11} color="#fff" />
@@ -465,9 +517,13 @@ const Events = () => {
                         <View style={styles.cardTitleRow}>
                             <Text style={styles.cardTitle} numberOfLines={2}>{item?.functionHallName}</Text>
                             <View style={styles.cardPriceWrap}>
-                                {item?.menuImages?.length > 0
-                                    ? <Text style={styles.cardPriceText}>Menu Based</Text>
-                                    : <Text style={styles.cardPriceText}>{formatAmount(item?.rentPricePerDay)}<Text style={styles.cardPriceUnit}>/day</Text></Text>
+                                {menuBased
+                                    ? menuPrice !== null
+                                        ? <Text style={styles.cardPriceText}>From {formatPlatePrice(menuPrice)}<Text style={styles.cardPriceUnit}>/plate</Text></Text>
+                                        : <Text style={styles.cardPriceText}>Menu price on request</Text>
+                                    : rent !== null
+                                        ? <Text style={styles.cardPriceText}>{formatAmount(rent)}<Text style={styles.cardPriceUnit}>/day</Text></Text>
+                                        : <Text style={styles.cardPriceText}>Price on request</Text>
                                 }
                             </View>
                         </View>
@@ -475,7 +531,7 @@ const Events = () => {
                         <View style={styles.cardAddressRow}>
                             <LocationMarkIcon width={12} height={12} />
                             <Text numberOfLines={1} style={styles.cardAddress}>
-                                {item?.functionHallAddress?.address}
+                                {venueLocality(item)}
                             </Text>
                         </View>
 
@@ -504,7 +560,7 @@ const Events = () => {
                 </TouchableOpacity>
             </View>
         );
-    }, [navigation, activeAutoplayCardId, isScreenFocused]);
+    }, [navigation]);
 
     const isApplyDisabled = !selectedPriceRange && !selectedSeatingCapacity &&
         isACSelected === null && !selectedChip && !switchCateringVal;
@@ -732,7 +788,7 @@ const Events = () => {
                                         <IonIcon name="business-outline" size={14} color="#939393" style={{ marginRight: 8 }} />
                                         <View style={{ flex: 1 }}>
                                             <Text style={styles.dropdownText} numberOfLines={1}>{item.functionHallName}</Text>
-                                            <Text style={styles.dropdownSubText} numberOfLines={1}>{item?.functionHallAddress?.address}</Text>
+                                            <Text style={styles.dropdownSubText} numberOfLines={1}>{venueLocality(item)}</Text>
                                         </View>
                                         <IonIcon name="chevron-forward" size={13} color="#ccc" />
                                     </TouchableOpacity>
@@ -776,18 +832,16 @@ const Events = () => {
                     keyExtractor={keyExtractor}
                     onScroll={handleListScroll}
                     scrollEventThrottle={16}
-                    onViewableItemsChanged={onViewableItemsChanged}
-                    viewabilityConfig={viewabilityConfig}
-                    extraData={`${activeAutoplayCardId}-${isScreenFocused}`}
                     onEndReached={onEndReached}
-                    onEndReachedThreshold={0.6}
+                    onEndReachedThreshold={0.8}
                     ListFooterComponent={ListFooter}
                     ListEmptyComponent={ListEmpty}
                     contentContainerStyle={styles.listContent}
                     removeClippedSubviews={true}
-                    maxToRenderPerBatch={6}
-                    windowSize={10}
-                    initialNumToRender={5}
+                    maxToRenderPerBatch={5}
+                    updateCellsBatchingPeriod={50}
+                    windowSize={7}
+                    initialNumToRender={4}
                     showsVerticalScrollIndicator={false}
                 />
             )}

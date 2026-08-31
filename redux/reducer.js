@@ -2,7 +2,7 @@ const initialState = {
     userId: '',
     deviceFCMToken: '',
     vendorLoggedInMobileNum: '',
-    userLocation: '',
+    userLocation: null,
     userLoggedInMobileNum: '',
     userCurrentLocation: '',
     userLoggedInName: '',

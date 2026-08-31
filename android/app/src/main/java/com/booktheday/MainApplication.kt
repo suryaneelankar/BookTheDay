@@ -11,6 +11,11 @@ import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
 import com.razorpay.rn.RazorpayPackage
 import com.dylanvann.fastimage.FastImageViewPackage;
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.media.AudioAttributes
+import android.media.RingtoneManager
+import android.os.Build
 
 class MainApplication : Application(), ReactApplication {
 
@@ -32,8 +37,37 @@ class MainApplication : Application(), ReactApplication {
   override val reactHost: ReactHost
     get() = getDefaultReactHost(applicationContext, reactNativeHost)
 
+  private fun createBookingNotificationChannel() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val soundUri = RingtoneManager.getDefaultUri(
+            RingtoneManager.TYPE_NOTIFICATION
+        )
+
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+
+        val channel = NotificationChannel(
+            "booking_reminders_v1",
+            "Booking notifications",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Booking requests, reminders and updates"
+            setSound(soundUri, audioAttributes)
+        }
+
+        val manager = getSystemService(
+            NotificationManager::class.java
+        )
+
+        manager.createNotificationChannel(channel)
+    }
+  }
+
   override fun onCreate() {
     super.onCreate()
+    createBookingNotificationChannel()
     SoLoader.init(this, false)
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
       // If you opted-in for the New Architecture, we load the native entry point for this app.

@@ -1,6 +1,5 @@
 import {
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   Text,
   View,
@@ -175,14 +174,7 @@ const VendorCategoryScreen = ({ navigation }) => {
   ];
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.categoryCard}
-      activeOpacity={0.88}
-      onPress={() =>
-        navigation.navigate(item.navScreen, {
-          isAadharUpdate: profileData?.aadharImage?.url ? true : false,
-        })
-      }>
+    <View style={styles.categoryCard}>
 
       {/* ── Image with overlaid info ── */}
       <View style={styles.categoryImageWrapper}>
@@ -191,10 +183,10 @@ const VendorCategoryScreen = ({ navigation }) => {
         {/* Dark scrim */}
         <View style={styles.categoryScrim} />
 
-        {/* Active badge top-right */}
+        {/* Listing type badge */}
         <View style={styles.activeBadge}>
-          <View style={styles.activeDot} />
-          <Text style={styles.activeBadgeText}>Active</Text>
+          <IonIcon name="business-outline" size={12} color="#FFFFFF" />
+          <Text style={styles.activeBadgeText}>VENUE SERVICE</Text>
         </View>
 
         {/* Title + subtitle bottom-left */}
@@ -213,7 +205,7 @@ const VendorCategoryScreen = ({ navigation }) => {
       <View style={styles.categoryBody}>
         <Text style={styles.categoryDescription}>{item.description}</Text>
 
-        {/* Feature chips */}
+        {/* Service capabilities */}
         <View style={styles.chipsRow}>
           {item.features.map((f, i) => (
             <View key={i} style={styles.chip}>
@@ -223,22 +215,39 @@ const VendorCategoryScreen = ({ navigation }) => {
           ))}
         </View>
 
-        {/* Divider */}
         <View style={styles.cardDivider} />
 
-        {/* CTA row */}
+        {/* Clear, separate actions */}
         <View style={styles.ctaRow}>
-          <View>
-            <Text style={styles.ctaLabel}>Ready to manage?</Text>
-            <Text style={styles.ctaHint}>Tap to open your listings</Text>
-          </View>
-          <View style={styles.ctaBtn}>
-            <Text style={styles.ctaBtnText}>Open</Text>
-            <IonIcon name="arrow-forward" size={14} color="#fff" />
+          <View style={styles.ctaCopy}>
+            <Text style={styles.ctaLabel}>Venue workspace</Text>
+            <Text style={styles.ctaHint}>Add a venue or update an existing listing</Text>
           </View>
         </View>
+
+        <View style={styles.categoryActions}>
+          <TouchableOpacity
+            activeOpacity={0.82}
+            style={styles.secondaryAction}
+            onPress={() => navigation.navigate('VendorVenueListings')}>
+            <IonIcon name="list-outline" size={16} color="#9A431B" />
+            <Text style={styles.secondaryActionText}>My Listings</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.82}
+            style={styles.primaryAction}
+            onPress={() =>
+              navigation.navigate(item.navScreen, {
+                isAadharUpdate: Boolean(profileData?.aadharImage?.url),
+              })
+            }>
+            <IonIcon name="add" size={18} color="#FFFFFF" />
+            <Text style={styles.primaryActionText}>Add Venue</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 
   return (
@@ -247,67 +256,126 @@ const VendorCategoryScreen = ({ navigation }) => {
         <LinearGradient
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
-          colors={['#FFF7E7', '#FFF7E7']}
+          colors={['#FAF7F4', '#F7F2EE']}
           style={[
             styles.background,
             pending > 0 && styles.backgroundWithPendingCard,
           ]}>
 
-          {/* Profile Header */}
-          <View style={styles.profileRow}>
-            <ProfileIcon />
-            <View style={{ flex: 1 }}>
-              <Text numberOfLines={2} style={styles.vendorNameText}>
-                Hi, {vendorLoggedInName}
+          {/* Vendor header */}
+          <LinearGradient
+            colors={['#7B3B20', '#A4542A']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.profileRow}>
+            <View style={styles.profileIconWrap}>
+              <ProfileIcon width={42} height={42} />
+            </View>
+
+            <View style={styles.profileCopy}>
+              <Text style={styles.welcomeLabel}>WELCOME BACK</Text>
+              <Text numberOfLines={1} style={styles.vendorNameText}>
+                {vendorLoggedInName || 'Vendor'}
               </Text>
               <Text style={styles.vendorPhoneText}>
                 +91 {vendorLoggedInMobileNum}
               </Text>
             </View>
-          </View>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={styles.listingsHeaderButton}
+              onPress={() => navigation.navigate('VendorVenueListings')}
+              accessibilityRole="button"
+              accessibilityLabel="Open my venue listings">
+              <IonIcon name="business-outline" size={18} color="#7B3518" />
+              <Text style={styles.listingsHeaderText}>My Listings</Text>
+            </TouchableOpacity>
+          </LinearGradient>
 
           {/* Bookings Overview */}
           <View style={styles.bookingsOverview}>
+            <View style={styles.sectionHeadingRow}>
+              <View>
+                <Text style={[styles.sectionEyebrow, styles.bookingEyebrow]}>
+                  BOOKING ACTIVITY
+                </Text>
+                <Text style={[styles.sectionTitle, styles.bookingTitle]}>
+                  Overview
+                </Text>
+              </View>
+              <TouchableOpacity
+                activeOpacity={0.75}
+                onPress={() => navigation.navigate('Events')}>
+                <Text style={styles.viewAllText}>View requests</Text>
+              </TouchableOpacity>
+            </View>
+
             <View style={styles.overviewCards}>
-              <View style={styles.overviewCard}>
+              <View style={[styles.overviewCard, styles.totalOverviewCard]}>
+                <View style={[styles.overviewIcon, styles.totalIcon]}>
+                  <IonIcon name="calendar-outline" size={16} color="#8A4A22" />
+                </View>
                 <Text style={styles.overviewCount}>{totalBookings}</Text>
-                <Text style={styles.overviewLabel}>Total Bookings</Text>
+                <Text style={styles.overviewLabel}>Total</Text>
               </View>
               <TouchableOpacity
                 onPress={() => navigation.navigate('Events')}
-                style={styles.overviewCard}>
+                activeOpacity={0.8}
+                style={[styles.overviewCard, styles.pendingOverviewCard]}>
+                <View style={[styles.overviewIcon, styles.pendingIcon]}>
+                  <IonIcon name="time-outline" size={16} color="#B25A1E" />
+                </View>
                 <Text style={styles.overviewCount}>{pending}</Text>
                 <Text style={styles.overviewLabel}>Pending</Text>
               </TouchableOpacity>
-              <View style={styles.overviewCard}>
+              <View style={[styles.overviewCard, styles.completedOverviewCard]}>
+                <View style={[styles.overviewIcon, styles.completedIcon]}>
+                  <IonIcon name="checkmark-circle-outline" size={16} color="#28754A" />
+                </View>
                 <Text style={styles.overviewCount}>{completed}</Text>
                 <Text style={styles.overviewLabel}>Completed</Text>
               </View>
             </View>
           </View>
 
-          {/* Vendor Categories */}
-          <Text style={styles.sectionTitle}>Vendor Categories</Text>
-          <FlatList
-            data={categoriesData}
-            renderItem={renderItem}
-            keyExtractor={item => item.id.toString()}
-            contentContainerStyle={styles.listContainer}
-            scrollEnabled={false}
-          />
+          {/* Venue management */}
+          <View style={styles.sectionHeadingRow}>
+            <View>
+              <Text style={styles.sectionEyebrow}>YOUR BUSINESS</Text>
+              <Text style={styles.sectionTitle}>Manage venues</Text>
+            </View>
+          </View>
+          <View style={styles.listContainer}>
+            {categoriesData.map(item => (
+              <View key={item.id}>{renderItem({ item })}</View>
+            ))}
+          </View>
 
           {/* Quick Tips */}
-          <View>
-            <Text style={styles.sectionTitle}>Quick Tips</Text>
-            <Text style={styles.tip}>
-              1. Update your profile regularly to attract more customers.
-            </Text>
-            <Text style={styles.tip}>
-              2. Respond to inquiries quickly to improve customer satisfaction.
-            </Text>
-            <Text style={styles.tip}>
-              3. Keep your pricing competitive for better conversions.
-            </Text>
+          <View style={styles.tipsSection}>
+            <Text style={styles.sectionEyebrow}>GROW YOUR BOOKINGS</Text>
+            <Text style={styles.sectionTitle}>Quick tips</Text>
+
+            <View style={styles.tipsCard}>
+              {[
+                ['images-outline', 'Keep venue photos and details updated.'],
+                ['flash-outline', 'Respond quickly to new booking requests.'],
+                ['pricetag-outline', 'Review your pricing regularly.'],
+              ].map(([icon, tip], index) => (
+                <View
+                  key={tip}
+                  style={[
+                    styles.tipRow,
+                    index < 2 && styles.tipRowBorder,
+                  ]}>
+                  <View style={styles.tipIcon}>
+                    <IonIcon name={icon} size={16} color="#A44A1F" />
+                  </View>
+                  <Text style={styles.tip}>{tip}</Text>
+                </View>
+              ))}
+            </View>
           </View>
 
           {/* How It Works */}
@@ -377,11 +445,7 @@ const styles = StyleSheet.create({
   },
   screenContainer: {
     flex: 1,
-    backgroundColor: '#FFF7E7',
-  },
-
-  backgroundWithPendingCard: {
-    paddingBottom: 112,
+    backgroundColor: '#FAF7F4',
   },
 
   pendingCardWrapper: {
@@ -502,88 +566,195 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
+    paddingTop: 12,
   },
   profileRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: -15,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#6D3018',
+    borderRadius: 16,
+    elevation: 4,
+    shadowColor: '#54210F',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+  },
+  profileIconWrap: {
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 24,
+    backgroundColor: 'rgba(255,255,255,0.94)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.55)',
+  },
+  profileCopy: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  welcomeLabel: {
+    color: '#F8D7C2',
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+    fontFamily: 'ManropeRegular',
   },
   vendorNameText: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#1A1E25',
-    fontFamily: 'PoppinsRegular',
+    marginTop: 1,
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    fontFamily: 'ManropeRegular',
     textTransform: 'capitalize',
   },
   vendorPhoneText: {
+    marginTop: 1,
     fontFamily: 'LeagueSpartanRegular',
-    color: '#333333',
+    color: '#F5D8C8',
+    fontSize: 11,
+  },
+  listingsHeaderButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 9,
+    paddingVertical: 7,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.62)',
+    borderRadius: 11,
+    backgroundColor: '#FFF4EC',
+  },
+  listingsHeaderText: {
+    marginTop: 2,
+    color: '#783817',
+    fontSize: 8,
+    fontWeight: '700',
+    fontFamily: 'ManropeRegular',
   },
   bookingsOverview: {
-    marginTop: 25,
-    marginBottom: 20,
+    marginTop: 20,
+    marginBottom: 22,
+    padding: 13,
+    borderWidth: 1,
+    borderColor: '#FFF3CD',
+    borderRadius: 16,
+    backgroundColor: '#FFF3CD',
+  },
+  sectionHeadingRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  sectionEyebrow: {
+    color: '#A06E50',
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 0.9,
+    fontFamily: 'ManropeRegular',
+  },
+  viewAllText: {
+    color: '#7D3518',
+    fontSize: 10,
+    fontWeight: '700',
+    fontFamily: 'ManropeRegular',
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333333',
+    marginTop: 2,
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#312B28',
     fontFamily: 'ManropeRegular',
-    marginBottom: 10,
   },
   overviewCards: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   overviewCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    padding: 15,
+    backgroundColor: '#FFF8F3',
+    borderRadius: 13,
+    paddingVertical: 11,
     alignItems: 'center',
     flex: 1,
-    marginHorizontal: 5,
-    shadowColor: '#000',
+    marginHorizontal: 4,
+    borderWidth: 1,
+    borderColor: '#DFC0AC',
+    elevation: 1,
+    shadowColor: '#5B3824',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-    height: 100,
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    minHeight: 104,
     justifyContent: 'center',
   },
+  pendingOverviewCard: {
+    borderColor: '#E3A574',
+    backgroundColor: '#FFF8F3',
+  },
+  totalOverviewCard: {
+    borderColor: '#D7AA8D',
+    backgroundColor: '#FFF8F3',
+  },
+  completedOverviewCard: {
+    borderColor: '#AFCDBA',
+    backgroundColor: '#FFF8F3',
+  },
+  overviewIcon: {
+    width: 28,
+    height: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 9,
+    marginBottom: 5,
+  },
+  totalIcon: { backgroundColor: '#F8EEE8' },
+  pendingIcon: { backgroundColor: '#FFF0E4' },
+  completedIcon: { backgroundColor: '#EAF6EF' },
   overviewCount: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FD813B',
+    fontSize: 21,
+    fontWeight: '800',
+    color: '#713716',
+    fontFamily: 'ManropeRegular',
   },
   overviewLabel: {
-    fontSize: 14,
-    color: '#333333',
+    marginTop: 1,
+    fontSize: 10,
+    color: '#5F4D43',
     textAlign: 'center',
     fontFamily: 'ManropeRegular',
   },
+  bookingEyebrow: {
+    color: '#8B4928',
+  },
+  bookingTitle: {
+    color: '#4C2818',
+  },
   listContainer: {
-    paddingBottom: 20,
+    paddingBottom: 16,
   },
 
   // ── CATEGORY CARD ──
   categoryCard: {
     backgroundColor: '#fff',
-    borderRadius: 18,
-    marginVertical: 10,
+    borderRadius: 16,
+    marginBottom: 8,
     overflow: 'hidden',
-    elevation: 4,
-    shadowColor: '#000',
+    elevation: 2,
+    shadowColor: '#56331F',
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.09,
-    shadowRadius: 10,
+    shadowOpacity: 0.07,
+    shadowRadius: 8,
     borderWidth: 1,
-    borderColor: '#EFEFEF',
+    borderColor: '#EDE5DF',
   },
   categoryImageWrapper: {
     position: 'relative',
   },
   categoryImage: {
-    height: 175,
+    height: 150,
     width: '100%',
   },
   categoryScrim: {
@@ -592,7 +763,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(10,10,20,0.38)',
+    backgroundColor: 'rgba(35,22,15,0.32)',
   },
   activeBadge: {
     position: 'absolute',
@@ -600,23 +771,18 @@ const styles = StyleSheet.create({
     right: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    backgroundColor: 'rgba(40,25,17,0.44)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.4)',
     borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  activeDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: '#34D399',
+    paddingHorizontal: 9,
+    paddingVertical: 5,
   },
   activeBadgeText: {
     color: '#fff',
-    fontSize: 11,
+    marginLeft: 4,
+    fontSize: 8,
+    letterSpacing: 0.5,
     fontWeight: '700',
     fontFamily: 'ManropeRegular',
   },
@@ -649,20 +815,19 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   categoryBody: {
-    padding: 16,
+    padding: 14,
   },
   categoryDescription: {
     fontSize: 13,
     color: '#7E8389',
     fontFamily: 'ManropeRegular',
     lineHeight: 20,
-    marginBottom: 14,
+    marginBottom: 11,
   },
   chipsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 14,
+    marginBottom: 11,
   },
   chip: {
     flexDirection: 'row',
@@ -670,13 +835,14 @@ const styles = StyleSheet.create({
     gap: 4,
     backgroundColor: '#F0FDF6',
     borderRadius: 20,
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     paddingVertical: 5,
     borderWidth: 1,
     borderColor: '#D1FAE5',
   },
   chipText: {
-    fontSize: 12,
+    marginLeft: 4,
+    fontSize: 10,
     color: '#059669',
     fontWeight: '600',
     fontFamily: 'ManropeRegular',
@@ -691,6 +857,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  ctaCopy: {
+    flex: 1,
+  },
   ctaLabel: {
     fontSize: 14,
     fontWeight: '700',
@@ -699,32 +868,87 @@ const styles = StyleSheet.create({
   },
   ctaHint: {
     fontSize: 11,
-    color: '#ABABAB',
+    color: '#8B8079',
     fontFamily: 'ManropeRegular',
     marginTop: 2,
   },
-  ctaBtn: {
+  categoryActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: '#FD813B',
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 24,
+    marginTop: 12,
   },
-  ctaBtnText: {
-    color: '#fff',
-    fontSize: 14,
+  secondaryAction: {
+    flex: 1,
+    minHeight: 42,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 7,
+    borderWidth: 1,
+    borderColor: '#E8CBB8',
+    borderRadius: 11,
+    backgroundColor: '#FFF8F3',
+  },
+  secondaryActionText: {
+    marginLeft: 5,
+    color: '#8B3E19',
+    fontSize: 11,
     fontWeight: '700',
     fontFamily: 'ManropeRegular',
   },
-
-  tip: {
-    fontSize: 14,
-    color: '#333333',
-    marginBottom: 5,
+  primaryAction: {
+    flex: 1,
+    minHeight: 42,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 7,
+    borderRadius: 11,
+    backgroundColor: '#D96A2B',
+  },
+  primaryActionText: {
+    marginLeft: 4,
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '800',
     fontFamily: 'ManropeRegular',
-    marginHorizontal: 10,
+  },
+  tipsSection: {
+    marginTop: 12,
+    marginBottom: 18,
+  },
+  tipsCard: {
+    marginTop: 10,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#EDE5DF',
+    borderRadius: 14,
+    backgroundColor: '#FFFFFF',
+  },
+  tipRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 11,
+  },
+  tipRowBorder: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#EDE7E2',
+  },
+  tipIcon: {
+    width: 30,
+    height: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+    borderRadius: 10,
+    backgroundColor: '#FFF2E8',
+  },
+  tip: {
+    flex: 1,
+    fontSize: 11,
+    lineHeight: 16,
+    color: '#615852',
+    fontFamily: 'ManropeRegular',
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Dimensions, StyleSheet, FlatList, Switch } from "react-native";
 import CustomAlert from '../../../components/CustomAlert';
 import ProfileIcon from '../../../assets/vendorIcons/profileIcon.svg'
@@ -7,12 +7,8 @@ import axios from "axios";
 import BASE_URL from "../../../apiconfig";
 import { formatAmount, formatDate } from '../../../utils/GlobalFunctions';
 import ArrowRight from '../../../assets/vendorIcons/arrowRight.svg';
-import PersonOne from '../../../assets/vendorIcons/personOne.svg';
-import PersonTwo from '../../../assets/vendorIcons/personTwo.svg';
-import PersonThree from '../../../assets/vendorIcons/personThree.svg';
 import themevariable from "../../../utils/themevariable";
 import ListedTimeIcon from '../../../assets/vendorIcons/listedTimeIcon.svg';
-import EditButton from '../../../assets/vendorIcons/editButton.svg';
 import { useSelector } from "react-redux";
 import { getVendorAuthToken } from "../../../utils/StoreAuthToken";
 import { useFocusEffect } from "@react-navigation/native";
@@ -21,13 +17,15 @@ import DeleteIcon from '../../../assets/svgs/deleteIcon.svg';
 import CalendarIcon from '../../../assets/svgs/calendarOrangeIcon.svg';
 import ServiceTime from '../../../assets/svgs/serviceTime.svg';
 const moment = require('moment');
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const VendorDashBoardTab = ({ navigation }) => {
 
-    const [clothJewelBookingsData, setclothJewelBookingsData] = useState([]);
+    // const [clothJewelBookingsData, setclothJewelBookingsData] = useState([]);
     const [vendorListing, setVendorListings] = useState([]);
     const [functionHallBookingsData, setFunctionHallBookingsData] = useState([]);
-    const [cateringsBookingsData, setCateringBookingsData] = useState([]);
+    // const [cateringsBookingsData, setCateringBookingsData] = useState([]);
     const [getVendorAuth, setGetVendorAuth] = useState('');
     const [totalEarnings, setTotalEarnings] = useState(0);
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
@@ -38,9 +36,9 @@ const VendorDashBoardTab = ({ navigation }) => {
             // Code to run when the screen is focused
             getVendorAuthTokenRes();
             getTotalVendorEarnings();
-            getVendorClothJewelBookings();
+            // getVendorClothJewelBookings();
             getVendorFunctionHallBookings();
-            getVendorFoodCateringBookings();
+            // getVendorFoodCateringBookings();
 
             getVendorListings();
 
@@ -53,7 +51,6 @@ const VendorDashBoardTab = ({ navigation }) => {
 
     const getVendorAuthTokenRes = async () => {
         const token = await getVendorAuthToken();
-        console.log("VendorAuthToken is::*****************************", token);
     };
 
     const getTotalVendorEarnings = async () => {
@@ -74,18 +71,18 @@ const VendorDashBoardTab = ({ navigation }) => {
     }
 
     const allCatProductDetailEndpoints = {
-        clothjewels: {
-            productDetailsEndpoint: 'getClothJewelsById',
-            bookingDetailsEndpoint: 'clothJewelBookingsGotForVendor',
-            catType: 'clothjewels',
-            confirmationEndpoint: 'clothJewelsbookingConfirmationFromVendor'
-        },
-        foodcatering: {
-            productDetailsEndpoint: 'getCateringDetailsById',
-            bookingDetailsEndpoint: 'foodCateringBookingsGotForVendor',
-            catType: 'foodcatering',
-            confirmationEndpoint: 'foodCateringBookingConfirmationFromVendor'
-        },
+        // clothjewels: {
+        //     productDetailsEndpoint: 'getClothJewelsById',
+        //     bookingDetailsEndpoint: 'clothJewelBookingsGotForVendor',
+        //     catType: 'clothjewels',
+        //     confirmationEndpoint: 'clothJewelsbookingConfirmationFromVendor'
+        // },
+        // foodcatering: {
+        //     productDetailsEndpoint: 'getCateringDetailsById',
+        //     bookingDetailsEndpoint: 'foodCateringBookingsGotForVendor',
+        //     catType: 'foodcatering',
+        //     confirmationEndpoint: 'foodCateringBookingConfirmationFromVendor'
+        // },
         functionhalls: {
             productDetailsEndpoint: 'getFunctionHallDetailsById',
             bookingDetailsEndpoint: 'functionHallBookingsGotForVendor',
@@ -109,16 +106,18 @@ const VendorDashBoardTab = ({ navigation }) => {
             const result = response?.data?.posts.map(item => {
                 const catType = item?.postId?.catType;
                 let productName = '';
+                let verificationStatus = '';
 
                 if (catType === 'functionhall') {
-                    productName = item.postId.functionHallName;
+                    productName = item?.postId?.functionHallName;
+                    verificationStatus = item?.postId?.verificationStatus;
                 }
-                else if (catType === 'clothjewels') {
-                    productName = item.postId.productName;
-                }
-                else if (catType === 'catering') {
-                    productName = item.postId.foodCateringName;
-                }
+                // else if (catType === 'clothjewels') {
+                //     productName = item.postId.productName;
+                // }
+                // else if (catType === 'catering') {
+                //     productName = item.postId.foodCateringName;
+                // }
                 //    console.log("listing data::::::", JSON.stringify(response?.data))
                 return {
                     _id: response?.data?._id,
@@ -127,7 +126,8 @@ const VendorDashBoardTab = ({ navigation }) => {
                     particularPostId: item?.postId?._id,
                     createdAt: response?.data?.createdAt,
                     available: item?.postId?.available,
-                    catType: item?.postId?.catType
+                    catType: item?.postId?.catType,
+                    verificationStatus: verificationStatus
                 };
             });
             const filteredResult = result.filter((item) => item?.productName);
@@ -139,25 +139,25 @@ const VendorDashBoardTab = ({ navigation }) => {
         }
     }
 
-    const getVendorClothJewelBookings = async () => {
-        const vendorMobileNumber = vendorLoggedInMobileNum;
-        const token = await getVendorAuthToken();
-        setGetVendorAuth(token);
-        try {
-            const response = await axios.get(`${BASE_URL}/clothJewelBookingsGotForVendor/${vendorMobileNumber}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-            const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
-            const output = consolidateByProductId(activeBookings);
-            // const output = consolidateByProductId(response?.data?.data);
-            // console.log('output is ::>>', output);
-            setclothJewelBookingsData(output)
-        } catch (error) {
-            console.log("clothJewelBookingsGotForVendor error::::::::::", error);
-        }
-    }
+    // const getVendorClothJewelBookings = async () => {
+    //     const vendorMobileNumber = vendorLoggedInMobileNum;
+    //     const token = await getVendorAuthToken();
+    //     setGetVendorAuth(token);
+    //     try {
+    //         const response = await axios.get(`${BASE_URL}/clothJewelBookingsGotForVendor/${vendorMobileNumber}`, {
+    //             headers: {
+    //                 'Authorization': `Bearer ${token}`,
+    //             },
+    //         });
+    //         const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
+    //         const output = consolidateByProductId(activeBookings);
+    //         // const output = consolidateByProductId(response?.data?.data);
+    //         // console.log('output is ::>>', output);
+    //         setclothJewelBookingsData(output)
+    //     } catch (error) {
+    //         console.log("clothJewelBookingsGotForVendor error::::::::::", error);
+    //     }
+    // }
 
     const getVendorFunctionHallBookings = async () => {
         const vendorMobileNumber = vendorLoggedInMobileNum;
@@ -188,37 +188,35 @@ const VendorDashBoardTab = ({ navigation }) => {
         }
     }
 
-    const getVendorFoodCateringBookings = async () => {
-        const vendorMobileNumber = vendorLoggedInMobileNum;
-        const token = await getVendorAuthToken();
-        try {
-            const response = await axios.get(`${BASE_URL}/foodCateringBookingsGotForVendor/${vendorMobileNumber}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-            // console.log('resp foodcateringBookings ::>>', response?.data?.data);
-            const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
-            const outputData = consolidateFoodCateringDataByProductId(activeBookings);
-            // const outputData = consolidateFoodCateringDataByProductId(response?.data?.data);
-            setCateringBookingsData(outputData);
+    // const getVendorFoodCateringBookings = async () => {
+    //     const vendorMobileNumber = vendorLoggedInMobileNum;
+    //     const token = await getVendorAuthToken();
+    //     try {
+    //         const response = await axios.get(`${BASE_URL}/foodCateringBookingsGotForVendor/${vendorMobileNumber}`, {
+    //             headers: {
+    //                 'Authorization': `Bearer ${token}`,
+    //             },
+    //         });
+    //         // console.log('resp foodcateringBookings ::>>', response?.data?.data);
+    //         const activeBookings = response?.data?.data.filter((booking) => booking.isActiveBooking === true);
+    //         const outputData = consolidateFoodCateringDataByProductId(activeBookings);
+    //         // const outputData = consolidateFoodCateringDataByProductId(response?.data?.data);
+    //         setCateringBookingsData(outputData);
 
-        } catch (error) {
-            console.log("foodCateringBookingsGotForVendor error::::::::::", error);
-        }
-    }
+    //     } catch (error) {
+    //         console.log("foodCateringBookingsGotForVendor error::::::::::", error);
+    //     }
+    // }
 
     const deleteTheVendorPost = async (vendorId, postId) => {
         const token = await getVendorAuthToken();
         // console.log('vendorId is:::',vendorId,postId);
-        console.log("deleteTheVendorPost payload:::", vendorId, postId);
         try {
             const response = await axios.delete(`${BASE_URL}/deleteVendorPost/${vendorId}/post/${postId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            console.log('response deleteTheVendorPost is:::>>', response);
             if (response?.status == 200) {
                 showSuccessAlert();
                 getVendorListings();
@@ -268,14 +266,12 @@ const VendorDashBoardTab = ({ navigation }) => {
             available: !toggleAvailable,
             modelType: catType
         }
-        console.log("toggle payloa d:;", payload);
         try {
             const response = await axios.patch(`${BASE_URL}/vendor/productRecord/availability`, payload, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
             });
-            console.log('response toggle availability is:::>>', response);
             if (response?.status == 200) {
                 showSuccessToggleAlert();
                 getVendorListings();
@@ -317,67 +313,73 @@ const VendorDashBoardTab = ({ navigation }) => {
 
     const renderVendorList = ({ item }) => {
         if (!item) return null; // skip null placeholders
-    
+
         return (
             <TouchableOpacity
-                style={{
-                    opacity: item?.available ? 1 : 0.5,
-                    backgroundColor: 'white',
-                    marginTop: 10,
-                    width: '90%', // full width for single column
-                    alignSelf: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 10,
-                }}
-                onPress={() => navigation.navigate('EditFunctionHall', { hallId: item?._id })} // Navigate to edit screen
+                activeOpacity={0.88}
+                style={[styles.listingCard, !item?.available && styles.listingCardInactive]}
+                onPress={() => navigation.navigate('EditFunctionHall', { hallId: item?.particularPostId })} // Navigate to edit screen
             >
-                <View style={{ marginTop: 5, width: '100%', marginHorizontal: 5 }}>
-                    <FastImage
-                        style={{ width: '97%', height: 200, borderRadius: 10 }}
-                        source={{ uri: item?.productImage }}
-                    />
-                    <Text style={styles.productName}>
-                        {capitalizeFirstLetters(item?.productName)}
-                    </Text>
-    
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, justifyContent: 'space-between', width: '90%', marginHorizontal: 5 }}>
+                <FastImage
+                    style={styles.listingImage}
+                    source={{ uri: item?.productImage }}
+                    resizeMode={FastImage.resizeMode.cover}
+                />
+
+                <View style={styles.listingBody}>
+                    <View style={styles.listingTitleRow}>
+                        <Text style={styles.productName} numberOfLines={2}>
+                            {capitalizeFirstLetters(item?.productName)}
+                        </Text>
+                        <FontAwesome
+                            name="pencil"
+                            size={24}
+                            color="#A44A1F"
+                        />
+                    </View>
+
+                    <View style={styles.listingMetaRow}>
+                        <View style={styles.listedDateRow}>
+                            <ListedTimeIcon width={16} height={16} />
+                            <Text style={styles.price}>{formatDate(item?.createdAt)}</Text>
+                        </View>
                         <Text
                             style={[
                                 styles.productListedName,
-                                {
-                                    color: item?.available ? '#57A64F' : '#EF0000',
-                                    backgroundColor: item?.available ? '#45FE3529' : '#FE353529',
-                                },
+                                item?.verificationStatus == 'approved' ? styles.listedBadge : styles.unlistedBadge,
                             ]}
                         >
-                            {item?.available ? 'Listed' : 'Not Listed'}
+                            {item?.verificationStatus == 'approved' ? 'Listed' : 'On Hold'}
                         </Text>
-                        <Switch
-                            trackColor={{ false: '#EF0000', true: '#e8e46b' }}
-                            thumbColor="#ECA73C"
-                            ios_backgroundColor="#3e3e3e"
-                            style={{left: 10}}
-                            onValueChange={() =>
-                                showAvailabilityConfirmation(item?.catType, item?.particularPostId, item?.available)
-                            }
-                            value={item?.available}
-                        />
                     </View>
-    
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, justifyContent: 'space-between', width: '90%', bottom: 5 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 }}>
-                            <ListedTimeIcon />
-                            <Text style={styles.price}>{formatDate(item?.createdAt)}</Text>
+
+                    <View style={styles.listingActions}>
+                        <View style={styles.availabilityRow}>
+                            <Text style={styles.availabilityLabel}>Accept bookings</Text>
+                            <Switch
+                                trackColor={{ false: '#E5E7EB', true: '#F4C9AA' }}
+                                thumbColor={item?.available ? '#C96A32' : '#9CA3AF'}
+                                ios_backgroundColor="#E5E7EB"
+                                onValueChange={() =>
+                                    showAvailabilityConfirmation(item?.catType, item?.particularPostId, item?.available)
+                                }
+                                value={item?.available}
+                            />
                         </View>
-                        <TouchableOpacity onPress={() => showConfirmationAlert(item?._id, item?.particularPostId)}>
-                            <DeleteIcon />
+                        <TouchableOpacity
+                            style={styles.deleteButton}
+                            onPress={() => showConfirmationAlert(item?._id, item?.particularPostId)}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Delete ${item?.productName || 'listing'}`}
+                        >
+                            <DeleteIcon width={18} height={18} />
                         </TouchableOpacity>
                     </View>
                 </View>
             </TouchableOpacity>
         );
     };
-    
+
 
     const renderFunctionHallItem = ({ item }) => {
         return (
@@ -524,39 +526,39 @@ const VendorDashBoardTab = ({ navigation }) => {
         )
     }
 
-    const renderFoodCateringItem = ({ item }) => {
-        const convertedImageUrl = item?.professionalImage?.url;
+    // const renderFoodCateringItem = ({ item }) => {
+    //     const convertedImageUrl = item?.professionalImage?.url;
 
-        return (
-            <TouchableOpacity
-                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId, catEndPoint: allCatProductDetailEndpoints?.foodcatering, catType: "catering", bookingId: item?.bookingId })}
-                style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <FastImage source={{
-                        uri: convertedImageUrl,
-                        // headers: { Authorization: `Bearer ${getVendorAuth}` }
-                    }} style={{ width: 60, height: 60 }}
-                    />
-                    <View style={{ margin: 10 }}>
-                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{item?.productName} </Text>
-                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.totalAmount)}</Text>
-                    </View>
-                </View>
-                <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', height: 35, borderRadius: 5, position: 'absolute', right: 10 }}>
-                    <Text style={{ color: '#FD813B', marginHorizontal: 5 }}>{item?.count == 1 ? '1 Request ' : `${item?.count} Requests `}</Text>
-                    {item?.count == 1 ? <PersonOne /> :
-                        <>
-                            <PersonOne style={{ marginRight: -10 }} />
-                            <PersonTwo style={{ marginRight: -10 }} />
-                            <PersonThree />
-                        </>}
-                    <ArrowRight style={{ marginTop: 3, marginHorizontal: 10 }} />
-                </View>
+    //     return (
+    //         <TouchableOpacity
+    //             onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId, catEndPoint: allCatProductDetailEndpoints?.foodcatering, catType: "catering", bookingId: item?.bookingId })}
+    //             style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
+    //             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    //                 <FastImage source={{
+    //                     uri: convertedImageUrl,
+    //                     // headers: { Authorization: `Bearer ${getVendorAuth}` }
+    //                 }} style={{ width: 60, height: 60 }}
+    //                 />
+    //                 <View style={{ margin: 10 }}>
+    //                     <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{item?.productName} </Text>
+    //                     <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.totalAmount)}</Text>
+    //                 </View>
+    //             </View>
+    //             <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', height: 35, borderRadius: 5, position: 'absolute', right: 10 }}>
+    //                 <Text style={{ color: '#FD813B', marginHorizontal: 5 }}>{item?.count == 1 ? '1 Request ' : `${item?.count} Requests `}</Text>
+    //                 {item?.count == 1 ? <PersonOne /> :
+    //                     <>
+    //                         <PersonOne style={{ marginRight: -10 }} />
+    //                         <PersonTwo style={{ marginRight: -10 }} />
+    //                         <PersonThree />
+    //                     </>}
+    //                 <ArrowRight style={{ marginTop: 3, marginHorizontal: 10 }} />
+    //             </View>
 
 
-            </TouchableOpacity>
-        )
-    }
+    //         </TouchableOpacity>
+    //     )
+    // }
 
     function capitalizeFirstLetters(str) {
         // console.log('str is::>>', str)
@@ -565,93 +567,93 @@ const VendorDashBoardTab = ({ navigation }) => {
         }
     }
 
-    const renderItem = ({ item }) => {
-        const convertedImageUrl = item?.professionalImage?.url;
+    // const renderItem = ({ item }) => {
+    //     const convertedImageUrl = item?.professionalImage?.url;
 
-        return (
-            <TouchableOpacity
-                onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId, catEndPoint: allCatProductDetailEndpoints?.clothjewels, catType: "clothjewels", bookingId: item?.bookingId })}
-                style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <FastImage source={{
-                        uri: convertedImageUrl,
-                        // headers: { Authorization: `Bearer ${getVendorAuth}` }
-                    }} style={{ width: 60, height: 60 }}
-                    />
-                    <View style={{ margin: 10 }}>
-                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{capitalizeFirstLetters(item?.productName)} </Text>
-                        <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.perDayPrice)} / day</Text>
-                    </View>
-                </View>
-                <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', height: 35, borderRadius: 5, position: 'absolute', right: 10 }}>
-                    <Text style={{ color: '#FD813B', marginHorizontal: 5 }}>{item?.count == 1 ? '1 Request ' : `${item?.count} Requests `}</Text>
-                    {item?.count == 1 ? <PersonOne /> :
-                        <>
-                            <PersonOne style={{ marginRight: -10 }} />
-                            <PersonTwo style={{ marginRight: -10 }} />
-                            <PersonThree />
-                        </>}
-                    <ArrowRight style={{ marginTop: 3, marginHorizontal: 10 }} />
-                </View>
+    //     return (
+    //         <TouchableOpacity
+    //             onPress={() => navigation.navigate('RequestConfirmation', { productId: item?.productId, catEndPoint: allCatProductDetailEndpoints?.clothjewels, catType: "clothjewels", bookingId: item?.bookingId })}
+    //             style={{ flexDirection: 'row', padding: 15, backgroundColor: 'white', alignItems: 'center', justifyContent: 'space-between' }}>
+    //             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    //                 <FastImage source={{
+    //                     uri: convertedImageUrl,
+    //                     // headers: { Authorization: `Bearer ${getVendorAuth}` }
+    //                 }} style={{ width: 60, height: 60 }}
+    //                 />
+    //                 <View style={{ margin: 10 }}>
+    //                     <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500', width: Dimensions.get('window').width / 3.5 }}>{capitalizeFirstLetters(item?.productName)} </Text>
+    //                     <Text style={{ color: '#1A1F36', fontFamily: 'ManropeRegular', fontWeight: '500' }}>{formatAmount(item?.perDayPrice)} / day</Text>
+    //                 </View>
+    //             </View>
+    //             <View style={{ backgroundColor: '#FFF8F0', flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', height: 35, borderRadius: 5, position: 'absolute', right: 10 }}>
+    //                 <Text style={{ color: '#FD813B', marginHorizontal: 5 }}>{item?.count == 1 ? '1 Request ' : `${item?.count} Requests `}</Text>
+    //                 {item?.count == 1 ? <PersonOne /> :
+    //                     <>
+    //                         <PersonOne style={{ marginRight: -10 }} />
+    //                         <PersonTwo style={{ marginRight: -10 }} />
+    //                         <PersonThree />
+    //                     </>}
+    //                 <ArrowRight style={{ marginTop: 3, marginHorizontal: 10 }} />
+    //             </View>
 
 
-            </TouchableOpacity>
-        )
-    }
+    //         </TouchableOpacity>
+    //     )
+    // }
 
-    const consolidateByProductId = (data) => {
-        const grouped = data.reduce((acc, item) => {
-            if (!acc[item?.productId]) {
-                acc[item?.productId] = {
-                    productId: item?.productId,
-                    productName: item?.productName,
-                    perDayPrice: item?.perDayPrice,
-                    professionalImage: item?.professionalImage,
-                    count: 0
-                };
-            }
-            acc[item?.productId].count += 1;
-            return acc;
-        }, {});
+    // const consolidateByProductId = (data) => {
+    //     const grouped = data.reduce((acc, item) => {
+    //         if (!acc[item?.productId]) {
+    //             acc[item?.productId] = {
+    //                 productId: item?.productId,
+    //                 productName: item?.productName,
+    //                 perDayPrice: item?.perDayPrice,
+    //                 professionalImage: item?.professionalImage,
+    //                 count: 0
+    //             };
+    //         }
+    //         acc[item?.productId].count += 1;
+    //         return acc;
+    //     }, {});
 
-        return Object.values(grouped);
-    };
+    //     return Object.values(grouped);
+    // };
 
-    const consolidateFunctionHallsDataByProductId = (data) => {
-        const grouped = data.reduce((acc, item) => {
-            if (!acc[item?.productId]) {
-                acc[item?.productId] = {
-                    productId: item?.productId,
-                    productName: item?.functionHallName,
-                    totalAmount: item?.totalAmount,
-                    professionalImage: item?.professionalImage,
-                    count: 0
-                };
-            }
-            acc[item?.productId].count += 1;
-            return acc;
-        }, {});
+    // const consolidateFunctionHallsDataByProductId = (data) => {
+    //     const grouped = data.reduce((acc, item) => {
+    //         if (!acc[item?.productId]) {
+    //             acc[item?.productId] = {
+    //                 productId: item?.productId,
+    //                 productName: item?.functionHallName,
+    //                 totalAmount: item?.totalAmount,
+    //                 professionalImage: item?.professionalImage,
+    //                 count: 0
+    //             };
+    //         }
+    //         acc[item?.productId].count += 1;
+    //         return acc;
+    //     }, {});
 
-        return Object.values(grouped);
-    };
+    //     return Object.values(grouped);
+    // };
 
-    const consolidateFoodCateringDataByProductId = (data) => {
-        const grouped = data.reduce((acc, item) => {
-            if (!acc[item?.productId]) {
-                acc[item?.productId] = {
-                    productId: item?.productId,
-                    productName: item?.foodCateringName,
-                    totalAmount: item?.totalAmount,
-                    professionalImage: item?.professionalImage,
-                    count: 0
-                };
-            }
-            acc[item?.productId].count += 1;
-            return acc;
-        }, {});
+    // const consolidateFoodCateringDataByProductId = (data) => {
+    //     const grouped = data.reduce((acc, item) => {
+    //         if (!acc[item?.productId]) {
+    //             acc[item?.productId] = {
+    //                 productId: item?.productId,
+    //                 productName: item?.foodCateringName,
+    //                 totalAmount: item?.totalAmount,
+    //                 professionalImage: item?.professionalImage,
+    //                 count: 0
+    //             };
+    //         }
+    //         acc[item?.productId].count += 1;
+    //         return acc;
+    //     }, {});
 
-        return Object.values(grouped);
-    };
+    //     return Object.values(grouped);
+    // };
 
     const ItemSeparator = () => {
         return <View style={{ width: '90%', alignSelf: 'center', height: 1, backgroundColor: '#F0F0F0', marginVertical: 6 }} />;
@@ -660,41 +662,76 @@ const VendorDashBoardTab = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.mainContainer}>
-            <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF7E7', '#FFF7E7', '#FFF7E7']} style={{ flex: 1 }}>
+            <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFFBF8', '#FFF7F2', '#FFFFFF']} style={styles.screenGradient}>
 
-                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', justifyContent: "space-between" }}>
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
-                        <ProfileIcon style={{}} />
-                        <View>
-                            <Text style={{ fontSize: 22, fontWeight: '700', color: '#1A1E25', fontFamily: 'PoppinsRegular', textTransform: "capitalize" }}>Hi, {vendorLoggedInName}</Text>
-                            <Text style={{ fontFamily: 'LeagueSpartanRegular', color: themevariable.Color_000000, }}>+91 {vendorLoggedInMobileNum}</Text>
+                <View style={styles.header}>
+                    <View style={styles.profileRow}>
+                        {/* <View style={styles.profileIconWrap}>
+                            <ProfileIcon width={42} height={42} />
+                        </View> */}
+                        <View style={styles.profileTextWrap}>
+                            <Text style={styles.greeting} numberOfLines={1}>Hi, {vendorLoggedInName}</Text>
+                            <Text style={styles.mobileNumber}>+91 {vendorLoggedInMobileNum}</Text>
                         </View>
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            style={styles.myListingsButton}
+                            onPress={() =>
+                                navigation.navigate(
+                                    'VendorVenueListings',
+                                )
+                            }
+                            accessibilityRole="button"
+                            accessibilityLabel="Open my venue listings"
+                        >
+                            <View style={styles.listingsIconWrap}>
+                                <Ionicons
+                                    name="business-outline"
+                                    size={20}
+                                    color="#A44A1F"
+                                />
+                            </View>
+
+                            <Text style={styles.myListingsText}>
+                                My Listings
+                            </Text>
+                        </TouchableOpacity>
                     </View>
                     {/* <TouchableOpacity onPress={() => navigation.navigate('AdminDashboard')}>
                         <ProfileIcon />
                     </TouchableOpacity> */}
                 </View>
 
-                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} colors={['#FFF3CD', '#FFDB7E']} style={{ width: '90%', alignSelf: 'center', padding: 20, borderRadius: 10, marginTop: 20 }}>
-                    <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
-                        <View>
-                            <Text style={{ color: '#1A1F36', fontSize: 14, fontWeight: 700, color: '#1A1F36' }}>Total Earnings</Text>
-                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 40, color: '#1A1F36', }}>{formatAmount(totalEarnings)}</Text>
+                <LinearGradient start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} colors={['#FFF4EB', '#FCE3D2']} style={styles.summaryCard}>
+                    <View style={styles.summaryRow}>
+                        <View style={styles.summaryItem}>
+                            <Text style={styles.summaryLabel}>TOTAL EARNINGS</Text>
+                            <Text style={styles.earningsValue} numberOfLines={1} adjustsFontSizeToFit>{formatAmount(totalEarnings || 0)}</Text>
+                            <Text style={styles.summaryHint}>From completed bookings</Text>
                         </View>
-                        <View style={{ width: 2, height: '100%', backgroundColor: '#F9CD4F' }} />
-                        <View>
-                            <Text style={{ color: '#1A1F36', fontSize: 14, fontWeight: 700, color: '#1A1F36' }}>Current Listing</Text>
-                            <Text style={{ fontFamily: 'ManropeRegular', fontWeight: '700', fontSize: 40, color: '#1A1F36', alignSelf: 'center' }}>{vendorListing?.length ? vendorListing?.length : 0}</Text>
+                        <View style={styles.summaryDivider} />
+                        <View style={[styles.summaryItem, styles.listingSummaryItem]}>
+                            <Text style={styles.summaryLabel}>ACTIVE LISTINGS</Text>
+                            <Text style={styles.listingCount}>{vendorListing?.length || 0}</Text>
+                            <Text style={styles.summaryHint}>Venue listings</Text>
                         </View>
                     </View>
                 </LinearGradient>
-                <ScrollView>
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 
-                    {clothJewelBookingsData?.length || functionHallBookingsData?.length || cateringsBookingsData?.length ?
-                        <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Recent Request</Text>
+                    {functionHallBookingsData?.length ?
+                        <View style={styles.sectionHeader}>
+                            <View>
+                                <Text style={styles.sectionTitle}>Recent requests</Text>
+                                <Text style={styles.sectionSubtitle}>Review and respond to customers</Text>
+                            </View>
+                            <View style={styles.countBadge}>
+                                <Text style={styles.countBadgeText}>{functionHallBookingsData.length}</Text>
+                            </View>
+                        </View>
                         : null}
                     <View >
-                        {clothJewelBookingsData?.length ?
+                        {/* {clothJewelBookingsData?.length ?
                             <>
                                 <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Cloth/Jewel Bookings</Text>
                                 <FlatList
@@ -704,21 +741,22 @@ const VendorDashBoardTab = ({ navigation }) => {
                                     ItemSeparatorComponent={ItemSeparator}
                                 />
                             </>
-                            : null}
+                            : null} */}
 
                         {functionHallBookingsData?.length ?
                             <>
-                                <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Function Hall Bookings</Text>
                                 <FlatList
                                     data={functionHallBookingsData}
                                     renderItem={renderFunctionHallItem}
-                                    contentContainerStyle={{ borderRadius: 15, marginHorizontal: '5%', margin: 15 }}
+                                    scrollEnabled={false}
+                                    keyExtractor={(item, index) => String(item?.bookingId || item?._id || index)}
+                                    contentContainerStyle={styles.bookingList}
                                     ItemSeparatorComponent={ItemSeparator}
                                 />
                             </>
                             : null}
 
-                        {cateringsBookingsData?.length ?
+                        {/* {cateringsBookingsData?.length ?
                             <>
                                 <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: '5%' }}>Food Catering Bookings</Text>
                                 <FlatList
@@ -728,14 +766,23 @@ const VendorDashBoardTab = ({ navigation }) => {
                                     ItemSeparatorComponent={ItemSeparator}
                                 />
                             </>
-                            : null}
+                            : null} */}
                     </View>
                     {vendorListing?.length > 0 ?
-                        <Text style={{ fontFamily: 'ManropeRegular', fontWeight: 700, fontSize: 16, color: '#000000', marginHorizontal: '5%', marginTop: 20 }}>All Listed Products</Text>
+                        <View style={styles.sectionHeader}>
+                            <View>
+                                <Text style={styles.sectionTitle}>Your listings</Text>
+                                <Text style={styles.sectionSubtitle}>Manage availability and venue details</Text>
+                            </View>
+                            <View style={styles.countBadge}>
+                                <Text style={styles.countBadgeText}>{vendorListing.length}</Text>
+                            </View>
+                        </View>
                         : <View style={styles.suggestionBox}>
-                            <Text style={styles.suggestionTitle}>Add Your Listings Now!</Text>
+                            <Text style={styles.emptyIcon}>＋</Text>
+                            <Text style={styles.suggestionTitle}>Add your first listing</Text>
                             <Text style={styles.suggestionText}>
-                                Start renting out your properties and increase your earnings today. Add listings for your rentals and attract potential customers easily.
+                                Publish your venue and start receiving booking requests from BookTheDay customers.
                             </Text>
                             <TouchableOpacity style={styles.ctaButton} onPress={() => navigation.navigate('VendorHome')}>
                                 <Text style={styles.ctaButtonText}>Add Listing</Text>
@@ -744,8 +791,10 @@ const VendorDashBoardTab = ({ navigation }) => {
                     <FlatList
                         data={vendorListing}
                         renderItem={renderVendorList}
-                        contentContainerStyle={{ paddingBottom: 100 }}
-                        // numColumns={2}
+                        scrollEnabled={false}
+                        keyExtractor={(item, index) => String(item?.particularPostId || index)}
+                        contentContainerStyle={styles.listingList}
+                    // numColumns={2}
                     />
                 </ScrollView>
             </LinearGradient>
@@ -756,6 +805,263 @@ const VendorDashBoardTab = ({ navigation }) => {
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
+        backgroundColor: '#FFFBF8',
+    },
+    screenGradient: {
+        flex: 1,
+    },
+    header: {
+        paddingHorizontal: 20,
+        paddingTop: 12,
+        paddingBottom: 14,
+        backgroundColor: 'rgba(255,255,255,0.96)',
+        borderBottomWidth: 1,
+        borderBottomColor: '#F4EAE3',
+    },
+    profileRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    profileIconWrap: {
+        // width: 50,
+        // height: 50,
+        // borderRadius: 25,
+        alignItems: 'center',
+        justifyContent: 'center',
+        // backgroundColor: '#FFF2E8',
+        // borderWidth: 1,
+        // borderColor: '#F4D6C2',
+        marginRight: 12,
+    },
+    myListingsButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 9,
+        paddingVertical: 6,
+        borderWidth: 1,
+        borderColor: '#EACDBB',
+        borderRadius: 18,
+        backgroundColor: '#FFF8F3',
+    },
+
+    listingsIconWrap: {
+        width: 28,
+        height: 28,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 14,
+        backgroundColor: '#FCE9DC',
+    },
+
+    myListingsText: {
+        marginLeft: 6,
+        color: '#713716',
+        fontSize: 11,
+        fontWeight: '700',
+        fontFamily: 'ManropeRegular',
+    },
+    profileTextWrap: {
+        flex: 1,
+    },
+    greeting: {
+        fontSize: 20,
+        fontWeight: '700',
+        color: '#2D211B',
+        fontFamily: 'PoppinsRegular',
+        textTransform: 'capitalize',
+    },
+    mobileNumber: {
+        marginTop: 1,
+        fontSize: 12,
+        fontFamily: 'ManropeRegular',
+        color: '#806C61',
+    },
+    summaryCard: {
+        width: '90%',
+        alignSelf: 'center',
+        paddingVertical: 18,
+        paddingHorizontal: 16,
+        borderRadius: 18,
+        marginTop: 18,
+        borderWidth: 1,
+        borderColor: '#F1CFB7',
+        shadowColor: '#7A3E1F',
+        shadowOpacity: 0.08,
+        shadowOffset: { width: 0, height: 5 },
+        shadowRadius: 12,
+        elevation: 3,
+    },
+    summaryRow: {
+        flexDirection: 'row',
+        alignItems: 'stretch',
+    },
+    summaryItem: {
+        flex: 1.45,
+        justifyContent: 'center',
+    },
+    listingSummaryItem: {
+        flex: 0.8,
+        alignItems: 'center',
+    },
+    summaryLabel: {
+        color: '#8D6048',
+        fontSize: 10,
+        fontWeight: '800',
+        letterSpacing: 0.8,
+        fontFamily: 'ManropeRegular',
+    },
+    earningsValue: {
+        marginTop: 4,
+        color: '#33231B',
+        fontSize: 28,
+        fontWeight: '800',
+        fontFamily: 'ManropeRegular',
+    },
+    listingCount: {
+        marginTop: 4,
+        color: '#33231B',
+        fontSize: 28,
+        fontWeight: '800',
+        fontFamily: 'ManropeRegular',
+    },
+    summaryHint: {
+        marginTop: 2,
+        color: '#8A766B',
+        fontSize: 10,
+        fontFamily: 'ManropeRegular',
+    },
+    summaryDivider: {
+        width: 1,
+        marginHorizontal: 16,
+        backgroundColor: '#E9C6AE',
+    },
+    scrollContent: {
+        paddingTop: 8,
+        paddingBottom: 110,
+    },
+    sectionHeader: {
+        marginTop: 20,
+        marginBottom: 10,
+        marginHorizontal: '5%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    sectionTitle: {
+        color: '#2D211B',
+        fontFamily: 'ManropeRegular',
+        fontWeight: '800',
+        fontSize: 17,
+    },
+    sectionSubtitle: {
+        marginTop: 2,
+        color: '#8A766B',
+        fontFamily: 'ManropeRegular',
+        fontSize: 11,
+    },
+    countBadge: {
+        minWidth: 28,
+        height: 28,
+        paddingHorizontal: 8,
+        borderRadius: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#FFF0E5',
+        borderWidth: 1,
+        borderColor: '#F1D0B9',
+    },
+    countBadgeText: {
+        color: '#A7552B',
+        fontFamily: 'ManropeRegular',
+        fontWeight: '800',
+        fontSize: 12,
+    },
+    bookingList: {
+        marginHorizontal: '5%',
+        borderRadius: 15,
+    },
+    listingList: {
+        paddingBottom: 8,
+    },
+    listingCard: {
+        flexDirection: 'row',
+        width: '90%',
+        minHeight: 126,
+        alignSelf: 'center',
+        marginBottom: 12,
+        padding: 10,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: '#EFE3DB',
+        shadowColor: '#5B3827',
+        shadowOpacity: 0.06,
+        shadowOffset: { width: 0, height: 3 },
+        shadowRadius: 8,
+        elevation: 2,
+    },
+    listingCardInactive: {
+        backgroundColor: '#FAFAFA',
+        opacity: 0.72,
+    },
+    listingImage: {
+        width: 104,
+        height: 106,
+        borderRadius: 12,
+        backgroundColor: '#F3ECE7',
+    },
+    listingBody: {
+        flex: 1,
+        marginLeft: 12,
+        justifyContent: 'space-between',
+    },
+    listingTitleRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+    },
+    listingMetaRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: 5,
+    },
+    listedDateRow: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginRight: 6,
+    },
+    listingActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: 6,
+        paddingTop: 6,
+        borderTopWidth: 1,
+        borderTopColor: '#F4ECE7',
+    },
+    availabilityRow: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    availabilityLabel: {
+        color: '#6F5C52',
+        fontFamily: 'ManropeRegular',
+        fontSize: 11,
+    },
+    deleteButton: {
+        width: 34,
+        height: 34,
+        marginLeft: 8,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#FFF4F4',
+        borderWidth: 1,
+        borderColor: '#F2DADA',
     },
     productContainer: {
 
@@ -775,57 +1081,86 @@ const styles = StyleSheet.create({
     },
     productName: {
         fontFamily: 'ManropeRegular',
-        fontSize: 12,
-        color: '#202020',
-        width: '90%',
-        margin: 5
+        fontSize: 14,
+        lineHeight: 19,
+        fontWeight: '700',
+        color: '#2D211B',
+        flex: 1,
+        marginRight: 8,
     },
     productListedName: {
         fontFamily: 'ManropeRegular',
-        fontSize: 14,
-        color: '#202020',
-        textAlign: "left",
-        justifyContent: "flex-start",
-        padding: 5,
-        borderRadius: 5
+        fontSize: 10,
+        fontWeight: '700',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 10,
+        overflow: 'hidden',
+    },
+    listedBadge: {
+        color: '#347447',
+        backgroundColor: '#E9F5EC',
+    },
+    unlistedBadge: {
+        color: '#A94A4A',
+        backgroundColor: '#FBEAEA',
     },
     price: {
-        color: themevariable.Color_202020,
         fontWeight: '400',
-        fontSize: 14,
+        fontSize: 10,
         fontFamily: 'ManropeRegular',
-        color: '#202020',
-        marginHorizontal: 5,
-        margin: 5
+        color: '#806C61',
+        marginLeft: 5,
     },
     suggestionBox: {
-        backgroundColor: '#FFF5E1',
-        borderRadius: 10,
-        padding: 16,
+        width: '90%',
+        alignSelf: 'center',
+        backgroundColor: '#FFF8F3',
+        borderRadius: 18,
+        borderWidth: 1,
+        borderColor: '#EFDACB',
+        padding: 22,
         marginTop: 20,
         alignItems: 'center',
     },
+    emptyIcon: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        color: '#B75D2F',
+        backgroundColor: '#FFEBDD',
+        fontSize: 25,
+        overflow: 'hidden',
+        marginBottom: 10,
+    },
     suggestionTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: '800',
+        color: '#33231B',
+        fontFamily: 'ManropeRegular',
         marginBottom: 8,
     },
     suggestionText: {
-        fontSize: 14,
-        color: '#555',
+        fontSize: 13,
+        lineHeight: 19,
+        color: '#766359',
+        fontFamily: 'ManropeRegular',
         textAlign: 'center',
         marginBottom: 16,
     },
     ctaButton: {
-        backgroundColor: '#FFA726',
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: 8,
+        backgroundColor: '#B95F31',
+        paddingVertical: 11,
+        paddingHorizontal: 26,
+        borderRadius: 12,
     },
     ctaButtonText: {
         color: '#FFF',
-        fontWeight: 'bold',
-        fontSize: 16,
+        fontFamily: 'ManropeRegular',
+        fontWeight: '800',
+        fontSize: 14,
     },
 
 })

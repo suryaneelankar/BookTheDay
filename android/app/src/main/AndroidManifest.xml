@@ -1,4 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -17,8 +19,22 @@
       android:theme="@style/AppTheme">
 
       <meta-data
-     android:name="com.google.android.geo.API_KEY"
-     android:value="AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo"/>
+      android:name="com.google.android.geo.API_KEY"
+      android:value="AIzaSyC9nx4lgaP6QuoLMbyIlA_On-IRZkFLbRo"/>
+
+     <meta-data
+      android:name="com.google.firebase.messaging.default_notification_icon"
+      android:resource="@drawable/ic_stat_booktheday" />
+
+    <meta-data
+    android:name="com.google.firebase.messaging.default_notification_channel_id"
+    android:value="booking_reminders_v1"
+    tools:replace="android:value" />
+
+    <meta-data
+    android:name="com.google.firebase.messaging.default_notification_color"
+    android:resource="@color/notification_accent"
+    tools:replace="android:resource" />
 
       <activity
         android:name=".MainActivity"

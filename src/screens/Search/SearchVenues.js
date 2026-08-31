@@ -20,11 +20,12 @@ import FastImage from 'react-native-fast-image';
 import { formatAmount } from '../../utils/GlobalFunctions';
 import ActionSheet from 'react-native-actions-sheet';
 import LinearGradient from 'react-native-linear-gradient';
+import HomeVenueFeed from '../Home/HomeVenueFeed';
 
 const seatingCapacity = ['50-100', '100-200', '200-400', '400-600', '600-800', '800-1000', '1000-1200', '1200+'];
 const priceRanges = ['10k-50k', '50k-1L', '1L-2L', '2L-3L', '3L-5L', '5L-10L', '10L-12L', '12L-15L', '15L-20L', '20L+'];
 
-const SearchVenues = () => {
+const StandardSearchVenues = () => {
   const navigation = useNavigation();
   const inputRef = useRef(null);
   const actionSheetRef = useRef(null);
@@ -345,4 +346,11 @@ const styles = StyleSheet.create({
   filterApplyText: { fontFamily: 'ManropeRegular', fontSize: 14, fontWeight: '700', color: '#FFFFFF' },
 });
 
-export default SearchVenues;
+// Normal search retains its original component and behaviour.
+export default function SearchVenues({ route }) {
+  const mode = route?.params?.homeFeed;
+  if (mode === 'recent' || mode === 'discover') {
+    return <HomeVenueFeed key={mode} mode={mode} />;
+  }
+  return <StandardSearchVenues />;
+}

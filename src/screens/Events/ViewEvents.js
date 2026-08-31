@@ -63,6 +63,14 @@ const ViewEvents = ({ route, navigation }) => {
   const [videoPreview, setVideoPreview] = useState({ visible: false, uri: null });
   const [galleryImages, setGalleryImages] = useState([]);
 
+  const includedGuests = Number(eventsDetails?.includedGuestCount);
+
+  const showIncludedGuests =
+    eventsDetails?.venueCategory === 'Farm House' &&
+    !(menuImages?.length > 0) &&
+    Number.isInteger(includedGuests) &&
+    includedGuests > 0;
+
   const heroVideoRef = useRef(null);
 
   const openFullscreenVideo = (index) => {
@@ -171,7 +179,7 @@ const ViewEvents = ({ route, navigation }) => {
                   onPress={() => { setMenuImageCurrentIndex(index); setIsMenuImageModalVisible(true); }}
                   style={styles.menuImageWrapper}>
                   <Image
-                    source={{uri: item.url}}
+                    source={{ uri: item.url }}
                     resizeMode="cover"
                     style={styles.menuImageStyle}
                   />
@@ -181,7 +189,7 @@ const ViewEvents = ({ route, navigation }) => {
                   </View>
                   {/* Price badge top-right */}
                   <View style={styles.menuPriceBadge}>
-                    <Text style={styles.menuPriceBadgeText}>₹{item.menuPrice}<Text style={{fontSize: 10}}>/plate</Text></Text>
+                    <Text style={styles.menuPriceBadgeText}>₹{item.menuPrice}<Text style={{ fontSize: 10 }}>/plate</Text></Text>
                   </View>
                   {/* Zoom hint */}
                   <View style={styles.menuZoomHint}>
@@ -717,17 +725,38 @@ const ViewEvents = ({ route, navigation }) => {
           </TouchableOpacity>
 
           {/* ── PRICING CARD ── */}
+          {/* ── PRICING CARD ── */}
           <View style={styles.pricingHighlightCard}>
             <View style={{ flex: 1 }}>
               <Text style={styles.pricingHighlightLabel}>
                 {menuImages?.length > 0 ? 'Pricing' : 'Rent Price'}
               </Text>
+
               <Text style={styles.pricingHighlightValue}>
-                {menuImages?.length > 0 ? 'Menu Based Pricing' : `${formatAmount(eventsDetails?.rentPricePerDay)} / day`}
+                {menuImages?.length > 0
+                  ? 'Menu Based Pricing'
+                  : `${formatAmount(eventsDetails?.rentPricePerDay)} / day`}
               </Text>
+
+              {showIncludedGuests && (
+                <View style={styles.includedGuestsBadge}>
+                  <IonIcon
+                    name="people-outline"
+                    size={14}
+                    color="#2F653B"
+                  />
+
+                  <Text style={styles.includedGuestsLabel}>
+                    Includes {includedGuests}{' '}
+                    {includedGuests === 1 ? 'guest' : 'guests'}
+                  </Text>
+                </View>
+              )}
             </View>
+
             <View style={styles.pricingAdvanceBox}>
               <Text style={styles.pricingAdvanceLabel}>Advance</Text>
+
               <Text style={styles.pricingAdvanceValue}>
                 {menuImages?.length > 0
                   ? `${eventsDetails?.advanceAmountInPercentageForMenu}%`
@@ -854,36 +883,36 @@ const ViewEvents = ({ route, navigation }) => {
             const menuKey = `${img.menuType}_${img._id || index}`;
             return parseInt(menuQuantities[menuKey] || '0', 10) > 0;
           }) && (
-            <View style={[styles.summaryCard, {marginTop: 12}]}>
-              <View style={styles.summaryCardHeader}>
-                <IonIcon name="restaurant-outline" size={18} color="#FD813B" />
-                <Text style={styles.summaryCardTitle}>Menu Selection</Text>
-              </View>
-              <View style={styles.summaryDivider} />
-              {menuImages.map((img, index) => {
-                const menuKey = `${img.menuType}_${img._id || index}`;
-                const qty = parseInt(menuQuantities[menuKey] || '0', 10);
-                if (qty === 0) return null;
-                const lineTotal = qty * parseInt(img.menuPrice || '0', 10);
-                return (
-                  <View key={menuKey} style={styles.summaryRow}>
-                    <View style={{flex: 1}}>
-                      <Text style={styles.summaryRowLabel}>{img.menuType}</Text>
-                      <Text style={[styles.summaryRowLabel, {fontSize: 11, color: '#939393', fontWeight: '400'}]}>
-                        {qty} {qty === 1 ? 'plate' : 'plates'} × ₹{img.menuPrice}
-                      </Text>
+              <View style={[styles.summaryCard, { marginTop: 12 }]}>
+                <View style={styles.summaryCardHeader}>
+                  <IonIcon name="restaurant-outline" size={18} color="#FD813B" />
+                  <Text style={styles.summaryCardTitle}>Menu Selection</Text>
+                </View>
+                <View style={styles.summaryDivider} />
+                {menuImages.map((img, index) => {
+                  const menuKey = `${img.menuType}_${img._id || index}`;
+                  const qty = parseInt(menuQuantities[menuKey] || '0', 10);
+                  if (qty === 0) return null;
+                  const lineTotal = qty * parseInt(img.menuPrice || '0', 10);
+                  return (
+                    <View key={menuKey} style={styles.summaryRow}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.summaryRowLabel}>{img.menuType}</Text>
+                        <Text style={[styles.summaryRowLabel, { fontSize: 11, color: '#939393', fontWeight: '400' }]}>
+                          {qty} {qty === 1 ? 'plate' : 'plates'} × ₹{img.menuPrice}
+                        </Text>
+                      </View>
+                      <Text style={styles.summaryRowValue}>{formatAmount(lineTotal)}</Text>
                     </View>
-                    <Text style={styles.summaryRowValue}>{formatAmount(lineTotal)}</Text>
-                  </View>
-                );
-              })}
-              <View style={styles.summaryDivider} />
-              <View style={styles.summaryRow}>
-                <Text style={[styles.summaryRowLabel, {fontSize: 15, color: '#121212'}]}>Menu Total</Text>
-                <Text style={styles.summaryTotalValue}>{formatAmount(totalAmountWithMenu)}</Text>
+                  );
+                })}
+                <View style={styles.summaryDivider} />
+                <View style={styles.summaryRow}>
+                  <Text style={[styles.summaryRowLabel, { fontSize: 15, color: '#121212' }]}>Menu Total</Text>
+                  <Text style={styles.summaryTotalValue}>{formatAmount(totalAmountWithMenu)}</Text>
+                </View>
               </View>
-            </View>
-          )}
+            )}
 
           <View style={{ marginBottom: "10%" }} />
 
@@ -1150,7 +1179,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     elevation: 3,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
     borderWidth: 1,
@@ -1923,6 +1952,27 @@ const styles = StyleSheet.create({
     color: '#DF6E12',
     fontFamily: 'ManropeRegular',
     marginTop: 2,
+  },
+
+  includedGuestsBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: '#EAF5EC',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginTop: 8,
+    marginRight: 8,
+  },
+
+  includedGuestsLabel: {
+    flexShrink: 1,
+    marginLeft: 6,
+    color: '#2F653B',
+    fontSize: 12,
+    fontWeight: '600',
+    fontFamily: 'ManropeRegular',
   },
   // ── AREA CHIP ──
   areaChip: {

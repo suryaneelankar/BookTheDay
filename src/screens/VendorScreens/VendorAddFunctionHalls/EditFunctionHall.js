@@ -32,6 +32,8 @@ const EditFunctionHall = ({ route, navigation }) => {
     const [seatingCapacity, setSeatingCapacity] = useState('');
     const [bedRooms, setBedRooms] = useState('');
     const [functionHallAreaInSft, setFunctionHallAreaInSft] = useState('');
+    const [venueCategory, setVenueCategory] = useState('Function Hall');
+    const [includedGuestCount, setIncludedGuestCount] = useState('');
     const [hallAmenities, setHallAmenities] = useState([]); // array of amenities
     const [menuAvailable, setMenuAvailable] = useState(false);
     const [foodType, setFoodType] = useState('');
@@ -39,6 +41,8 @@ const EditFunctionHall = ({ route, navigation }) => {
     const [advanceAmount, setAdvanceAmount] = useState('');
     const [advanceAmountPercentage, setAdvanceAmountPercentage] = useState('');
     const [serviceCharges, setServiceCharges] = useState('');
+    const [overTimeCharges, setOverTimeCharges] = useState('');
+    const [available, setAvailable] = useState(true);
     const FOOD_TYPES = ["veg", "non-veg", "Both"];
     const [discountPercentage, setDiscountPercentage] = useState(0);
     const vendorLoggedInMobileNum = useSelector((state) => state.vendorLoggedInMobileNum);
@@ -49,6 +53,11 @@ const EditFunctionHall = ({ route, navigation }) => {
     const [functionHallCity, setFunctionHallCity] = useState('');
     const [functionHallPinCode, setFunctionHallPinCode] = useState('');
     const [county, setCounty] = useState('');
+    const [latitude, setLatitude] = useState('');
+    const [longitude, setLongitude] = useState('');
+    const [verificationStatus, setVerificationStatus] = useState('onhold');
+
+    const VENUE_CATEGORIES = ['Function Hall', 'Banquet Hall', 'Farm House', 'Luxury Resort'];
 
     // Location picker modal
     const [isLocationPickerVisible, setLocationPickerVisible] = useState(false);
@@ -85,16 +94,17 @@ const EditFunctionHall = ({ route, navigation }) => {
 
     useEffect(() => {
         loadFunctionHallDetails();
-    }, []);
+    }, [hallId]);
 
     const loadFunctionHallDetails = async () => {
         setLoading(true);
         try {
             const token = await getVendorAuthToken();
-            const response = await axios.get(`${BASE_URL}/getFunctionHallDetailsById/689b5718cc6425607182aef9`, {
+            const response = await axios.get(`${BASE_URL}/vendor/function-halls/${hallId}/edit`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            const data = response.data;
+            const data = response.data?.data;
+            if (!data?._id) throw new Error('Invalid venue response.');
 
             // Fill basic fields
             setFunctionHallName(data.functionHallName || '');
@@ -103,12 +113,19 @@ const EditFunctionHall = ({ route, navigation }) => {
             setBedRooms(data.bedRooms?.toString() || '');
             setFunctionHallAreaInSft(data.functionHallAreaInSft?.toString() || '');
             // setFoodType(data.foodType || '');
-            setMenuAvailable(Boolean(data.menuAvailable));
+            setMenuAvailable(Boolean(data.menuAvailable || data.pricingType === 'menu_based' || data.menuImages?.flat?.(Infinity)?.length));
             setRentPricePerDay(data.rentPricePerDay?.toString() || '');
             setAdvanceAmount(data.advanceAmount?.toString() || '');
             setAdvanceAmountPercentage(data.advanceAmountInPercentageForMenu?.toString() || '');
             setServiceCharges(data.serviceCharges?.toString() || '');
             setCounty(data.county || '');
+            setVenueCategory(data.venueCategory || 'Function Hall');
+            setIncludedGuestCount(data.includedGuestCount?.toString() || '');
+            setOverTimeCharges(data.overTimeCharges?.toString() || '');
+            setAvailable(data.available === true);
+            setLatitude(data.latitude?.toString() || '');
+            setLongitude(data.longitude?.toString() || '');
+            setVerificationStatus(data.verificationStatus || 'onhold');
 
             setSelectedAmenities(parseAmenities(data.hallAmenities));
             setFoodType(data.foodType);
@@ -129,7 +146,7 @@ const EditFunctionHall = ({ route, navigation }) => {
             }
 
             console.log('data.functionHallAddress is::>>', data);
-            console.log('data.professionalImage.url is::>>', data.professionalImage.url);
+            console.log('data.professionalImage.url is::>>', data.professionalImage?.url);
             setoldMainImageFileName(data.professionalImage?.filename || '');
 
             // Main image from API response
@@ -140,6 +157,8 @@ const EditFunctionHall = ({ route, navigation }) => {
                             uri: data.professionalImage.url,
                             fileName: data.professionalImage.filename || 'main.jpg',
                             type: data.professionalImage.mimetype || 'image/jpeg',
+                            serverId: data.professionalImage._id,
+                            isExisting: true,
                         },
                     ],
                 });
@@ -153,6 +172,8 @@ const EditFunctionHall = ({ route, navigation }) => {
                             uri: img.url,
                             fileName: img.filename || `image${index + 1}.jpg`,
                             type: img.mimetype || 'image/jpeg',
+                            serverId: img._id,
+                            isExisting: true,
                         },
                     ],
                 }));
@@ -164,7 +185,17 @@ const EditFunctionHall = ({ route, navigation }) => {
             }
 
         } catch (error) {
-            console.error('Error loading function hall details:', error.message || error);
+            console.error(
+                'Error loading function hall details:',
+                error.response?.status,
+                error.response?.data,
+            );
+
+            Alert.alert(
+                'Unable to load venue',
+                error.response?.data?.message ||
+                'Please try again.',
+            )
         } finally {
             setLoading(false);
         }
@@ -287,14 +318,10 @@ const EditFunctionHall = ({ route, navigation }) => {
     };
 
     // Normalize additional images for FlatList
-    const normalizedImages = Object.values(additionalImages)
-        .filter(Boolean)
-        .map(img => {
-            if (img.url) return { uri: img.url };
-            if (img.assets && img.assets[0]?.uri) return { uri: img.assets[0].uri };
-            return null;
-        })
-        .filter(Boolean);
+    const normalizedImages = keyOrder.map((key) => ({
+        key,
+        uri: additionalImages[key]?.assets?.[0]?.uri || '',
+    }));
 
     const handleLocationSelected = (location, address) => {
         if (!location || !address) return;
@@ -303,6 +330,10 @@ const EditFunctionHall = ({ route, navigation }) => {
         setFunctionHallCity(location.city || location.subDivisionArea || '');
         setFunctionHallPinCode(location.pinCode?.toString() || '');
         setCounty(location.county || location.subDivisionArea || '');
+        const nextLatitude = location?.region?.latitude ?? location?.latitude;
+        const nextLongitude = location?.region?.longitude ?? location?.longitude;
+        if (Number.isFinite(Number(nextLatitude))) setLatitude(String(nextLatitude));
+        if (Number.isFinite(Number(nextLongitude))) setLongitude(String(nextLongitude));
         setLocationPickerVisible(false);
     };
 
@@ -312,13 +343,35 @@ const EditFunctionHall = ({ route, navigation }) => {
 
     // Save changes handler - Implement API call here
     const onPressEditAndSave = async () => {
-        // Validation as in Add. (reuse your checks)
+        if (!functionHallName.trim()) return Alert.alert('Required field', 'Enter the venue name.');
+        if (!selectedAmenities.length) return Alert.alert('Required field', 'Select at least one amenity.');
+        if (!seatingCapacity) return Alert.alert('Required field', 'Select seating capacity.');
+        if (!foodType) return Alert.alert('Required field', 'Select food type.');
+        if (!functionHallAddress || !latitude || !longitude)
+            return Alert.alert('Required field', 'Select the venue location on the map.');
+        if (!mainImageUrl?.assets?.[0]?.uri)
+            return Alert.alert('Required field', 'Keep or select a cover photo.');
 
-        const vendorMobileNumber = vendorLoggedInMobileNum;
+        const selectedGallery = keyOrder
+            .map(key => additionalImages[key]?.assets?.[0])
+            .filter(asset => asset?.uri);
+        if (selectedGallery.length < 4 || selectedGallery.length > 8)
+            return Alert.alert('Additional photos', 'Keep or select a total of 4–8 photos.');
+
+        if (!menuAvailable && (!Number(rentPricePerDay) || !Number(advanceAmount)))
+            return Alert.alert('Pricing details', 'Enter daily rent and advance amount.');
+        if (menuAvailable && !Number(advanceAmountPercentage))
+            return Alert.alert('Pricing details', 'Enter the menu advance percentage.');
+        if (venueCategory === 'Farm House' && includedGuestCount) {
+            const guests = Number(includedGuestCount);
+            if (!Number.isInteger(guests) || guests < 1 || guests > 10000)
+                return Alert.alert('Included guests', 'Enter a whole number between 1 and 10,000.');
+        }
+
         const formData = new FormData();
 
         // (1) Professional Image — Only if new
-        if (mainImageUrl?.assets?.[0]?.uri && mainImageUrl?.assets?.[0]?.fileName !== oldMainImageFileName) {
+        if (mainImageUrl?.assets?.[0]?.uri && !mainImageUrl.assets[0].isExisting) {
             formData.append('professionalImage', {
                 uri: mainImageUrl.assets[0].uri,
                 type: mainImageUrl.assets[0].type,
@@ -333,14 +386,14 @@ const EditFunctionHall = ({ route, navigation }) => {
 
 
 
+        const retainedAdditionalImageIds = [];
         keyOrder.forEach((key) => {
             const value = additionalImages[key];
             const imgAsset = value?.assets?.[0];
             if (!imgAsset?.uri) return;
 
-            if (imgAsset.uri.startsWith('http')) {
-                // Send URL for unchanged image
-                formData.append('additionalImages', imgAsset.uri);
+            if (imgAsset.isExisting && imgAsset.serverId) {
+                retainedAdditionalImageIds.push(String(imgAsset.serverId));
             } else {
                 // Send File for changed image
                 formData.append('additionalImages', {
@@ -350,6 +403,7 @@ const EditFunctionHall = ({ route, navigation }) => {
                 });
             }
         });
+        formData.append('retainedAdditionalImageIds', JSON.stringify(retainedAdditionalImageIds));
 
         // (3) Menu Images with Meta
         // const menuImageMetaData = [];
@@ -375,7 +429,7 @@ const EditFunctionHall = ({ route, navigation }) => {
         formData.append('functionHallName', functionHallName);
         formData.append('description', description);
         formData.append('functionHallAreaInSft', functionHallAreaInSft);
-        formData.append('hallAmenities', JSON.stringify(hallAmenities));
+        formData.append('hallAmenities', JSON.stringify(selectedAmenities));
         formData.append('foodType', foodType);
         formData.append('seatingCapacity', seatingCapacity);
         formData.append('bedRooms', bedRooms);
@@ -384,16 +438,15 @@ const EditFunctionHall = ({ route, navigation }) => {
         formData.append('advanceAmountInPercentageForMenu', advanceAmountPercentage);
         formData.append('discountPercentage', discountPercentage);
         formData.append('functionHallAddress', JSON.stringify(functionHallAddessIs));
-        formData.append('vendorMobileNumber', vendorMobileNumber);
-        formData.append('available', true);
-        formData.append('accepted', false);
-        formData.append('overTimeCharges', 500);
+        formData.append('venueCategory', venueCategory);
+        formData.append('menuAvailable', String(menuAvailable));
+        formData.append('available', String(available));
+        formData.append('overTimeCharges', overTimeCharges || '0');
         formData.append('county', county);
-        formData.append('latitude', '10.12');
-        formData.append('longitude', '10.23');
-        formData.append('serviceCharges', serviceCharges);
-        formData.append('vendorEarningAmount', rentPricePerDay);
-        formData.append('vendorEarningAmountAfterDiscount', discountPercentage);
+        formData.append('latitude', latitude);
+        formData.append('longitude', longitude);
+        if (venueCategory === 'Farm House' && includedGuestCount.trim())
+            formData.append('includedGuestCount', includedGuestCount.trim());
         // Add other fields as per your API
 
         const token = await getVendorAuthToken();
@@ -402,7 +455,7 @@ const EditFunctionHall = ({ route, navigation }) => {
 
 
         try {
-            const response = await axios.patch(`${BASE_URL}/EditFunctionHall/689b5718cc6425607182aef9`, formData, {
+            const response = await axios.patch(`${BASE_URL}/vendor/function-halls/${hallId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Authorization': `Bearer ${token}`,
@@ -410,17 +463,24 @@ const EditFunctionHall = ({ route, navigation }) => {
             });
             if (response.status === 200) {
                 setLoading(false);
-                Alert.alert("Success", "Function Hall updated successfully!", [{
-                    text: "Ok",
-                    onPress: () => navigation.goBack()
-                }]);
+                Alert.alert(
+                    response.data?.requiresReview ? 'Submitted for review' : 'Updated',
+                    response.data?.message || 'Venue updated successfully.',
+                    [{
+                        text: "Ok",
+                        onPress: () => navigation.goBack()
+                    }]
+                );
             } else {
                 setLoading(false);
                 Alert.alert('Error', 'Failed to update function hall');
             }
         } catch (error) {
             setLoading(false);
-            Alert.alert('Error', 'Failed to update: ' + (error.message || 'Unknown error'));
+            Alert.alert(
+                'Unable to update',
+                error.response?.data?.message || error.message || 'Please try again.',
+            );
         }
     }
 
@@ -433,6 +493,13 @@ const EditFunctionHall = ({ route, navigation }) => {
                 </View>
             ) : (
                 <ScrollView contentContainerStyle={{ padding: 12 }}>
+                    <View style={styles.reviewNotice}>
+                        <Text style={styles.reviewNoticeTitle}>Approval policy</Text>
+                        <Text style={styles.reviewNoticeText}>
+                            Changes to details, pricing, location, category or photos move this listing to On Hold for admin review. Availability-only changes remain approved.
+                        </Text>
+                        <Text style={styles.currentStatus}>Current status: {verificationStatus}</Text>
+                    </View>
                     <Modal
                         visible={isLocationPickerVisible}
                         animationType="slide"
@@ -464,10 +531,16 @@ const EditFunctionHall = ({ route, navigation }) => {
                         <FlatList
                             data={normalizedImages}
                             horizontal
-                            keyExtractor={(item, index) => index.toString()}
+                            keyExtractor={item => item.key}
                             renderItem={({ item, index }) => (
                                 <TouchableOpacity onPress={() => openGalleryOrCameraForAdditonalImages(index)}>
-                                    <Image source={{ uri: item.uri }} style={styles.additionalImage} />
+                                    {item.uri ? (
+                                        <Image source={{ uri: item.uri }} style={styles.additionalImage} />
+                                    ) : (
+                                        <View style={[styles.additionalImage, styles.addImagePlaceholder]}>
+                                            <Text style={styles.addImageText}>+ Photo</Text>
+                                        </View>
+                                    )}
                                 </TouchableOpacity>
                             )}
                         />
@@ -479,12 +552,170 @@ const EditFunctionHall = ({ route, navigation }) => {
                             isRequired
                         />
 
-                        <Text style={styles.label}>Food Type</Text>
-                        <TextField
-                            label="Food Type"
-                            value={foodType}
-                            onChangeHandler={setFoodType}
-                        />
+                        <Text style={styles.label}>Venue Category</Text>
+                        <View style={styles.optionWrap}>
+                            {VENUE_CATEGORIES.map(category => (
+                                <TouchableOpacity
+                                    key={category}
+                                    style={[styles.optionChip, venueCategory === category && styles.optionChipSelected]}
+                                    onPress={() => setVenueCategory(category)}
+                                >
+                                    <Text style={[styles.optionChipText, venueCategory === category && styles.optionChipTextSelected]}>
+                                        {category}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        {venueCategory === 'Farm House' && (
+                            <TextField
+                                label="Guests Included in Price"
+                                value={includedGuestCount}
+                                onChangeHandler={setIncludedGuestCount}
+                                keyboardType="number-pad"
+                            />
+                        )}
+
+                        <View style={styles.formSection}>
+                            <Text style={styles.fieldTitle}>
+                                Food Type <Text style={styles.required}>*</Text>
+                            </Text>
+                            <Text style={styles.fieldHint}>
+                                Select the food options supported by this venue.
+                            </Text>
+
+                            <View style={styles.foodTypeRow}>
+                                {FOOD_TYPES.map(type => {
+                                    const selected = foodType === type;
+                                    const label = type === 'veg'
+                                        ? 'Veg'
+                                        : type === 'non-veg'
+                                            ? 'Non-Veg'
+                                            : 'Both';
+
+                                    return (
+                                        <TouchableOpacity
+                                            key={type}
+                                            activeOpacity={0.8}
+                                            accessibilityRole="radio"
+                                            accessibilityState={{ selected }}
+                                            onPress={() => setFoodType(type)}
+                                            style={[
+                                                styles.foodTypeOption,
+                                                selected && styles.foodTypeOptionSelected,
+                                            ]}
+                                        >
+                                            <View style={[
+                                                styles.radioOuter,
+                                                selected && styles.radioOuterSelected,
+                                            ]}>
+                                                {selected && <View style={styles.radioInner} />}
+                                            </View>
+                                            <Text style={[
+                                                styles.foodTypeText,
+                                                selected && styles.foodTypeTextSelected,
+                                            ]}>
+                                                {label}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                })}
+                            </View>
+                        </View>
+
+                        <View style={styles.formSection}>
+                            <View style={styles.fieldTitleRow}>
+                                <Text style={styles.fieldTitle}>
+                                    Amenities <Text style={styles.required}>*</Text>
+                                </Text>
+                                <Text style={styles.selectedCount}>
+                                    {selectedAmenities.length} selected
+                                </Text>
+                            </View>
+                            <Text style={styles.fieldHint}>
+                                Select every facility available at the venue.
+                            </Text>
+
+                            <View style={styles.amenitiesGrid}>
+                                {ALL_AMENITIES.map(item => {
+                                    const selected = selectedAmenities.includes(item);
+
+                                    return (
+                                        <TouchableOpacity
+                                            key={item}
+                                            activeOpacity={0.8}
+                                            accessibilityRole="checkbox"
+                                            accessibilityState={{ checked: selected }}
+                                            onPress={() => toggleAmenity(item)}
+                                            style={[
+                                                styles.amenityOption,
+                                                selected && styles.amenityOptionSelected,
+                                            ]}
+                                        >
+                                            <View style={[
+                                                styles.checkbox,
+                                                selected && styles.checkboxSelected,
+                                            ]}>
+                                                {selected && (
+                                                    <Text style={styles.checkboxTick}>✓</Text>
+                                                )}
+                                            </View>
+                                            <Text style={[
+                                                styles.amenityText,
+                                                selected && styles.amenityTextSelected,
+                                            ]}>
+                                                {item}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                })}
+                            </View>
+                        </View>
+
+                        <View style={styles.formSection}>
+                            <Text style={styles.fieldTitle}>
+                                Seating Capacity <Text style={styles.required}>*</Text>
+                            </Text>
+                            <Text style={styles.fieldHint}>
+                                Choose the maximum comfortable seating range.
+                            </Text>
+
+                            <View style={styles.seatingGrid}>
+                                {SEATING_OPTIONS.map(option => {
+                                    const selected = seatingCapacity === option;
+
+                                    return (
+                                        <TouchableOpacity
+                                            key={option}
+                                            activeOpacity={0.8}
+                                            accessibilityRole="radio"
+                                            accessibilityState={{ selected }}
+                                            onPress={() => setSeatingCapacity(option)}
+                                            style={[
+                                                styles.seatingOption,
+                                                selected && styles.seatingOptionSelected,
+                                            ]}
+                                        >
+                                            <Text style={[
+                                                styles.seatingValue,
+                                                selected && styles.seatingValueSelected,
+                                            ]}>
+                                                {option}
+                                            </Text>
+                                            <Text style={[
+                                                styles.seatingUnit,
+                                                selected && styles.seatingUnitSelected,
+                                            ]}>
+                                                guests
+                                            </Text>
+                                            {selected && (
+                                                <View style={styles.selectedDot} />
+                                            )}
+                                        </TouchableOpacity>
+                                    );
+                                })}
+                            </View>
+                        </View>
 
                         <TextField
                             label="Hall Description"
@@ -492,45 +723,6 @@ const EditFunctionHall = ({ route, navigation }) => {
                             onChangeHandler={setDescription}
                             isDescriptionField
                         />
-
-                        {FOOD_TYPES.map(type => (
-                            <TouchableOpacity key={type} onPress={() => setFoodType(type)} style={{ flexDirection: 'row', alignItems: 'center', marginRight: 20, marginBottom: 10 }}>
-                                <View style={{
-                                    width: 22, height: 22, borderWidth: 1, borderColor: "#FD813B", borderRadius: 4,
-                                    backgroundColor: foodType === type ? '#FD813B' : undefined,
-                                    marginRight: 8
-                                }} />
-                                <Text>{type}</Text>
-                            </TouchableOpacity>
-                        ))}
-
-                        {ALL_AMENITIES.map(item => (
-                            <TouchableOpacity key={item} onPress={() => toggleAmenity(item)} style={{ flexDirection: 'row', marginBottom: 8 }}>
-                                <View style={{
-                                    width: 22, height: 22, borderWidth: 1, borderColor: "#FD813B", borderRadius: 4,
-                                    backgroundColor: selectedAmenities.includes(item) ? '#FD813B' : undefined,
-                                    marginRight: 8
-                                }} />
-                                <Text>{item}</Text>
-                            </TouchableOpacity>
-                        ))}
-
-                        {SEATING_OPTIONS.map(opt => (
-                            <TouchableOpacity
-                                key={opt}
-                                style={{
-                                    borderWidth: seatingCapacity === opt ? 2 : 0,
-                                    borderColor: seatingCapacity === opt ? '#ECA73C' : 'transparent',
-                                    backgroundColor: '#FFF5E3',
-                                    borderRadius: 5,
-                                    padding: 10,
-                                    margin: 5
-                                }}
-                                onPress={() => setSeatingCapacity(opt)}
-                            >
-                                <Text>{opt}</Text>
-                            </TouchableOpacity>
-                        ))}
 
                         <TextField
                             label="Bedrooms"
@@ -545,7 +737,6 @@ const EditFunctionHall = ({ route, navigation }) => {
                             value={functionHallAreaInSft}
                             onChangeHandler={setFunctionHallAreaInSft}
                             keyboardType="number-pad"
-                            isRequired
                         />
 
                         {/* Hall Amenities: You can create UI as checkboxes below if needed */}
@@ -553,19 +744,26 @@ const EditFunctionHall = ({ route, navigation }) => {
                     </View>
 
                     <View style={styles.switchRow}>
-                        <Text style={styles.switchLabel}>Do you have in-house catering?</Text>
+                        <View style={styles.switchCopy}>
+                            <Text style={styles.switchLabel}>In-house catering</Text>
+                            <Text style={styles.modeHint}>
+                                Pricing mode is preserved. Menu photos and prices are not changed here.
+                            </Text>
+                        </View>
                         <Switch
                             trackColor={{ false: '#ccc', true: '#FD813B' }}
                             thumbColor={menuAvailable ? '#ECA73C' : '#fff'}
-                            onValueChange={() => setMenuAvailable(!menuAvailable)}
                             value={menuAvailable}
+                            disabled
                         />
                     </View>
 
                     {menuAvailable && (
                         <View style={styles.card}>
                             <Text style={styles.subTitle}>Menu Details</Text>
-                            {/* Insert menu upload UI here */}
+                            <Text style={styles.modeHint}>
+                                Existing menu images and per-plate prices remain unchanged. You can update the advance percentage below.
+                            </Text>
                         </View>
                     )}
 
@@ -589,8 +787,8 @@ const EditFunctionHall = ({ route, navigation }) => {
 
                         <TextField
                             label="Over Time Charges / hr"
-                            value={serviceCharges}
-                            onChangeHandler={setServiceCharges}
+                            value={overTimeCharges}
+                            onChangeHandler={setOverTimeCharges}
                             keyboardType="number-pad"
                         />
 
@@ -605,6 +803,21 @@ const EditFunctionHall = ({ route, navigation }) => {
                             </TouchableOpacity>
                         ))}
 
+                    </View>
+
+                    <View style={styles.switchRow}>
+                        <View style={styles.switchCopy}>
+                            <Text style={styles.switchLabel}>Accept new booking enquiries</Text>
+                            <Text style={styles.modeHint}>
+                                Availability-only updates do not require another admin review.
+                            </Text>
+                        </View>
+                        <Switch
+                            trackColor={{ false: '#D4D4D8', true: '#F2A66F' }}
+                            thumbColor={available ? '#FD813B' : '#FFFFFF'}
+                            onValueChange={setAvailable}
+                            value={available}
+                        />
                     </View>
 
                     <Text style={styles.sectionTitle}>Function Hall Address</Text>
@@ -645,6 +858,32 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#EBEDF3',
     },
+    reviewNotice: {
+        padding: 12,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: '#F1D1B8',
+        borderRadius: 10,
+        backgroundColor: '#FFF8F2',
+    },
+    reviewNoticeTitle: {
+        color: '#8A3F18',
+        fontSize: 14,
+        fontWeight: '700',
+        marginBottom: 4,
+    },
+    reviewNoticeText: {
+        color: '#6B4A3A',
+        fontSize: 12,
+        lineHeight: 18,
+    },
+    currentStatus: {
+        color: '#8A3F18',
+        fontSize: 12,
+        fontWeight: '700',
+        marginTop: 6,
+        textTransform: 'capitalize',
+    },
     sectionTitle: {
         fontSize: 18,
         fontWeight: '700',
@@ -678,6 +917,187 @@ export const styles = StyleSheet.create({
         color: 'red',
         fontWeight: '700',
     },
+    formSection: {
+        marginTop: 10,
+        marginBottom: 16,
+    },
+    fieldTitleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    fieldTitle: {
+        color: '#2F2925',
+        fontSize: 14,
+        fontWeight: '700',
+    },
+    fieldHint: {
+        color: '#81756D',
+        fontSize: 11,
+        lineHeight: 16,
+        marginTop: 3,
+        marginBottom: 10,
+    },
+    selectedCount: {
+        color: '#9A431B',
+        fontSize: 10,
+        fontWeight: '700',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 10,
+        backgroundColor: '#FFF0E5',
+    },
+    foodTypeRow: {
+        flexDirection: 'row',
+        marginHorizontal: -3,
+    },
+    foodTypeOption: {
+        flex: 1,
+        minHeight: 44,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginHorizontal: 3,
+        paddingHorizontal: 7,
+        borderWidth: 1,
+        borderColor: '#E8E1DC',
+        borderRadius: 10,
+        backgroundColor: '#FCFBFA',
+    },
+    foodTypeOptionSelected: {
+        borderColor: '#ECA170',
+        backgroundColor: '#FFF3EA',
+    },
+    radioOuter: {
+        width: 17,
+        height: 17,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 6,
+        borderWidth: 1.5,
+        borderColor: '#B9AEA7',
+        borderRadius: 9,
+        backgroundColor: '#FFFFFF',
+    },
+    radioOuterSelected: {
+        borderColor: '#D96A2B',
+    },
+    radioInner: {
+        width: 9,
+        height: 9,
+        borderRadius: 5,
+        backgroundColor: '#D96A2B',
+    },
+    foodTypeText: {
+        color: '#625A55',
+        fontSize: 11,
+        fontWeight: '600',
+    },
+    foodTypeTextSelected: {
+        color: '#8F3D17',
+        fontWeight: '700',
+    },
+    amenitiesGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+    },
+    amenityOption: {
+        width: '48.5%',
+        minHeight: 48,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 9,
+        paddingVertical: 8,
+        marginBottom: 8,
+        borderWidth: 1,
+        borderColor: '#ECE6E1',
+        borderRadius: 9,
+        backgroundColor: '#FCFBFA',
+    },
+    amenityOptionSelected: {
+        borderColor: '#EDB28B',
+        backgroundColor: '#FFF7F1',
+    },
+    checkbox: {
+        width: 19,
+        height: 19,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 7,
+        borderWidth: 1.5,
+        borderColor: '#BDB3AC',
+        borderRadius: 5,
+        backgroundColor: '#FFFFFF',
+    },
+    checkboxSelected: {
+        borderColor: '#D96A2B',
+        backgroundColor: '#D96A2B',
+    },
+    checkboxTick: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        lineHeight: 14,
+        fontWeight: '900',
+    },
+    amenityText: {
+        flex: 1,
+        color: '#5F5752',
+        fontSize: 10,
+        lineHeight: 14,
+        fontWeight: '500',
+    },
+    amenityTextSelected: {
+        color: '#713716',
+        fontWeight: '600',
+    },
+    seatingGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+    },
+    seatingOption: {
+        position: 'relative',
+        width: '48.5%',
+        minHeight: 55,
+        justifyContent: 'center',
+        paddingHorizontal: 12,
+        paddingVertical: 9,
+        marginBottom: 8,
+        borderWidth: 1,
+        borderColor: '#E8E1DC',
+        borderRadius: 10,
+        backgroundColor: '#FCFBFA',
+    },
+    seatingOptionSelected: {
+        borderColor: '#E99A67',
+        backgroundColor: '#FFF3EA',
+    },
+    seatingValue: {
+        color: '#403A36',
+        fontSize: 13,
+        fontWeight: '700',
+    },
+    seatingValueSelected: {
+        color: '#8F3D17',
+    },
+    seatingUnit: {
+        color: '#91857D',
+        fontSize: 9,
+        marginTop: 2,
+    },
+    seatingUnitSelected: {
+        color: '#A65B32',
+    },
+    selectedDot: {
+        position: 'absolute',
+        top: 9,
+        right: 9,
+        width: 7,
+        height: 7,
+        borderRadius: 4,
+        backgroundColor: '#D96A2B',
+    },
     switchRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -693,11 +1113,62 @@ export const styles = StyleSheet.create({
         fontWeight: '500',
         color: '#333',
     },
+    switchCopy: {
+        flex: 1,
+        marginRight: 12,
+    },
+    modeHint: {
+        color: '#71717A',
+        fontSize: 11,
+        lineHeight: 16,
+        marginTop: 3,
+    },
+    optionWrap: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginHorizontal: -4,
+        marginBottom: 8,
+    },
+    optionChip: {
+        paddingHorizontal: 11,
+        paddingVertical: 8,
+        margin: 4,
+        borderWidth: 1,
+        borderColor: '#E7D8CD',
+        borderRadius: 16,
+        backgroundColor: '#FFF9F5',
+    },
+    optionChipSelected: {
+        borderColor: '#FD813B',
+        backgroundColor: '#FFF0E5',
+    },
+    optionChipText: {
+        color: '#52525B',
+        fontSize: 12,
+        fontWeight: '500',
+    },
+    optionChipTextSelected: {
+        color: '#9A431B',
+        fontWeight: '700',
+    },
     additionalImage: {
         width: 80,
         height: 80,
         borderRadius: 5,
         marginRight: 8,
+    },
+    addImagePlaceholder: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderStyle: 'dashed',
+        borderColor: '#E0B494',
+        backgroundColor: '#FFF8F2',
+    },
+    addImageText: {
+        color: '#9A431B',
+        fontSize: 11,
+        fontWeight: '600',
     },
     addressPicker: {
         flexDirection: 'row',

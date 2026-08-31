@@ -190,10 +190,6 @@ const ViewMyBookings = () => {
           },
         },
       );
-      console.log(
-        'Funtional halls BOOKINGS RES:::::::::',
-        JSON.stringify(response?.data),
-      );
       setHallsBookings(response?.data?.data);
     } catch (error) {
       console.log('My Bookings data error>>::', error);
@@ -647,6 +643,8 @@ const ViewMyBookings = () => {
     );
   };
 
+  // console.log('!selectedReason || !selectedBookingId',selectedReason,selectedBookingId);
+
   return (
     <SafeAreaView style={styles.container}>
       <ActionSheet
@@ -719,11 +717,10 @@ const ViewMyBookings = () => {
 
           <TouchableOpacity
             style={[
-              styles.confirmCancelButton,
-              (!selectedReason || !selectedBookingId) &&
-              styles.confirmCancelButtonDisabled,
+              (!selectedReason || !selectedBookingId ||(selectedReason === 'Other (Please specify...)' && !otherReasonText.trim())) ?
+              styles.confirmCancelButtonDisabled : styles.confirmCancelButton
             ]}
-            disabled={!selectedReason || !selectedBookingId}
+            disabled={!selectedReason || !selectedBookingId ||(selectedReason === 'Other (Please specify...)' &&  !otherReasonText.trim())}
             onPress={() => {
               if (
                 selectedReason === 'Other (Please specify...)' &&
@@ -1292,8 +1289,8 @@ const styles = StyleSheet.create({
   radioInner: {
     height: 12,
     width: 12,
-    borderRadius: 6,
-    backgroundColor: COLORS.cancelRed,
+    borderRadius: 12,
+    backgroundColor: COLORS.red,
   },
   radioLabel: {
     color: COLORS.dark,
@@ -1357,7 +1354,7 @@ const styles = StyleSheet.create({
     fontFamily: 'ManropeRegular',
   },
   confirmCancelButton: {
-    backgroundColor: COLORS.cancelRed,
+    backgroundColor: COLORS.green,
     padding: 14,
     borderRadius: 10,
     marginTop: 24,
@@ -1366,7 +1363,13 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   confirmCancelButtonDisabled: {
-    opacity: 0.5,
+    padding: 14,
+    borderRadius: 10,
+    marginTop: 24,
+    alignItems: 'center',
+    width: '80%',
+    alignSelf: 'center',
+    backgroundColor: COLORS.gray,
   },
   confirmCancelText: {
     color: COLORS.white,
