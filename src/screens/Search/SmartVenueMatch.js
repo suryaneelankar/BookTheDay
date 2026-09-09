@@ -21,12 +21,17 @@ import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import BASE_URL from '../../apiconfig';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
+import { horizontalScale, moderateScale, verticalScale } from '../../utils/scalingMetrics';
 
 const BRAND = '#E56B1F';
 const GOLD = '#FFD166';
 const INK = '#2D1B12';
 const CREAM = '#FFF8F1';
 const MUTED = '#78645A';
+const ACTION_DARK = '#7A5200';
+const ACTION_GOLD = '#A87205';
+const ACTION_MID = '#CE951A';
+const ACTION_BRIGHT = '#E4B946';
 const VENUE_CATEGORIES = [
   { label: 'All', value: 'Any' },
   { label: 'Function Halls', value: 'Function Hall' },
@@ -66,8 +71,10 @@ const DISTANCES = [2, 5, 10, 20, 'all'];
 const RUPEE = '\u20B9';
 const money = value => `${RUPEE}${Number(value || 0).toLocaleString('en-IN')}`;
 
-const SmartVenueMatch = () => {
+const SmartVenueMatch = ({ route }) => {
   const navigation = useNavigation();
+  const showHeader =
+    route?.params?.showHeader === true;
   const userLocationFetched = useSelector(state => state.userLocation);
   const currentLatitude = userLocationFetched?.geometry?.location?.lat
     ? userLocationFetched?.geometry?.location?.lat
@@ -747,7 +754,13 @@ const SmartVenueMatch = () => {
             <Text style={styles.editSearchText}>Edit search</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.budgetSummary}>
+        <LinearGradient
+          colors={[ACTION_DARK, ACTION_GOLD, ACTION_MID]}
+          locations={[0, 0.52, 1]}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          style={styles.budgetSummary}
+        >
           <View>
             <Text style={styles.budgetSummaryLabel}>
               {form.includeFood
@@ -771,7 +784,7 @@ const SmartVenueMatch = () => {
             size={22}
             color="#FFFFFF"
           />
-        </View>
+        </LinearGradient>
         {resultCount === 0 && (
           <View style={styles.emptyState}>
             <IonIcon name="search-outline" size={30} color={BRAND} />
@@ -868,14 +881,9 @@ const SmartVenueMatch = () => {
     const categoryHighlight = CATEGORY_HIGHLIGHTS[venueCategory]
       ?? CATEGORY_HIGHLIGHTS['Function Hall'];
 
-    const categoryMessage =
-      match.budgetStatus === 'not_applicable'
-        ? `This ${categoryHighlight.label} offers menu-based pricing`
-        : isMenuBasedPricing
-          ? `This ${categoryHighlight.label} has menu-based pricing`
-          : match.budgetStatus === 'within'
-            ? `This ${categoryHighlight.label} falls within your budget`
-            : `Price confirmation required for this ${categoryHighlight.label}`;
+    const matchHighlights = Array.isArray(match.reasons)
+      ? match.reasons.filter(Boolean).slice(0, 2)
+      : [];
 
 
     return (
@@ -885,38 +893,47 @@ const SmartVenueMatch = () => {
         onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}
       >
         <View style={styles.imageWrap}>
-          <FastImage source={{ uri: image }} style={styles.image} resizeMode={FastImage.resizeMode.cover} />
-          <LinearGradient colors={['transparent', 'rgba(24,18,16,0.62)']} style={styles.imageShade} />
+          {image ? (
+            <FastImage source={{ uri: image }} style={styles.image} resizeMode={FastImage.resizeMode.cover} />
+          ) : (
+            <View style={[styles.image, styles.imagePlaceholder]}>
+              <IonIcon name="image-outline" size={30} color="#A9988C" />
+            </View>
+          )}
           <View style={[styles.venueTypeBadge, { backgroundColor: 'rgba(255,255,255,0.90)' }]}>
             <IonIcon name={categoryHighlight.icon} size={12} color={categoryHighlight.color} />
             <Text style={[styles.venueTypeBadgeText, { color: categoryHighlight.color }]}>{categoryHighlight.label}</Text>
           </View>
-          {index === 0 && <View style={[styles.bestBadge, { backgroundColor: 'rgba(255,247,224,0.94)' }]}><IonIcon name="trophy" size={12} color="#A56A16" /><Text style={[styles.bestText, { color: '#8A5A16' }]}>BEST MATCH</Text></View>}
-          <View style={[styles.scoreBadge, { backgroundColor: 'rgba(255,255,255,0.92)' }]}><Text style={[styles.scoreNumber, { color: '#986A2D' }]}>{match.score}%</Text><Text style={[styles.scoreLabel, { color: '#786F68' }]}> match</Text></View>
-          <Text style={styles.venueName} numberOfLines={1}>{item.functionHallName}</Text>
+          <View style={styles.scoreBadge}>
+            <Text style={styles.scoreNumber}>{match.score}%</Text>
+            <Text style={styles.scoreLabel}>match</Text>
+          </View>
         </View>
-
         <View style={styles.venueBody}>
-          <View style={[styles.categoryBudgetBanner, { backgroundColor: categoryHighlight.background, borderColor: 'rgba(120,90,45,0.10)', borderWidth: 1 }]}>
-            <View style={[styles.categoryBudgetIcon, { backgroundColor: categoryHighlight.color, opacity: 0.88 }]}>
-              <IonIcon name={categoryHighlight.icon} size={14} color="#fff" />
+          <View style={styles.venueHeadingRow}>
+            <View style={styles.venueHeadingCopy}>
+              <Text style={styles.venueName} numberOfLines={1}>
+                {item.functionHallName}
+              </Text>
+              <View style={styles.venueMetaRow}>
+                {index === 0 && (
+                  <View style={styles.bestMatchChip}>
+                    <IonIcon name="trophy-outline" size={11} color="#8A5A16" />
+                    <Text style={styles.bestMatchText}>Best match</Text>
+                  </View>
+                )}
+                {match.distanceKm != null && (
+                  <View style={styles.venueMetaItem}>
+                    <IonIcon name="location-outline" size={12} color="#8B7A70" />
+                    <Text style={styles.venueMetaText}>{match.distanceKm} km</Text>
+                  </View>
+                )}
+              </View>
             </View>
-            <Text style={[styles.categoryBudgetText, { color: categoryHighlight.color }]}>
-              {categoryMessage}
-            </Text>
-            <IonIcon
-              name={
-                match.budgetStatus === 'within'
-                  ? 'checkmark-circle'
-                  : 'information-circle'
-              }
-              size={17}
-              color={categoryHighlight.color}
-            />
           </View>
 
           <View style={styles.priceRow}>
-            <View>
+            <View style={styles.priceCopy}>
               <Text style={styles.estimateLabel}>
                 {isMenuBasedPricing
                   ? startingPlatePrice > 0
@@ -1003,39 +1020,41 @@ const SmartVenueMatch = () => {
             </View>
           )}
 
-          <View style={styles.breakdown}>
-            {rentAmount > 0 && (
-              <Text style={styles.breakdownText}>
-                Rent {money(rentAmount)}
-              </Text>
-            )}
-
-            {isMenuBasedPricing && (
-              <Text style={styles.menuBasedChip}>
-                Price depends on selected menu
-              </Text>
-            )}
-
-            {!isMenuBasedPricing &&
-              form.includeFood && (
-                <Text style={styles.breakdownText}>
-                  Menu pricing needs confirmation
-                </Text>
+          {(rentAmount > 0 || isMenuBasedPricing || Number(estimate.decoration ?? 0) > 0) && (
+            <View style={styles.breakdown}>
+              {rentAmount > 0 && (
+                <View style={styles.breakdownItem}>
+                  <IonIcon name="business-outline" size={12} color="#8A755F" />
+                  <Text style={styles.breakdownText}>Rent {money(rentAmount)}</Text>
+                </View>
               )}
 
-            {Number(estimate.decoration ?? 0) > 0 && (
-              <Text style={styles.breakdownText}>
-                Decor {money(estimate.decoration)}
-              </Text>
-            )}
-          </View>
+              {isMenuBasedPricing && (
+                <View style={styles.breakdownItem}>
+                  <IonIcon name="restaurant-outline" size={12} color="#8A755F" />
+                  <Text style={styles.breakdownText}>Selected menu decides price</Text>
+                </View>
+              )}
 
-          {(match.reasons ?? []).map(reason => (
-            <View key={reason} style={styles.reasonRow}>
-              <IonIcon name="checkmark-circle" size={15} color="#5D9B72" />
-              <Text style={styles.reasonText}>{reason}</Text>
+              {Number(estimate.decoration ?? 0) > 0 && (
+                <View style={styles.breakdownItem}>
+                  <IonIcon name="color-palette-outline" size={12} color="#8A755F" />
+                  <Text style={styles.breakdownText}>Decor {money(estimate.decoration)}</Text>
+                </View>
+              )}
             </View>
-          ))}
+          )}
+
+          {matchHighlights.length > 0 && (
+            <View style={styles.matchHighlights}>
+              {matchHighlights.map(reason => (
+                <View key={reason} style={styles.reasonRow}>
+                  <IonIcon name="checkmark-circle" size={14} color="#4F8B64" />
+                  <Text style={styles.reasonText} numberOfLines={1}>{reason}</Text>
+                </View>
+              ))}
+            </View>
+          )}
 
           <View style={styles.cardActions}>
             <TouchableOpacity
@@ -1046,14 +1065,22 @@ const SmartVenueMatch = () => {
               <Text style={[styles.compareText, selected && styles.compareTextActive]}>{selected ? 'Added' : 'Compare'}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.detailsButton} onPress={() => navigation.navigate('ViewEvents', { categoryId: item._id })}>
-              <Text style={styles.detailsText}>View venue</Text>
-              <IonIcon name="chevron-forward" size={16} color="#fff" />
+              <LinearGradient
+                colors={[ACTION_DARK, ACTION_GOLD, ACTION_MID]}
+                locations={[0, 0.55, 1]}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+                style={styles.detailsButtonGradient}
+              >
+                <Text style={styles.detailsText}>View venue</Text>
+                <IonIcon name="chevron-forward" size={16} color="#fff" />
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         </View>
       </TouchableOpacity>
     );
-  }, [comparison, form.includeFood, navigation, toggleCompare]);
+  }, [comparison, form.budget, form.includeFood, navigation, toggleCompare]);
 
   const renderCategoryHeader = useCallback(({ section }) => {
     return (
@@ -1076,17 +1103,61 @@ const SmartVenueMatch = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.screenHeader}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      {showHeader && (
+        <LinearGradient
+          colors={['#FFF8F2', '#FDEBDD', '#F8D6BF']}
+          locations={[0, 0.52, 1]}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          style={styles.screenHeader}
         >
-          <IonIcon name="arrow-back" size={23} color={INK} />
-        </TouchableOpacity>
-        <Text style={styles.screenHeaderTitle}>Smart Venue Match</Text>
-        <View style={styles.headerSpacer} />
-      </View>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.75}
+            hitSlop={{
+              top: 10,
+              bottom: 10,
+              left: 10,
+              right: 10,
+            }}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+          >
+            <IonIcon
+              name="chevron-back"
+              size={22}
+              color="#7A5200"
+            />
+          </TouchableOpacity>
+
+          <View style={styles.screenHeaderContent}>
+            <View style={styles.screenHeaderTitleRow}>
+              <IonIcon
+                name="sparkles"
+                size={12}
+                color="#A87205"
+              />
+
+              <Text style={styles.screenHeaderTitle}>
+                Smart Venue Match
+              </Text>
+            </View>
+
+            <Text style={styles.screenHeaderSubtitle}>
+              Find venues that fit your needs
+            </Text>
+          </View>
+
+          {/* <View style={styles.headerIcon}>
+            <IonIcon
+              name="options-outline"
+              size={17}
+              color="#A87205"
+            />
+          </View> */}
+        </LinearGradient>
+      )}
       <SectionList
         sections={results}
         renderItem={renderVenue}
@@ -1103,9 +1174,18 @@ const SmartVenueMatch = () => {
       />
 
       {comparison.length > 0 && (
-        <TouchableOpacity style={styles.compareDock} onPress={() => setCompareVisible(true)}>
+        <TouchableOpacity style={[styles.compareDock, route?.params?.showHeader ? { bottom: 12 } : { bottom: 62 }]} onPress={() => setCompareVisible(true)}>
           <View><Text style={styles.compareDockTitle}>Compare venues</Text><Text style={styles.compareDockSub}>{comparison.length}/3 selected</Text></View>
-          <View style={styles.compareDockButton}><Text style={styles.compareDockButtonText}>Compare now</Text><IonIcon name="arrow-forward" size={16} color="#fff" /></View>
+          <LinearGradient
+            colors={[ACTION_GOLD, ACTION_MID, ACTION_BRIGHT]}
+            locations={[0, 0.56, 1]}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={styles.compareDockButton}
+          >
+            <Text style={styles.compareDockButtonText}>Compare now</Text>
+            <IonIcon name="arrow-forward" size={16} color="#FFFFFF" />
+          </LinearGradient>
         </TouchableOpacity>
       )}
 
@@ -1348,57 +1428,93 @@ const ComparisonRow = ({ icon, label, value, strong, last }) => (
 const styles = StyleSheet.create({
   venueCard: {
     marginHorizontal: 16,
-    marginBottom: 12,
+    marginBottom: 14,
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    borderRadius: 18,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#F1E7E0',
-    elevation: 2,
-    shadowColor: '#8B6A57',
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
+    borderColor: '#EDE2D9',
+    elevation: 3,
+    shadowColor: '#654A38',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
     shadowOffset: { width: 0, height: 3 },
   },
 
   imageWrap: {
-    height: 155,
+    height: 146,
+    backgroundColor: '#F3EEE9',
   },
 
   venueBody: {
-    padding: 12,
+    paddingHorizontal: 13,
+    paddingTop: 12,
+    paddingBottom: 13,
   },
 
-  categoryBudgetBanner: {
-    minHeight: 34,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    borderRadius: 9,
+  venueHeadingRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+
+  venueHeadingCopy: {
+    flex: 1,
+  },
+
+  venueMetaRow: {
+    minHeight: 20,
+    marginTop: 5,
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 7,
   },
 
-  categoryBudgetIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+  bestMatchChip: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 7,
+    gap: 4,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 9,
+    backgroundColor: '#FFF5D9',
+    borderWidth: 1,
+    borderColor: '#ECD38E',
   },
 
-  categoryBudgetText: {
-    flex: 1,
-    fontSize: 10,
-    lineHeight: 14,
+  bestMatchText: {
+    color: '#7A5200',
+    fontSize: 8,
+    fontWeight: '900',
+  },
+
+  venueMetaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+
+  venueMetaText: {
+    color: '#7F736B',
+    fontSize: 9,
     fontWeight: '700',
   },
 
   priceRow: {
-    marginTop: 10,
+    marginTop: 9,
+    padding: 10,
+    borderRadius: 12,
+    backgroundColor: '#FFFCF8',
+    borderWidth: 1,
+    borderColor: '#EEE3DA',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+
+  priceCopy: {
+    flex: 1,
+    paddingRight: 8,
   },
 
   estimateLabel: {
@@ -1408,10 +1524,10 @@ const styles = StyleSheet.create({
   },
 
   totalPrice: {
-    color: '#3F332D',
-    fontSize: 19,
+    color: '#2F2925',
+    fontSize: 18,
     fontWeight: '900',
-    marginTop: 1,
+    marginTop: 2,
   },
 
   statusPill: {
@@ -1448,32 +1564,40 @@ const styles = StyleSheet.create({
   },
 
   breakdown: {
-    marginTop: 7,
+    marginTop: 8,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 5,
+    gap: 6,
+  },
+
+  breakdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#F8F4F0',
+    borderRadius: 9,
+    paddingHorizontal: 7,
+    paddingVertical: 5,
   },
 
   breakdownText: {
-    color: '#887A70',
-    backgroundColor: '#FAF6F2',
-    paddingHorizontal: 7,
-    paddingVertical: 4,
-    borderRadius: 7,
+    color: '#74675E',
     fontSize: 9,
+    fontWeight: '700',
   },
 
-  menuBasedChip: {
-    color: '#A27642',
-    backgroundColor: '#FFF8EA',
-    paddingHorizontal: 7,
-    paddingVertical: 4,
-    borderRadius: 7,
-    fontSize: 9,
+  matchHighlights: {
+    marginTop: 8,
+    paddingHorizontal: 9,
+    paddingVertical: 7,
+    borderRadius: 11,
+    backgroundColor: '#F3FAF5',
+    borderWidth: 1,
+    borderColor: '#D8EBDD',
+    gap: 5,
   },
 
   reasonRow: {
-    marginTop: 5,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -1481,43 +1605,121 @@ const styles = StyleSheet.create({
   reasonText: {
     flex: 1,
     color: '#776B63',
-    fontSize: 10,
+    fontSize: 9,
+    fontWeight: '700',
     marginLeft: 5,
   },
 
   cardActions: {
-    marginTop: 10,
+    marginTop: 11,
     flexDirection: 'row',
     gap: 8,
   },
 
   compareButton: {
-    flex: 0.8,
-    minHeight: 36,
+    flex: 0.9,
+    minHeight: 38,
     paddingHorizontal: 8,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#E8D8CC',
+    borderColor: '#D9B44A',
+    backgroundColor: '#FFF6D8',
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
   },
 
   detailsButton: {
-    flex: 1.2,
-    minHeight: 36,
-    paddingHorizontal: 10,
+    flex: 1.1,
+    minHeight: 38,
     borderRadius: 10,
-    backgroundColor: '#C98255',
+    overflow: 'hidden',
+  },
+
+  detailsButtonGradient: {
+    flex: 1,
+    width: '100%',
+    minHeight: 38,
+    paddingHorizontal: 10,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
+    gap: 4,
   },
   safeArea: { flex: 1, backgroundColor: CREAM },
   content: { paddingBottom: 110 },
-  screenHeader: { height: 54, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F3E3D8' },
-  backButton: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF0E5' },
-  screenHeaderTitle: { color: INK, fontFamily: 'ManropeRegular', fontSize: 16, fontWeight: '800' },
+  screenHeader: {
+    minHeight: verticalScale(64),
+    paddingHorizontal: horizontalScale(14),
+    paddingVertical: verticalScale(9),
+
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    // borderBottomWidth: 1,
+    // borderBottomColor: '#E6C76D',
+
+    elevation: 2,
+
+    shadowColor: '#7A5200',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+  },
+
+  backButton: {
+    width: moderateScale(38),
+    height: moderateScale(38),
+    // borderRadius: moderateScale(19),
+
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    // backgroundColor: 'rgba(255,255,255,0.82)',
+
+    // borderWidth: 1,
+    // borderColor: '#E6C76D',
+  },
+
+  screenHeaderContent: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 20
+  },
+  screenHeaderTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: horizontalScale(5),
+  },
+  screenHeaderTitle: {
+    color: '#2D2418',
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(15),
+    fontWeight: '800',
+  },
+  screenHeaderSubtitle: {
+    marginTop: verticalScale(2),
+    color: '#756A58',
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(9),
+    fontWeight: '600',
+  },
+  headerIcon: {
+    width: moderateScale(38),
+    height: moderateScale(38),
+    borderRadius: moderateScale(19),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFF8E5',
+    borderWidth: 1,
+    borderColor: '#E6C76D',
+  },
+
   headerSpacer: { width: 38 },
   hero: {
     paddingHorizontal: 20,
@@ -1749,10 +1951,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 11,
     borderRadius: 13,
-    backgroundColor: '#C98255',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#D4A82C',
+    elevation: 3,
+    shadowColor: ACTION_DARK,
+    shadowOpacity: 0.18,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
   },
 
   budgetSummaryLabel: {
@@ -1861,16 +2069,14 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
 
-  image: { width: '100%', height: '100%', backgroundColor: '#F2D5C2' },
-  imageShade: { ...StyleSheet.absoluteFillObject },
-  venueTypeBadge: { position: 'absolute', top: 11, left: 11, flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 14 },
+  image: { width: '100%', height: '100%', backgroundColor: '#F2EDE8' },
+  imagePlaceholder: { alignItems: 'center', justifyContent: 'center' },
+  venueTypeBadge: { position: 'absolute', top: 11, left: 11, flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 9, paddingVertical: 5, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.94)' },
   venueTypeBadgeText: { color: '#fff', fontFamily: 'ManropeRegular', fontSize: 10, fontWeight: '900' },
-  bestBadge: { position: 'absolute', top: 43, left: 11, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: GOLD, paddingHorizontal: 9, paddingVertical: 5, borderRadius: 14 },
-  bestText: { color: '#5B3700', fontSize: 9, fontWeight: '900' },
-  scoreBadge: { position: 'absolute', top: 11, right: 11, flexDirection: 'row', alignItems: 'baseline', backgroundColor: 'rgba(147,24,108,0.92)', paddingHorizontal: 9, paddingVertical: 5, borderRadius: 14 },
-  scoreNumber: { color: '#fff', fontSize: 13, fontWeight: '900' },
-  scoreLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 9 },
-  venueName: { position: 'absolute', left: 13, right: 13, bottom: 11, color: '#fff', fontFamily: 'ManropeRegular', fontSize: 17, fontWeight: '800' },
+  scoreBadge: { position: 'absolute', top: 11, right: 11, flexDirection: 'row', alignItems: 'baseline', gap: 2, backgroundColor: 'rgba(122,82,0,0.92)', paddingHorizontal: 9, paddingVertical: 5, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.30)' },
+  scoreNumber: { color: '#fff', fontSize: 12, fontWeight: '900' },
+  scoreLabel: { color: 'rgba(255,255,255,0.82)', fontSize: 8, fontWeight: '700' },
+  venueName: { color: '#2F2925', fontFamily: 'ManropeRegular', fontSize: 15, lineHeight: 20, fontWeight: '900' },
   within: { backgroundColor: '#E3F7EC' }, near: { backgroundColor: '#FFF1D5' }, over: { backgroundColor: '#FCE4E7' },
   menuStatus: {
     backgroundColor: '#FFF0E5',
@@ -1879,15 +2085,15 @@ const styles = StyleSheet.create({
   unknownStatus: {
     backgroundColor: '#F1F3F5',
   },
-  compareButtonActive: { backgroundColor: BRAND },
-  compareText: { color: BRAND, fontSize: 12, fontWeight: '800' },
+  compareButtonActive: { backgroundColor: '#327048', borderColor: '#327048' },
+  compareText: { color: ACTION_DARK, fontSize: 12, fontWeight: '900' },
   compareTextActive: { color: '#fff' },
   detailsText: { color: '#fff', fontSize: 12, fontWeight: '800' },
-  compareDock: { position: 'absolute', left: 12, right: 12, bottom: 12, backgroundColor: INK, borderRadius: 17, padding: 12, paddingLeft: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', elevation: 10 },
+  compareDock: { position: 'absolute', left: 12, right: 12, backgroundColor: '#3A2A13', borderRadius: 17, padding: 11, paddingLeft: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderColor: '#8F6814', elevation: 12, shadowColor: '#1F1608', shadowOpacity: 0.30, shadowRadius: 8, shadowOffset: { width: 0, height: 4 } },
   compareDockTitle: { color: '#fff', fontSize: 13, fontWeight: '800' },
-  compareDockSub: { color: 'rgba(255,255,255,0.62)', fontSize: 10, marginTop: 2 },
-  compareDockButton: { backgroundColor: BRAND, borderRadius: 12, paddingHorizontal: 13, paddingVertical: 10, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  compareDockButtonText: { color: '#fff', fontSize: 11, fontWeight: '800' },
+  compareDockSub: { color: '#E6D6AE', fontSize: 10, marginTop: 2 },
+  compareDockButton: { minHeight: 38, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 9, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, borderWidth: 1, borderColor: '#EDC65C' },
+  compareDockButtonText: { color: '#FFFFFF', fontSize: 11, fontWeight: '900' },
   modalSafe: { flex: 1, backgroundColor: '#FFF9F5' },
   modalHeader: {
     paddingHorizontal: 16,

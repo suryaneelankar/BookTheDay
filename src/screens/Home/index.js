@@ -49,6 +49,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import FastImage from 'react-native-fast-image';
 import { isLocationEnabled } from 'react-native-android-location-enabler';
 import { promptForEnableLocationIfNeeded } from 'react-native-android-location-enabler';
+import { getRecentlyViewedVenues } from '../../utils/recentlyViewedVenues';
 
 /* COMMENTED OUT — catering/cloth/jewel imports no longer used
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -136,6 +137,45 @@ const eligibleVenues = values => {
 const createdTime = venue => {
   const value = new Date(venue?.createdAt).getTime();
   return venue?.createdAt && Number.isFinite(value) ? value : 0;
+};
+
+// Recently viewed venues are stored newest first. Prefer the category with
+// the most views; when counts match, the most recently viewed category wins.
+const getPreferredCategory = recentlyViewed => {
+  const stats = {};
+
+  (Array.isArray(recentlyViewed) ? recentlyViewed : []).forEach(
+    (venue, index) => {
+      const category = venue?.venueCategory;
+
+      if (!HOME_CATEGORIES.includes(category)) return;
+
+      if (!stats[category]) {
+        stats[category] = {
+          count: 0,
+          latestIndex: index,
+        };
+      }
+
+      stats[category].count += Math.max(
+        1,
+        Number(venue?.viewCount) || 1,
+      );
+      stats[category].latestIndex = Math.min(
+        stats[category].latestIndex,
+        index,
+      );
+    },
+  );
+
+  return Object.entries(stats)
+    .sort(([, first], [, second]) => {
+      if (second.count !== first.count) {
+        return second.count - first.count;
+      }
+
+      return first.latestIndex - second.latestIndex;
+    })[0]?.[0] ?? null;
 };
 
 const recentlyAddedLabel = createdAt => {
@@ -379,6 +419,13 @@ const HomeDashboard = () => {
   const paymentReadyCount = paymentReadyBookings.length;
   const firstPaymentReadyBooking = paymentReadyBookings[0];
 
+  const CATEGORY_PLURAL = {
+    'Function Hall': 'Function Halls',
+    'Banquet Hall': 'Banquet Halls',
+    'Farm House': 'Farm Houses',
+    'Luxury Resort': 'Luxury Resorts',
+  };
+
 
   const [homeLoading, setHomeLoading] = useState(() => {
     const cache = readHomeVenueCache();
@@ -411,6 +458,7 @@ const HomeDashboard = () => {
   const nearbyRequest = useRef(0);
   const latestRequest = useRef(0);
   const discoverRequest = useRef(0);
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
 
   useEffect(() => {
     homeMounted.current = true;
@@ -448,6 +496,28 @@ const HomeDashboard = () => {
     });
     return () => { cancelled = true; };
   }, [shortlistKey, shortlistReload]);
+
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+
+      const loadRecentlyViewed =
+        async () => {
+          const venues =
+            await getRecentlyViewedVenues(10);
+
+          if (active) {
+            setRecentlyViewed(venues);
+          }
+        };
+
+      loadRecentlyViewed();
+
+      return () => {
+        active = false;
+      };
+    }, []),
+  );
 
   async function toggleShortlist(venue) {
     if (!shortlistReady || shortlistBusy.current || !venue?._id) return;
@@ -875,6 +945,36 @@ const HomeDashboard = () => {
     () => buildHomeSections(nearByEventsData, premiumHalls, eventsData),
     [nearByEventsData, premiumHalls, eventsData],
   );
+
+  const preferredCategory = useMemo(
+    () => recentlyViewed.length >= 2
+      ? getPreferredCategory(recentlyViewed)
+      : null,
+    [recentlyViewed],
+  );
+
+  const recommendedVenues = useMemo(() => {
+    if (!preferredCategory) return [];
+
+    const viewedIds = new Set(
+      recentlyViewed.map(venue => String(venue?._id)),
+    );
+
+    // premiumHalls is the discovery feed. eventsData contains only the recent
+    // feed, so using it alone can leave this section empty unexpectedly.
+    const recommendationPool = eligibleVenues([
+      ...premiumHalls,
+      ...eventsData,
+      ...nearByEventsData,
+    ]);
+
+    return recommendationPool
+      .filter(venue =>
+        venue.venueCategory === preferredCategory &&
+        !viewedIds.has(String(venue._id)),
+      )
+      .slice(0, 10);
+  }, [preferredCategory, recentlyViewed, premiumHalls, eventsData, nearByEventsData]);
   const refreshHomeFeeds = async (token, force = false) => {
     if (homeFetchBusy.current) return;
     const cache = readHomeVenueCache();
@@ -1108,9 +1208,14 @@ const HomeDashboard = () => {
           <IonIcon name="arrow-forward" size={16} color="#A74416" />
         </TouchableOpacity>
       </View>
-      <FlatList data={items} renderItem={({ item }) => renderHallCard(item)} horizontal
-        extraData={shortlistState} keyExtractor={item => String(item._id)}
-        showsHorizontalScrollIndicator={false} contentContainerStyle={styles.listPadding} />
+      <FlatList data={items}
+        renderItem={({ item }) => renderHallCard(item)}
+        horizontal
+        extraData={shortlistState}
+        keyExtractor={item => String(item._id)}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.listPadding}
+      />
       {!items.length && !homeLoading && <Text style={[styles.homeNoticeText, { marginHorizontal: 20 }]}>Tap See all to browse this collection.</Text>}
     </View>
   ) : null;
@@ -1346,7 +1451,7 @@ const HomeDashboard = () => {
               {/* Banner 1 - Function Halls */}
               <TouchableOpacity
                 activeOpacity={0.95}
-                onPress={() => navigation.navigate('Events')}
+                onPress={() => navigation.navigate('ExploreTab')}
                 style={styles.heroBannerSlide}>
                 <Image
                   source={BannerFunctionHalls}
@@ -1358,7 +1463,7 @@ const HomeDashboard = () => {
               {/* Banner 2 - Farm Houses */}
               <TouchableOpacity
                 activeOpacity={0.95}
-                onPress={() => navigation.navigate('FarmHouseTab')}
+                onPress={() => navigation.navigate('ExploreTab')}
                 style={styles.heroBannerSlide}>
                 <Image
                   source={BannerFarmHouses}
@@ -1370,7 +1475,7 @@ const HomeDashboard = () => {
               {/* Banner 3 - Luxury Resorts */}
               <TouchableOpacity
                 activeOpacity={0.95}
-                onPress={() => navigation.navigate('LuxuryResorts')}
+                onPress={() => navigation.navigate('ExploreTab')}
                 style={styles.heroBannerSlide}>
                 <Image
                   source={BannerResorts}
@@ -1382,7 +1487,7 @@ const HomeDashboard = () => {
               {/* Banner 4 - Banquet Halls */}
               <TouchableOpacity
                 activeOpacity={0.95}
-                onPress={() => navigation.navigate('BanquetHallsTab')}
+                onPress={() => navigation.navigate('ExploreTab')}
                 style={styles.heroBannerSlide}>
                 <Image
                   source={BannerBanquetHalls}
@@ -1430,7 +1535,10 @@ const HomeDashboard = () => {
             <View style={styles.catGrid}>
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={() => navigation.navigate('Events')}
+                onPress={() => navigation.navigate('DiscoverVenues', {
+                  mode: 'discover',
+                  category: 'Function Hall',
+                })}
                 style={styles.catItem}>
                 <View style={styles.catCircle}>
                   <Image source={FunctionHallImg} style={{ width: 70, height: 70 }} resizeMode="cover" />
@@ -1440,7 +1548,10 @@ const HomeDashboard = () => {
 
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={() => navigation.navigate('FarmHouseTab')}
+                onPress={() => navigation.navigate('DiscoverVenues', {
+                  mode: 'discover',
+                  category: 'Farm House',
+                })}
                 style={styles.catItem}>
                 <View style={styles.catCircle}>
                   <Image source={FarmHouseIconPng} style={{ width: 70, height: 70 }} resizeMode="cover" />
@@ -1450,7 +1561,10 @@ const HomeDashboard = () => {
 
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={() => navigation.navigate('LuxuryResorts')}
+                onPress={() => navigation.navigate('DiscoverVenues', {
+                  mode: 'discover',
+                  category: 'Luxury Resort',
+                })}
                 style={styles.catItem}>
                 <View style={styles.catCircle}>
                   <Image source={ResortImg} style={{ width: 70, height: 70 }} resizeMode="cover" />
@@ -1460,7 +1574,10 @@ const HomeDashboard = () => {
 
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={() => navigation.navigate('BanquetHallsTab')}
+                onPress={() => navigation.navigate('DiscoverVenues', {
+                  mode: 'discover',
+                  category: 'Banquet Hall',
+                })}
                 style={styles.catItem}>
                 <View style={styles.catCircle}>
                   <Image source={BanquetHallImg} style={{ width: 70, height: 70 }} resizeMode="cover" />
@@ -1475,7 +1592,9 @@ const HomeDashboard = () => {
             activeOpacity={0.88}
             style={styles.smartMatchCard}
             onPress={() =>
-              navigation.navigate('SmartVenueMatch')
+              navigation.navigate('SmartVenueMatch', {
+                showHeader: true,
+              })
             }
             accessibilityRole="button"
             accessibilityLabel="Open Smart Venue Match"
@@ -1561,6 +1680,127 @@ const HomeDashboard = () => {
             </TouchableOpacity>
           )}
           {renderHomeSection('Venues Near You', homeSections.near, 'NearByEvents')}
+
+          {recentlyViewed.length > 0 && (
+            <View style={styles.rvSection}>
+              <View style={styles.rvHeader}>
+                <View>
+                  <Text style={styles.rvEyebrow}>
+                    CONTINUE WHERE YOU LEFT OFF
+                  </Text>
+
+                  <Text style={styles.rvTitle}>
+                    Recently viewed
+                  </Text>
+                </View>
+
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate(
+                      'RecentlyViewedVenues',
+                    )
+                  }
+                >
+                  <Text style={styles.rvSeeAllText}>
+                    See all
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.rvHistoryCard}>
+                {recentlyViewed.slice(0, 3).map((item, index) => {
+                  const isMenuBased =
+                    item.menuAvailable === true ||
+                    item.pricingType === 'menu_based';
+
+                  const price = Number(item.rentPricePerDay) > 0
+                    ? `₹${Number(item.rentPricePerDay).toLocaleString('en-IN')}`
+                    : 'Price on request';
+
+                  return (
+                    <TouchableOpacity
+                      key={String(item._id)}
+                      activeOpacity={0.85}
+                      style={[
+                        styles.rvRow,
+                        index < Math.min(recentlyViewed.length, 3) - 1 &&
+                        styles.rvRowBorder,
+                      ]}
+                      onPress={() =>
+                        navigation.navigate(
+                          'ViewEvents',
+                          {
+                            categoryId: item._id,
+                          },
+                        )
+                      }
+                    >
+                      {item.imageUrl ? (
+                        <Image
+                          source={{
+                            uri: item.imageUrl,
+                          }}
+                          style={styles.rvImage}
+                        />
+                      ) : (
+                        <View
+                          style={[
+                            styles.rvImage,
+                            styles.rvImagePlaceholder,
+                          ]}
+                        >
+                          <IonIcon
+                            name="image-outline"
+                            size={22}
+                            color="#A58F83"
+                          />
+                        </View>
+                      )}
+
+                      <View style={styles.rvContent}>
+                        <View style={styles.rvCategoryRow}>
+                          <Text style={styles.rvCategory} numberOfLines={1}>
+                            {item.venueCategory || 'Venue'}
+                          </Text>
+                          <IonIcon name="time-outline" size={11} color="#A06A4C" />
+                        </View>
+
+                        <Text
+                          style={styles.rvVenueName}
+                          numberOfLines={1}
+                        >
+                          {item.functionHallName}
+                        </Text>
+
+                        <View style={styles.rvLocationRow}>
+                          <IonIcon name="location-outline" size={12} color="#8D7C72" />
+                          <Text style={styles.rvLocation} numberOfLines={1}>
+                            {item.locality || 'Location unavailable'}
+                          </Text>
+                        </View>
+
+                        <View style={styles.rvBottomRow}>
+                          <Text style={styles.rvPrice}>
+                            {isMenuBased ? 'Menu based' : price}
+                          </Text>
+                          {Number(item.includedGuestCount) > 0 && (
+                            <Text style={styles.rvGuestText}>
+                              {item.includedGuestCount} guests included
+                            </Text>
+                          )}
+                        </View>
+                      </View>
+
+                      <View style={styles.rvArrow}>
+                        <IonIcon name="chevron-forward" size={16} color="#98461F" />
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          )}
+
           {!homeLoading && !homeSections.near.length && (
             <TouchableOpacity style={styles.homeStateBox} onPress={() => navigation.navigate('LocationAdded')}>
               <Text style={styles.homeNoticeTitle}>Explore a different area</Text>
@@ -1568,6 +1808,52 @@ const HomeDashboard = () => {
             </TouchableOpacity>
           )}
           {renderHomeSection('Discover Venues', homeSections.discover, 'SearchVenues', 'discover')}
+ 
+          {preferredCategory &&
+            recommendedVenues.length > 0 && (
+              <View style={styles.recommendedSection}>
+                <View style={styles.sectionHeader}>
+                  <View>
+                    <Text style={styles.sectionTitle}>
+                      Recommended for you
+                    </Text>
+
+                    <Text style={styles.recommendedSubtitle}>
+                      More {CATEGORY_PLURAL[preferredCategory] || 'venues'} based on what you viewed
+                    </Text>
+                  </View>
+
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate('DiscoverVenues', {
+                        mode: 'discover',
+                        category: preferredCategory,
+                      })
+                    }
+                  >
+                    <Text style={styles.seeAllText}>
+                      See all
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <FlatList
+                  horizontal
+                  data={recommendedVenues}
+                  keyExtractor={item =>
+                    `recommended-${item._id}`
+                  }
+                  renderItem={({ item }) => renderHallCard(item)}
+                  extraData={shortlistState}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.listPadding}
+                  initialNumToRender={4}
+                  maxToRenderPerBatch={5}
+                  windowSize={5}
+                  removeClippedSubviews
+                />
+              </View>
+            )}
           {renderRecentlyAdded(homeSections.recent)}
           {/* ════════════════════════════════════════
 
@@ -2528,6 +2814,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: horizontalScale(16),
     marginBottom: verticalScale(14),
   },
+  recommendedSection: {
+    marginTop: verticalScale(24),
+  },
+  recommendedSubtitle: {
+    marginTop: verticalScale(3),
+    color: '#806F64',
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(10.5),
+  },
   sectionTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -2889,6 +3184,138 @@ const styles = StyleSheet.create({
     fontSize: moderateScale(9.5),
     fontWeight: '800',
     color: '#8A4B08',
+  },
+
+  // Recently viewed uses its own rv* namespace so it does not clash with
+  // the shared section header or the existing Recently Added styles.
+  rvSection: {
+    marginTop: verticalScale(22),
+  },
+  rvHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    marginBottom: verticalScale(10),
+    paddingHorizontal: horizontalScale(16),
+  },
+  rvEyebrow: {
+    color: '#A05B36',
+    fontSize: moderateScale(8),
+    fontWeight: '800',
+    letterSpacing: 0.8,
+    fontFamily: 'ManropeRegular',
+  },
+  rvTitle: {
+    marginTop: verticalScale(2),
+    color: '#312824',
+    fontSize: moderateScale(18),
+    fontWeight: '800',
+    fontFamily: 'ManropeRegular',
+  },
+  rvSeeAllText: {
+    color: '#98461F',
+    fontSize: moderateScale(11),
+    fontWeight: '800',
+    fontFamily: 'ManropeRegular',
+  },
+  rvHistoryCard: {
+    marginHorizontal: horizontalScale(16),
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E8D9CF',
+    borderRadius: moderateScale(17),
+    backgroundColor: '#FFFDFC',
+    elevation: 2,
+    shadowColor: '#59331F',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.07,
+    shadowRadius: 7,
+  },
+  rvRow: {
+    minHeight: verticalScale(104),
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: moderateScale(10),
+  },
+  rvRowBorder: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E9DED7',
+  },
+  rvImage: {
+    width: horizontalScale(86),
+    height: verticalScale(82),
+    borderRadius: moderateScale(12),
+    backgroundColor: '#F2E9E3',
+  },
+  rvImagePlaceholder: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rvContent: {
+    flex: 1,
+    alignSelf: 'stretch',
+    justifyContent: 'center',
+    marginLeft: horizontalScale(11),
+  },
+  rvCategoryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rvCategory: {
+    maxWidth: '82%',
+    marginRight: horizontalScale(5),
+    color: '#A25932',
+    fontSize: moderateScale(8),
+    fontWeight: '800',
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    fontFamily: 'ManropeRegular',
+  },
+  rvVenueName: {
+    marginTop: verticalScale(3),
+    color: '#332A26',
+    fontSize: moderateScale(13),
+    fontWeight: '800',
+    fontFamily: 'ManropeRegular',
+  },
+  rvLocationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: verticalScale(5),
+  },
+  rvLocation: {
+    flex: 1,
+    marginLeft: horizontalScale(3),
+    color: '#81736B',
+    fontSize: moderateScale(10),
+    fontFamily: 'ManropeRegular',
+  },
+  rvBottomRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: verticalScale(7),
+  },
+  rvPrice: {
+    color: '#93401B',
+    fontSize: moderateScale(11),
+    fontWeight: '800',
+    fontFamily: 'ManropeRegular',
+  },
+  rvGuestText: {
+    marginLeft: horizontalScale(8),
+    color: '#5F7564',
+    fontSize: moderateScale(8),
+    fontWeight: '700',
+    fontFamily: 'ManropeRegular',
+  },
+  rvArrow: {
+    width: moderateScale(28),
+    height: moderateScale(28),
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: horizontalScale(5),
+    borderRadius: moderateScale(14),
+    backgroundColor: '#FFF0E6',
   },
   // ── WHY BOOKTHEDAY ──────────────────────────────────────────────────────────
 

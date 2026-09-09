@@ -1,130 +1,374 @@
 import * as Keychain from 'react-native-keychain';
 
-// Store the token securely
-export const storeUserAuthToken = async (token) => {
-  try {
-    await Keychain.setGenericPassword('userToken', token);
-  } catch (error) {
-    console.error('Error storing the token securely', error);
-  }
+const SERVICES = {
+  USER_TOKEN:
+    'com.booktheday.auth.user',
+
+  VENDOR_TOKEN:
+    'com.booktheday.auth.vendor',
+
+  USER_MOBILE:
+    'com.booktheday.mobile.user',
+
+  VENDOR_MOBILE:
+    'com.booktheday.mobile.vendor',
+
+  ACTIVE_ROLE:
+    'com.booktheday.auth.active-role',
 };
 
-// Retrieve the token securely
-export const getUserAuthToken = async () => {
-  try {
-    const credentials = await Keychain.getGenericPassword();
-    if (credentials && credentials.username === 'userToken') {
-        // console.log('credentials password is :::>>>', credentials.password);
+const validateValue = (
+  value,
+  fieldName,
+) => {
+  if (
+    typeof value !== 'string' ||
+    !value.trim()
+  ) {
+    throw new Error(
+      `${fieldName} is required.`,
+    );
+  }
+
+  return value.trim();
+};
+
+/* --------------------------------------------------
+ * User token
+ * -------------------------------------------------- */
+
+export const storeUserAuthToken =
+  async token => {
+    const validToken =
+      validateValue(
+        token,
+        'User token',
+      );
+
+    await Keychain.setGenericPassword(
+      'userToken',
+      validToken,
+      {
+        service:
+          SERVICES.USER_TOKEN,
+      },
+    );
+
+    return true;
+  };
+
+export const getUserAuthToken =
+  async () => {
+    try {
+      const credentials =
+        await Keychain.getGenericPassword({
+          service:
+            SERVICES.USER_TOKEN,
+        });
+
+      if (
+        credentials &&
+        credentials.username ===
+          'userToken'
+      ) {
         return credentials.password;
       }
-      return credentials.password;
-  } catch (error) {
-    console.error('Error retrieving the token securely', error);
-    return null;
-  }
-};
 
-// Remove the token securely
-export const removeUserAuthToken = async () => {
-  try {
-    await Keychain.resetGenericPassword();
-  } catch (error) {
-    console.error('Error removing the token securely', error);
-  }
-};
-
-export const storeVendorAuthToken = async (token) => {
-    try {
-      await Keychain.setGenericPassword('vendorToken', token);
+      return null;
     } catch (error) {
-      console.error('Error storing the token securely', error);
+      console.error(
+        'Error retrieving user token:',
+        error,
+      );
+
+      return null;
     }
   };
-  
-  // Retrieve the token securely
-  export const getVendorAuthToken = async () => {
+
+export const removeUserAuthToken =
+  async () => {
+    await Keychain.resetGenericPassword({
+      service:
+        SERVICES.USER_TOKEN,
+    });
+  };
+
+/* --------------------------------------------------
+ * Vendor token
+ * -------------------------------------------------- */
+
+export const storeVendorAuthToken =
+  async token => {
+    const validToken =
+      validateValue(
+        token,
+        'Vendor token',
+      );
+
+    await Keychain.setGenericPassword(
+      'vendorToken',
+      validToken,
+      {
+        service:
+          SERVICES.VENDOR_TOKEN,
+      },
+    );
+
+    return true;
+  };
+
+export const getVendorAuthToken =
+  async () => {
     try {
-      const credentials = await Keychain.getGenericPassword();
-      if (credentials && credentials.username === 'vendorToken') {
+      const credentials =
+        await Keychain.getGenericPassword({
+          service:
+            SERVICES.VENDOR_TOKEN,
+        });
+
+      if (
+        credentials &&
+        credentials.username ===
+          'vendorToken'
+      ) {
         return credentials.password;
       }
+
       return null;
     } catch (error) {
-      console.error('Error retrieving the token securely', error);
+      console.error(
+        'Error retrieving vendor token:',
+        error,
+      );
+
       return null;
     }
   };
-  
-  // Remove the token securely
-  export const removeVendorAuthToken = async () => {
+
+export const removeVendorAuthToken =
+  async () => {
+    await Keychain.resetGenericPassword({
+      service:
+        SERVICES.VENDOR_TOKEN,
+    });
+  };
+
+/* --------------------------------------------------
+ * User mobile number
+ * -------------------------------------------------- */
+
+export const storeUserMobileNumber =
+  async number => {
+    const mobileNumber =
+      validateValue(
+        String(number || ''),
+        'User mobile number',
+      );
+
+    await Keychain.setGenericPassword(
+      'userNumber',
+      mobileNumber,
+      {
+        service:
+          SERVICES.USER_MOBILE,
+      },
+    );
+
+    return true;
+  };
+
+export const getUserMobileNumber =
+  async () => {
     try {
-      await Keychain.resetGenericPassword();
+      const credentials =
+        await Keychain.getGenericPassword({
+          service:
+            SERVICES.USER_MOBILE,
+        });
+
+      if (
+        credentials &&
+        credentials.username ===
+          'userNumber'
+      ) {
+        return credentials.password;
+      }
+
+      return null;
     } catch (error) {
-      console.error('Error removing the token securely', error);
+      console.error(
+        'Error retrieving user mobile number:',
+        error,
+      );
+
+      return null;
     }
   };
 
+export const removeUserMobileNumber =
+  async () => {
+    await Keychain.resetGenericPassword({
+      service:
+        SERVICES.USER_MOBILE,
+    });
+  };
 
-   // store  the vendor mobile number securely
-  export const storeVendorMobileNumber = async (number) => {
+/* --------------------------------------------------
+ * Vendor mobile number
+ * -------------------------------------------------- */
+
+export const storeVendorMobileNumber =
+  async number => {
+    const mobileNumber =
+      validateValue(
+        String(number || ''),
+        'Vendor mobile number',
+      );
+
+    await Keychain.setGenericPassword(
+      'vendorNumber',
+      mobileNumber,
+      {
+        service:
+          SERVICES.VENDOR_MOBILE,
+      },
+    );
+
+    return true;
+  };
+
+export const getVendorMobileNumber =
+  async () => {
     try {
-      await Keychain.setGenericPassword('vendorNumber', number, { service: 'vendorMobileNumber' });
+      const credentials =
+        await Keychain.getGenericPassword({
+          service:
+            SERVICES.VENDOR_MOBILE,
+        });
+
+      if (
+        credentials &&
+        credentials.username ===
+          'vendorNumber'
+      ) {
+        return credentials.password;
+      }
+
+      return null;
     } catch (error) {
-      console.error('Error storing the vendor number securely', error);
+      console.error(
+        'Error retrieving vendor mobile number:',
+        error,
+      );
+
+      return null;
     }
   };
 
-   // Retrieve the vendor mobile number securely
-export const getVendorMobileNumber = async () => {
-  try {
-    const credentials = await Keychain.getGenericPassword({ service: 'vendorMobileNumber' });
-    if (credentials && credentials.username === 'vendorNumber') {
-      return credentials.password;
+export const removeVendorMobileNumber =
+  async () => {
+    await Keychain.resetGenericPassword({
+      service:
+        SERVICES.VENDOR_MOBILE,
+    });
+  };
+
+/* --------------------------------------------------
+ * Active login role
+ * -------------------------------------------------- */
+
+export const storeActiveRole =
+  async role => {
+    if (
+      role !== 'user' &&
+      role !== 'vendor'
+    ) {
+      throw new Error(
+        'Active role must be user or vendor.',
+      );
     }
-    return null;
-  } catch (error) {
-    console.error('Error retrieving the vendor number securely', error);
-    return null;
-  }
-};
 
-// Remove the vendor mobile number securely
-export const removeVendorMobileNumber = async () => {
-  try {
-    await Keychain.resetGenericPassword({ service: 'vendorMobileNumber' });
-  } catch (error) {
-    console.error('Error removing the vendor number securely', error);
-  }
-};
+    await Keychain.setGenericPassword(
+      'activeRole',
+      role,
+      {
+        service:
+          SERVICES.ACTIVE_ROLE,
+      },
+    );
 
-// Store the user's mobile number securely
-export const storeUserMobileNumber = async (number) => {
-  try {
-    await Keychain.setGenericPassword('userNumber', number, { service: 'userMobileNumber' });
-  } catch (error) {
-    console.error('Error storing the user mobile number securely', error);
-  }
-};
+    return true;
+  };
 
-// Retrieve the user's mobile number securely
-export const getUserMobileNumber = async () => {
-  try {
-    const credentials = await Keychain.getGenericPassword({ service: 'userMobileNumber' });
-    if (credentials && credentials.username === 'userNumber') {
-      return credentials.password;
+export const getActiveRole =
+  async () => {
+    try {
+      const credentials =
+        await Keychain.getGenericPassword({
+          service:
+            SERVICES.ACTIVE_ROLE,
+        });
+
+      if (
+        credentials &&
+        credentials.username ===
+          'activeRole' &&
+        (
+          credentials.password ===
+            'user' ||
+          credentials.password ===
+            'vendor'
+        )
+      ) {
+        return credentials.password;
+      }
+
+      return null;
+    } catch (error) {
+      console.error(
+        'Error retrieving active role:',
+        error,
+      );
+
+      return null;
     }
-    return null;
-  } catch (error) {
-    console.error('Error retrieving the user mobile number securely', error);
-    return null;
-  }
-};
+  };
 
-// Remove the user's mobile number securely
-export const removeUserMobileNumber = async () => {
-  try {
-    await Keychain.resetGenericPassword({ service: 'userMobileNumber' });
-  } catch (error) {
-    console.error('Error removing the user mobile number securely', error);
-  }
-};
+export const removeActiveRole =
+  async () => {
+    await Keychain.resetGenericPassword({
+      service:
+        SERVICES.ACTIVE_ROLE,
+    });
+  };
+
+/* --------------------------------------------------
+ * Complete session removal
+ * -------------------------------------------------- */
+
+export const clearUserSession =
+  async () => {
+    await Promise.all([
+      removeUserAuthToken(),
+      removeUserMobileNumber(),
+    ]);
+  };
+
+export const clearVendorSession =
+  async () => {
+    await Promise.all([
+      removeVendorAuthToken(),
+      removeVendorMobileNumber(),
+    ]);
+  };
+
+export const clearAllAuthSessions =
+  async () => {
+    await Promise.all([
+      removeUserAuthToken(),
+      removeUserMobileNumber(),
+      removeVendorAuthToken(),
+      removeVendorMobileNumber(),
+      removeActiveRole(),
+    ]);
+  };

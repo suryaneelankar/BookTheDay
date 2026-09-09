@@ -63,6 +63,8 @@ import EditFunctionHall from "../screens/VendorScreens/VendorAddFunctionHalls/Ed
 import VendorVenueListings from "../screens/VendorScreens/VendorProfile/VendorVenueListings";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import SmartVenueMatch from "../screens/Search/SmartVenueMatch";
+import RecentlyViewedVenues from "../screens/Events/RecentlyViewedVenues";
+import HomeVenueFeed from "../screens/Home/HomeVenueFeed";
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
@@ -76,523 +78,539 @@ const HomeScreen = () => {
 
 const AuthNavigator = () => (
     <AuthStack.Navigator initialRouteName="LandingScreen">
-            <Stack.Screen
-                name="LandingScreen"
-                component={LandingScreen}
-                options={{
-                    header: () => (''),
-                    headerShown: false,
-                }}
-            />
-            <Stack.Screen
-                name="LoginScreen"
-                component={LoginScreen}
-                options={{
-                    // header: () => <NavigationHeader Icon={true} title="" />,
-                    headerShown: false,
-                }}
-            />
-            <Stack.Screen
-                name="UserAndVendorRegister"
-                component={UserAndVendorRegister}
-                options={{
-                    // header: () => <NavigationHeader Icon={true} title="" />,
-                    headerShown: false,
-                }}
-            />
-            <Stack.Screen
-                name="OtpValidation"
-                component={OtpValidation}
-                options={{
-                    // header: () => <NavigationHeader Icon={true} title="" />,
-                    headerShown: false,
-                }}
-            />
-        </AuthStack.Navigator>
+        <Stack.Screen
+            name="LandingScreen"
+            component={LandingScreen}
+            options={{
+                header: () => (''),
+                headerShown: false,
+            }}
+        />
+        <Stack.Screen
+            name="LoginScreen"
+            component={LoginScreen}
+            options={{
+                // header: () => <NavigationHeader Icon={true} title="" />,
+                headerShown: false,
+            }}
+        />
+        <Stack.Screen
+            name="UserAndVendorRegister"
+            component={UserAndVendorRegister}
+            options={{
+                // header: () => <NavigationHeader Icon={true} title="" />,
+                headerShown: false,
+            }}
+        />
+        <Stack.Screen
+            name="OtpValidation"
+            component={OtpValidation}
+            options={{
+                // header: () => <NavigationHeader Icon={true} title="" />,
+                headerShown: false,
+            }}
+        />
+    </AuthStack.Navigator>
 );
 
 const HomeNavigator = () => (
     <HomeStack.Navigator
         initialRouteName="Home"
     >
-            <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="ViewTrendingDetails" component={ViewTrendingDetails} options={{
+        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="ViewTrendingDetails" component={ViewTrendingDetails} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="Trending" />
+                </SafeAreaView>
+            )
+            , headerShown: true
+        }} />
+        <Stack.Screen name="CategoriesList" component={CategoriesList} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="View Products" />
+                </SafeAreaView>
+            ),
+            headerShown: true,
+        }} />
+        <Stack.Screen name="ViewEvents" component={ViewEvents} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="Event Details" />
+                </SafeAreaView>
+            )
+            , headerShown: true
+        }} />
+
+        <Stack.Screen
+            name="RecentlyViewedVenues"
+            component={RecentlyViewedVenues}
+            options={{
+                headerShown: false,
+            }}
+        />
+
+        <Stack.Screen
+            name="DiscoverVenues"
+            component={HomeVenueFeed}
+            options={{
+                headerShown: false,
+            }}
+        />
+
+        <Stack.Screen
+            name="SmartVenueMatch"
+            component={SmartVenueMatch}
+            options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+            name="SearchVenues"
+            component={SearchVenues}
+            options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+            name="BudgetPlanner"
+            component={BudgetPlanner}
+            options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+            name="EditProfile"
+            component={EditProfile}
+            options={{
                 header: () => (
                     <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="Trending" />
-                    </SafeAreaView>
-                )
-                , headerShown: true
-            }} />
-            <Stack.Screen name="CategoriesList" component={CategoriesList} options={{
-                header: () => (
-                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="View Products" />
-                    </SafeAreaView>
-                ),
-                headerShown: true,
-            }} />
-            <Stack.Screen name="ViewEvents" component={ViewEvents} options={{
-                header: () => (
-                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="Event Details" />
-                    </SafeAreaView>
-                )
-                , headerShown: true
-            }} />
-
-            <Stack.Screen
-                name="SmartVenueMatch"
-                component={SmartVenueMatch}
-                 options={{ headerShown: false }}
-            />
-
-            <Stack.Screen
-                name="SearchVenues"
-                component={SearchVenues}
-                options={{ headerShown: false }}
-            />
-
-            <Stack.Screen
-                name="BudgetPlanner"
-                component={BudgetPlanner}
-                options={{ headerShown: false }}
-            />
-
-            <Stack.Screen
-                name="EditProfile"
-                component={EditProfile}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Edit Profile" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="ViewMyBookings"
-                component={ViewMyBookings}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="My Bookings" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-
-            <Stack.Screen
-                name="BookingReview"
-                component={BookingReview}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Review Your Booking" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-
-            <Stack.Screen
-                name="ViewCatDetails"
-                component={ViewCatDetails}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Product Details" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="PaymentSuccess"
-                component={PaymentSuccess}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Payment Successful" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="PaymentFailed"
-                component={PaymentFailedScreen}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Payment Failed" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="EditAddFoodCatering"
-                component={EditAddFoodCatering}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Edit Catering Form" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="EditAddFoodCateringGeneral"
-                component={EditAddFoodCateringGeneral}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Add Food Catering" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="BookingDetailsScreen"
-                component={BookingDetailsScreen}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Cart" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="AadharUpload"
-                component={AadharUpload}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="KYC Documents" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="UserAadharUpload"
-                component={UserAadharUpload}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="KYC Documents" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="BankDetailsScreen"
-                component={BankDetailsScreen}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Bank Details" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="MyTransactions"
-                component={MyTransactions}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="My Transactions" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-
-            <Stack.Screen
-                name="MyBookings"
-                component={MyBookings}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="My Bookings" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="HallsBookingOverView"
-                component={HallsBookingOverView}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Booking Overview" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-
-            <Stack.Screen
-                name="LocationAdded"
-                component={LocationAdded}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Add Location" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="ViewCaterings"
-                component={ViewCaterings}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="View Caterings" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="CateringsOverView"
-                component={CateringsOverView}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Cart" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="NearByEvents"
-                component={NearByEvents}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Near By Events" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="LuxuryResorts"
-                component={LuxuryResorts}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: '#0A1628' }}>
-                            <NavigationHeader Icon={true} title="Luxury Resorts" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="FarmHouse"
-                component={FarmHouse}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: '#1A2E1A' }}>
-                            <NavigationHeader Icon={true} title="Farm Houses" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="BanquetHalls"
-                component={BanquetHalls}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: '#1A0808' }}>
-                            <NavigationHeader Icon={true} title="Banquet Halls" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="NearByFoodCaterings"
-                component={NearByFoodCaterings}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Near By Caterings" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="AboutUsScreen"
-                component={AboutUsScreen}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="About Us" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="VendorTermsAndCond"
-                component={VendorTermsAndCond}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="VendorRefundPolicy"
-                component={VendorRefundPolicy}
-                options={{
-                    header: () => (
-                        <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                            <NavigationHeader Icon={true} title="Refund Policy" />
-                        </SafeAreaView>
-                    ),
-                    headerShown: true,
-                }}
-            />
-
-            {/* ############### profile Screens ################# */}
-            <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{
-                header: () => (
-                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="Profile" />
-                    </SafeAreaView>
-                ),
-                headerShown: true
-            }} />
-            <Stack.Screen name="AboutUs" component={AboutUs} options={{
-                header: () => (
-                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="About Us" />
-                    </SafeAreaView>
-                ),
-                headerShown: true
-            }} />
-            <Stack.Screen name="ContactUs" component={ContactUs} options={{
-                header: () => (
-                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="Contact Us" />
+                        <NavigationHeader Icon={true} title="Edit Profile" />
                     </SafeAreaView>
                 ),
                 headerShown: true,
-            }} />
-            <Stack.Screen name="DeleteMyAccount" component={DeleteMyAccount} options={{
+            }}
+        />
+        <Stack.Screen
+            name="ViewMyBookings"
+            component={ViewMyBookings}
+            options={{
                 header: () => (
                     <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="Delete Account" />
+                        <NavigationHeader Icon={true} title="My Bookings" />
                     </SafeAreaView>
                 ),
                 headerShown: true,
-            }} />
-            <Stack.Screen name="RefundPolicy" component={RefundPolicy} options={{
+            }}
+        />
+
+        <Stack.Screen
+            name="BookingReview"
+            component={BookingReview}
+            options={{
                 header: () => (
                     <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="" />
+                        <NavigationHeader Icon={true} title="Review Your Booking" />
+                    </SafeAreaView>
+                ),
+                headerShown: false,
+            }}
+        />
+
+        <Stack.Screen
+            name="ViewCatDetails"
+            component={ViewCatDetails}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="Product Details" />
                     </SafeAreaView>
                 ),
                 headerShown: true,
-            }} />
-            <Stack.Screen name="TermsAndConditions" component={TermsAndConditionsScreen} options={{
+            }}
+        />
+        <Stack.Screen
+            name="PaymentSuccess"
+            component={PaymentSuccess}
+            options={{
                 header: () => (
                     <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="" />
+                        <NavigationHeader Icon={true} title="Payment Successful" />
                     </SafeAreaView>
                 ),
                 headerShown: true,
-            }} />
-            {/* //////////////////////      VENDOR SCREENS     ///////////////////////////////////////////// */}
-
-            <Stack.Screen name="RequestConfirmation" component={RequestConfirmation} options={{
+            }}
+        />
+        <Stack.Screen
+            name="PaymentFailed"
+            component={PaymentFailedScreen}
+            options={{
                 header: () => (
                     <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="Request Details" />
+                        <NavigationHeader Icon={true} title="Payment Failed" />
                     </SafeAreaView>
                 ),
                 headerShown: true,
-            }} />
-
-
-
-            <Stack.Screen name="RentOnProducts" component={RentOnProducts} options={{
+            }}
+        />
+        <Stack.Screen
+            name="EditAddFoodCatering"
+            component={EditAddFoodCatering}
+            options={{
                 header: () => (
                     <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="Add Cloth/Jewels" />
-                    </SafeAreaView>
-                ), headerShown: true
-            }} />
-
-            <Stack.Screen name="AddFunctionalHall" component={AddFunctionalHall} options={{
-                header: () => (
-                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="Add Function Hall" />
+                        <NavigationHeader Icon={true} title="Edit Catering Form" />
                     </SafeAreaView>
                 ),
                 headerShown: true,
-            }} />
-
-            <Stack.Screen name="EditFunctionHall" component={EditFunctionHall} options={{
-                header: () => (
-                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="Edit Function Hall" />
-                    </SafeAreaView>
-                ),
-                headerShown: true,
-            }} />
-            <Stack.Screen name="VendorVenueListings" component={VendorVenueListings} options={{
-                header: () => (
-                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="My Listings" />
-                    </SafeAreaView>
-                ),
-                headerShown: true,
-            }} />
-            {/* EditFunctionHallScreen */}
-
-
-            <Stack.Screen name="AddFoodCatering" component={AddFoodCatering} options={{
+            }}
+        />
+        <Stack.Screen
+            name="EditAddFoodCateringGeneral"
+            component={EditAddFoodCateringGeneral}
+            options={{
                 header: () => (
                     <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
                         <NavigationHeader Icon={true} title="Add Food Catering" />
                     </SafeAreaView>
                 ),
                 headerShown: true,
-            }} />
-
-            <Stack.Screen name="AdminDashboard" component={AdminDashboard} options={{
+            }}
+        />
+        <Stack.Screen
+            name="BookingDetailsScreen"
+            component={BookingDetailsScreen}
+            options={{
                 header: () => (
                     <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
-                        <NavigationHeader Icon={true} title="Admin Dashboard" />
+                        <NavigationHeader Icon={true} title="Cart" />
                     </SafeAreaView>
                 ),
                 headerShown: true,
-            }} />
+            }}
+        />
+        <Stack.Screen
+            name="AadharUpload"
+            component={AadharUpload}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="KYC Documents" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+        <Stack.Screen
+            name="UserAadharUpload"
+            component={UserAadharUpload}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="KYC Documents" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+        <Stack.Screen
+            name="BankDetailsScreen"
+            component={BankDetailsScreen}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="Bank Details" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+        <Stack.Screen
+            name="MyTransactions"
+            component={MyTransactions}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="My Transactions" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
 
-        </HomeStack.Navigator>
+        <Stack.Screen
+            name="MyBookings"
+            component={MyBookings}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="My Bookings" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+        <Stack.Screen
+            name="HallsBookingOverView"
+            component={HallsBookingOverView}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="Booking Overview" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+
+        <Stack.Screen
+            name="LocationAdded"
+            component={LocationAdded}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="Add Location" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+        <Stack.Screen
+            name="ViewCaterings"
+            component={ViewCaterings}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="View Caterings" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+        <Stack.Screen
+            name="CateringsOverView"
+            component={CateringsOverView}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="Cart" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+        <Stack.Screen
+            name="NearByEvents"
+            component={NearByEvents}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="Near By Events" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+        <Stack.Screen
+            name="LuxuryResorts"
+            component={LuxuryResorts}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: '#0A1628' }}>
+                        <NavigationHeader Icon={true} title="Luxury Resorts" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+        <Stack.Screen
+            name="FarmHouse"
+            component={FarmHouse}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: '#1A2E1A' }}>
+                        <NavigationHeader Icon={true} title="Farm Houses" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+        <Stack.Screen
+            name="BanquetHalls"
+            component={BanquetHalls}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: '#1A0808' }}>
+                        <NavigationHeader Icon={true} title="Banquet Halls" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+        <Stack.Screen
+            name="NearByFoodCaterings"
+            component={NearByFoodCaterings}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="Near By Caterings" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+        <Stack.Screen
+            name="AboutUsScreen"
+            component={AboutUsScreen}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="About Us" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+        <Stack.Screen
+            name="VendorTermsAndCond"
+            component={VendorTermsAndCond}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+        <Stack.Screen
+            name="VendorRefundPolicy"
+            component={VendorRefundPolicy}
+            options={{
+                header: () => (
+                    <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                        <NavigationHeader Icon={true} title="Refund Policy" />
+                    </SafeAreaView>
+                ),
+                headerShown: true,
+            }}
+        />
+
+        {/* ############### profile Screens ################# */}
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="Profile" />
+                </SafeAreaView>
+            ),
+            headerShown: true
+        }} />
+        <Stack.Screen name="AboutUs" component={AboutUs} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="About Us" />
+                </SafeAreaView>
+            ),
+            headerShown: true
+        }} />
+        <Stack.Screen name="ContactUs" component={ContactUs} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="Contact Us" />
+                </SafeAreaView>
+            ),
+            headerShown: true,
+        }} />
+        <Stack.Screen name="DeleteMyAccount" component={DeleteMyAccount} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="Delete Account" />
+                </SafeAreaView>
+            ),
+            headerShown: true,
+        }} />
+        <Stack.Screen name="RefundPolicy" component={RefundPolicy} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="" />
+                </SafeAreaView>
+            ),
+            headerShown: true,
+        }} />
+        <Stack.Screen name="TermsAndConditions" component={TermsAndConditionsScreen} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="" />
+                </SafeAreaView>
+            ),
+            headerShown: true,
+        }} />
+        {/* //////////////////////      VENDOR SCREENS     ///////////////////////////////////////////// */}
+
+        <Stack.Screen name="RequestConfirmation" component={RequestConfirmation} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="Request Details" />
+                </SafeAreaView>
+            ),
+            headerShown: true,
+        }} />
+
+
+
+        <Stack.Screen name="RentOnProducts" component={RentOnProducts} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="Add Cloth/Jewels" />
+                </SafeAreaView>
+            ), headerShown: true
+        }} />
+
+        <Stack.Screen name="AddFunctionalHall" component={AddFunctionalHall} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="Add Function Hall" />
+                </SafeAreaView>
+            ),
+            headerShown: true,
+        }} />
+
+        <Stack.Screen name="EditFunctionHall" component={EditFunctionHall} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="Edit Function Hall" />
+                </SafeAreaView>
+            ),
+            headerShown: true,
+        }} />
+        <Stack.Screen name="VendorVenueListings" component={VendorVenueListings} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="My Listings" />
+                </SafeAreaView>
+            ),
+            headerShown: true,
+        }} />
+        {/* EditFunctionHallScreen */}
+
+
+        <Stack.Screen name="AddFoodCatering" component={AddFoodCatering} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="Add Food Catering" />
+                </SafeAreaView>
+            ),
+            headerShown: true,
+        }} />
+
+        <Stack.Screen name="AdminDashboard" component={AdminDashboard} options={{
+            header: () => (
+                <SafeAreaView edges={['top']} style={{ backgroundColor: 'white' }}>
+                    <NavigationHeader Icon={true} title="Admin Dashboard" />
+                </SafeAreaView>
+            ),
+            headerShown: true,
+        }} />
+
+    </HomeStack.Navigator>
 );
 
 const MainNavigation = () => {

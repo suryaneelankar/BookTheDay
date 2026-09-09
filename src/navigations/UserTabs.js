@@ -1,21 +1,21 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
 import HomeDashboard from '../screens/Home';
-import Events from '../screens/Events';
+import ExploreScreen from '../screens/Explore';
+import SmartVenueMatch from '../screens/Search/SmartVenueMatch';
+import ViewMyBookings from '../screens/Profile/MyBookings';
+import ProfileMainScreen from '../screens/Profile/ProfileScreen';
 import HomeIcon from '../assets/svgs/tabIcons/home.svg';
 import FocusedHomeIcon from '../assets/svgs/tabIcons/focusedHome.svg';
 import { Platform } from 'react-native';
 import IonIcon from 'react-native-vector-icons/Ionicons';
-import LuxuryResorts from '../screens/Events/LuxuryResorts';
-import FarmHouse from '../screens/Events/FarmHouse';
-import BanquetHalls from '../screens/Events/BanquetHalls';
 
 const Tab = createBottomTabNavigator();
 
 const UserTabs = () => {
   return (
     <Tab.Navigator
-      initialRouteName='UserHome'
+      initialRouteName="UserHome"
       screenOptions={{
         tabBarShowLabel: true,
         tabBarStyle: {
@@ -36,67 +36,82 @@ const UserTabs = () => {
         },
       }}>
 
-      {/* ── Home ── */}
+      {/* ── 1. Home ── */}
       <Tab.Screen
         name="UserHome"
         component={HomeDashboard}
         options={{
-          tabBarIcon: ({ focused }) => (
-            focused ? <FocusedHomeIcon /> : <HomeIcon />
-          ),
+          tabBarIcon: ({ focused }) =>
+            focused ? <FocusedHomeIcon /> : <HomeIcon />,
           tabBarLabel: 'Home',
           headerShown: false,
         }}
       />
 
-      {/* ── Banquets ── */}
+      {/* ── 2. Explore (all venue categories with filter bar) ── */}
       <Tab.Screen
-        name="BanquetHallsTab"
-        component={BanquetHalls}
+        name="ExploreTab"
+        component={ExploreScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <IonIcon name={focused ? "ribbon" : "ribbon-outline"} size={22} color={focused ? '#FD813B' : '#AAAEBB'} />
+            <IonIcon
+              name={focused ? 'compass' : 'compass-outline'}
+              size={24}
+              color={focused ? '#FD813B' : '#AAAEBB'}
+            />
           ),
-          tabBarLabel: 'Banquets',
+          tabBarLabel: 'Explore',
           headerShown: false,
         }}
       />
 
-      {/* ── Resorts ── */}
+      {/* ── 3. Smart Match (centre — primary differentiator) ── */}
       <Tab.Screen
-        name="LuxuryResorts"
-        component={LuxuryResorts}
+        name="SmartMatchTab"
+        component={SmartVenueMatch}
         options={{
           tabBarIcon: ({ focused }) => (
-            <IonIcon name={focused ? "sparkles" : "sparkles-outline"} size={22} color={focused ? '#FD813B' : '#AAAEBB'} />
+            <IonIcon
+              name={focused ? 'sparkles' : 'sparkles-outline'}
+              size={24}
+              color={focused ? '#FD813B' : '#AAAEBB'}
+            />
           ),
-          tabBarLabel: 'Resorts',
+          tabBarLabel: 'Smart Match',
           headerShown: false,
         }}
       />
 
-      {/* ── Farm Houses ── */}
+      {/* ── 4. My Bookings ── */}
       <Tab.Screen
-        name="FarmHouseTab"
-        component={FarmHouse}
+        name="MyBookingsTab"
+        component={ViewMyBookings}
         options={{
           tabBarIcon: ({ focused }) => (
-            <IonIcon name={focused ? "leaf" : "leaf-outline"} size={22} color={focused ? '#FD813B' : '#AAAEBB'} />
+            <IonIcon
+              name={focused ? 'calendar' : 'calendar-outline'}
+              size={24}
+              color={focused ? '#FD813B' : '#AAAEBB'}
+            />
           ),
-          tabBarLabel: 'Farm Houses',
+          tabBarLabel: 'My Bookings',
           headerShown: false,
         }}
       />
 
-      {/* ── Function Halls (all) ── */}
+      {/* ── 5. Profile ── */}
       <Tab.Screen
-        name="Events"
-        component={Events}
+        name="ProfileTab"
+        component={ProfileMainScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <IonIcon name={focused ? "business" : "business-outline"} size={22} color={focused ? '#FD813B' : '#AAAEBB'} />
+            <IonIcon
+              name={focused ? 'person' : 'person-outline'}
+              size={24}
+              color={focused ? '#FD813B' : '#AAAEBB'}
+            />
           ),
-          tabBarLabel: 'All Halls',
+          tabBarLabel: 'Profile',
           headerShown: false,
         }}
       />

@@ -690,6 +690,44 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
     const onPressSaveAndPost = async () => {
         const { finalEarningAfterDiscount, earningAmount, serviceCharges } = calculateCharges();
+        const menuPackages = (menuAvailable ? [
+            {
+                slot: 'basic-veg',
+                menuType: basicVegMenuName?.trim() || 'Basic Veg Menu',
+                menuPrice: Number(basicVegPrice),
+                image: menuImages.menuImageOne,
+            },
+            {
+                slot: 'premium-veg',
+                menuType: premiumVegMenuName?.trim() || 'Premium Veg Menu',
+                menuPrice: Number(premiumVegPrice),
+                image: menuImages.menuImageTwo,
+            },
+            {
+                slot: 'elite-veg',
+                menuType: eliteVegMenuName?.trim() || 'Elite Veg Menu',
+                menuPrice: Number(eliteVegPrice),
+                image: menuImages.menuImageThree,
+            },
+            {
+                slot: 'basic-nonveg',
+                menuType: basicNonVegMenuName?.trim() || 'Basic Non Veg Menu',
+                menuPrice: Number(basicNonVegPrice),
+                image: menuImages.menuImageFour,
+            },
+            {
+                slot: 'premium-nonveg',
+                menuType: premiumNonVegMenuName?.trim() || 'Premium Non Veg Menu',
+                menuPrice: Number(premiumNonVegPrice),
+                image: menuImages.menuImageFive,
+            },
+            {
+                slot: 'elite-nonveg',
+                menuType: eliteNonVegMenuName?.trim() || 'Elite Non Veg Menu',
+                menuPrice: Number(eliteNonVegPrice),
+                image: menuImages.menuImageSix,
+            },
+        ] : []).filter(item => Number.isFinite(item.menuPrice) && item.menuPrice > 0);
         const missingField = [
             {
                 invalid: !mainImageUrl,
@@ -731,8 +769,13 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                 return;
             }
         } else {
-            if ((basicVegPrice === 0 || basicVegPrice === undefined) || (advanceAmountPercentage === 0 || advanceAmountPercentage === undefined)) {
-                CustomAlert.alert('Please fill Mandatory fields', 'Please fill Veg Menu Price & Advance percentage', undefined, { type: 'warning' });
+            if (menuPackages.length === 0) {
+                CustomAlert.alert('Please fill Mandatory fields', 'Please enter at least one veg or non-veg menu price.', undefined, { type: 'warning' });
+                return;
+            }
+
+            if (!Number.isFinite(Number(advanceAmountPercentage)) || Number(advanceAmountPercentage) <= 0) {
+                CustomAlert.alert('Please fill Mandatory fields', 'Please enter the menu advance percentage.', undefined, { type: 'warning' });
                 return;
             }
         }
@@ -770,14 +813,6 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         if (eliteNonVegPrice > 0 && eliteNonVegMenuName === '') {
             setEliteNonVegMenuName('Elite Non Veg Menu');
         }
-
-        Object.entries(menuImages).forEach(([key, value]) => {
-            console.log('value is ::>>', value);
-            if (value?.menuPrice && (!value?.assets || value.assets.length === 0)) {
-                CustomAlert.alert('Missing Image', `Please upload an image for menu.`, undefined, { type: 'warning' });
-                return;
-            }
-        });
 
         const uploadedImagesCount = Object.values(additionalImages).filter(value => value !== undefined).length;
 
@@ -851,25 +886,33 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
         const menuImageMetaData = [];
 
-        Object.entries(menuImages).forEach(([key, value]) => {
-            const imageAsset = value?.assets?.[0];
+        menuPackages.forEach(menuPackage => {
+            const imageAsset = menuPackage.image?.assets?.[0];
             if (imageAsset?.uri) {
+                const safeMenuFileName = sanitizeFileName(imageAsset.fileName);
+
                 formData.append('menuImages', {
                     uri: imageAsset.uri,
-                    type: imageAsset.type,
-                    name: imageAsset.fileName,
+                    type: imageAsset.type || 'image/jpeg',
+                    name: safeMenuFileName,
                 });
 
-                // Save related metadata separately
                 menuImageMetaData.push({
-                    fileName: imageAsset.fileName,
-                    menuType: value?.menuType || "",
-                    menuPrice: value?.menuPrice || 0,
+                    slot: menuPackage.slot,
+                    fileName: safeMenuFileName,
+                    menuType: menuPackage.menuType,
+                    menuPrice: menuPackage.menuPrice,
                 });
             }
         });
 
         formData.append('menuImagesMeta', JSON.stringify(menuImageMetaData));
+        formData.append(
+            'menuPackages',
+            JSON.stringify(
+                menuPackages.map(({ image, ...menuPackage }) => menuPackage),
+            ),
+        );
 
         videos.forEach((video, idx) => {
             if (video?.uri) {
@@ -894,6 +937,8 @@ const GeneralDetails = ({ isAadharUpdate }) => {
         formData.append('vendorMobileNumber', vendorMobileNumber);
         formData.append('advanceAmount', advanceAmount);
         formData.append('advanceAmountInPercentageForMenu', advanceAmountPercentage);
+        formData.append('menuAvailable', String(menuAvailable));
+        formData.append('pricingType', menuAvailable ? 'menu_based' : 'fixed');
         formData.append('discountPercentage', discountPercentage);
         formData.append('seatingCapacity', selectedSeatingCapacity);
         formData.append('accepted', false);

@@ -1,80 +1,143 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ActivityIndicator } from 'react-native';
-import LinearGradient from "react-native-linear-gradient";
-import { moderateScale, verticalScale } from "../../utils/scalingMetrics";
+import React, { useState } from 'react';
 
-const PayNowButton = ({ onPress, text, disabled, }) => {
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
 
-    const [loading, setLoading] = useState(false);
+import LinearGradient from
+  'react-native-linear-gradient';
 
-    const handlePress = async () => {
-        if (loading) return; // Prevent multiple clicks
-        setLoading(true);
+import {
+  moderateScale,
+} from '../../utils/scalingMetrics';
 
-        try {
-            await onPress(); // Ensure `onPress` is an async function
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
+const PayNowButton = ({
+  onPress,
+  text,
+  disabled = false,
+}) => {
+  const [loading, setLoading] =
+    useState(false);
+
+  const handlePress = async () => {
+    if (
+      disabled ||
+      loading ||
+      typeof onPress !== 'function'
+    ) {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await onPress();
+    } catch (error) {
+      console.error(
+        'Pay Now action failed:',
+        error,
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const buttonDisabled =
+    disabled || loading;
+
+  return (
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={handlePress}
+      disabled={buttonDisabled}
+      style={styles.container}
+      accessibilityRole="button"
+      accessibilityState={{
+        disabled: buttonDisabled,
+        busy: loading,
+      }}
+    >
+      <LinearGradient
+        colors={
+          buttonDisabled
+            ? [
+                '#D9D2C7',
+                '#C8C0B5',
+              ]
+            : [
+                '#A87205',
+                '#CE951A',
+                '#E4B946',
+              ]
         }
-    };
+        locations={
+          buttonDisabled
+            ? [0, 1]
+            : [0, 0.55, 1]
+        }
+        start={{
+          x: 0,
+          y: 0.5,
+        }}
+        end={{
+          x: 1,
+          y: 0.5,
+        }}
+        style={styles.gradientButton}
+      >
+        {loading ? (
+          <ActivityIndicator
+            size="small"
+            color="#FFFFFF"
+          />
+        ) : (
+          <Text
+            style={[
+              styles.buttonText,
 
-    return (
-        <TouchableOpacity onPress={handlePress} style={[styles.container]} disabled={disabled} activeOpacity={0.5}>
-            <LinearGradient
-                colors={['#D2453B', '#A0153E']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={[
-                    styles.buttonView,
-                    { alignSelf: 'center' },
-                    disabled && { opacity: 0.5 } // Add this line
-                ]}
-            >
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    {loading ? (
-                        <ActivityIndicator color="#F4F4F6" />
-                    ) : (
-                        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", flexDirection: "row", position: "relative" }}>
-                            <Text style={styles.buttonText}>
-                                {text}
-                            </Text>
-                        </View>
-                    )}
-                </View>
-            </LinearGradient>
-        </TouchableOpacity>
-    );
+              buttonDisabled &&
+                styles.disabledButtonText,
+            ]}
+          >
+            {text}
+          </Text>
+        )}
+      </LinearGradient>
+    </TouchableOpacity>
+  );
 };
 
 export default PayNowButton;
 
 const styles = StyleSheet.create({
-    container: {
-        // backgroundColor: "white",
-        paddingVertical: verticalScale(15),
-        width: 120,
-        alignSelf: "center"
-    },
-    buttonView: {
-        padding: 8,
-        borderRadius: moderateScale(4),
-        alignItems: "center",
+  container: {
+    flex: 1,
+    minWidth: 0,
+    minHeight: 36,
+  },
 
-    },
-    buttonText: {
-        color: "#F4F4F6",
-        fontSize: 14,
-        fontWeight: "600",
-        fontFamily: "ManropeRegular",
-        textAlign: "center"
-    },
-    SubmitbuttonText: {
-        color: "#F4F4F6",
-        fontSize: 16,
-        fontWeight: "600",
-        fontFamily: "ManropeRegular",
-        textAlign: "center"
-    }
-})
+  gradientButton: {
+    flex: 1,
+    width: '100%',
+    minHeight: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#D7AA37',
+    borderRadius: moderateScale(20),
+  },
+
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: moderateScale(10.5),
+    fontWeight: '800',
+    fontFamily: 'ManropeRegular',
+    textAlign: 'center',
+  },
+  disabledButtonText: {
+    color: '#746D65',
+  },
+});

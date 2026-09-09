@@ -6,16 +6,10 @@ import BASE_URL, { LocalHostUrl } from "../../apiconfig";
 import { verticalScale } from "../../utils/scalingMetrics";
 import { Calendar } from 'react-native-calendars';
 import moment from 'moment';
-import MapMarkIcon from '../../assets/svgs/orangeMapMark.svg';
-import CalendarIcon from '../../assets/svgs/calendarOrangeIcon.svg';
 import Modal from 'react-native-modal';
 import themevariable from "../../utils/themevariable";
 import LeftArrow from '../../assets/svgs/leftarrowWhite.svg';
 import BookDatesButton from "../../components/GradientButton";
-import ServiceTime from '../../assets/svgs/serviceTime.svg';
-import VegNonVegIcon from '../../assets/svgs/foodtype/vegNonveg.svg';
-import VegIcon from '../../assets/svgs/foodtype/veg.svg';
-import NonVegIcon from '../../assets/svgs/foodtype/NonVeg.svg';
 import { getUserAuthToken } from "../../utils/StoreAuthToken";
 import CustomModal from "../../components/AlertModal";
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -31,6 +25,7 @@ import ZoomImage from "../../components/ZoomImage";
 import ZoomIcon from 'react-native-vector-icons/MaterialIcons';
 import Video from 'react-native-video';
 import LinearGradient from "react-native-linear-gradient";
+import { addRecentlyViewedVenue } from '../../utils/recentlyViewedVenues';
 
 const { width, height } = Dimensions.get('window');
 
@@ -52,6 +47,7 @@ const ViewEvents = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const { categoryId } = route.params;
+  const [functionHallDetails, setFunctionHallDetails] = useState([]);
 
   const [isCameraZoomImageModalVisible, setIsCameraZoomImageModalVisible] = useState(false);
   const [isMenuImageModalVisible, setIsMenuImageModalVisible] = useState(false);
@@ -278,6 +274,14 @@ const ViewEvents = ({ route, navigation }) => {
       }));
       setAmenitiesData(amenities);
 
+      // console.log('response?.data?._id is ::>>',response?.data?._id);
+
+      if (response?.data?._id) {
+        await addRecentlyViewedVenue(
+          response.data,
+        );
+      }
+
     } catch (error) {
       // console.log("events error::::::::::", error);
 
@@ -387,7 +391,7 @@ const ViewEvents = ({ route, navigation }) => {
     return result;
   };
 
-  const rows = chunkArray(amenitiesData, 4); // Split data into rows of 4 items
+  const rows = chunkArray(amenitiesData, 3); // Three readable amenity cards per row
 
   const renderHallAmenities = ({ item }) => {
 
@@ -430,8 +434,11 @@ const ViewEvents = ({ route, navigation }) => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
-      <ScrollView style={{ backgroundColor: "white", marginBottom: 30 }}>
+    <View style={styles.vdScreen}>
+      <ScrollView
+        style={styles.vdScroll}
+        contentContainerStyle={styles.vdScrollContent}
+        showsVerticalScrollIndicator={false}>
 
         {/* ══ HERO ══
              • Has video  → autoplay video + play button + premium badge
@@ -439,6 +446,15 @@ const ViewEvents = ({ route, navigation }) => {
              Both cases share the same gradient overlay + name/address
         ══════════════════════════════════════════ */}
         <View style={styles.heroContainer}>
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => navigation.goBack()}
+            style={styles.vdBackButton}
+            accessibilityRole="button"
+            accessibilityLabel="Go back">
+            <IonIcon name="arrow-back" size={21} color="#FFFFFF" />
+          </TouchableOpacity>
 
           {hallVideos?.length > 0 ? (
             /* ── VIDEO HERO ── */
@@ -701,28 +717,40 @@ const ViewEvents = ({ route, navigation }) => {
           </View>
         </View>
 
-        <View style={{ flex: 1, marginTop: 16, marginHorizontal: 20 }}>
+        <View style={styles.vdContent}>
 
           {/* ── VENUE NAME + VERIFIED BADGE ── */}
-          <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" }}>
-            <Text style={{ fontSize: 20, color: "#100D25", fontWeight: "700", fontFamily: 'ManropeRegular', width: "65%" }}>{eventsDetails?.functionHallName}</Text>
+          <View style={styles.vdVenueHeaderCard}>
+            <View style={styles.vdVenueTitleRow}>
+            <View style={styles.vdVenueTitleCopy}>
+              <Text style={styles.vdCategoryLabel}>
+                {(eventsDetails?.venueCategory || 'Venue').toUpperCase()}
+              </Text>
+              <Text style={styles.vdVenueTitle}>{eventsDetails?.functionHallName}</Text>
+            </View>
             <View style={styles.verifiedBadge}>
               <IonIcon name="shield-checkmark" size={13} color="#009C4D" />
               <Text style={styles.verifiedText}>Verified</Text>
             </View>
           </View>
 
-
           {/* ── ADDRESS + STREET VIEW ── */}
-          <View style={{ flexDirection: "row", marginTop: 12, alignItems: "flex-start" }}>
-            <MapMarkIcon style={{ marginTop: 2 }} />
-            <Text style={{ color: "#939393", fontSize: 12, fontWeight: "400", fontFamily: 'ManropeRegular', marginLeft: 5, flex: 1 }}>{eventsDetails?.functionHallAddress?.address}</Text>
-          </View>
-          <TouchableOpacity onPress={showAlert} style={{ marginTop: 6, marginLeft: 5 }}>
-            <Text style={{ color: "#FD813B", fontSize: 12, fontWeight: "600", textDecorationLine: "underline", fontFamily: 'ManropeRegular' }}>
-              📍 View on Street View
+          <View style={styles.vdAddressRow}>
+            <View style={styles.vdAddressIcon}>
+              <IonIcon name="location-outline" size={18} color="#A54A20" />
+            </View>
+            <Text style={styles.vdAddressText}>
+              {eventsDetails?.functionHallAddress?.address || 'Address unavailable'}
             </Text>
+          </View>
+          <TouchableOpacity onPress={showAlert} style={styles.vdMapButton}>
+            <IonIcon name="map-outline" size={15} color="#93401B" />
+            <Text style={styles.vdMapButtonText}>
+              View Street View
+            </Text>
+            <IonIcon name="open-outline" size={13} color="#93401B" />
           </TouchableOpacity>
+          </View>
 
           {/* ── PRICING CARD ── */}
           {/* ── PRICING CARD ── */}
@@ -767,12 +795,19 @@ const ViewEvents = ({ route, navigation }) => {
 
 
           {/* ── DESCRIPTION ── */}
-          <View style={{ marginTop: 20, marginBottom: 10 }}>
-            <Text style={styles.title}>About This Venue</Text>
-            <Text style={{ fontFamily: 'ManropeRegular', fontSize: 13, color: "#8B8B8B", fontWeight: "400", marginTop: 6, lineHeight: 20, marginBottom: 10 }}>{HallDescription}</Text>
-            {!!eventsDetails?.description && (
-              <Text style={{ fontFamily: 'ManropeRegular', fontSize: 13, color: "#FD813B", fontWeight: "400", marginTop: 4, lineHeight: 20 }}>{eventsDetails?.description}</Text>
-            )}
+          <View style={styles.vdSectionCard}>
+            <View style={styles.vdSectionHeader}>
+              <View style={styles.vdSectionIcon}>
+                <IonIcon name="information-circle-outline" size={18} color="#A54A20" />
+              </View>
+              <View>
+                <Text style={styles.vdSectionEyebrow}>VENUE INFORMATION</Text>
+                <Text style={styles.vdSectionTitle}>About this venue</Text>
+              </View>
+            </View>
+            <Text style={styles.vdDescription}>
+              {eventsDetails?.description || HallDescription}
+            </Text>
             {!!eventsDetails?.functionHallAreaInSft && (
               <View style={styles.areaChip}>
                 <IonIcon name="expand-outline" size={14} color="#FD813B" />
@@ -785,44 +820,59 @@ const ViewEvents = ({ route, navigation }) => {
             CateringMenuSection()
           )}
 
-          <View style={{ borderColor: "#F1F1F1", borderWidth: 1, width: "100%", marginTop: 5 }} />
-
-          <View style={{ marginTop: 20 }}>
-            <Text style={{ fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular' }}>Hall Amenities</Text>
+          <View style={styles.vdSectionCard}>
+            <View style={styles.vdSectionHeader}>
+              <View style={styles.vdSectionIcon}>
+                <IonIcon name="sparkles-outline" size={18} color="#A54A20" />
+              </View>
+              <View>
+                <Text style={styles.vdSectionEyebrow}>WHAT IS AVAILABLE</Text>
+                <Text style={styles.vdSectionTitle}>Venue amenities</Text>
+              </View>
+            </View>
             <FlatList
               data={rows}
               keyExtractor={(item, index) => index.toString()}
               renderItem={renderHallAmenities}
-              contentContainerStyle={{ marginTop: 15 }}
+              contentContainerStyle={styles.vdAmenitiesList}
+              scrollEnabled={false}
             />
 
           </View>
 
           {renderCalendar()}
-          <Text style={{ marginTop: 20, fontWeight: "700", color: "#121212", fontSize: 16, fontFamily: 'ManropeRegular' }}>Select Booking Details</Text>
-          <View style={{ marginTop: 15 }}>
-            <Text style={{ fontWeight: "600", color: "#121212", fontSize: 14, fontFamily: 'ManropeRegular' }}>Booking Date</Text>
+          <View style={styles.vdBookingCard}>
+            <View style={styles.vdSectionHeader}>
+              <View style={[styles.vdSectionIcon, styles.vdBookingIcon]}>
+                <IonIcon name="calendar-outline" size={18} color="#FFFFFF" />
+              </View>
+              <View style={styles.vdBookingHeadingCopy}>
+                <Text style={styles.vdBookingEyebrow}>CHECK YOUR EVENT DATE</Text>
+                <Text style={styles.vdBookingTitle}>Select booking details</Text>
+                <Text style={styles.vdBookingSubtitle}>The vendor will confirm availability after your request.</Text>
+              </View>
+            </View>
 
-            <TouchableOpacity style={{
-              marginTop: 10, flexDirection: "row",
-              alignItems: "center", justifyContent: "space-between",
-              borderWidth: 1, borderColor: "#FD813B", borderRadius: 4,
-              paddingHorizontal: 20, paddingVertical: 12
-            }} onPress={() => setIsVisible(true)}>
-              <Text style={{ fontSize: 13, fontFamily: 'ManropeRegular', fontWeight: "400", color: selectedDate ? "#121212" : "#8B8B8B", }}>{selectedDate ? moment(selectedDate).format('DD-MM-YYYY') : 'Pick A Date'}</Text>
-              <CalendarIcon />
+            <Text style={styles.vdFieldLabel}>Booking date</Text>
+            <TouchableOpacity style={styles.vdSelector} onPress={() => setIsVisible(true)}>
+              <View style={styles.vdSelectorLeading}>
+                <IonIcon name="calendar-clear-outline" size={18} color="#A54A20" />
+                <Text style={[styles.vdSelectorText, selectedDate && styles.vdSelectorTextActive]}>
+                  {selectedDate ? moment(selectedDate).format('DD MMM YYYY') : 'Choose event date'}
+                </Text>
+              </View>
+              <IonIcon name="chevron-forward" size={17} color="#A98A79" />
             </TouchableOpacity>
 
-            <Text style={{ marginTop: 20, fontWeight: "600", color: "#121212", fontSize: 14, fontFamily: 'ManropeRegular' }}>Booking Time</Text>
-
-            <TouchableOpacity style={{
-              marginTop: 10, flexDirection: "row",
-              alignItems: "center", justifyContent: "space-between",
-              borderWidth: 1, borderColor: "#FD813B", borderRadius: 4,
-              paddingHorizontal: 20, paddingVertical: 12
-            }} onPress={() => setTimeSlotModalVisible(true)}>
-              <Text style={{ fontSize: 13, fontFamily: 'ManropeRegular', fontWeight: "400", color: selectedDate ? "#121212" : "#8B8B8B", }}>{selectedTimeSlot ? selectedTimeSlot : 'Pick A Time'}</Text>
-              <ServiceTime />
+            <Text style={styles.vdFieldLabel}>Booking time</Text>
+            <TouchableOpacity style={styles.vdSelector} onPress={() => setTimeSlotModalVisible(true)}>
+              <View style={styles.vdSelectorLeading}>
+                <IonIcon name="time-outline" size={19} color="#A54A20" />
+                <Text style={[styles.vdSelectorText, selectedTimeSlot && styles.vdSelectorTextActive]}>
+                  {selectedTimeSlot || 'Choose time slot'}
+                </Text>
+              </View>
+              <IonIcon name="chevron-forward" size={17} color="#A98A79" />
             </TouchableOpacity>
           </View>
 
@@ -914,7 +964,7 @@ const ViewEvents = ({ route, navigation }) => {
               </View>
             )}
 
-          <View style={{ marginBottom: "10%" }} />
+          <View style={styles.vdBottomSpacer} />
 
 
         </View>
@@ -1085,8 +1135,7 @@ const ViewEvents = ({ route, navigation }) => {
           </View>
         </Modal>
       </ScrollView>
-      {console.log('totalAdvacneAmountAfterPercentageCalculation is ::>>', totalAdvacneAmountAfterPercentageCalculation)}
-      <View style={{ flex: 1, bottom: 0, position: "absolute" }}>
+      <View style={styles.vdStickyFooter}>
         <BookDatesButton
 
           onPress={() => {
@@ -1126,7 +1175,7 @@ const ViewEvents = ({ route, navigation }) => {
               setModalVisible(true);
             }
           }}
-          text={'View Cart'}
+          text={'Continue Booking'}
           padding={10}
         />
       </View>
@@ -1136,6 +1185,248 @@ const ViewEvents = ({ route, navigation }) => {
 
 
 const styles = StyleSheet.create({
+  vdScreen: {
+    flex: 1,
+    backgroundColor: '#F8F4F1',
+  },
+  vdScroll: {
+    flex: 1,
+    backgroundColor: '#F8F4F1',
+  },
+  vdScrollContent: {
+    paddingBottom: verticalScale(112),
+  },
+  vdBackButton: {
+    position: 'absolute',
+    top: verticalScale(16),
+    left: 16,
+    zIndex: 30,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(35,22,15,0.56)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.36)',
+  },
+  vdContent: {
+    marginTop: verticalScale(16),
+    marginHorizontal: 16,
+  },
+  vdVenueHeaderCard: {
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E8D9CF',
+    borderRadius: 18,
+    backgroundColor: '#FFFDFC',
+    elevation: 2,
+    shadowColor: '#56331F',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.07,
+    shadowRadius: 7,
+  },
+  vdVenueTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  vdVenueTitleCopy: {
+    flex: 1,
+    paddingRight: 10,
+  },
+  vdCategoryLabel: {
+    marginBottom: 4,
+    color: '#A65A35',
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+    fontFamily: 'ManropeRegular',
+  },
+  vdVenueTitle: {
+    color: '#302621',
+    fontSize: 21,
+    lineHeight: 28,
+    fontWeight: '800',
+    fontFamily: 'ManropeRegular',
+  },
+  vdAddressRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 13,
+    paddingTop: 13,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#E9DED7',
+  },
+  vdAddressIcon: {
+    width: 30,
+    height: 30,
+    marginRight: 9,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFF0E7',
+  },
+  vdAddressText: {
+    flex: 1,
+    color: '#746760',
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily: 'ManropeRegular',
+  },
+  vdMapButton: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 11,
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+    borderWidth: 1,
+    borderColor: '#EDCDBA',
+    borderRadius: 11,
+    backgroundColor: '#FFF5EE',
+  },
+  vdMapButtonText: {
+    marginHorizontal: 6,
+    color: '#93401B',
+    fontSize: 11,
+    fontWeight: '700',
+    fontFamily: 'ManropeRegular',
+  },
+  vdSectionCard: {
+    marginTop: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E9DDD5',
+    borderRadius: 17,
+    backgroundColor: '#FFFDFC',
+  },
+  vdSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 13,
+  },
+  vdSectionIcon: {
+    width: 36,
+    height: 36,
+    marginRight: 10,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFF0E7',
+  },
+  vdSectionEyebrow: {
+    color: '#A36A4A',
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 0.7,
+    fontFamily: 'ManropeRegular',
+  },
+  vdSectionTitle: {
+    marginTop: 2,
+    color: '#332A26',
+    fontSize: 16,
+    fontWeight: '800',
+    fontFamily: 'ManropeRegular',
+  },
+  vdDescription: {
+    color: '#70645E',
+    fontSize: 12.5,
+    lineHeight: 20,
+    fontFamily: 'ManropeRegular',
+  },
+  vdAmenitiesList: {
+    paddingTop: 2,
+  },
+  vdBookingCard: {
+    marginTop: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E0B89F',
+    borderRadius: 18,
+    backgroundColor: '#F7E8DE',
+  },
+  vdBookingIcon: {
+    backgroundColor: '#A54A20',
+  },
+  vdBookingHeadingCopy: {
+    flex: 1,
+  },
+  vdBookingEyebrow: {
+    color: '#8C4B2A',
+    fontSize: 8,
+    fontWeight: '800',
+    letterSpacing: 0.7,
+    fontFamily: 'ManropeRegular',
+  },
+  vdBookingTitle: {
+    marginTop: 2,
+    color: '#44281B',
+    fontSize: 16,
+    fontWeight: '800',
+    fontFamily: 'ManropeRegular',
+  },
+  vdBookingSubtitle: {
+    marginTop: 3,
+    color: '#806557',
+    fontSize: 10,
+    lineHeight: 15,
+    fontFamily: 'ManropeRegular',
+  },
+  vdFieldLabel: {
+    marginTop: 11,
+    marginBottom: 7,
+    color: '#5D4032',
+    fontSize: 11,
+    fontWeight: '700',
+    fontFamily: 'ManropeRegular',
+  },
+  vdSelector: {
+    minHeight: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 13,
+    borderWidth: 1,
+    borderColor: '#DDBAA6',
+    borderRadius: 13,
+    backgroundColor: '#FFFDFC',
+  },
+  vdSelectorLeading: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  vdSelectorText: {
+    flex: 1,
+    marginLeft: 9,
+    color: '#967E71',
+    fontSize: 12,
+    fontFamily: 'ManropeRegular',
+  },
+  vdSelectorTextActive: {
+    color: '#382A24',
+    fontWeight: '700',
+  },
+  vdBottomSpacer: {
+    height: verticalScale(20),
+  },
+  vdStickyFooter: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingTop: 7,
+    paddingBottom: 8,
+    backgroundColor: 'rgba(255,253,251,0.98)',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#E3D4CB',
+    elevation: 12,
+    shadowColor: '#432718',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+  },
   imageContainer: {
     justifyContent: 'center',
     alignItems: 'center', backgroundColor: "#F9F9F9",
@@ -1336,7 +1627,7 @@ const styles = StyleSheet.create({
   // ── WAVE CONNECTOR ──
   waveConnector: {
     height: 48,
-    backgroundColor: '#fff',
+    backgroundColor: '#F8F4F1',
     overflow: 'visible',
     alignItems: 'center',
     justifyContent: 'flex-end',
@@ -1390,7 +1681,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#F1F1F1',
+    borderColor: '#E7DCD5',
   },
   galleryHeader: {
     flexDirection: 'row',
@@ -1805,25 +2096,30 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    // justifyContent: 'space-between',
-    alignItems: "center",
-    marginTop: 5,
-    justifyContent: "flex-start"
+    alignItems: 'stretch',
+    marginTop: 8,
   },
   itemContainer: {
     alignItems: 'center',
-    width: Dimensions.get('window').width / 5,
-    marginRight: 10
+    justifyContent: 'center',
+    flex: 1,
+    minHeight: 88,
+    marginHorizontal: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#EADFD7',
+    borderRadius: 12,
+    backgroundColor: '#FAF6F3',
   },
   itemText: {
-    fontSize: 10,
-    fontWeight: "400",
-    color: "#606060",
+    fontSize: 9.5,
+    lineHeight: 13,
+    fontWeight: '600',
+    color: '#5F544E',
     fontFamily: 'ManropeRegular',
-    marginTop: 5,
-    height: 30,
-    textAlign: "center"
-
+    marginTop: 7,
+    textAlign: 'center',
   },
   timeSlotText: {
     fontSize: 13,
@@ -1853,14 +2149,14 @@ const styles = StyleSheet.create({
   // ── QUICK STATS BAR ──
   quickStatsBar: {
     flexDirection: 'row',
-    backgroundColor: '#FFFBF5',
+    backgroundColor: '#FFFDFC',
     marginHorizontal: 16,
     marginTop: 16,
     borderRadius: 16,
     paddingVertical: 14,
     paddingHorizontal: 8,
     borderWidth: 1,
-    borderColor: '#F5E7B6',
+    borderColor: '#E8D9CF',
     elevation: 2,
     shadowColor: '#FD813B',
     shadowOffset: { width: 0, height: 2 },
@@ -1911,12 +2207,12 @@ const styles = StyleSheet.create({
   // ── PRICING HIGHLIGHT CARD ──
   pricingHighlightCard: {
     flexDirection: 'row',
-    backgroundColor: '#FDF9EE',
+    backgroundColor: '#FFF3E9',
     borderRadius: 14,
     padding: 16,
     marginTop: 18,
     borderWidth: 1,
-    borderColor: '#F5E7B6',
+    borderColor: '#EAC8B2',
     alignItems: 'center',
   },
   pricingHighlightLabel: {
@@ -1994,12 +2290,12 @@ const styles = StyleSheet.create({
   },
   // ── BOOKING SUMMARY CARD ──
   summaryCard: {
-    backgroundColor: '#FFFBF5',
+    backgroundColor: '#FFFDFC',
     borderRadius: 16,
     padding: 18,
     marginTop: 20,
     borderWidth: 1,
-    borderColor: '#F5E7B6',
+    borderColor: '#E8D9CF',
   },
   summaryCardHeader: {
     flexDirection: 'row',
