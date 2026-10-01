@@ -19,10 +19,8 @@ import axios from 'axios';
 import { getUserAuthToken } from '../../utils/StoreAuthToken';
 import FastImage from 'react-native-fast-image';
 import { formatAmount } from '../../utils/GlobalFunctions';
-import RazorpayCheckout from 'react-native-razorpay';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import StepIndicator from 'react-native-step-indicator';
-import { useSelector } from 'react-redux';
 import LocationIcon from '../../assets/vendorIcons/locationIcon.svg';
 import PayNowButton from './PayNowButton';
 import ActionSheet from 'react-native-actions-sheet';
@@ -30,6 +28,7 @@ import FloatingCloseButton from '../Events/floatingCloseButton';
 import moment from 'moment';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
+import { horizontalScale, moderateScale, verticalScale } from '../../utils/scalingMetrics';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -69,10 +68,6 @@ const ViewMyBookings = () => {
   const [hallsBookings, setHallsBookings] = useState();
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
-  const userLoggedInMobileNum = useSelector(
-    state => state.userLoggedInMobileNum,
-  );
-  const userLoggedInName = useSelector(state => state.userLoggedInName);
   const actionSheetRef = useRef(null);
   const [selectedReason, setSelectedReason] = useState('');
   const [selectedBookingId, setSelectedBookingId] = useState(null);
@@ -269,170 +264,6 @@ const ViewMyBookings = () => {
     }
   };
 
-  const fetchRazorpayKey = async () => {
-    const res = await fetch(`${BASE_URL}/razorpay-key`);
-    const data = await res.json();
-    console.log('Razorpay key data is my bookings ::>>', data);
-    return data;
-  };
-
-  const handlePayment = async (
-    advanceAmount,
-    bookingId,
-    catType,
-    vendorMobileNumber,
-    productName,
-    totalAmount,
-  ) => {
-    const token = await getUserAuthToken();
-    const { key, defaultMethod } = await fetchRazorpayKey();
-    let initiatePaymentPayload = {
-      orderAmount: advanceAmount,
-      currency: 'INR',
-      userFullName: userLoggedInName,
-      userMobileNumber: userLoggedInMobileNum,
-      vendorMobileNumber: vendorMobileNumber,
-      productName: productName,
-    };
-
-    try {
-      const initiateresponse = await axios.post(
-        `${BASE_URL}/user/initiate-payment`,
-        initiatePaymentPayload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      console.log(
-        'initiate payment  RES:::::::::',
-        JSON.stringify(initiateresponse?.data),
-      );
-
-      if (initiateresponse?.data) {
-        try {
-          const response = await fetch(`${BASE_URL}/create-order`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              amount: advanceAmount,
-              currency: 'INR',
-              receipt: 'receipt#1',
-              userFullName: userLoggedInName,
-              userMobileNumber: userLoggedInMobileNum,
-            }),
-          });
-
-          const data = await response.json();
-          console.log('razor pay data is ::>>', data);
-
-          var options = {
-            description: 'Test Transaction',
-            image: 'https://your-logo-url.com/logo.png',
-            currency: data.currency,
-            key: key,
-            amount: data.amount,
-            order_id: data.orderId,
-            name: 'Book the day',
-            prefill: {
-              email: 'bookthedaytechnologies@gmail.com',
-              contact: userLoggedInMobileNum,
-              name: userLoggedInName,
-              method: defaultMethod,
-            },
-            theme: { color: '#FFDB7E' },
-          };
-
-          console.log('options is::>>', options);
-
-          RazorpayCheckout.open(options)
-            .then(async paymentData => {
-              console.log('success resp::>>', paymentData);
-              navigation.navigate('PaymentSuccess', {
-                productName,
-                advanceAmount,
-                totalAmount,
-                bookingId,
-                orderId: initiateresponse?.data?.data?.OrderId,
-                paymentId: paymentData?.razorpay_payment_id,
-                catType,
-              });
-
-              let statusPaymentPayload = {
-                orderId: initiateresponse?.data?.data?.OrderId,
-                paymentStatus: 'success',
-                orderAdvanceAmount: advanceAmount,
-                razorpay_order_id: paymentData?.razorpay_order_id,
-                razorpay_payment_id: paymentData?.razorpay_payment_id,
-                razorpay_signature: paymentData?.razorpay_signature,
-                vendorMobileNumber: vendorMobileNumber,
-                bookingId: bookingId,
-                catType: catType,
-              };
-              try {
-                const resp = await axios.patch(
-                  `${BASE_URL}/user/update-payment-status`,
-                  statusPaymentPayload,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  },
-                );
-                console.log(
-                  'success payment  RES:::::::::',
-                  JSON.stringify(resp?.data),
-                );
-              } catch (error) {
-                console.log('Payment error>>::', error);
-              }
-            })
-
-            .catch(async error => {
-              let failurePaymentPayload = {
-                orderId: initiateresponse?.data?.data?.OrderId,
-                paymentStatus: 'failed',
-                orderAdvanceAmount: advanceAmount,
-                razorpay_order_id: data?.orderId,
-                razorpay_payment_id: '',
-                razorpay_signature: '',
-              };
-
-              try {
-                const resp = await axios.patch(
-                  `${BASE_URL}/user/update-payment-status`,
-                  failurePaymentPayload,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${token}`,
-                    },
-                  },
-                );
-                console.log(
-                  'failure payment  RES:::::::::',
-                  JSON.stringify(resp?.data),
-                );
-              } catch (err) {
-                console.log('failure Payment error>>::', err);
-              }
-              navigation.navigate('PaymentFailed');
-              console.log(error);
-            });
-        } catch (error) {
-          console.error(error);
-          CustomAlert.alert('Error', 'Something went wrong', undefined, {
-            type: 'error',
-          });
-        }
-      }
-    } catch (error) {
-      console.log('Initiate Payment error>>::', error);
-    }
-  };
-
   const openMap = (lat, lon) => {
     const url = Platform.select({
       ios: `maps:0,0?q=${lat},${lon}`,
@@ -502,31 +333,85 @@ const ViewMyBookings = () => {
   const renderItem = ({ item }) => {
     const updatedImgUrl = item?.professionalImage?.url;
 
-    const bookingDate = item?.startDate;
-    const today = moment();
-    const parsedBookingDate = moment(bookingDate, 'DD MMMM YYYY');
-    const diffInDays = parsedBookingDate.diff(today, 'days');
+    const bookingDate = String(item?.startDate || '',).trim();
+    const bookingStatus = String(item?.bookingStatus || '',).trim().toLowerCase();
 
-    const canCancel =
-      diffInDays >= 7 &&
-      item.bookingStatus !== 'cancelled' &&
-      item.bookingStatus !== 'rejected';
+    console.log('bookingStatus is ::>>>>', bookingStatus);
 
-    const venueName =
-      item?.catType === 'caterings'
-        ? item?.foodCateringName
-        : item?.catType === 'functionHalls'
-          ? item?.functionHallName
-          : item?.productName;
+    const today = moment().startOf('day');
+    const parsedBookingDate = moment(bookingDate, ['DD MMMM YYYY', 'DD MMM YYYY', 'YYYY-MM-DD', moment.ISO_8601,], true,);
 
-    const advanceLabel =
-      item?.catType === 'caterings' || item?.catType === 'functionHalls'
-        ? item?.advanceAmountPaid > 0
-          ? 'Advance Paid'
-          : 'Advance Amount'
-        : item?.securityDepositAmountPaid > 0
-          ? 'Security Paid'
-          : 'Security Deposit';
+    const bookingDay = parsedBookingDate.clone().startOf('day');
+    const diffInDays = parsedBookingDate.isValid() ? bookingDay.diff(today, 'days') : -1;
+
+    const canCancel = parsedBookingDate.isValid() && diffInDays >= 10 && !['cancelled', 'rejected', 'payment successful'].includes(bookingStatus);
+
+    const canPay = parsedBookingDate.isValid() && bookingDay.isSameOrAfter(today) && bookingStatus === 'approved';
+
+    const getPaymentButtonConfig = () => {
+      if (bookingStatus === 'payment successful') {
+        return {
+          text: 'Payment Success',
+          gradientColors: ['#07875D', '#12A875'],
+          textColor: '#FFFFFF',
+          borderColor: '#07875D',
+        };
+      }
+
+      if (bookingStatus === 'cancelled') {
+        return {
+          text: 'Cancelled',
+          gradientColors: ['#FDECF1', '#F8DCE5'],
+          textColor: '#B4234D',
+          borderColor: '#E8A9BB',
+        };
+      }
+
+      if (bookingStatus === 'rejected') {
+        return {
+          text: 'Rejected',
+          gradientColors: ['#F1F0F5', '#E3E1E9'],
+          textColor: '#625D70',
+          borderColor: '#C9C5D2',
+        };
+      }
+
+      if (diffInDays < 0) {
+        return {
+          text: 'Booking Expired',
+          gradientColors: ['#E9E4E1', '#DDD6D2'],
+          textColor: '#746D65',
+          borderColor: '#CEC5C0',
+        };
+      }
+
+      if (bookingStatus === 'approved') {
+        return {
+          text: 'Pay ₹999',
+        };
+      }
+
+      return {
+        text: 'Awaiting Approval',
+        gradientColors: ['#FFF4DB', '#FFE9B8'],
+        textColor: '#9A6500',
+        borderColor: '#EBCB82',
+      };
+    };
+
+    const paymentButtonConfig = getPaymentButtonConfig();
+
+    const venueName = item?.catType === 'functionHalls'
+      ? item?.functionHallName
+      : item?.productName;
+
+    const advanceLabel = item?.catType === 'functionHalls'
+      ? item?.advanceAmountPaid > 0
+        ? 'Advance Paid'
+        : 'Advance Amount'
+      : item?.securityDepositAmountPaid > 0
+        ? 'Security Paid'
+        : 'Security Deposit';
 
     const advanceValue = item?.advanceAmountToPay
       ? item?.advanceAmountToPay
@@ -603,31 +488,54 @@ const ViewMyBookings = () => {
             </View>
           </View>
 
-          <View style={styles.dateSection}>
-            {item?.catType === 'caterings' ||
-              item?.catType === 'functionHalls' ? (
-              <View style={styles.dateRow}>
-                <IonIcon name="calendar-outline" size={14} color={COLORS.gray} />
-                <Text style={styles.dateText}>
-                  Booking Date:{' '}
-                  <Text style={styles.dateHighlight}>{item?.startDate}</Text>
+          <View style={styles.bookingMetaBar}>
+            {/* Booking date */}
+            <View style={styles.bookingMetaItem}>
+              <View style={styles.bookingMetaIcon}>
+                <IonIcon
+                  name="calendar-outline"
+                  size={moderateScale(13)}
+                  color={COLORS.primary}
+                />
+              </View>
+
+              <View style={styles.bookingMetaTextWrap}>
+                <Text style={styles.bookingMetaLabel}>
+                  EVENT DATE
+                </Text>
+
+                <Text
+                  numberOfLines={1}
+                  style={styles.bookingMetaValue}>
+                  {item?.startDate || 'Not available'}
                 </Text>
               </View>
-            ) : (
-              <>
-                <View style={styles.dateRow}>
-                  <IonIcon name="calendar-outline" size={14} color={COLORS.gray} />
-                  <Text style={styles.dateText}>Start: {item?.startDate}</Text>
-                </View>
-                <View style={styles.dateRow}>
-                  <IonIcon name="calendar-outline" size={14} color={COLORS.gray} />
-                  <Text style={styles.dateText}>End: {item?.endDate}</Text>
-                </View>
-              </>
-            )}
-            <View style={styles.bookingIdPill}>
-              <IonIcon name="document-text-outline" size={12} color={COLORS.gray} />
-              <Text style={styles.bookingId}>Booking ID: {item?.bookingId}</Text>
+            </View>
+
+            <View style={styles.bookingMetaDivider} />
+
+            {/* Booking ID */}
+            <View style={styles.bookingMetaItem}>
+              <View style={styles.bookingMetaIcon}>
+                <IonIcon
+                  name="document-text-outline"
+                  size={moderateScale(13)}
+                  color={COLORS.primary}
+                />
+              </View>
+
+              <View style={styles.bookingMetaTextWrap}>
+                <Text style={styles.bookingMetaLabel}>
+                  BOOKING ID
+                </Text>
+
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="middle"
+                  style={styles.bookingMetaValue}>
+                  {item?.bookingId || 'Not available'}
+                </Text>
+              </View>
             </View>
           </View>
 
@@ -642,6 +550,52 @@ const ViewMyBookings = () => {
                 {item?.functionHallAddress?.address}
               </Text>
             </TouchableOpacity>
+          ) : null}
+
+          {bookingStatus === 'payment successful' &&
+            item?.vendorMobileNumber ? (
+            <View style={styles.vendorContactCard}>
+              <View style={styles.vendorContactLeft}>
+                <View style={styles.vendorContactIcon}>
+                  <IonIcon
+                    name="call-outline"
+                    size={moderateScale(15)}
+                    color="#07875D"
+                  />
+                </View>
+
+                <View style={styles.vendorContactContent}>
+                  <Text style={styles.vendorContactLabel}>
+                    VENUE CONTACT
+                  </Text>
+
+                  <Text style={styles.vendorContactNumber}>
+                    {item.vendorMobileNumber}
+                  </Text>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel="Call venue"
+                activeOpacity={0.8}
+                onPress={() =>
+                  Linking.openURL(
+                    `tel:${item.vendorMobileNumber}`,
+                  )
+                }
+                style={styles.callVendorButton}>
+                <IonIcon
+                  name="call"
+                  size={moderateScale(13)}
+                  color="#FFFFFF"
+                />
+
+                <Text style={styles.callVendorButtonText}>
+                  Call
+                </Text>
+              </TouchableOpacity>
+            </View>
           ) : null}
 
           <View style={styles.stepIndicatorContainer}>
@@ -682,37 +636,40 @@ const ViewMyBookings = () => {
             <View style={styles.payButtonWrapper}>
               <PayNowButton
                 onPress={() => {
-                const yourObjectWithDetails = {
-                  totalAmount: item?.totalAmount,
-                  advanceAmountToPay: item?.advanceAmountToPay,
-                  securityDepositAmount: item?.securityDepositAmount,
-                  vendorName:
-                    item?.vendorName ??
-                    item?.functionHallName ??
-                    item?.foodCateringName ??
-                    item?.productName,
-                  bookingId: item?.bookingId,
-                  productName:
-                    item?.productName ??
-                    item?.functionHallName ??
-                    item?.foodCateringName,
-                  startDate: item?.startDate,
-                  endDate: item?.endDate,
-                  catType: item?.catType,
-                  vendorMobileNumber: item?.vendorMobileNumber,
-                  foodCateringName: item?.foodCateringName ?? '',
-                  functionHallName: item?.functionHallName ?? '',
-                  hallAddress: item?.functionHallAddress?.address ?? '',
-                  hallImage: item?.professionalImage?.url ?? '',
-                  seatingCapacity: item?.seatingCapacity ?? '',
-                };
-                navigation.navigate('BookingReview', {
-                  selectedBooking: yourObjectWithDetails,
-                });
-              }}
-                text="Pay Now"
+                  const yourObjectWithDetails = {
+                    totalAmount: item?.totalAmount,
+                    advanceAmountToPay: item?.advanceAmountToPay,
+                    securityDepositAmount: item?.securityDepositAmount,
+                    vendorName:
+                      item?.vendorName ??
+                      item?.functionHallName ??
+                      item?.foodCateringName ??
+                      item?.productName,
+                    bookingId: item?.bookingId,
+                    productName:
+                      item?.productName ??
+                      item?.functionHallName ??
+                      item?.foodCateringName,
+                    startDate: item?.startDate,
+                    endDate: item?.endDate,
+                    catType: item?.catType,
+                    vendorMobileNumber: item?.vendorMobileNumber,
+                    foodCateringName: item?.foodCateringName ?? '',
+                    functionHallName: item?.functionHallName ?? '',
+                    hallAddress: item?.functionHallAddress?.address ?? '',
+                    hallImage: item?.professionalImage?.url ?? '',
+                    seatingCapacity: item?.seatingCapacity ?? '',
+                  };
+                  navigation.navigate('BookingReview', {
+                    selectedBooking: yourObjectWithDetails,
+                  });
+                }}
+                text={paymentButtonConfig.text}
+                gradientColors={paymentButtonConfig.gradientColors}
+                textColor={paymentButtonConfig.textColor}
+                borderColor={paymentButtonConfig.borderColor}
                 showIcon={false}
-                disabled={item.bookingStatus !== 'approved'}
+                disabled={!canPay}
               />
             </View>
           </View>
@@ -917,8 +874,11 @@ const ViewMyBookings = () => {
           keyExtractor={item =>
             String(item?._id ?? item?.bookingId)
           }
+          contentContainerStyle={styles.bookingListContent}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.bookingList}
+          ItemSeparatorComponent={() => (
+            <View style={styles.cardSeparator} />
+          )}
           ListEmptyComponent={
             <View style={styles.filterEmptyState}>
               <IonIcon name="file-tray-outline" size={34} color="#B58B74" />
@@ -967,8 +927,16 @@ const ViewMyBookings = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
-    paddingBottom : 32
+    backgroundColor: '#F6F1ED',
+    paddingBottom: 32
+  },
+  bookingListContent: {
+    paddingTop: verticalScale(12),
+    paddingBottom: verticalScale(32),
+    backgroundColor: '#F7F2EE',
+  },
+  cardSeparator: {
+    height: verticalScale(2),
   },
   pageHeaderTop: {
     flexDirection: 'row',
@@ -1178,27 +1146,32 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   card: {
-    backgroundColor: COLORS.white,
-    borderRadius: 18,
-    marginHorizontal: 14,
-    marginVertical: 6,
-    borderWidth: 1,
-    borderColor: '#E8DCD5',
-    shadowColor: COLORS.primaryDark,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.09,
-    shadowRadius: 9,
-    elevation: 4,
+    marginHorizontal: horizontalScale(12),
+    marginBottom: verticalScale(16),
+    backgroundColor: '#FFFFFF',
+    borderRadius: moderateScale(18),
+    borderWidth: 1.2,
+    borderColor: '#DFC8BA',
     overflow: 'hidden',
+    elevation: 4,
+    shadowColor: '#6B3821',
+    shadowOffset: {
+      width: 0,
+      height: verticalScale(3),
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: moderateScale(6),
   },
   cardImageWrap: {
     position: 'relative',
-    height: 105,
-    backgroundColor: '#EFE6E0',
-  },
-  cardImage: {
-    height: '100%',
     width: '100%',
+    height: verticalScale(150),
+    backgroundColor: '#EEE7E2',
+  },
+
+  cardImage: {
+    width: '100%',
+    height: '100%',
   },
   cardImagePlaceholder: {
     alignItems: 'center',
@@ -1230,9 +1203,9 @@ const styles = StyleSheet.create({
   },
 
   cardContent: {
-    paddingHorizontal: 12,
-    paddingTop: 11,
-    paddingBottom: 10,
+    paddingHorizontal: horizontalScale(12),
+    paddingTop: verticalScale(9),
+    paddingBottom: verticalScale(10),
   },
   cardHeader: {
     flexDirection: 'row',
@@ -1309,13 +1282,16 @@ const styles = StyleSheet.create({
   amountGrid: {
     flexDirection: 'row',
     backgroundColor: COLORS.lightBg,
-    borderRadius: 11,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginTop: 7,
-    marginBottom: 9,
+
+    borderRadius: moderateScale(10),
     borderWidth: 1,
     borderColor: '#EEE2DB',
+
+    paddingHorizontal: horizontalScale(9),
+    paddingVertical: verticalScale(6),
+
+    marginTop: verticalScale(5),
+    marginBottom: verticalScale(6),
   },
   amountItem: {
     flex: 1,
@@ -1378,12 +1354,12 @@ const styles = StyleSheet.create({
   },
   bookingIdPill: {
     alignSelf: 'flex-start',
-    flexDirection: 'row',
-    alignItems: 'center',
+    // flexDirection: 'row',
+    // alignItems: 'center',
     marginTop: 0,
     marginLeft: 6,
     paddingHorizontal: 7,
-    paddingVertical: 3,
+    paddingVertical: 10,
     borderRadius: 9,
     backgroundColor: '#F5EFEB',
   },
@@ -1403,31 +1379,100 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     flex: 1,
   },
+  vendorContactCard: {
+    minHeight: verticalScale(45),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: verticalScale(7),
+    paddingHorizontal: horizontalScale(8),
+    paddingVertical: verticalScale(6),
+    borderRadius: moderateScale(11),
+    borderWidth: 1,
+    borderColor: '#B9E4D3',
+    backgroundColor: '#EFFAF5',
+  },
+  vendorContactLeft: {
+    flex: 1,
+    minWidth: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  vendorContactIcon: {
+    width: moderateScale(28),
+    height: moderateScale(28),
+    borderRadius: moderateScale(14),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#DDF5EA',
+  },
+  vendorContactContent: {
+    flex: 1,
+    minWidth: 0,
+    marginLeft: horizontalScale(7),
+  },
+  vendorContactLabel: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(6.8),
+    lineHeight: moderateScale(9),
+    fontWeight: '800',
+    letterSpacing: 0.5,
+    color: '#53806E',
+  },
+  vendorContactNumber: {
+    marginTop: verticalScale(1),
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(10.5),
+    lineHeight: moderateScale(14),
+    fontWeight: '800',
+    color: '#185C45',
+  },
+  callVendorButton: {
+    minHeight: verticalScale(30),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: horizontalScale(11),
+    borderRadius: moderateScale(16),
+    backgroundColor: '#07875D',
+  },
+  callVendorButtonText: {
+    marginLeft: horizontalScale(4),
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(9),
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
   stepIndicatorContainer: {
-    marginBottom: 9,
-    paddingHorizontal: 6,
-    paddingTop: 8,
-    paddingBottom: 4,
+    marginBottom: verticalScale(7),
+    paddingHorizontal: horizontalScale(6),
+    paddingTop: verticalScale(6),
+    paddingBottom: verticalScale(2),
     borderWidth: 1,
     borderColor: '#EEE2DB',
-    borderRadius: 13,
+    borderRadius: moderateScale(11),
     backgroundColor: '#FFFCFA',
   },
+
   progressLabel: {
-    marginBottom: 7,
+    marginBottom: verticalScale(4),
+
     color: '#9A715C',
-    fontSize: 7,
-    fontWeight: '800',
-    letterSpacing: 0.7,
     fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(6.8),
+    fontWeight: '800',
+    letterSpacing: 0.6,
   },
   cardFooter: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 9,
-    paddingTop: 9,
+    alignItems: 'flex-start',
+    gap: horizontalScale(8),
+
+    marginTop: verticalScale(2),
+    paddingTop: verticalScale(9),
+
     borderTopWidth: 1,
-    borderTopColor: '#F0E8E2',
+    borderTopColor: '#EADFD9',
   },
 
   cancelButton: {
@@ -1645,6 +1690,72 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 15,
     fontFamily: 'ManropeRegular',
+  },
+  bookingMetaBar: {
+    minHeight: verticalScale(44),
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    marginTop: verticalScale(6),
+    marginBottom: verticalScale(7),
+
+    paddingHorizontal: horizontalScale(8),
+    paddingVertical: verticalScale(5),
+
+    borderRadius: moderateScale(11),
+    borderWidth: 1,
+    borderColor: '#EEE2DB',
+    backgroundColor: '#FCF8F5',
+  },
+
+  bookingMetaItem: {
+    flex: 1,
+    minWidth: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  bookingMetaIcon: {
+    width: moderateScale(26),
+    height: moderateScale(26),
+    borderRadius: moderateScale(13),
+
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    backgroundColor: '#FFF0E6',
+  },
+
+  bookingMetaTextWrap: {
+    flex: 1,
+    minWidth: 0,
+    marginLeft: horizontalScale(6),
+  },
+
+  bookingMetaLabel: {
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(6.8),
+    lineHeight: moderateScale(9),
+    fontWeight: '800',
+    letterSpacing: 0.45,
+    color: COLORS.lightGray,
+  },
+
+  bookingMetaValue: {
+    marginTop: verticalScale(1),
+
+    fontFamily: 'ManropeRegular',
+    fontSize: moderateScale(9.5),
+    lineHeight: moderateScale(13),
+    fontWeight: '700',
+    color: COLORS.dark,
+  },
+
+  bookingMetaDivider: {
+    width: 1,
+    height: verticalScale(27),
+    marginHorizontal: horizontalScale(7),
+    backgroundColor: '#E8DCD5',
   },
 });
 

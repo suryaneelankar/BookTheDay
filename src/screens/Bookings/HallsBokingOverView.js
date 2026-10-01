@@ -77,6 +77,7 @@ const HallsBookingOverView = ({route, navigation}) => {
     totalPrice,
     advanceAmount,
     selectedMenus,
+    venueCategory
   } = route.params;
 
   const [bookingDetails, setBookingDetails] = useState(null);
@@ -155,6 +156,7 @@ const HallsBookingOverView = ({route, navigation}) => {
       startDate: moment(bookingDate, 'DD-MM-YYYY').format('DD MMMM YYYY'),
       endDate: moment(bookingDate, 'DD-MM-YYYY').format('DD MMMM YYYY'),
       numOfDays: 1,
+      venueCategory: venueCategory,
       totalAmount: toNumericString(totalPrice),
       userMobileNumber: userLoggedInMobileNum,
       bookingTime: timeSlot,

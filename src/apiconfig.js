@@ -2,14 +2,16 @@
 
 // LIVE / Production
 
-// const BASE_URL = "http://43.205.231.56:4000"; // Live url
-// export const LocalHostUrl = '43.205.231.56';
+const BASE_URL = "https://api.booktheday.in"; // Live url
+export const LocalHostUrl = 'api.booktheday.in';
 
 
 // Staging / Dev
 
 
-const BASE_URL = "http://192.168.1.4:4000"; // Staging url
-export const LocalHostUrl = '192.168.1.4';
+// const BASE_URL = 'http://192.168.1.5:4000';
+// export const LocalHostUrl = '192.168.1.5';
+
+// 192.168.1.5
 
 export default BASE_URL;

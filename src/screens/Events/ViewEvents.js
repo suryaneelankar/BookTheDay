@@ -1136,8 +1136,8 @@ const ViewEvents = ({ route, navigation }) => {
         </Modal>
       </ScrollView>
       <View style={styles.vdStickyFooter}>
+      
         <BookDatesButton
-
           onPress={() => {
             const selectedMenus = menuImages
               .map(menu => {
@@ -1162,6 +1162,7 @@ const ViewEvents = ({ route, navigation }) => {
               navigation.navigate('HallsBookingOverView', {
                 categoryId: categoryId,
                 timeSlot: selectedTimeSlot,
+                venueCategory: eventsDetails?.venueCategory,
                 bookingDate: moment(selectedDate).format('DD-MM-YYYY'),
                 totalPrice: `${menuImages?.length > 0 ? (totalAmountWithMenu > 0 ? totalAmountWithMenu : 0) : eventsDetails?.rentPricePerDay}`,
                 advanceAmount: `${menuImages?.length > 0 ? (Number(totalAdvacneAmountAfterPercentageCalculation) || 0) : (eventsDetails?.advanceAmount)}`,

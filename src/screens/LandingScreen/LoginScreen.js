@@ -80,6 +80,10 @@ const LoginScreen = ({route}) => {
       password: String(password),
     };
 
+    console.log('payload is for login is::>>>>',payload);
+
+    console.log('Login URL:', `${BASE_URL}/${type}/login`);
+
     try {
       const logineRes = await axios.post(`${BASE_URL}/${type}/login`, payload);
       if (logineRes?.status === 200) {

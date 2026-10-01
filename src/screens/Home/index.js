@@ -50,6 +50,7 @@ import FastImage from 'react-native-fast-image';
 import { isLocationEnabled } from 'react-native-android-location-enabler';
 import { promptForEnableLocationIfNeeded } from 'react-native-android-location-enabler';
 import { getRecentlyViewedVenues } from '../../utils/recentlyViewedVenues';
+import FloatingCartButton from '../../components/FloatingCartButton';
 
 /* COMMENTED OUT — catering/cloth/jewel imports no longer used
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -385,6 +386,10 @@ const HomeDashboard = () => {
   const [currentPage] = useState(1);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  const [approvedBookings, setApprovedBookings] = useState([]);
+  const [userAuthToken, setUserAuthToken] = useState(null);
+  const [showPaymentCard, setShowPaymentCard] = useState(true);
+
   /* COMMENTED OUT — catering / cloth / jewel state
   const [cateringsData, setCateringsData] = useState([]);
   const [nearbyCateringsData, setNearByCateringsData] = useState([]);
@@ -473,6 +478,78 @@ const HomeDashboard = () => {
     setPaymentReadyBookings([]);
     bookingsRequest.current++; profileRequest.current++;
   }, [userLoggedInMobileNumber]);
+
+  const loadApprovedBookings = useCallback(async () => {
+    try {
+      const token = await getUserAuthToken();
+
+      if (!token) {
+        setUserAuthToken(null);
+        setApprovedBookings([]);
+        return;
+      }
+
+      setUserAuthToken(token);
+
+      const response = await axios.get(
+        `${BASE_URL}/getUserFunctionHallBookings`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          timeout: 15000,
+        },
+      );
+
+      const bookings = Array.isArray(response?.data?.data)
+        ? response.data.data
+        : [];
+
+      const approvedAndUnpaid = bookings.filter(booking => {
+        const bookingStatus = String(
+          booking?.bookingStatus || '',
+        ).toLowerCase();
+
+        const paymentStatus = String(
+          booking?.paymentStatus || '',
+        ).toLowerCase();
+
+        const alreadyPaid =
+          bookingStatus === 'payment successful' ||
+          paymentStatus === 'success' ||
+          Number(booking?.advanceAmountPaid || 0) > 0;
+
+        return bookingStatus === 'approved' && !alreadyPaid;
+      });
+
+      setApprovedBookings(approvedAndUnpaid);
+    } catch (error) {
+      console.error(
+        'Home approved bookings error:',
+        error?.response?.data || error?.message,
+      );
+
+      setApprovedBookings([]);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      let screenActive = true;
+
+      const load = async () => {
+        if (screenActive) {
+          await loadApprovedBookings();
+        }
+      };
+
+      load();
+
+      return () => {
+        screenActive = false;
+      };
+    }, [loadApprovedBookings]),
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -1808,7 +1885,7 @@ const HomeDashboard = () => {
             </TouchableOpacity>
           )}
           {renderHomeSection('Discover Venues', homeSections.discover, 'SearchVenues', 'discover')}
- 
+
           {preferredCategory &&
             recommendedVenues.length > 0 && (
               <View style={styles.recommendedSection}>
@@ -2020,6 +2097,19 @@ const HomeDashboard = () => {
             </TouchableOpacity>
           </SafeAreaView>
         </Modal>
+
+        {showPaymentCard &&
+          approvedBookings.length > 0 &&
+          userAuthToken && (
+            <FloatingCartButton
+              hallsData={approvedBookings}
+              authToken={userAuthToken}
+              onClose={() => setShowPaymentCard(false)}
+              onPress={() =>
+                navigation.navigate('ViewMyBookings')
+              }
+            />
+          )}
       </LinearGradient>
     </SafeAreaView>
   );
@@ -2028,6 +2118,10 @@ const HomeDashboard = () => {
 // const styles = StyleSheet.create({
 
 const styles = StyleSheet.create({
+
+  scrollContent: {
+    paddingBottom: 170,
+  },
 
   smartMatchCard: {
     marginHorizontal: horizontalScale(16),

@@ -28,7 +28,7 @@ const PaymentConfirmationModal = ({ visible, message, onClose, onSubmit }) => {
             </Text>
           <View style={{ flexDirection: 'row', width: "90%", alignSelf: "center", bottom: 10 }}>
             <TouchableOpacity onPress={() => setIsChecked(!isChecked)}>
-              <View style={{ flexDirection: "row" }}>
+              <View style={{ flexDirection: "row",marginTop: 20 }}>
                 <View
                   style={{
                     width: 20,

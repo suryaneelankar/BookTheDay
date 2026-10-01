@@ -46,7 +46,7 @@ const MyTransactions = () => {
                 },
             });
             setTransactionsData(response?.data?.data);
-            console.log('response getTransactionsData is ::>>', response?.data?.data);
+            // console.log('response getTransactionsData is ::>>', response?.data?.data);
         } catch (error) {
             console.log("getTransactionsData error::::::::::", error);
         }

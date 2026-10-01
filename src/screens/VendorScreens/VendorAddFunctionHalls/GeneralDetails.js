@@ -25,6 +25,9 @@ import { formatAmount } from '../../../utils/GlobalFunctions';
 import DocumentPicker from 'react-native-document-picker';
 import Video from 'react-native-video';
 
+const SERVICE_FEE_RATE = 0.02;
+const MAX_SERVICE_FEE = 10000;
+
 const GeneralDetails = ({ isAadharUpdate }) => {
     const navigation = useNavigation();
     const [BedRooms, setBedRooms] = useState('');
@@ -1133,21 +1136,21 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                 {seatingCapacity.map((item) => {
                     const isSelected = item === selectedSeatingCapacity;
                     return (
-                    <TouchableOpacity
-                        key={item}
-                        accessibilityRole="radio"
-                        accessibilityState={{ selected: isSelected }}
-                        style={[styles.seatingOption, isSelected && styles.seatingOptionSelected]}
-                        onPress={() => onPressSeatingCapacity(item)}
-                    >
-                        <Text style={[styles.seatingValue, isSelected && styles.seatingValueSelected]}>
-                            {item}
-                        </Text>
-                        <Text style={[styles.seatingUnit, isSelected && styles.seatingUnitSelected]}>
-                            guests
-                        </Text>
-                        {isSelected && <View style={styles.selectedDot} />}
-                    </TouchableOpacity>
+                        <TouchableOpacity
+                            key={item}
+                            accessibilityRole="radio"
+                            accessibilityState={{ selected: isSelected }}
+                            style={[styles.seatingOption, isSelected && styles.seatingOptionSelected]}
+                            onPress={() => onPressSeatingCapacity(item)}
+                        >
+                            <Text style={[styles.seatingValue, isSelected && styles.seatingValueSelected]}>
+                                {item}
+                            </Text>
+                            <Text style={[styles.seatingUnit, isSelected && styles.seatingUnitSelected]}>
+                                guests
+                            </Text>
+                            {isSelected && <View style={styles.selectedDot} />}
+                        </TouchableOpacity>
                     );
                 })}
             </View>
@@ -1230,19 +1233,31 @@ const GeneralDetails = ({ isAadharUpdate }) => {
 
 
     const calculateCharges = () => {
-        let earningAmount = perDayRentPrice - (perDayRentPrice * discountPercentage / 100);
-        let serviceFeePercentage = 0.03; // 3% for < ₹10,000, 5% for ≥ ₹10,000
-        let serviceCharges = earningAmount * serviceFeePercentage;
-        let finalEarningAfterDiscount = earningAmount - serviceCharges;
+        let earningAmount =
+            Number(perDayRentPrice || 0) -
+            (Number(perDayRentPrice || 0) *
+                Number(discountPercentage || 0)) / 100;
+
+        let serviceCharges = Math.min(
+            earningAmount * SERVICE_FEE_RATE,
+            MAX_SERVICE_FEE,
+        );
+
+        let finalEarningAfterDiscount =
+            earningAmount - serviceCharges;
+
         if (menuAvailable) {
-            finalEarningAfterDiscount = 0;
             earningAmount = 0;
             serviceCharges = 0;
+            finalEarningAfterDiscount = 0;
         }
 
-        return { finalEarningAfterDiscount, earningAmount, serviceCharges }
-
-    }
+        return {
+            finalEarningAfterDiscount,
+            earningAmount,
+            serviceCharges,
+        };
+    };
 
     const menuTypes = [
         {
@@ -1335,72 +1350,72 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         <View style={styles.fieldBlock}>
                             <Text style={styles.fieldTitle}>Cover photo<Text style={styles.required}>*</Text></Text>
                             <Text style={styles.fieldHint}>Use a clear, well-lit photo that represents the venue.</Text>
-                        <ChooseFileField
-                            label={'Hall Image'}
-                            isRequired={true}
-                            placeholder={'Hall Image'}
-                            onPressChooseFile={openGalleryOrCamera}
-                        />
-                        <TouchableOpacity onPress={() => { openGalleryOrCamera() }}>
-                            {mainImageUrl ?
-                                <Image
-                                    source={{ uri: mainImageUrl?.assets[0].uri }}
-                                    width={'100%'}
-                                    height={300}
-                                    style={styles.coverImage}
-                                    resizeMode='cover'
-                                /> : null}
-                        </TouchableOpacity>
+                            <ChooseFileField
+                                label={'Hall Image'}
+                                isRequired={true}
+                                placeholder={'Hall Image'}
+                                onPressChooseFile={openGalleryOrCamera}
+                            />
+                            <TouchableOpacity onPress={() => { openGalleryOrCamera() }}>
+                                {mainImageUrl ?
+                                    <Image
+                                        source={{ uri: mainImageUrl?.assets[0].uri }}
+                                        width={'100%'}
+                                        height={300}
+                                        style={styles.coverImage}
+                                        resizeMode='cover'
+                                    /> : null}
+                            </TouchableOpacity>
                         </View>
 
                         <View style={styles.fieldBlock}>
-                        <Text style={styles.fieldTitle}>Gallery photos<Text style={styles.required}>*</Text></Text>
-                        <Text style={styles.fieldHint}>Upload at least 4 and up to 8 additional photos.</Text>
-                        <FlatList
-                            data={data}
-                            numColumns={4}
-                            scrollEnabled={false}
-                            renderItem={ListItem}
-                            keyExtractor={item => item.id}
-                            contentContainerStyle={styles.photoGrid}
-                        />
+                            <Text style={styles.fieldTitle}>Gallery photos<Text style={styles.required}>*</Text></Text>
+                            <Text style={styles.fieldHint}>Upload at least 4 and up to 8 additional photos.</Text>
+                            <FlatList
+                                data={data}
+                                numColumns={4}
+                                scrollEnabled={false}
+                                renderItem={ListItem}
+                                keyExtractor={item => item.id}
+                                contentContainerStyle={styles.photoGrid}
+                            />
                         </View>
 
                         <View style={styles.fieldBlock}>
-                        <Text style={styles.fieldTitle}>Venue videos</Text>
-                        <Text style={styles.fieldHint}>Optional · up to 3 videos · maximum 35 MB each.</Text>
-                        <View style={styles.videoRow}>
-                            {videos.map((video, idx) => (
-                                <TouchableOpacity
-                                    key={idx}
-                                    onPress={() => setVideoPickerModal({ visible: true, index: idx })}
-                                    style={[styles.videoSlot, video && styles.videoSlotSelected]}
-                                >
-                                    <View style={styles.videoIconCircle}>
-                                        <Icon name={video ? 'videocam' : 'videocam-outline'} size={20} color={video ? '#A44A1F' : '#8B817B'} />
-                                    </View>
-                                    <Text style={[styles.videoSlotText, video && styles.videoSlotTextSelected]} numberOfLines={2}>
-                                        {video ? (video.fileName || 'Video ' + (idx + 1)) : `Upload Video ${idx + 1}`}
-                                    </Text>
-                                    {video && (
-                                        <>
-                                            <TouchableOpacity
-                                                onPress={(e) => { e.stopPropagation?.(); setVideoPaused(false); setVideoPreview({ visible: true, uri: video.uri }); }}
-                                                style={styles.previewButton}
-                                            >
-                                                <Text style={styles.previewButtonText}>Preview</Text>
-                                            </TouchableOpacity>
-                                            <TouchableOpacity
-                                                onPress={(e) => { e.stopPropagation?.(); setVideos(prev => { const u = [...prev]; u[idx] = null; return u; }); }}
-                                                style={styles.removeVideoButton}
-                                            >
-                                                <Icon name="close" size={13} color="#A13A3A" />
-                                            </TouchableOpacity>
-                                        </>
-                                    )}
-                                </TouchableOpacity>
-                            ))}
-                        </View>
+                            <Text style={styles.fieldTitle}>Venue videos</Text>
+                            <Text style={styles.fieldHint}>Optional · up to 3 videos · maximum 35 MB each.</Text>
+                            <View style={styles.videoRow}>
+                                {videos.map((video, idx) => (
+                                    <TouchableOpacity
+                                        key={idx}
+                                        onPress={() => setVideoPickerModal({ visible: true, index: idx })}
+                                        style={[styles.videoSlot, video && styles.videoSlotSelected]}
+                                    >
+                                        <View style={styles.videoIconCircle}>
+                                            <Icon name={video ? 'videocam' : 'videocam-outline'} size={20} color={video ? '#A44A1F' : '#8B817B'} />
+                                        </View>
+                                        <Text style={[styles.videoSlotText, video && styles.videoSlotTextSelected]} numberOfLines={2}>
+                                            {video ? (video.fileName || 'Video ' + (idx + 1)) : `Upload Video ${idx + 1}`}
+                                        </Text>
+                                        {video && (
+                                            <>
+                                                <TouchableOpacity
+                                                    onPress={(e) => { e.stopPropagation?.(); setVideoPaused(false); setVideoPreview({ visible: true, uri: video.uri }); }}
+                                                    style={styles.previewButton}
+                                                >
+                                                    <Text style={styles.previewButtonText}>Preview</Text>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity
+                                                    onPress={(e) => { e.stopPropagation?.(); setVideos(prev => { const u = [...prev]; u[idx] = null; return u; }); }}
+                                                    style={styles.removeVideoButton}
+                                                >
+                                                    <Icon name="close" size={13} color="#A13A3A" />
+                                                </TouchableOpacity>
+                                            </>
+                                        )}
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
                         </View>
 
                         <TextField
@@ -1645,9 +1660,17 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                             !isNaN(perDayRentPrice - (perDayRentPrice * discountPercentage / 100)) && perDayRentPrice ? (
                                 <>
                                     {(() => {
-                                        const discountedPrice = perDayRentPrice - (perDayRentPrice * discountPercentage / 100);
-                                        const serviceFeePercentage = 0.03; // 3% for < ₹10,000, 5% for ≥ ₹10,000
-                                        const serviceFee = discountedPrice * serviceFeePercentage;
+                                        const serviceFeePercentage = SERVICE_FEE_RATE;
+                                        const discountedPrice =
+                                            Number(perDayRentPrice || 0) -
+                                            (Number(perDayRentPrice || 0) *
+                                                Number(discountPercentage || 0)) / 100;
+
+                                        const serviceFee = Math.min(
+                                            discountedPrice * SERVICE_FEE_RATE,
+                                            MAX_SERVICE_FEE,
+                                        );
+
                                         const finalEarning = discountedPrice - serviceFee;
 
                                         return (
@@ -1673,7 +1696,7 @@ const GeneralDetails = ({ isAadharUpdate }) => {
                         ) : null}
                         <View style={styles.feeNotice}>
                             <Icon name="information-circle-outline" size={17} color="#8A4A22" />
-                            <Text style={styles.feeNoticeText}>BookTheDay service fee: 3% for all orders.</Text>
+                            <Text style={styles.feeNoticeText}>BookTheDay service fee: 2%, capped at ₹10,000 per booking.</Text>
                         </View>
                         {/* <Text style={styles.discountlabel}>5% for orders above ₹30,000</Text> */}
 
